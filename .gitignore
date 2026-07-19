@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# TEPCO source files are publicly readable but marked redistribution-prohibited.
+# Keep them only in the local working copy; commit the documented screening result.
+data/external/tepco/*.zip
+data/external/tepco/*.csv

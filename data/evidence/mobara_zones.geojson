@@ -1,0 +1,1005 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "MOBARA-44",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.28506000000002,
+              35.44815
+            ],
+            [
+              140.28818,
+              35.44815
+            ],
+            [
+              140.28818,
+              35.4513
+            ],
+            [
+              140.28506000000002,
+              35.4513
+            ],
+            [
+              140.28506000000002,
+              35.44815
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 1,
+        "preferred_cells": 1,
+        "mean_solar_score": 74.0,
+        "action_score": 83,
+        "action": "优先土地与并网尽调",
+        "region": "mobara",
+        "zone_id": "MOBARA-44",
+        "embedding_change_score": 43.2,
+        "embedding_support_cells": 9,
+        "embedding_used_in_score": false,
+        "context_density": "sparse",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-12",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.27882,
+              35.4387
+            ],
+            [
+              140.28194,
+              35.4387
+            ],
+            [
+              140.28194,
+              35.44185
+            ],
+            [
+              140.27882,
+              35.44185
+            ],
+            [
+              140.27882,
+              35.4387
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 4,
+        "preferred_cells": 2,
+        "mean_solar_score": 88.2,
+        "action_score": 75,
+        "action": "优先土地与并网尽调",
+        "region": "mobara",
+        "zone_id": "MOBARA-12",
+        "embedding_change_score": 47.8,
+        "embedding_support_cells": 12,
+        "embedding_used_in_score": false,
+        "context_density": "dense",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-22",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.27882,
+              35.44185
+            ],
+            [
+              140.28194,
+              35.44185
+            ],
+            [
+              140.28194,
+              35.445
+            ],
+            [
+              140.27882,
+              35.445
+            ],
+            [
+              140.27882,
+              35.44185
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 6,
+        "preferred_cells": 4,
+        "mean_solar_score": 78.5,
+        "action_score": 74,
+        "action": "优先土地与并网尽调",
+        "region": "mobara",
+        "zone_id": "MOBARA-22",
+        "embedding_change_score": 66.3,
+        "embedding_support_cells": 9,
+        "embedding_used_in_score": false,
+        "context_density": "dense",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-31",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.2757,
+              35.445
+            ],
+            [
+              140.27882,
+              35.445
+            ],
+            [
+              140.27882,
+              35.44815
+            ],
+            [
+              140.2757,
+              35.44815
+            ],
+            [
+              140.2757,
+              35.445
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 3,
+        "preferred_cells": 2,
+        "mean_solar_score": 77.3,
+        "action_score": 74,
+        "action": "优先土地与并网尽调",
+        "region": "mobara",
+        "zone_id": "MOBARA-31",
+        "embedding_change_score": 45.7,
+        "embedding_support_cells": 12,
+        "embedding_used_in_score": false,
+        "context_density": "moderate",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-41",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.2757,
+              35.44815
+            ],
+            [
+              140.27882,
+              35.44815
+            ],
+            [
+              140.27882,
+              35.4513
+            ],
+            [
+              140.2757,
+              35.4513
+            ],
+            [
+              140.2757,
+              35.44815
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 2,
+        "preferred_cells": 1,
+        "mean_solar_score": 86.0,
+        "action_score": 73,
+        "action": "优先土地与并网尽调",
+        "region": "mobara",
+        "zone_id": "MOBARA-41",
+        "embedding_change_score": 63.0,
+        "embedding_support_cells": 9,
+        "embedding_used_in_score": false,
+        "context_density": "moderate",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-11",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.2757,
+              35.4387
+            ],
+            [
+              140.27882,
+              35.4387
+            ],
+            [
+              140.27882,
+              35.44185
+            ],
+            [
+              140.2757,
+              35.44185
+            ],
+            [
+              140.2757,
+              35.4387
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 4,
+        "preferred_cells": 2,
+        "mean_solar_score": 79.5,
+        "action_score": 69,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-11",
+        "embedding_change_score": 67.2,
+        "embedding_support_cells": 12,
+        "embedding_used_in_score": false,
+        "context_density": "dense",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-32",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.27882,
+              35.445
+            ],
+            [
+              140.28194,
+              35.445
+            ],
+            [
+              140.28194,
+              35.44815
+            ],
+            [
+              140.27882,
+              35.44815
+            ],
+            [
+              140.27882,
+              35.445
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 4,
+        "preferred_cells": 2,
+        "mean_solar_score": 77.8,
+        "action_score": 68,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-32",
+        "embedding_change_score": 69.4,
+        "embedding_support_cells": 12,
+        "embedding_used_in_score": false,
+        "context_density": "dense",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-45",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.28818,
+              35.44815
+            ],
+            [
+              140.2913,
+              35.44815
+            ],
+            [
+              140.2913,
+              35.4513
+            ],
+            [
+              140.28818,
+              35.4513
+            ],
+            [
+              140.28818,
+              35.44815
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 2,
+        "preferred_cells": 1,
+        "mean_solar_score": 75.0,
+        "action_score": 66,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-45",
+        "embedding_change_score": 74.2,
+        "embedding_support_cells": 9,
+        "embedding_used_in_score": false,
+        "context_density": "moderate",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-21",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.2757,
+              35.44185
+            ],
+            [
+              140.27882,
+              35.44185
+            ],
+            [
+              140.27882,
+              35.445
+            ],
+            [
+              140.2757,
+              35.445
+            ],
+            [
+              140.2757,
+              35.44185
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 6,
+        "preferred_cells": 3,
+        "mean_solar_score": 72.0,
+        "action_score": 64,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-21",
+        "embedding_change_score": 54.7,
+        "embedding_support_cells": 9,
+        "embedding_used_in_score": false,
+        "context_density": "dense",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-34",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.28506000000002,
+              35.445
+            ],
+            [
+              140.28818,
+              35.445
+            ],
+            [
+              140.28818,
+              35.44815
+            ],
+            [
+              140.28506000000002,
+              35.44815
+            ],
+            [
+              140.28506000000002,
+              35.445
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 2,
+        "preferred_cells": 1,
+        "mean_solar_score": 70.0,
+        "action_score": 63,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-34",
+        "embedding_change_score": 51.7,
+        "embedding_support_cells": 10,
+        "embedding_used_in_score": false,
+        "context_density": "moderate",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-42",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.27882,
+              35.44815
+            ],
+            [
+              140.28194,
+              35.44815
+            ],
+            [
+              140.28194,
+              35.4513
+            ],
+            [
+              140.27882,
+              35.4513
+            ],
+            [
+              140.27882,
+              35.44815
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 2,
+        "preferred_cells": 1,
+        "mean_solar_score": 70.0,
+        "action_score": 63,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-42",
+        "embedding_change_score": 47.4,
+        "embedding_support_cells": 9,
+        "embedding_used_in_score": false,
+        "context_density": "moderate",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-24",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.28506000000002,
+              35.44185
+            ],
+            [
+              140.28818,
+              35.44185
+            ],
+            [
+              140.28818,
+              35.445
+            ],
+            [
+              140.28506000000002,
+              35.445
+            ],
+            [
+              140.28506000000002,
+              35.44185
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 3,
+        "preferred_cells": 0,
+        "mean_solar_score": 85.3,
+        "action_score": 55,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-24",
+        "embedding_change_score": 71.3,
+        "embedding_support_cells": 6,
+        "embedding_used_in_score": false,
+        "context_density": "moderate",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-13",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.28194,
+              35.4387
+            ],
+            [
+              140.28506000000002,
+              35.4387
+            ],
+            [
+              140.28506000000002,
+              35.44185
+            ],
+            [
+              140.28194,
+              35.44185
+            ],
+            [
+              140.28194,
+              35.4387
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 4,
+        "preferred_cells": 0,
+        "mean_solar_score": 83.8,
+        "action_score": 54,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-13",
+        "embedding_change_score": 49.1,
+        "embedding_support_cells": 12,
+        "embedding_used_in_score": false,
+        "context_density": "dense",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-25",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.28818,
+              35.44185
+            ],
+            [
+              140.2913,
+              35.44185
+            ],
+            [
+              140.2913,
+              35.445
+            ],
+            [
+              140.28818,
+              35.445
+            ],
+            [
+              140.28818,
+              35.44185
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 6,
+        "preferred_cells": 0,
+        "mean_solar_score": 81.2,
+        "action_score": 53,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-25",
+        "embedding_change_score": 50.4,
+        "embedding_support_cells": 12,
+        "embedding_used_in_score": false,
+        "context_density": "dense",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-23",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.28194,
+              35.44185
+            ],
+            [
+              140.28506000000002,
+              35.44185
+            ],
+            [
+              140.28506000000002,
+              35.445
+            ],
+            [
+              140.28194,
+              35.445
+            ],
+            [
+              140.28194,
+              35.44185
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 5,
+        "preferred_cells": 0,
+        "mean_solar_score": 79.6,
+        "action_score": 52,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-23",
+        "embedding_change_score": 32.0,
+        "embedding_support_cells": 9,
+        "embedding_used_in_score": false,
+        "context_density": "dense",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-35",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.28818,
+              35.445
+            ],
+            [
+              140.2913,
+              35.445
+            ],
+            [
+              140.2913,
+              35.44815
+            ],
+            [
+              140.28818,
+              35.44815
+            ],
+            [
+              140.28818,
+              35.445
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 4,
+        "preferred_cells": 0,
+        "mean_solar_score": 78.5,
+        "action_score": 51,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-35",
+        "embedding_change_score": 69.0,
+        "embedding_support_cells": 14,
+        "embedding_used_in_score": false,
+        "context_density": "dense",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-14",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.28506000000002,
+              35.4387
+            ],
+            [
+              140.28818,
+              35.4387
+            ],
+            [
+              140.28818,
+              35.44185
+            ],
+            [
+              140.28506000000002,
+              35.44185
+            ],
+            [
+              140.28506000000002,
+              35.4387
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 2,
+        "preferred_cells": 0,
+        "mean_solar_score": 77.0,
+        "action_score": 50,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-14",
+        "embedding_change_score": 45.4,
+        "embedding_support_cells": 8,
+        "embedding_used_in_score": false,
+        "context_density": "moderate",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-15",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.28818,
+              35.4387
+            ],
+            [
+              140.2913,
+              35.4387
+            ],
+            [
+              140.2913,
+              35.44185
+            ],
+            [
+              140.28818,
+              35.44185
+            ],
+            [
+              140.28818,
+              35.4387
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 4,
+        "preferred_cells": 0,
+        "mean_solar_score": 75.0,
+        "action_score": 49,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-15",
+        "embedding_change_score": 22.2,
+        "embedding_support_cells": 16,
+        "embedding_used_in_score": false,
+        "context_density": "dense",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-33",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.28194,
+              35.445
+            ],
+            [
+              140.28506000000002,
+              35.445
+            ],
+            [
+              140.28506000000002,
+              35.44815
+            ],
+            [
+              140.28194,
+              35.44815
+            ],
+            [
+              140.28194,
+              35.445
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 4,
+        "preferred_cells": 1,
+        "mean_solar_score": 57.8,
+        "action_score": 46,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-33",
+        "embedding_change_score": 41.6,
+        "embedding_support_cells": 12,
+        "embedding_used_in_score": false,
+        "context_density": "dense",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "MOBARA-43",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              140.28194,
+              35.44815
+            ],
+            [
+              140.28506000000002,
+              35.44815
+            ],
+            [
+              140.28506000000002,
+              35.4513
+            ],
+            [
+              140.28194,
+              35.4513
+            ],
+            [
+              140.28194,
+              35.44815
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "solar_cells": 2,
+        "preferred_cells": 0,
+        "mean_solar_score": 48.0,
+        "action_score": 31,
+        "action": "保留观察",
+        "region": "mobara",
+        "zone_id": "MOBARA-43",
+        "embedding_change_score": 47.3,
+        "embedding_support_cells": 9,
+        "embedding_used_in_score": false,
+        "context_density": "moderate",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "generated_at": "2026-07-20",
+  "official_facilities": {
+    "source_rows_in_study_area": 2,
+    "source": "Yokohama City regional disaster prevention bases, updated 2026-04-01",
+    "license": "CC BY 4.0",
+    "important_note": "Official location is observed; roof match, PV capacity and resilience score are PoC proxies."
+  },
+  "satellite_embedding": {
+    "status": "integrated_observed",
+    "resolution_m": 10,
+    "years": [
+      2023,
+      2024
+    ],
+    "used_in_score": false,
+    "role": [
+      "annual change evidence",
+      "similarity features",
+      "future sparse-label transfer"
+    ]
+  },
+  "sparse_context_evidence": {
+    "source": "TsumiNa/geo_pfn docs/sparse-context-results.html",
+    "task": "Haneda Su prediction from whole-borehole context",
+    "query_boreholes": 48,
+    "context_boreholes": [
+      3,
+      6,
+      12,
+      25,
+      50,
+      100,
+      192
+    ],
+    "mid_sparse_regime": [
+      25,
+      50
+    ],
+    "geopfn_rmse_l": [
+      28.5,
+      24.65,
+      20.74,
+      20.03,
+      20.01,
+      18.92,
+      19.12
+    ],
+    "tabicl_rmse_l": [
+      24.74,
+      24.77,
+      21.09,
+      26.33,
+      24.01,
+      20.61,
+      19.24
+    ],
+    "hgbt_rmse_l": [
+      29.05,
+      22.74,
+      21.97,
+      21.47,
+      20.81,
+      19.67,
+      18.53
+    ],
+    "guardrail": "Mechanism evidence only; not transferred as an accuracy claim for surface-risk modules."
+  },
+  "scale_contract": [
+    {
+      "scale": "5–10 m",
+      "inputs": "GSI DEM / Satellite Embedding",
+      "role": "terrain and surface-change evidence"
+    },
+    {
+      "scale": "object",
+      "inputs": "buildings / roads / official facilities / solar cells",
+      "role": "actionable assets"
+    },
+    {
+      "scale": "100–300 m",
+      "inputs": "neighborhood context",
+      "role": "demand, access and service gap"
+    },
+    {
+      "scale": "region / portfolio",
+      "inputs": "grid gate / evidence coverage / project queue",
+      "role": "investment sequencing"
+    }
+  ]
+}

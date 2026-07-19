@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TerrAI Spatial Intelligence Platform</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="vendor/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">T</div>
+        <div><strong>TerrAI</strong><span>Spatial Intelligence</span></div>
+      </div>
+
+      <nav class="nav" aria-label="分析模块" data-i18n-aria="分析模块">
+        <p class="nav-label" data-i18n="统一工作台">统一工作台</p>
+        <button class="nav-item active" data-module="overview">
+          <span class="nav-icon">⌂</span><span data-i18n="双区域总览">双区域总览</span>
+        </button>
+        <button class="nav-item nav-joint" data-module="evidence">
+          <span class="nav-icon">◎</span><span data-i18n="多尺度证据">多尺度证据</span><b>10 m</b>
+        </button>
+        <p class="nav-label" data-i18n="横滨 · 城市韧性">横滨 · 城市韧性</p>
+        <button class="nav-item" data-module="slope">
+          <span class="nav-icon">△</span><span data-i18n="坡地暴露">坡地暴露</span><em>2,128</em>
+        </button>
+        <button class="nav-item" data-module="roads">
+          <span class="nav-icon">⌁</span><span data-i18n="道路韧性">道路韧性</span><em>272</em>
+        </button>
+        <button class="nav-item" data-module="facilities">
+          <span class="nav-icon">⌘</span><span data-i18n="官方设施韧性">官方设施韧性</span><em>2</em>
+        </button>
+        <button class="nav-item nav-joint" data-module="joint">
+          <span class="nav-icon">✣</span><span data-i18n="设施—道路—社区">设施—道路—社区</span><b data-i18n="同域">同域</b>
+        </button>
+        <p class="nav-label" data-i18n="茂原 · 新能源开发">茂原 · 新能源开发</p>
+        <button class="nav-item" data-module="solar">
+          <span class="nav-icon">☼</span><span data-i18n="光伏选址">光伏选址</span><em>70</em>
+        </button>
+        <button class="nav-item" data-module="development">
+          <span class="nav-icon">▧</span><span data-i18n="开发约束">开发约束</span><b>NEW</b>
+        </button>
+      </nav>
+
+      <div class="foundation-card">
+        <div class="foundation-title"><span class="pulse"></span><span data-i18n="数据底座在线">数据底座在线</span></div>
+        <div class="foundation-row"><span data-i18n="地形">地形</span><strong>GSI DEM5A</strong></div>
+        <div class="foundation-row"><span data-i18n="遥感表征">遥感表征</span><strong>Google AEF · 10 m</strong></div>
+        <div class="foundation-row"><span data-i18n="资产 / 道路">资产 / 道路</span><strong>OpenStreetMap</strong></div>
+        <div class="foundation-row"><span data-i18n="公共设施">公共设施</span><strong data-i18n="横滨市 · 2026">横滨市 · 2026</strong></div>
+        <div class="foundation-row"><span data-i18n="太阳能">太阳能</span><strong>NASA POWER</strong></div>
+        <small data-i18n="当前 Demo 零付费数据服务 · 来源状态可追溯">当前 Demo 零付费数据服务 · 来源状态可追溯</small>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div>
+          <span class="eyebrow" id="eyebrow">决策总览</span>
+          <h1 id="page-title">从单项筛查，到组合式空间决策</h1>
+        </div>
+        <div class="top-actions">
+          <div class="language-switcher" role="group" aria-label="Language">
+            <button class="language-button active" data-lang="zh" lang="zh">中</button>
+            <button class="language-button" data-lang="ja" lang="ja">日</button>
+            <button class="language-button" data-lang="en" lang="en">EN</button>
+          </div>
+          <span class="data-date" data-i18n="数据快照 · 2026-07">数据快照 · 2026-07</span>
+          <button class="region-pill" id="region-pill">横滨 · 保土谷区 <span>⌄</span></button>
+        </div>
+      </header>
+
+      <section class="hero-strip" id="hero-strip">
+        <div class="hero-copy">
+          <span class="hero-kicker" id="hero-kicker">JOINT INTELLIGENCE</span>
+          <h2 id="hero-title">把“风险在哪里”升级为“先在哪里联合行动”</h2>
+          <p id="hero-description">同一空间底座同时回答建筑风险、道路保障与清洁能源部署问题，并生成新的韧性投资对象。</p>
+          <div class="evidence-status" id="evidence-status"></div>
+        </div>
+        <div class="hero-formula" id="hero-formula">
+          <span>坡地暴露</span><i>＋</i><span>道路韧性</span><i>＋</i><span>光伏能力</span><i>→</i><strong>社区韧性枢纽</strong>
+        </div>
+      </section>
+
+      <section class="metrics" id="metrics" aria-label="关键指标" data-i18n-aria="关键指标"></section>
+
+      <section class="analysis-grid">
+        <div class="map-card">
+          <div class="map-toolbar">
+            <div class="view-tabs" id="view-tabs"></div>
+            <div class="map-tools">
+              <div class="basemap-switcher" id="basemap-switcher" aria-label="背景地图"></div>
+              <div class="map-legend" id="map-legend"></div>
+            </div>
+          </div>
+          <div id="map" aria-label="空间分析地图" data-i18n-aria="空间分析地图"></div>
+          <div class="map-note" id="map-note"></div>
+        </div>
+
+        <aside class="insight-panel">
+          <div class="panel-head">
+            <div><span class="eyebrow" id="queue-eyebrow">PRIORITY QUEUE</span><h3 id="queue-title">优先行动队列</h3></div>
+            <span class="queue-count" id="queue-count">—</span>
+          </div>
+          <div class="queue" id="queue"></div>
+          <div class="method-card" id="method-card"></div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <div class="audit-backdrop" id="audit-backdrop" hidden></div>
+  <aside class="audit-drawer" id="audit-drawer" aria-hidden="true" aria-labelledby="audit-title">
+    <div class="audit-head">
+      <div>
+        <span class="eyebrow" data-i18n="可审计详情">可审计详情</span>
+        <h2 id="audit-title">—</h2>
+      </div>
+      <button class="audit-close" id="audit-close" type="button" aria-label="关闭" data-i18n-aria="关闭">×</button>
+    </div>
+    <div class="audit-body">
+      <span class="audit-type" id="audit-type">—</span>
+      <div class="audit-value" id="audit-value">—</div>
+      <div class="audit-sections" id="audit-sections"></div>
+      <div class="audit-caveat"><strong data-i18n="如何理解">如何理解</strong><p id="audit-caveat"></p></div>
+    </div>
+  </aside>
+
+  <div class="loading" id="loading"><div class="loader"></div><span data-i18n="正在装载统一空间底座…">正在装载统一空间底座…</span></div>
+  <script src="vendor/leaflet.js"></script>
+  <script src="i18n.js"></script>
+  <script src="audit.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

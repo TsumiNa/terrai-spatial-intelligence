@@ -1,0 +1,22 @@
+{
+  "generated_at": "2026-07-19T18:51:25.137929+00:00",
+  "method": "PoC heuristic spatial multi-criteria analysis",
+  "resilience_hubs": {
+    "count": 30,
+    "priority_count": 30,
+    "pv_capacity_proxy_kwp": 2204,
+    "served_high_risk_building_links": 1345
+  },
+  "compound_corridors": {
+    "count": 150,
+    "priority_count": 79,
+    "road_length_km": 16.4,
+    "high_risk_building_links": 2587
+  },
+  "solar_delivery_cells": {
+    "count": 23,
+    "priority_count": 11,
+    "area_ha": 51.5
+  },
+  "important_note": "Counts describe screening relationships, not unique beneficiaries or engineering feasibility."
+}

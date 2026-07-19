@@ -1,0 +1,62 @@
+{
+  "generated_at": "2026-07-20",
+  "dataset": "Google Satellite Embedding V1 / AlphaEarth Foundations",
+  "license": "CC BY 4.0",
+  "attribution": "The AlphaEarth Foundations Satellite Embedding dataset is produced by Google and Google DeepMind.",
+  "years": [
+    2023,
+    2024
+  ],
+  "role": "Annual change evidence and similarity features; excluded from suitability scores until local validation.",
+  "source": "Source Cooperative public mirror (not officially supported by Google)",
+  "overlays": {
+    "yokohama": {
+      "bounds": [
+        [
+          35.4426965196261,
+          139.58341491403544
+        ],
+        [
+          35.450476958643925,
+          139.59341541473836
+        ]
+      ],
+      "change_image": "data/google/satellite_embedding/yokohama_change_2023_2024.png",
+      "latent_image": "data/google/satellite_embedding/yokohama_latent_2024.png"
+    },
+    "mobara": {
+      "bounds": [
+        [
+          35.43873665456753,
+          140.2756937257152
+        ],
+        [
+          35.451362496201114,
+          140.29133816066576
+        ]
+      ],
+      "change_image": "data/google/satellite_embedding/mobara_change_2023_2024.png",
+      "latent_image": "data/google/satellite_embedding/mobara_latent_2024.png"
+    }
+  },
+  "regions": {
+    "yokohama": {
+      "label": "横滨 · 保土谷区",
+      "pixel_count": 7820,
+      "valid_pct": 100.0,
+      "mean_cosine_change": 0.00969,
+      "p95_cosine_change": 0.01606,
+      "source_vrt_2023": "tge-labs/aef/v1/annual/2023/54N/x9q74gwv3o090ncty-0000008192-0000000000.vrt",
+      "source_vrt_2024": "tge-labs/aef/v1/annual/2024/54N/xk952h40spwd777ys-0000008192-0000000000.vrt"
+    },
+    "mobara": {
+      "label": "千叶 · 茂原市",
+      "pixel_count": 19877,
+      "valid_pct": 100.0,
+      "mean_cosine_change": 0.02278,
+      "p95_cosine_change": 0.04355,
+      "source_vrt_2023": "tge-labs/aef/v1/annual/2023/54N/x9q74gwv3o090ncty-0000008192-0000008192.vrt",
+      "source_vrt_2024": "tge-labs/aef/v1/annual/2024/54N/xk952h40spwd777ys-0000008192-0000008192.vrt"
+    }
+  }
+}

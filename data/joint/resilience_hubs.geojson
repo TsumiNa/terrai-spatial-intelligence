@@ -1,0 +1,2803 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": 303178545,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5893536,
+              35.4477555
+            ],
+            [
+              139.5891628,
+              35.4473436
+            ],
+            [
+              139.5892421,
+              35.4473192
+            ],
+            [
+              139.5892496,
+              35.4473354
+            ],
+            [
+              139.589305,
+              35.4473183
+            ],
+            [
+              139.5893307,
+              35.4473738
+            ],
+            [
+              139.5892978,
+              35.4473839
+            ],
+            [
+              139.5893102,
+              35.4474107
+            ],
+            [
+              139.5892948,
+              35.4474154
+            ],
+            [
+              139.58944,
+              35.4477289
+            ],
+            [
+              139.5893536,
+              35.4477555
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 303178545,
+        "building": "house",
+        "name": "Building 303178545",
+        "levels": null,
+        "footprint_m2": 444,
+        "centroid": [
+          139.589299,
+          35.447438
+        ],
+        "elevation_m": 17.6,
+        "slope_deg": 7.3,
+        "local_relief_m": 16.7,
+        "low_point_m": 3.5,
+        "dem_source": "DEM5A",
+        "risk_score": 52,
+        "risk_band": "medium",
+        "slope_component": 41,
+        "relief_component": 70,
+        "low_point_component": 58,
+        "hub_score": 92,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 53.3,
+        "served_high_risk_buildings": 51,
+        "nearest_road_m": 10,
+        "nearest_road_name": "Road 125705167",
+        "nearest_road_priority": 85,
+        "pv_component": 100,
+        "access_component": 88,
+        "community_need_component": 100,
+        "site_safety_component": 48,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 362367592,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5850208,
+              35.4501962
+            ],
+            [
+              139.5855544,
+              35.4498262
+            ],
+            [
+              139.585384,
+              35.4496665
+            ],
+            [
+              139.5855684,
+              35.4495359
+            ],
+            [
+              139.5854478,
+              35.4494228
+            ],
+            [
+              139.585407,
+              35.4493827
+            ],
+            [
+              139.5851279,
+              35.4495762
+            ],
+            [
+              139.5853112,
+              35.4497516
+            ],
+            [
+              139.5852474,
+              35.4497959
+            ],
+            [
+              139.5852336,
+              35.4497827
+            ],
+            [
+              139.5848931,
+              35.4500188
+            ],
+            [
+              139.5849057,
+              35.4500309
+            ],
+            [
+              139.5848722,
+              35.450054
+            ],
+            [
+              139.5849268,
+              35.4501062
+            ],
+            [
+              139.5849588,
+              35.4501368
+            ],
+            [
+              139.5850208,
+              35.4501962
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 362367592,
+        "building": "school",
+        "name": "Building 362367592",
+        "levels": null,
+        "footprint_m2": 2167,
+        "centroid": [
+          139.585191,
+          35.449819
+        ],
+        "elevation_m": 64.3,
+        "slope_deg": 6.0,
+        "local_relief_m": 11.1,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 32,
+        "risk_band": "low",
+        "slope_component": 33,
+        "relief_component": 46,
+        "low_point_component": 0,
+        "hub_score": 92,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 260.0,
+        "served_high_risk_buildings": 28,
+        "nearest_road_m": 9,
+        "nearest_road_name": "Road 158525946",
+        "nearest_road_priority": 76,
+        "pv_component": 100,
+        "access_component": 82,
+        "community_need_component": 100,
+        "site_safety_component": 68,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 469656952,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5843377,
+              35.4442951
+            ],
+            [
+              139.5844169,
+              35.444283
+            ],
+            [
+              139.5844132,
+              35.4442605
+            ],
+            [
+              139.5853905,
+              35.443999
+            ],
+            [
+              139.5854817,
+              35.4443082
+            ],
+            [
+              139.5853985,
+              35.4443278
+            ],
+            [
+              139.5853301,
+              35.444318
+            ],
+            [
+              139.5853087,
+              35.4443224
+            ],
+            [
+              139.5852698,
+              35.4441727
+            ],
+            [
+              139.5852487,
+              35.4441797
+            ],
+            [
+              139.5852577,
+              35.4442164
+            ],
+            [
+              139.5852269,
+              35.444224
+            ],
+            [
+              139.5852192,
+              35.4441928
+            ],
+            [
+              139.5849282,
+              35.4442573
+            ],
+            [
+              139.5849452,
+              35.4442951
+            ],
+            [
+              139.5849135,
+              35.4442999
+            ],
+            [
+              139.5849023,
+              35.4442634
+            ],
+            [
+              139.5846788,
+              35.444313
+            ],
+            [
+              139.584681,
+              35.4443257
+            ],
+            [
+              139.5846426,
+              35.4443348
+            ],
+            [
+              139.5846542,
+              35.4443661
+            ],
+            [
+              139.5846291,
+              35.4443764
+            ],
+            [
+              139.5846167,
+              35.4443519
+            ],
+            [
+              139.5845058,
+              35.4443764
+            ],
+            [
+              139.5845241,
+              35.4444426
+            ],
+            [
+              139.5843864,
+              35.4444801
+            ],
+            [
+              139.5843645,
+              35.4444273
+            ],
+            [
+              139.5844839,
+              35.4443989
+            ],
+            [
+              139.584483,
+              35.4443807
+            ],
+            [
+              139.5844132,
+              35.444396
+            ],
+            [
+              139.5844075,
+              35.4443792
+            ],
+            [
+              139.5843726,
+              35.4443901
+            ],
+            [
+              139.5843377,
+              35.4442951
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 469656952,
+        "building": "apartments",
+        "name": "Building 469656952",
+        "levels": null,
+        "footprint_m2": 1856,
+        "centroid": [
+          139.584807,
+          35.444311
+        ],
+        "elevation_m": 35.4,
+        "slope_deg": 6.6,
+        "local_relief_m": 26.8,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 50,
+        "risk_band": "medium",
+        "slope_component": 37,
+        "relief_component": 100,
+        "low_point_component": 0,
+        "hub_score": 90,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 222.7,
+        "served_high_risk_buildings": 57,
+        "nearest_road_m": 25,
+        "nearest_road_name": "東伸坂",
+        "nearest_road_priority": 81,
+        "pv_component": 100,
+        "access_component": 82,
+        "community_need_component": 100,
+        "site_safety_component": 50,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 303176240,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5885134,
+              35.4498364
+            ],
+            [
+              139.588511,
+              35.44982
+            ],
+            [
+              139.5885259,
+              35.4498191
+            ],
+            [
+              139.5885246,
+              35.4497658
+            ],
+            [
+              139.5884956,
+              35.4497646
+            ],
+            [
+              139.5884936,
+              35.4497054
+            ],
+            [
+              139.5880373,
+              35.4497167
+            ],
+            [
+              139.5880363,
+              35.4497695
+            ],
+            [
+              139.5880065,
+              35.4497752
+            ],
+            [
+              139.5880082,
+              35.4497949
+            ],
+            [
+              139.5879844,
+              35.449803
+            ],
+            [
+              139.5879858,
+              35.4498474
+            ],
+            [
+              139.5885134,
+              35.4498364
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 303176240,
+        "building": "house",
+        "name": "桜ヶ丘グリーンハイツ 2号",
+        "levels": null,
+        "footprint_m2": 655,
+        "centroid": [
+          139.58826,
+          35.449785
+        ],
+        "elevation_m": 51.7,
+        "slope_deg": 7.0,
+        "local_relief_m": 20.3,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 47,
+        "risk_band": "low",
+        "slope_component": 39,
+        "relief_component": 85,
+        "low_point_component": 0,
+        "hub_score": 90,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 78.6,
+        "served_high_risk_buildings": 18,
+        "nearest_road_m": 21,
+        "nearest_road_name": "Road 158515028",
+        "nearest_road_priority": 77,
+        "pv_component": 100,
+        "access_component": 80,
+        "community_need_component": 100,
+        "site_safety_component": 53,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 303012795,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5885338,
+              35.4471068
+            ],
+            [
+              139.5884909,
+              35.4469641
+            ],
+            [
+              139.5883457,
+              35.4469931
+            ],
+            [
+              139.588319,
+              35.4469042
+            ],
+            [
+              139.5885914,
+              35.4468498
+            ],
+            [
+              139.588661,
+              35.4470814
+            ],
+            [
+              139.5885338,
+              35.4471068
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 303012795,
+        "building": "apartments",
+        "name": "Building 303012795",
+        "levels": null,
+        "footprint_m2": 452,
+        "centroid": [
+          139.58849,
+          35.446983
+        ],
+        "elevation_m": 14.7,
+        "slope_deg": 7.5,
+        "local_relief_m": 10.3,
+        "low_point_m": 1.6,
+        "dem_source": "DEM5A",
+        "risk_score": 40,
+        "risk_band": "low",
+        "slope_component": 42,
+        "relief_component": 43,
+        "low_point_component": 27,
+        "hub_score": 90,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 54.2,
+        "served_high_risk_buildings": 19,
+        "nearest_road_m": 16,
+        "nearest_road_name": "Road 158516313",
+        "nearest_road_priority": 69,
+        "pv_component": 100,
+        "access_component": 76,
+        "community_need_component": 100,
+        "site_safety_component": 60,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 470106458,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5874692,
+              35.4443508
+            ],
+            [
+              139.5874933,
+              35.4443312
+            ],
+            [
+              139.5874974,
+              35.4443137
+            ],
+            [
+              139.5875362,
+              35.4442853
+            ],
+            [
+              139.5875698,
+              35.4442744
+            ],
+            [
+              139.587679,
+              35.4443603
+            ],
+            [
+              139.5877052,
+              35.4443454
+            ],
+            [
+              139.5877347,
+              35.4443541
+            ],
+            [
+              139.587789,
+              35.4444051
+            ],
+            [
+              139.587838,
+              35.4444492
+            ],
+            [
+              139.5878225,
+              35.4444619
+            ],
+            [
+              139.5878453,
+              35.444499
+            ],
+            [
+              139.5878192,
+              35.4445322
+            ],
+            [
+              139.5878232,
+              35.4445529
+            ],
+            [
+              139.5877622,
+              35.4445974
+            ],
+            [
+              139.5876878,
+              35.4445201
+            ],
+            [
+              139.5876677,
+              35.4445343
+            ],
+            [
+              139.5876207,
+              35.4444917
+            ],
+            [
+              139.5876341,
+              35.444483
+            ],
+            [
+              139.5875376,
+              35.4443967
+            ],
+            [
+              139.5875234,
+              35.444404
+            ],
+            [
+              139.5874692,
+              35.4443508
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 470106458,
+        "building": "house",
+        "name": "Building 470106458",
+        "levels": null,
+        "footprint_m2": 549,
+        "centroid": [
+          139.587669,
+          35.444426
+        ],
+        "elevation_m": 38.4,
+        "slope_deg": 11.2,
+        "local_relief_m": 36.3,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 64,
+        "risk_band": "medium",
+        "slope_component": 62,
+        "relief_component": 100,
+        "low_point_component": 0,
+        "hub_score": 89,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 65.9,
+        "served_high_risk_buildings": 73,
+        "nearest_road_m": 14,
+        "nearest_road_name": "Road 175560129",
+        "nearest_road_priority": 79,
+        "pv_component": 100,
+        "access_component": 83,
+        "community_need_component": 100,
+        "site_safety_component": 36,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 303176241,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5884222,
+              35.4496178
+            ],
+            [
+              139.5885435,
+              35.4495397
+            ],
+            [
+              139.5883665,
+              35.4493683
+            ],
+            [
+              139.5883004,
+              35.4494143
+            ],
+            [
+              139.5882614,
+              35.4493745
+            ],
+            [
+              139.5882118,
+              35.4494147
+            ],
+            [
+              139.5882385,
+              35.4494338
+            ],
+            [
+              139.588214,
+              35.4494565
+            ],
+            [
+              139.5882264,
+              35.4494654
+            ],
+            [
+              139.5882572,
+              35.449448
+            ],
+            [
+              139.5884222,
+              35.4496178
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 303176241,
+        "building": "house",
+        "name": "桜ヶ丘グリーンハイツ 4号",
+        "levels": null,
+        "footprint_m2": 374,
+        "centroid": [
+          139.588304,
+          35.449453
+        ],
+        "elevation_m": 50.2,
+        "slope_deg": 7.4,
+        "local_relief_m": 14.3,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 40,
+        "risk_band": "low",
+        "slope_component": 41,
+        "relief_component": 60,
+        "low_point_component": 0,
+        "hub_score": 89,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 44.9,
+        "served_high_risk_buildings": 32,
+        "nearest_road_m": 13,
+        "nearest_road_name": "Road 365800326",
+        "nearest_road_priority": 61,
+        "pv_component": 100,
+        "access_component": 72,
+        "community_need_component": 100,
+        "site_safety_component": 60,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 303176247,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.587453,
+              35.4484699
+            ],
+            [
+              139.5874274,
+              35.4484561
+            ],
+            [
+              139.5874534,
+              35.448412
+            ],
+            [
+              139.5874806,
+              35.4484263
+            ],
+            [
+              139.5875259,
+              35.4483551
+            ],
+            [
+              139.5878846,
+              35.4485063
+            ],
+            [
+              139.5878447,
+              35.4485692
+            ],
+            [
+              139.587874,
+              35.4485845
+            ],
+            [
+              139.5878481,
+              35.4486228
+            ],
+            [
+              139.5878647,
+              35.4486287
+            ],
+            [
+              139.5878522,
+              35.4486433
+            ],
+            [
+              139.5878237,
+              35.4486277
+            ],
+            [
+              139.587807,
+              35.4486557
+            ],
+            [
+              139.587795,
+              35.4486505
+            ],
+            [
+              139.5878117,
+              35.4486211
+            ],
+            [
+              139.587453,
+              35.4484699
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 303176247,
+        "building": "house",
+        "name": "桜ヶ丘グリーンハイツ 8号",
+        "levels": null,
+        "footprint_m2": 569,
+        "centroid": [
+          139.587716,
+          35.448549
+        ],
+        "elevation_m": 47.8,
+        "slope_deg": 1.8,
+        "local_relief_m": 20.9,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 32,
+        "risk_band": "low",
+        "slope_component": 10,
+        "relief_component": 87,
+        "low_point_component": 0,
+        "hub_score": 89,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 68.3,
+        "served_high_risk_buildings": 77,
+        "nearest_road_m": 17,
+        "nearest_road_name": "Road 158516312",
+        "nearest_road_priority": 60,
+        "pv_component": 100,
+        "access_component": 70,
+        "community_need_component": 100,
+        "site_safety_component": 68,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 303176245,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5874803,
+              35.4487698
+            ],
+            [
+              139.5875471,
+              35.448654
+            ],
+            [
+              139.5877844,
+              35.4487448
+            ],
+            [
+              139.5877454,
+              35.4488123
+            ],
+            [
+              139.5877844,
+              35.4488292
+            ],
+            [
+              139.5877512,
+              35.4488747
+            ],
+            [
+              139.5877307,
+              35.448891
+            ],
+            [
+              139.5877112,
+              35.4488829
+            ],
+            [
+              139.5877175,
+              35.4488606
+            ],
+            [
+              139.5874803,
+              35.4487698
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 303176245,
+        "building": "house",
+        "name": "桜ヶ丘グリーンハイツ 7号",
+        "levels": null,
+        "footprint_m2": 366,
+        "centroid": [
+          139.587695,
+          35.448813
+        ],
+        "elevation_m": 48.0,
+        "slope_deg": 3.1,
+        "local_relief_m": 17.2,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 31,
+        "risk_band": "low",
+        "slope_component": 17,
+        "relief_component": 72,
+        "low_point_component": 0,
+        "hub_score": 89,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 43.9,
+        "served_high_risk_buildings": 76,
+        "nearest_road_m": 12,
+        "nearest_road_name": "Road 158516312",
+        "nearest_road_priority": 60,
+        "pv_component": 98,
+        "access_component": 71,
+        "community_need_component": 100,
+        "site_safety_component": 69,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 303176238,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5874956,
+              35.4498953
+            ],
+            [
+              139.58753,
+              35.4497717
+            ],
+            [
+              139.5877982,
+              35.4498168
+            ],
+            [
+              139.5877827,
+              35.4498772
+            ],
+            [
+              139.5878071,
+              35.4498817
+            ],
+            [
+              139.5877966,
+              35.4499234
+            ],
+            [
+              139.5878251,
+              35.4499327
+            ],
+            [
+              139.5878218,
+              35.4499519
+            ],
+            [
+              139.5877651,
+              35.449946
+            ],
+            [
+              139.5874956,
+              35.4498953
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 303176238,
+        "building": "house",
+        "name": "桜ヶ丘グリーンハイツ 1号",
+        "levels": null,
+        "footprint_m2": 383,
+        "centroid": [
+          139.587736,
+          35.449889
+        ],
+        "elevation_m": 52.5,
+        "slope_deg": 3.4,
+        "local_relief_m": 13.5,
+        "low_point_m": 0.8,
+        "dem_source": "DEM5A",
+        "risk_score": 29,
+        "risk_band": "low",
+        "slope_component": 19,
+        "relief_component": 56,
+        "low_point_component": 13,
+        "hub_score": 89,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 46.0,
+        "served_high_risk_buildings": 22,
+        "nearest_road_m": 15,
+        "nearest_road_name": "Road 125735231",
+        "nearest_road_priority": 57,
+        "pv_component": 100,
+        "access_component": 69,
+        "community_need_component": 100,
+        "site_safety_component": 71,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 303176239,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5875587,
+              35.4496549
+            ],
+            [
+              139.5875939,
+              35.4495316
+            ],
+            [
+              139.5878554,
+              35.4495809
+            ],
+            [
+              139.5878429,
+              35.4496307
+            ],
+            [
+              139.5878696,
+              35.4496427
+            ],
+            [
+              139.5878593,
+              35.4496821
+            ],
+            [
+              139.5878941,
+              35.4496941
+            ],
+            [
+              139.587885,
+              35.4497121
+            ],
+            [
+              139.5878237,
+              35.4497004
+            ],
+            [
+              139.5875587,
+              35.4496549
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 303176239,
+        "building": "house",
+        "name": "桜ヶ丘グリーンハイツ 3号",
+        "levels": null,
+        "footprint_m2": 366,
+        "centroid": [
+          139.587798,
+          35.449648
+        ],
+        "elevation_m": 51.8,
+        "slope_deg": 1.9,
+        "local_relief_m": 15.3,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 25,
+        "risk_band": "low",
+        "slope_component": 11,
+        "relief_component": 64,
+        "low_point_component": 0,
+        "hub_score": 89,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 43.9,
+        "served_high_risk_buildings": 34,
+        "nearest_road_m": 15,
+        "nearest_road_name": "Road 125735231",
+        "nearest_road_priority": 57,
+        "pv_component": 98,
+        "access_component": 69,
+        "community_need_component": 100,
+        "site_safety_component": 75,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 303249912,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5862989,
+              35.4463238
+            ],
+            [
+              139.586403,
+              35.4463082
+            ],
+            [
+              139.5864602,
+              35.4465619
+            ],
+            [
+              139.5864146,
+              35.4465687
+            ],
+            [
+              139.5864185,
+              35.446586
+            ],
+            [
+              139.5864918,
+              35.446575
+            ],
+            [
+              139.5865482,
+              35.4468252
+            ],
+            [
+              139.5864438,
+              35.4468409
+            ],
+            [
+              139.5864317,
+              35.4467874
+            ],
+            [
+              139.5863876,
+              35.446794
+            ],
+            [
+              139.5863932,
+              35.4468186
+            ],
+            [
+              139.5863622,
+              35.4468232
+            ],
+            [
+              139.5863146,
+              35.4466119
+            ],
+            [
+              139.5862927,
+              35.4466151
+            ],
+            [
+              139.5862861,
+              35.446586
+            ],
+            [
+              139.5863259,
+              35.44658
+            ],
+            [
+              139.5863296,
+              35.4465963
+            ],
+            [
+              139.5863593,
+              35.4465919
+            ],
+            [
+              139.5862989,
+              35.4463238
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 303249912,
+        "building": "school",
+        "name": "Building 303249912",
+        "levels": null,
+        "footprint_m2": 730,
+        "centroid": [
+          139.586387,
+          35.446633
+        ],
+        "elevation_m": 17.5,
+        "slope_deg": 1.1,
+        "local_relief_m": 12.3,
+        "low_point_m": 0.7,
+        "dem_source": "DEM5A",
+        "risk_score": 20,
+        "risk_band": "low",
+        "slope_component": 6,
+        "relief_component": 51,
+        "low_point_component": 12,
+        "hub_score": 89,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 87.6,
+        "served_high_risk_buildings": 24,
+        "nearest_road_m": 10,
+        "nearest_road_name": "Road 125735204",
+        "nearest_road_priority": 50,
+        "pv_component": 100,
+        "access_component": 65,
+        "community_need_component": 100,
+        "site_safety_component": 80,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 362367591,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5855544,
+              35.4498262
+            ],
+            [
+              139.5856184,
+              35.4498862
+            ],
+            [
+              139.5858565,
+              35.4497176
+            ],
+            [
+              139.5858839,
+              35.4497432
+            ],
+            [
+              139.5859701,
+              35.4496822
+            ],
+            [
+              139.5859318,
+              35.4496462
+            ],
+            [
+              139.5859485,
+              35.4496344
+            ],
+            [
+              139.5857107,
+              35.4494115
+            ],
+            [
+              139.5856292,
+              35.4494692
+            ],
+            [
+              139.5855931,
+              35.4494354
+            ],
+            [
+              139.5855465,
+              35.4494683
+            ],
+            [
+              139.5854764,
+              35.4494026
+            ],
+            [
+              139.5854478,
+              35.4494228
+            ],
+            [
+              139.5855684,
+              35.4495359
+            ],
+            [
+              139.585384,
+              35.4496665
+            ],
+            [
+              139.5855544,
+              35.4498262
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 362367591,
+        "building": "school",
+        "name": "Building 362367591",
+        "levels": null,
+        "footprint_m2": 1477,
+        "centroid": [
+          139.585675,
+          35.449597
+        ],
+        "elevation_m": 64.4,
+        "slope_deg": 0.3,
+        "local_relief_m": 13.4,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 18,
+        "risk_band": "low",
+        "slope_component": 2,
+        "relief_component": 56,
+        "low_point_component": 0,
+        "hub_score": 88,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 177.2,
+        "served_high_risk_buildings": 42,
+        "nearest_road_m": 17,
+        "nearest_road_name": "Road 362367600",
+        "nearest_road_priority": 41,
+        "pv_component": 100,
+        "access_component": 58,
+        "community_need_component": 100,
+        "site_safety_component": 82,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 469829866,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5857848,
+              35.444991
+            ],
+            [
+              139.5858049,
+              35.4449156
+            ],
+            [
+              139.5857848,
+              35.4449112
+            ],
+            [
+              139.5857929,
+              35.4448675
+            ],
+            [
+              139.5858143,
+              35.4448686
+            ],
+            [
+              139.5858505,
+              35.4447736
+            ],
+            [
+              139.5858029,
+              35.4447491
+            ],
+            [
+              139.5858291,
+              35.4446796
+            ],
+            [
+              139.5857888,
+              35.4446698
+            ],
+            [
+              139.5858358,
+              35.4444567
+            ],
+            [
+              139.585923,
+              35.4443781
+            ],
+            [
+              139.5860611,
+              35.4444032
+            ],
+            [
+              139.5859833,
+              35.4446742
+            ],
+            [
+              139.5860101,
+              35.4446807
+            ],
+            [
+              139.5859987,
+              35.4447098
+            ],
+            [
+              139.5859739,
+              35.4447102
+            ],
+            [
+              139.5859431,
+              35.4448064
+            ],
+            [
+              139.5859685,
+              35.4448151
+            ],
+            [
+              139.5859189,
+              35.4449571
+            ],
+            [
+              139.585935,
+              35.4449626
+            ],
+            [
+              139.5859149,
+              35.4450216
+            ],
+            [
+              139.5857848,
+              35.444991
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 469829866,
+        "building": "apartments",
+        "name": "Building 469829866",
+        "levels": null,
+        "footprint_m2": 1038,
+        "centroid": [
+          139.585891,
+          35.444762
+        ],
+        "elevation_m": 19.1,
+        "slope_deg": 7.5,
+        "local_relief_m": 28.0,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 53,
+        "risk_band": "medium",
+        "slope_component": 42,
+        "relief_component": 100,
+        "low_point_component": 0,
+        "hub_score": 87,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 124.6,
+        "served_high_risk_buildings": 61,
+        "nearest_road_m": 28,
+        "nearest_road_name": "Road 175568347",
+        "nearest_road_priority": 62,
+        "pv_component": 100,
+        "access_component": 69,
+        "community_need_component": 100,
+        "site_safety_component": 47,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 303176243,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5879063,
+              35.4490037
+            ],
+            [
+              139.5878861,
+              35.449038
+            ],
+            [
+              139.5878483,
+              35.4490211
+            ],
+            [
+              139.5879154,
+              35.4489001
+            ],
+            [
+              139.5879591,
+              35.4489129
+            ],
+            [
+              139.5879702,
+              35.4488913
+            ],
+            [
+              139.5882704,
+              35.448994
+            ],
+            [
+              139.588235,
+              35.4490626
+            ],
+            [
+              139.5882716,
+              35.4490735
+            ],
+            [
+              139.5882429,
+              35.4491187
+            ],
+            [
+              139.58821,
+              35.4491111
+            ],
+            [
+              139.5879063,
+              35.4490037
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 303176243,
+        "building": "house",
+        "name": "桜ヶ丘グリーンハイツ 6号",
+        "levels": null,
+        "footprint_m2": 494,
+        "centroid": [
+          139.588065,
+          35.449012
+        ],
+        "elevation_m": 41.7,
+        "slope_deg": 6.0,
+        "local_relief_m": 21.3,
+        "low_point_m": 2.7,
+        "dem_source": "DEM5A",
+        "risk_score": 52,
+        "risk_band": "medium",
+        "slope_component": 33,
+        "relief_component": 89,
+        "low_point_component": 45,
+        "hub_score": 87,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 59.3,
+        "served_high_risk_buildings": 65,
+        "nearest_road_m": 20,
+        "nearest_road_name": "Road 365800326",
+        "nearest_road_priority": 61,
+        "pv_component": 100,
+        "access_component": 70,
+        "community_need_component": 100,
+        "site_safety_component": 48,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 362368640,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5899083,
+              35.4499618
+            ],
+            [
+              139.5898894,
+              35.4501265
+            ],
+            [
+              139.5902753,
+              35.4501558
+            ],
+            [
+              139.5902766,
+              35.4501449
+            ],
+            [
+              139.5903173,
+              35.450148
+            ],
+            [
+              139.5903311,
+              35.4500278
+            ],
+            [
+              139.5902908,
+              35.4500248
+            ],
+            [
+              139.5902947,
+              35.4499912
+            ],
+            [
+              139.5899083,
+              35.4499618
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 362368640,
+        "building": "yes",
+        "name": "Building 362368640",
+        "levels": null,
+        "footprint_m2": 696,
+        "centroid": [
+          139.590198,
+          35.450073
+        ],
+        "elevation_m": 56.0,
+        "slope_deg": 6.0,
+        "local_relief_m": 15.4,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 38,
+        "risk_band": "low",
+        "slope_component": 33,
+        "relief_component": 64,
+        "low_point_component": 0,
+        "hub_score": 87,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 83.5,
+        "served_high_risk_buildings": 22,
+        "nearest_road_m": 14,
+        "nearest_road_name": "Road 125705256",
+        "nearest_road_priority": 47,
+        "pv_component": 100,
+        "access_component": 62,
+        "community_need_component": 100,
+        "site_safety_component": 62,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 303176708,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5842272,
+              35.4476047
+            ],
+            [
+              139.584354,
+              35.4475176
+            ],
+            [
+              139.5841824,
+              35.4473518
+            ],
+            [
+              139.5840186,
+              35.4474642
+            ],
+            [
+              139.5840503,
+              35.4474949
+            ],
+            [
+              139.5840874,
+              35.4474695
+            ],
+            [
+              139.5842272,
+              35.4476047
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 303176708,
+        "building": "apartments",
+        "name": "保土ヶ谷オークヒルズ 1番館",
+        "levels": null,
+        "footprint_m2": 382,
+        "centroid": [
+          139.584153,
+          35.447484
+        ],
+        "elevation_m": 38.2,
+        "slope_deg": 10.6,
+        "local_relief_m": 23.1,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 61,
+        "risk_band": "medium",
+        "slope_component": 59,
+        "relief_component": 96,
+        "low_point_component": 0,
+        "hub_score": 85,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 45.8,
+        "served_high_risk_buildings": 31,
+        "nearest_road_m": 12,
+        "nearest_road_name": "Road 158903639",
+        "nearest_road_priority": 47,
+        "pv_component": 100,
+        "access_component": 63,
+        "community_need_component": 100,
+        "site_safety_component": 39,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 470101271,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5875081,
+              35.4440504
+            ],
+            [
+              139.5875483,
+              35.4439958
+            ],
+            [
+              139.5879714,
+              35.4441888
+            ],
+            [
+              139.5879271,
+              35.4442456
+            ],
+            [
+              139.5875081,
+              35.4440504
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 470101271,
+        "building": "house",
+        "name": "Building 470101271",
+        "levels": null,
+        "footprint_m2": 319,
+        "centroid": [
+          139.587739,
+          35.44412
+        ],
+        "elevation_m": 45.7,
+        "slope_deg": 9.6,
+        "local_relief_m": 28.1,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 59,
+        "risk_band": "medium",
+        "slope_component": 53,
+        "relief_component": 100,
+        "low_point_component": 0,
+        "hub_score": 85,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 38.3,
+        "served_high_risk_buildings": 84,
+        "nearest_road_m": 16,
+        "nearest_road_name": "Road 175560129",
+        "nearest_road_priority": 79,
+        "pv_component": 85,
+        "access_component": 83,
+        "community_need_component": 100,
+        "site_safety_component": 41,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 303176709,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.584492,
+              35.4475737
+            ],
+            [
+              139.5844611,
+              35.4475693
+            ],
+            [
+              139.5844271,
+              35.4475364
+            ],
+            [
+              139.5844476,
+              35.4475224
+            ],
+            [
+              139.5843401,
+              35.4474184
+            ],
+            [
+              139.5846824,
+              35.4471837
+            ],
+            [
+              139.5847253,
+              35.4471891
+            ],
+            [
+              139.5848616,
+              35.447322
+            ],
+            [
+              139.584492,
+              35.4475737
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 303176709,
+        "building": "apartments",
+        "name": "保土ヶ谷オークヒルズ 2番館",
+        "levels": null,
+        "footprint_m2": 965,
+        "centroid": [
+          139.584555,
+          35.447414
+        ],
+        "elevation_m": 40.7,
+        "slope_deg": 7.7,
+        "local_relief_m": 22.8,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 52,
+        "risk_band": "medium",
+        "slope_component": 43,
+        "relief_component": 95,
+        "low_point_component": 0,
+        "hub_score": 85,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 115.8,
+        "served_high_risk_buildings": 35,
+        "nearest_road_m": 16,
+        "nearest_road_name": "Road 158903639",
+        "nearest_road_priority": 47,
+        "pv_component": 100,
+        "access_component": 62,
+        "community_need_component": 100,
+        "site_safety_component": 48,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 438798274,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5875577,
+              35.4491787
+            ],
+            [
+              139.5875846,
+              35.449182
+            ],
+            [
+              139.5875953,
+              35.4491317
+            ],
+            [
+              139.5876784,
+              35.4491426
+            ],
+            [
+              139.5876758,
+              35.4491907
+            ],
+            [
+              139.5876315,
+              35.4494267
+            ],
+            [
+              139.5875175,
+              35.4494081
+            ],
+            [
+              139.5875577,
+              35.4491787
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 438798274,
+        "building": "apartments",
+        "name": "Building 438798274",
+        "levels": null,
+        "footprint_m2": 322,
+        "centroid": [
+          139.587606,
+          35.449237
+        ],
+        "elevation_m": 49.2,
+        "slope_deg": 4.3,
+        "local_relief_m": 17.5,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 35,
+        "risk_band": "low",
+        "slope_component": 24,
+        "relief_component": 73,
+        "low_point_component": 0,
+        "hub_score": 85,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 38.6,
+        "served_high_risk_buildings": 63,
+        "nearest_road_m": 10,
+        "nearest_road_name": "Road 158516312",
+        "nearest_road_priority": 60,
+        "pv_component": 86,
+        "access_component": 72,
+        "community_need_component": 100,
+        "site_safety_component": 65,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 470090458,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5877066,
+              35.4431981
+            ],
+            [
+              139.5877897,
+              35.4431566
+            ],
+            [
+              139.5878004,
+              35.4431643
+            ],
+            [
+              139.5878482,
+              35.4431397
+            ],
+            [
+              139.5879662,
+              35.4432839
+            ],
+            [
+              139.5878219,
+              35.4433576
+            ],
+            [
+              139.5877066,
+              35.4431981
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 470090458,
+        "building": "house",
+        "name": "Building 470090458",
+        "levels": null,
+        "footprint_m2": 298,
+        "centroid": [
+          139.587822,
+          35.443217
+        ],
+        "elevation_m": 39.7,
+        "slope_deg": 11.8,
+        "local_relief_m": 26.2,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 66,
+        "risk_band": "medium",
+        "slope_component": 66,
+        "relief_component": 100,
+        "low_point_component": 0,
+        "hub_score": 84,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 35.8,
+        "served_high_risk_buildings": 48,
+        "nearest_road_m": 19,
+        "nearest_road_name": "Road 175308735",
+        "nearest_road_priority": 85,
+        "pv_component": 80,
+        "access_component": 86,
+        "community_need_component": 100,
+        "site_safety_component": 34,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 470459963,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5920183,
+              35.4442951
+            ],
+            [
+              139.5921149,
+              35.4442678
+            ],
+            [
+              139.5922047,
+              35.4445104
+            ],
+            [
+              139.5922342,
+              35.4445027
+            ],
+            [
+              139.5922547,
+              35.4445637
+            ],
+            [
+              139.5921229,
+              35.4445989
+            ],
+            [
+              139.5920183,
+              35.4442951
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 470459963,
+        "building": "house",
+        "name": "Building 470459963",
+        "levels": null,
+        "footprint_m2": 356,
+        "centroid": [
+          139.592158,
+          35.444456
+        ],
+        "elevation_m": 8.5,
+        "slope_deg": 1.4,
+        "local_relief_m": 2.2,
+        "low_point_m": 0.3,
+        "dem_source": "DEM5A",
+        "risk_score": 8,
+        "risk_band": "low",
+        "slope_component": 8,
+        "relief_component": 9,
+        "low_point_component": 5,
+        "hub_score": 84,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 42.7,
+        "served_high_risk_buildings": 18,
+        "nearest_road_m": 30,
+        "nearest_road_name": "国道1号",
+        "nearest_road_priority": 27,
+        "pv_component": 95,
+        "access_component": 45,
+        "community_need_component": 100,
+        "site_safety_component": 92,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 438924210,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5842184,
+              35.448296
+            ],
+            [
+              139.5842372,
+              35.4482643
+            ],
+            [
+              139.5845295,
+              35.4483735
+            ],
+            [
+              139.5844987,
+              35.4484325
+            ],
+            [
+              139.5844491,
+              35.4484139
+            ],
+            [
+              139.5844343,
+              35.4484402
+            ],
+            [
+              139.5842197,
+              35.4483637
+            ],
+            [
+              139.5842477,
+              35.4483136
+            ],
+            [
+              139.5842184,
+              35.448296
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 438924210,
+        "building": "yes",
+        "name": "Building 438924210",
+        "levels": null,
+        "footprint_m2": 271,
+        "centroid": [
+          139.584354,
+          35.448362
+        ],
+        "elevation_m": 33.0,
+        "slope_deg": 4.4,
+        "local_relief_m": 16.6,
+        "low_point_m": 7.7,
+        "dem_source": "DEM5A",
+        "risk_score": 49,
+        "risk_band": "low",
+        "slope_component": 24,
+        "relief_component": 69,
+        "low_point_component": 100,
+        "hub_score": 83,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 32.5,
+        "served_high_risk_buildings": 38,
+        "nearest_road_m": 21,
+        "nearest_road_name": "Road 158900371",
+        "nearest_road_priority": 82,
+        "pv_component": 72,
+        "access_component": 83,
+        "community_need_component": 100,
+        "site_safety_component": 51,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 470459973,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.591962,
+              35.444317
+            ],
+            [
+              139.5920076,
+              35.4444557
+            ],
+            [
+              139.5919181,
+              35.4444741
+            ],
+            [
+              139.5919275,
+              35.4445091
+            ],
+            [
+              139.591899,
+              35.4445169
+            ],
+            [
+              139.5918909,
+              35.4444787
+            ],
+            [
+              139.5918292,
+              35.4444907
+            ],
+            [
+              139.5918577,
+              35.4445845
+            ],
+            [
+              139.5918869,
+              35.4445737
+            ],
+            [
+              139.5919848,
+              35.4445541
+            ],
+            [
+              139.5920066,
+              35.4446271
+            ],
+            [
+              139.5917236,
+              35.4446861
+            ],
+            [
+              139.591674,
+              35.4445277
+            ],
+            [
+              139.5917357,
+              35.4445113
+            ],
+            [
+              139.5916965,
+              35.4443716
+            ],
+            [
+              139.591962,
+              35.444317
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 470459973,
+        "building": "apartments",
+        "name": "Building 470459973",
+        "levels": null,
+        "footprint_m2": 779,
+        "centroid": [
+          139.591867,
+          35.444512
+        ],
+        "elevation_m": 7.9,
+        "slope_deg": 2.7,
+        "local_relief_m": 4.4,
+        "low_point_m": 0.7,
+        "dem_source": "DEM5A",
+        "risk_score": 16,
+        "risk_band": "low",
+        "slope_component": 15,
+        "relief_component": 18,
+        "low_point_component": 12,
+        "hub_score": 83,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 93.5,
+        "served_high_risk_buildings": 19,
+        "nearest_road_m": 20,
+        "nearest_road_name": "Road 470459964",
+        "nearest_road_priority": 12,
+        "pv_component": 100,
+        "access_component": 38,
+        "community_need_component": 100,
+        "site_safety_component": 84,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 470106425,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5879453,
+              35.4437237
+            ],
+            [
+              139.5879802,
+              35.4436363
+            ],
+            [
+              139.588129,
+              35.4436876
+            ],
+            [
+              139.5881384,
+              35.4436713
+            ],
+            [
+              139.5882309,
+              35.4437062
+            ],
+            [
+              139.5882114,
+              35.4437353
+            ],
+            [
+              139.5882846,
+              35.4437641
+            ],
+            [
+              139.5882597,
+              35.4438271
+            ],
+            [
+              139.5882222,
+              35.4438173
+            ],
+            [
+              139.5882269,
+              35.4438056
+            ],
+            [
+              139.588188,
+              35.4437925
+            ],
+            [
+              139.5881779,
+              35.4438129
+            ],
+            [
+              139.5880834,
+              35.4437849
+            ],
+            [
+              139.5880888,
+              35.4437674
+            ],
+            [
+              139.5880492,
+              35.4437506
+            ],
+            [
+              139.5880325,
+              35.4437783
+            ],
+            [
+              139.5879855,
+              35.4437619
+            ],
+            [
+              139.5879976,
+              35.4437412
+            ],
+            [
+              139.5879453,
+              35.4437237
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 470106425,
+        "building": "house",
+        "name": "Building 470106425",
+        "levels": null,
+        "footprint_m2": 326,
+        "centroid": [
+          139.588124,
+          35.443754
+        ],
+        "elevation_m": 50.4,
+        "slope_deg": 1.1,
+        "local_relief_m": 22.0,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 31,
+        "risk_band": "low",
+        "slope_component": 6,
+        "relief_component": 92,
+        "low_point_component": 0,
+        "hub_score": 82,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 39.1,
+        "served_high_risk_buildings": 84,
+        "nearest_road_m": 8,
+        "nearest_road_name": "Road 175560729",
+        "nearest_road_priority": 37,
+        "pv_component": 87,
+        "access_component": 57,
+        "community_need_component": 100,
+        "site_safety_component": 69,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 469412218,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5848112,
+              35.4456411
+            ],
+            [
+              139.5849669,
+              35.4456206
+            ],
+            [
+              139.5850124,
+              35.4457219
+            ],
+            [
+              139.5850218,
+              35.4457788
+            ],
+            [
+              139.5848569,
+              35.4458063
+            ],
+            [
+              139.5848112,
+              35.4456411
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 469412218,
+        "building": "yes",
+        "name": "Building 469412218",
+        "levels": null,
+        "footprint_m2": 281,
+        "centroid": [
+          139.584934,
+          35.445714
+        ],
+        "elevation_m": 12.8,
+        "slope_deg": 1.7,
+        "local_relief_m": 7.2,
+        "low_point_m": 0.5,
+        "dem_source": "DEM5A",
+        "risk_score": 15,
+        "risk_band": "low",
+        "slope_component": 9,
+        "relief_component": 30,
+        "low_point_component": 8,
+        "hub_score": 82,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 33.7,
+        "served_high_risk_buildings": 34,
+        "nearest_road_m": 13,
+        "nearest_road_name": "旧東海道",
+        "nearest_road_priority": 49,
+        "pv_component": 75,
+        "access_component": 64,
+        "community_need_component": 100,
+        "site_safety_component": 85,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 303176248,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5880672,
+              35.4486572
+            ],
+            [
+              139.588073,
+              35.4486897
+            ],
+            [
+              139.5880411,
+              35.4486918
+            ],
+            [
+              139.588043,
+              35.4486053
+            ],
+            [
+              139.5880707,
+              35.4486052
+            ],
+            [
+              139.5880755,
+              35.4485357
+            ],
+            [
+              139.5882769,
+              35.4485417
+            ],
+            [
+              139.5882788,
+              35.4486668
+            ],
+            [
+              139.5880672,
+              35.4486572
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 303176248,
+        "building": "house",
+        "name": "桜ヶ丘グリーンハイツ 9号",
+        "levels": null,
+        "footprint_m2": 280,
+        "centroid": [
+          139.588116,
+          35.448624
+        ],
+        "elevation_m": 46.0,
+        "slope_deg": 5.5,
+        "local_relief_m": 20.8,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 43,
+        "risk_band": "low",
+        "slope_component": 31,
+        "relief_component": 87,
+        "low_point_component": 0,
+        "hub_score": 81,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 33.6,
+        "served_high_risk_buildings": 78,
+        "nearest_road_m": 12,
+        "nearest_road_name": "Road 158516312",
+        "nearest_road_priority": 60,
+        "pv_component": 75,
+        "access_component": 71,
+        "community_need_component": 100,
+        "site_safety_component": 57,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 304924075,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5853298,
+              35.4455928
+            ],
+            [
+              139.5853508,
+              35.4457219
+            ],
+            [
+              139.5855518,
+              35.4457002
+            ],
+            [
+              139.5855308,
+              35.4455711
+            ],
+            [
+              139.5853298,
+              35.4455928
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 304924075,
+        "building": "yes",
+        "name": "Building 304924075",
+        "levels": null,
+        "footprint_m2": 266,
+        "centroid": [
+          139.585441,
+          35.445647
+        ],
+        "elevation_m": 12.7,
+        "slope_deg": 0.4,
+        "local_relief_m": 6.0,
+        "low_point_m": 0.5,
+        "dem_source": "DEM5A",
+        "risk_score": 10,
+        "risk_band": "low",
+        "slope_component": 2,
+        "relief_component": 25,
+        "low_point_component": 8,
+        "hub_score": 81,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 31.9,
+        "served_high_risk_buildings": 34,
+        "nearest_road_m": 13,
+        "nearest_road_name": "旧東海道",
+        "nearest_road_priority": 49,
+        "pv_component": 71,
+        "access_component": 64,
+        "community_need_component": 100,
+        "site_safety_component": 90,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 469395234,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5922758,
+              35.444825
+            ],
+            [
+              139.5924596,
+              35.4447856
+            ],
+            [
+              139.5925427,
+              35.4450872
+            ],
+            [
+              139.5922624,
+              35.4451418
+            ],
+            [
+              139.5922262,
+              35.4450019
+            ],
+            [
+              139.5923486,
+              35.444978
+            ],
+            [
+              139.5923446,
+              35.4449507
+            ],
+            [
+              139.592308,
+              35.4449561
+            ],
+            [
+              139.5922758,
+              35.444825
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 469395234,
+        "building": "house",
+        "name": "Building 469395234",
+        "levels": null,
+        "footprint_m2": 721,
+        "centroid": [
+          139.592346,
+          35.444966
+        ],
+        "elevation_m": 8.6,
+        "slope_deg": 1.5,
+        "local_relief_m": 7.8,
+        "low_point_m": 1.6,
+        "dem_source": "DEM5A",
+        "risk_score": 18,
+        "risk_band": "low",
+        "slope_component": 8,
+        "relief_component": 32,
+        "low_point_component": 27,
+        "hub_score": 79,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 86.5,
+        "served_high_risk_buildings": 15,
+        "nearest_road_m": 29,
+        "nearest_road_name": "国道1号",
+        "nearest_road_priority": 27,
+        "pv_component": 100,
+        "access_component": 46,
+        "community_need_component": 83,
+        "site_safety_component": 82,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 438912430,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5850566,
+              35.4480764
+            ],
+            [
+              139.5852484,
+              35.4480415
+            ],
+            [
+              139.5852659,
+              35.4481561
+            ],
+            [
+              139.5852189,
+              35.4481616
+            ],
+            [
+              139.5852095,
+              35.4481332
+            ],
+            [
+              139.5851277,
+              35.448142
+            ],
+            [
+              139.585129,
+              35.4481715
+            ],
+            [
+              139.5850727,
+              35.448178
+            ],
+            [
+              139.5850566,
+              35.4480764
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 438912430,
+        "building": "house",
+        "name": "Building 438912430",
+        "levels": null,
+        "footprint_m2": 189,
+        "centroid": [
+          139.585166,
+          35.448133
+        ],
+        "elevation_m": 42.1,
+        "slope_deg": 4.1,
+        "local_relief_m": 26.8,
+        "low_point_m": 0.0,
+        "dem_source": "DEM5A",
+        "risk_score": 43,
+        "risk_band": "low",
+        "slope_component": 23,
+        "relief_component": 100,
+        "low_point_component": 0,
+        "hub_score": 78,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 22.7,
+        "served_high_risk_buildings": 63,
+        "nearest_road_m": 18,
+        "nearest_road_name": "Road 158528171",
+        "nearest_road_priority": 90,
+        "pv_component": 50,
+        "access_component": 89,
+        "community_need_component": 100,
+        "site_safety_component": 57,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-07-18T16:12:16.072721+00:00",
+  "cell_count": 70,
+  "counts": {
+    "preferred": 21,
+    "conditional": 10,
+    "reject": 39
+  },
+  "shortlist_area_ha": 47.0,
+  "annual_ghi_kwh_m2": 1378,
+  "daily_ghi_kwh_m2": 3.7747,
+  "monthly_ghi": {
+    "JAN": 2.5426,
+    "FEB": 3.0197,
+    "MAR": 3.8081,
+    "APR": 4.6183,
+    "MAY": 5.0057,
+    "JUN": 4.6337,
+    "JUL": 4.9474,
+    "AUG": 5.1902,
+    "SEP": 3.9322,
+    "OCT": 2.9218,
+    "NOV": 2.3846,
+    "DEC": 2.2397
+  },
+  "nasa_api": {
+    "version": "v2.9.7",
+    "name": "POWER Climatology API"
+  },
+  "climatology": "20-year Meteorological and Solar Monthly & Annual Climatologies (January 2001 - December 2020)",
+  "bounds": {
+    "south": 35.439,
+    "west": 140.276,
+    "north": 35.451,
+    "east": 140.291
+  }
+}

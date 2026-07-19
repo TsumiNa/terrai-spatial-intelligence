@@ -1,0 +1,71 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "official-shelter-1",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5867118,
+          35.44666612
+        ]
+      },
+      "properties": {
+        "name": "岩崎小学校",
+        "type": "地域防災拠点",
+        "definition": "被災した住民の避難生活の場所、情報受伝達、備蓄機能を備えた拠点です。",
+        "address": "神奈川県横浜市保土ケ谷区岩崎町22-1",
+        "ward": "保土ケ谷区",
+        "official_status": "observed_official",
+        "resilience_score": 84,
+        "served_high_risk_buildings": 102,
+        "nearest_road_m": 38,
+        "nearest_road_name": "Road 125735204",
+        "nearest_road_priority": 50,
+        "matched_roof_m": 30,
+        "matched_roof_area_m2": 730,
+        "pv_kwp_proxy": 87.6,
+        "site_safety_component": 80,
+        "access_component": 59,
+        "community_need_component": 100,
+        "energy_component": 100,
+        "decision": "官方设施；优先核查屋顶结构、储能、备用电源与灾时道路连续性",
+        "limitations": "建筑轮廓为最近邻匹配；容量和结构未经现场验证"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "official-shelter-2",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5905756,
+          35.45038817
+        ]
+      },
+      "properties": {
+        "name": "桜台小学校",
+        "type": "地域防災拠点",
+        "definition": "被災した住民の避難生活の場所、情報受伝達、備蓄機能を備えた拠点です。",
+        "address": "神奈川県横浜市保土ケ谷区桜ケ丘一丁目13-1",
+        "ward": "保土ケ谷区",
+        "official_status": "observed_official",
+        "resilience_score": 76,
+        "served_high_risk_buildings": 58,
+        "nearest_road_m": 45,
+        "nearest_road_name": "Road 125705216",
+        "nearest_road_priority": 39,
+        "matched_roof_m": 49,
+        "matched_roof_area_m2": 696,
+        "pv_kwp_proxy": 83.5,
+        "site_safety_component": 62,
+        "access_component": 50,
+        "community_need_component": 100,
+        "energy_component": 100,
+        "decision": "官方设施；优先核查屋顶结构、储能、备用电源与灾时道路连续性",
+        "limitations": "建筑轮廓为最近邻匹配；容量和结构未经现场验证"
+      }
+    }
+  ]
+}

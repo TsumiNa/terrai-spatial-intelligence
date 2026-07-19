@@ -1,0 +1,132 @@
+{
+  "published_at": "2026-06-22",
+  "downloaded_at": "2026-07-20",
+  "source": "TEPCO Power Grid - 系統の予想潮流等に関する情報（千葉県CSV）",
+  "source_url": "https://www.tepco.co.jp/pg/consignment/system/index-j.html",
+  "raw_files": [
+    "data/external/tepco/csv_yosochoryu_chiba_soudensen.csv",
+    "data/external/tepco/csv_yosochoryu_chiba_hendensyo.csv"
+  ],
+  "chiba_summary": {
+    "transmission_line_rows": 175,
+    "transformer_rows": 201,
+    "lines_with_normal_output_control_possible": 174,
+    "transformers_with_normal_output_control_possible": 201
+  },
+  "mobara_matches": {
+    "lines": [
+      {
+        "equipment_id": "千葉県 66kV 81",
+        "name": "茂原線",
+        "voltage_kv": 66,
+        "circuits": 2,
+        "equipment_capacity_raw": 442,
+        "operating_capacity_before_control_mw": 253,
+        "existing_olr_mw": 100,
+        "operating_capacity_mw": 353,
+        "constraint": "熱容量",
+        "flow_from": "外房",
+        "flow_to": "茂原",
+        "predicted_flow_mw": -391,
+        "spare_own_mw": null,
+        "spare_with_upstream_mw": null,
+        "n_minus_1_applicable": "可",
+        "n_minus_1_control_mw": 89,
+        "normal_output_control_possible": true,
+        "affected_equipment": "対象",
+        "upstream_constraints": "変千葉県 66kV 9,変千葉県 154kV 7,千葉県 154kV 11,変千葉県 154kV 3,変基幹 275kV 12-1,基幹 500kV 47"
+      },
+      {
+        "equipment_id": "千葉県 66kV 83",
+        "name": "茂原線",
+        "voltage_kv": 66,
+        "circuits": 2,
+        "equipment_capacity_raw": 292,
+        "operating_capacity_before_control_mw": 167,
+        "existing_olr_mw": 100,
+        "operating_capacity_mw": 267,
+        "constraint": "熱容量",
+        "flow_from": "外房",
+        "flow_to": "茂原",
+        "predicted_flow_mw": -175,
+        "spare_own_mw": null,
+        "spare_with_upstream_mw": null,
+        "n_minus_1_applicable": "可",
+        "n_minus_1_control_mw": 25,
+        "normal_output_control_possible": true,
+        "affected_equipment": "-",
+        "upstream_constraints": "千葉県 66kV 81,変千葉県 66kV 9,変千葉県 154kV 7,千葉県 154kV 11,変千葉県 154kV 3,変基幹 275kV 12-1,基幹 500kV 47"
+      },
+      {
+        "equipment_id": "千葉県 66kV 85",
+        "name": "茂原線",
+        "voltage_kv": 66,
+        "circuits": 2,
+        "equipment_capacity_raw": 292,
+        "operating_capacity_before_control_mw": 167,
+        "existing_olr_mw": 100,
+        "operating_capacity_mw": 267,
+        "constraint": "熱容量",
+        "flow_from": "外房",
+        "flow_to": "茂原",
+        "predicted_flow_mw": -175,
+        "spare_own_mw": null,
+        "spare_with_upstream_mw": null,
+        "n_minus_1_applicable": "可",
+        "n_minus_1_control_mw": 25,
+        "normal_output_control_possible": true,
+        "affected_equipment": "-",
+        "upstream_constraints": "千葉県 66kV 81,変千葉県 66kV 9,変千葉県 154kV 7,千葉県 154kV 11,変千葉県 154kV 3,変基幹 275kV 12-1,基幹 500kV 47"
+      },
+      {
+        "equipment_id": "千葉県 66kV 86",
+        "name": "岬町線",
+        "voltage_kv": 66,
+        "circuits": 2,
+        "equipment_capacity_raw": 128,
+        "operating_capacity_before_control_mw": 74,
+        "existing_olr_mw": 50,
+        "operating_capacity_mw": 124,
+        "constraint": "熱容量",
+        "flow_from": "茂原",
+        "flow_to": "岬町",
+        "predicted_flow_mw": -181,
+        "spare_own_mw": null,
+        "spare_with_upstream_mw": null,
+        "n_minus_1_applicable": "可",
+        "n_minus_1_control_mw": 4,
+        "normal_output_control_possible": true,
+        "affected_equipment": "対象",
+        "upstream_constraints": "千葉県 66kV 81,変千葉県 66kV 9,変千葉県 154kV 7,千葉県 154kV 11,変千葉県 154kV 3,変基幹 275kV 12-1,基幹 500kV 47"
+      }
+    ],
+    "transformers": [
+      {
+        "equipment_id": "変千葉県 配電用変電所 138",
+        "name": "茂原",
+        "voltage_kv": "",
+        "units": 3,
+        "equipment_capacity_raw": 52,
+        "operating_capacity_mw": 54,
+        "constraint": "熱容量",
+        "predicted_flow_mw": null,
+        "spare_own_mw": 5,
+        "spare_with_upstream_mw": 0,
+        "n_minus_1_applicable": "不可#3",
+        "n_minus_1_control_mw": null,
+        "normal_output_control_possible": true,
+        "affected_equipment": "-",
+        "upstream_constraints": "千葉県 66kV 81,変千葉県 66kV 9,変千葉県 154kV 7,千葉県 154kV 11,変千葉県 154kV 3,変基幹 275kV 12-1,基幹 500kV 47"
+      }
+    ]
+  },
+  "mobara_screen": {
+    "station": "茂原",
+    "spare_own_mw": 5,
+    "spare_with_upstream_mw": 0,
+    "normal_output_control_possible": true,
+    "screening_status": "upstream_constrained",
+    "interpretation": "公开快照显示茂原配电用变电所自身尚有容量代理，但考虑上位系统后为0 MW，且存在平常时出力控制可能。"
+  },
+  "important_note": "公开数值只是选址筛查证据，不是接续検討结果；CSV没有可直接用于宗地空间连接的完整设备几何。"
+}

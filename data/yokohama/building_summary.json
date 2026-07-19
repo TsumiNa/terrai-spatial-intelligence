@@ -1,0 +1,18 @@
+{
+  "generated_at": "2026-07-17T18:03:24.323505+00:00",
+  "osm_timestamp": "2026-07-17T17:55:30Z",
+  "building_count": 2128,
+  "counts": {
+    "high": 450,
+    "medium": 789,
+    "low": 889
+  },
+  "mean_score": 54.7,
+  "max_score": 100,
+  "bounds": {
+    "south": 35.443,
+    "west": 139.584,
+    "north": 35.45,
+    "east": 139.593
+  }
+}

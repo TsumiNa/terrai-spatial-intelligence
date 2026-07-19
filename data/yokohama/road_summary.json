@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-07-18T16:07:20.656211+00:00",
+  "road_count": 272,
+  "total_km": 25.0,
+  "high_queue": 65,
+  "exposed_buildings": 1239,
+  "mean_score": 51.1,
+  "bounds": {
+    "south": 35.443,
+    "west": 139.584,
+    "north": 35.45,
+    "east": 139.593
+  }
+}

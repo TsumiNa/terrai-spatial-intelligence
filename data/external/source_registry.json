@@ -1,0 +1,175 @@
+{
+  "updated_at": "2026-07-20",
+  "scope": "TerrAI multi-scale spatial intelligence open-data pipeline",
+  "sources": [
+    {
+      "id": "gsi_dem5a_and_visual_tiles",
+      "theme": "terrain_and_visual_context",
+      "status": "integrated",
+      "format": "GML DEM / XYZ tiles",
+      "access_cost": "free; DEM download account required",
+      "license": "GSI content terms; Survey Act procedure may apply to some uses",
+      "official_page": "https://service.gsi.go.jp/kiban/app/help/",
+      "local_output": ["data/yokohama", "data/mobara", "data/tiles"],
+      "rights_limit": "Attribution and edited-data notice required; inspect third-party rights per tile layer"
+    },
+    {
+      "id": "google_satellite_embedding_v1",
+      "theme": "annual_change_and_similarity",
+      "status": "integrated",
+      "format": "64-band Cloud Optimized GeoTIFF via byte-range reads",
+      "years": [2023, 2024],
+      "license": "CC BY 4.0",
+      "access_cost": "free public COG mirror; no Earth Engine account",
+      "official_page": "https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_SATELLITE_EMBEDDING_V1_ANNUAL",
+      "mirror_page": "https://registry.opendata.aws/aef-source/",
+      "local_output": "data/google/satellite_embedding",
+      "scoring_limit": "Independent evidence only; excluded from decision scores until local validation"
+    },
+    {
+      "id": "openstreetmap",
+      "theme": "buildings_roads_landuse_water_power",
+      "status": "integrated",
+      "format": "OSM vector extracts converted to GeoJSON",
+      "access_cost": "free data; local processing",
+      "license": "ODbL 1.0",
+      "official_page": "https://www.openstreetmap.org/copyright",
+      "local_output": ["data/yokohama", "data/mobara"],
+      "rights_limit": "Attribution required; public derivative databases may trigger share-alike; completeness is not guaranteed"
+    },
+    {
+      "id": "yokohama_official_disaster_bases",
+      "theme": "official_facility_resilience",
+      "status": "integrated",
+      "format": "CSV",
+      "updated": "2026-04-01",
+      "license": "CC BY 4.0",
+      "access_cost": "free public CSV",
+      "download_url": "https://www.city.yokohama.lg.jp/bousai-kyukyu-bohan/bousai-saigai/data/shiryodata/data/data.files/hinanjo.csv",
+      "local_output": "data/yokohama/official_facility_resilience.geojson",
+      "spatial_limit": "Facility identity/location is official; roof, PV and service-area fields are PoC proxies"
+    },
+    {
+      "id": "nasa_power_solar_climatology",
+      "theme": "solar_resource_context",
+      "status": "integrated",
+      "format": "JSON API / cached summary",
+      "access_cost": "free API",
+      "license": "NASA open data policy; attribution recommended; no endorsement",
+      "official_page": "https://power.larc.nasa.gov/docs/services/api/temporal/climatology/",
+      "local_output": "data/mobara/solar_summary.json",
+      "spatial_limit": "Long-term climate background, not site-level energy yield"
+    },
+    {
+      "id": "tepco_chiba_predicted_flow",
+      "theme": "grid_capacity_screen",
+      "status": "integrated",
+      "format": "CSV in ZIP",
+      "access_cost": "free public download",
+      "license": "not an open-data license; official notice marks redistribution prohibited",
+      "official_page": "https://www.tepco.co.jp/pg/consignment/system/index-j.html",
+      "download_url": "https://www.tepco.co.jp/pg/consignment/system/pdf/csv_yosochoryu_chiba.zip",
+      "local_output": "data/mobara/tepco_grid_screen.json",
+      "spatial_limit": "No complete equipment geometry for parcel-level allocation; values do not guarantee connection",
+      "rights_limit": "Internal screening only until redistribution/commercial rights are confirmed with TEPCO"
+    },
+    {
+      "id": "esa_worldcover_2020_2021",
+      "theme": "interpretable_land_cover",
+      "status": "confirmed_not_integrated",
+      "format": "10 m Cloud Optimized GeoTIFF",
+      "access_cost": "free direct download",
+      "license": "CC BY 4.0",
+      "official_page": "https://esa-worldcover.org/en/data-access",
+      "spatial_limit": "2020 and 2021 products use different algorithm versions; change is not purely observed land-cover change"
+    },
+    {
+      "id": "copernicus_sentinel_2_l2a",
+      "theme": "multispectral_surface_evidence",
+      "status": "confirmed_not_integrated",
+      "format": "SAFE / COG via STAC",
+      "access_cost": "free data; Data Space account and quotas may apply",
+      "license": "Copernicus Sentinel data legal notice",
+      "official_page": "https://documentation.dataspace.copernicus.eu/APIs/STAC.html",
+      "spatial_limit": "Cloud masking, seasonal compositing and quality metadata required; 10 m is not roof-structure resolution"
+    },
+    {
+      "id": "gsi_hazard_map_open_layers",
+      "theme": "hazard_exposure",
+      "status": "confirmed_not_integrated",
+      "format": "XYZ tiles / source-dependent GIS",
+      "access_cost": "free for layers marked open data",
+      "license": "layer-specific; commercial use permitted only where portal marks open data",
+      "official_page": "https://disaportal.gsi.go.jp/hazardmapportal/hazardmap/copyright/opendata.html",
+      "spatial_limit": "Authority, vintage, scale and legal status must be retained per layer"
+    },
+    {
+      "id": "maff_2026_chiba_field_polygons",
+      "theme": "farmland_conversion_screen",
+      "status": "confirmed_download_on_demand",
+      "format": "FlatGeobuf in 5-part ZIP",
+      "access_cost": "free public download",
+      "license": "MAFF field polygon terms; attribution and edit notice",
+      "approx_download_size_mb": 318,
+      "official_page": "https://www.maff.go.jp/j/tokei/census/shuraku_data/2025/mb/index.html",
+      "download_parts": [
+        "https://www.maff.go.jp/j/tokei/census/shuraku_data/2025/mb/MB0001_2026_2025_12.zip.001",
+        "https://www.maff.go.jp/j/tokei/census/shuraku_data/2025/mb/MB0001_2026_2025_12.zip.002",
+        "https://www.maff.go.jp/j/tokei/census/shuraku_data/2025/mb/MB0001_2026_2025_12.zip.003",
+        "https://www.maff.go.jp/j/tokei/census/shuraku_data/2025/mb/MB0001_2026_2025_12.zip.004",
+        "https://www.maff.go.jp/j/tokei/census/shuraku_data/2025/mb/MB0001_2026_2025_12.zip.005"
+      ],
+      "spatial_limit": "Field polygons support agricultural-use screening but are not ownership records"
+    },
+    {
+      "id": "legal_affairs_bureau_cadastral_map",
+      "theme": "parcel_boundary",
+      "status": "confirmed_not_integrated",
+      "format": "GML / map data",
+      "access_cost": "free after G-Spatial Information Center login",
+      "license": "Legal Affairs Bureau map data terms",
+      "official_page": "https://www.moj.go.jp/MINJI/minji05_00494.html",
+      "spatial_limit": "Open parcel map does not provide a complete open owner list"
+    },
+    {
+      "id": "mlit_real_estate_information_library",
+      "theme": "land_price_and_planning",
+      "status": "confirmed_not_integrated",
+      "format": "API / GIS",
+      "access_cost": "free API; application and API key required",
+      "license": "MLIT Real Estate Information Library API terms",
+      "official_page": "https://www.reinfolib.mlit.go.jp/help/apiManual/",
+      "spatial_limit": "Required disclaimer; reference information only, not guaranteed for statutory procedures"
+    },
+    {
+      "id": "environmental_protection_layers",
+      "theme": "protected_area_exclusion",
+      "status": "confirmed_not_integrated",
+      "format": "GIS",
+      "access_cost": "mostly free public download",
+      "license": "dataset-specific; commercial-use flag must be checked",
+      "official_page": "https://nlftp.mlit.go.jp/ksj/",
+      "spatial_limit": "Natural parks, conservation, wildlife protection and forest layers differ in authority and update date"
+    },
+    {
+      "id": "meti_fit_fip_public_projects",
+      "theme": "renewable_project_market_context",
+      "status": "confirmed_not_integrated",
+      "format": "public tables / downloadable files",
+      "access_cost": "free public access",
+      "license": "website terms must be rechecked before bulk republication",
+      "official_page": "https://www.fit-portal.go.jp/PublicInfoSummary",
+      "spatial_limit": "Not a complete operating-asset inventory; small systems and address fields have publication limits"
+    },
+    {
+      "id": "estat_statistical_boundaries",
+      "theme": "administrative_and_demand_aggregation",
+      "status": "confirmed_not_integrated",
+      "format": "GIS boundary download",
+      "access_cost": "free public download",
+      "license": "Japanese government statistics terms and attribution",
+      "official_page": "https://www.e-stat.go.jp/gis/statmap-search?aggregateUnitForBoundary=A&page=1&type=2",
+      "spatial_limit": "Statistical boundary, not authoritative cadastral or legal boundary"
+    }
+  ]
+}
