@@ -10,22 +10,11 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+from .data_tasks import TASKS, ensure_data, status_rows, validate_json_outputs
+
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPTS = ROOT / "scripts"
-
-PIPELINES = {
-    "grid": SCRIPTS / "parse_tepco_grid.py",
-    "joint": SCRIPTS / "build_joint_analysis.py",
-    "evidence": SCRIPTS / "build_multiscale_evidence.py",
-}
-
 DEFAULT_PIPELINES = ("joint", "evidence")
-
-REMOTE_TASKS = {
-    "tiles": SCRIPTS / "fetch_visual_tiles.py",
-    "embedding": SCRIPTS / "fetch_google_satellite_embedding.py",
-}
 
 REQUIRED_FILES = [
     "index.html",
@@ -35,6 +24,10 @@ REQUIRED_FILES = [
     "app.js",
     "vendor/leaflet.js",
     "vendor/leaflet.css",
+    "terrai_spatial/data_tasks.py",
+    "scripts/ensure_data.py",
+    "scripts/bootstrap_packaged_data.py",
+    "data/tiles/manifest.json",
     "data/yokohama/building_risk.geojson",
     "data/yokohama/road_priority.geojson",
     "data/yokohama/official_facility_resilience.geojson",
@@ -46,35 +39,31 @@ REQUIRED_FILES = [
 ]
 
 
-def run_script(path: Path, extra_args: list[str] | None = None) -> None:
-    command = [sys.executable, str(path), *(extra_args or [])]
-    subprocess.run(command, cwd=ROOT, check=True)
-
-
 def command_build(args: argparse.Namespace) -> None:
     selected = list(DEFAULT_PIPELINES) if args.only == "all" else [args.only]
-    if "grid" in selected:
-        required = [
-            ROOT / "data/external/tepco/csv_yosochoryu_chiba_soudensen.csv",
-            ROOT / "data/external/tepco/csv_yosochoryu_chiba_hendensyo.csv",
-        ]
-        missing = [path.relative_to(ROOT) for path in required if not path.is_file()]
-        if missing:
-            names = ", ".join(map(str, missing))
-            raise SystemExit(
-                "TEPCO source files are local-only and missing: "
-                f"{names}. See data/external/tepco/README.md."
-            )
-    for name in selected:
-        print(f"[TerrAI] running {name} pipeline", flush=True)
-        run_script(PIPELINES[name])
+    ensure_data(selected=selected, allow_network=False, force=True)
 
 
 def command_fetch(args: argparse.Namespace) -> None:
-    run_script(REMOTE_TASKS[args.dataset], args.extra)
+    ensure_data(selected=[args.dataset], allow_network=True, force=True)
+
+
+def command_data(args: argparse.Namespace) -> None:
+    if args.action == "status":
+        for state in status_rows():
+            print(f"{state.name:10} {state.status:8} {state.reason}")
+        return
+    ensure_data(
+        selected=args.only,
+        allow_network=not args.offline,
+        force=args.action == "update",
+    )
 
 
 def command_serve(args: argparse.Namespace) -> None:
+    if not args.no_ensure_data:
+        print("[TerrAI data] checking startup data", flush=True)
+        ensure_data(allow_network=not args.offline)
     handler = partial(SimpleHTTPRequestHandler, directory=ROOT)
     server = ThreadingHTTPServer((args.host, args.port), handler)
     print(f"TerrAI demo: http://{args.host}:{args.port}/", flush=True)
@@ -99,7 +88,10 @@ def validate_json(path: Path) -> tuple[bool, str]:
 
 
 def command_validate(_: argparse.Namespace) -> None:
-    failures: list[str] = []
+    failures: list[str] = validate_json_outputs()
+    for state in status_rows():
+        if state.status != "ready":
+            failures.append(f"data task {state.name}: {state.status}: {state.reason}")
     for relative in REQUIRED_FILES:
         path = ROOT / relative
         if not path.is_file():
@@ -135,16 +127,23 @@ def build_parser() -> argparse.ArgumentParser:
     serve = subparsers.add_parser("serve", help="serve the static demo locally")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=4176)
+    serve.add_argument("--offline", action="store_true", help="repair local derivatives but do not download missing data")
+    serve.add_argument("--no-ensure-data", action="store_true", help="skip the automatic startup data check")
     serve.set_defaults(func=command_serve)
 
     build = subparsers.add_parser("build", help="rebuild redistributable derived data")
-    build.add_argument("--only", choices=["all", *PIPELINES], default="all")
+    build.add_argument("--only", choices=["all", "grid", *DEFAULT_PIPELINES], default="all")
     build.set_defaults(func=command_build)
 
     fetch = subparsers.add_parser("fetch", help="refresh remote open-data assets")
-    fetch.add_argument("dataset", choices=sorted(REMOTE_TASKS))
-    fetch.add_argument("extra", nargs=argparse.REMAINDER, help="arguments passed to the source adapter")
+    fetch.add_argument("dataset", choices=("tiles", "embedding"))
     fetch.set_defaults(func=command_fetch)
+
+    data = subparsers.add_parser("data", help="inspect, repair or update all data tasks")
+    data.add_argument("action", choices=("status", "ensure", "update"), nargs="?", default="ensure")
+    data.add_argument("--only", choices=tuple(TASKS), action="append", help="limit work to one or more tasks")
+    data.add_argument("--offline", action="store_true", help="do not download missing remote data")
+    data.set_defaults(func=command_data)
 
     validate = subparsers.add_parser("validate", help="validate required assets and JSON/GeoJSON")
     validate.set_defaults(func=command_validate)
@@ -153,4 +152,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    args.func(args)
+    try:
+        args.func(args)
+    except (RuntimeError, subprocess.CalledProcessError) as error:
+        print(f"TerrAI data error: {error}", file=sys.stderr)
+        raise SystemExit(2) from error

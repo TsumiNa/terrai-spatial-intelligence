@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import json
 import math
-from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -202,7 +201,7 @@ def main() -> None:
     write_json(
         DATA / "joint" / "joint_summary.json",
         {
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": "2026-07-20",
             "method": "PoC heuristic spatial multi-criteria analysis",
             "resilience_hubs": {
                 "count": len(hubs),

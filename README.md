@@ -12,11 +12,26 @@ uv run python -m terrai_spatial serve --port 4176
 
 然后访问 `http://localhost:4176/`。平台运行不需要后端、数据库或 API Key；底图、分析结果与 2023–2024 Satellite Embedding 裁剪均已缓存到本地。
 
+`serve` 启动服务器前会自动检查数据任务：缺失的打包基础数据优先从本地 Git 历史恢复，缺失的公开遥感/地图缓存会调用对应下载脚本，缺失或早于输入的派生结果会自动重建。每个实际执行的任务都会打印到终端，不会静默修改数据。若需要严格离线启动，可使用 `--offline`；若只想原样启动静态文件，可使用 `--no-ensure-data`。
+
 常用工程命令：
 
 ```bash
 # 校验必需文件和全部 JSON / GeoJSON
 uv run python -m terrai_spatial validate
+
+# 查看每条数据任务是 ready / missing / stale / blocked
+uv run python -m terrai_spatial data status
+
+# 补齐缺失数据并重建过期派生结果（启动时自动执行的同一逻辑）
+uv run python -m terrai_spatial data ensure
+
+# 主动刷新所有可自动更新的数据
+uv run python -m terrai_spatial data update
+
+# 只更新指定任务，可重复 --only
+uv run python -m terrai_spatial data update --only tiles
+uv run python -m terrai_spatial data update --only embedding
 
 # 依次重建可再发布的联合分析与多尺度证据
 uv run python -m terrai_spatial build
@@ -26,6 +41,29 @@ uv run python -m terrai_spatial build --only joint
 ```
 
 `uv.lock` 固定 Python 项目环境；基础运行和本地重建没有第三方 Python 依赖。只有重新获取 Satellite Embedding 时才安装 `remote` 可选依赖。
+
+数据任务也可以直接作为脚本运行：
+
+```bash
+# 与程序启动共享同一个任务注册表
+uv run python scripts/ensure_data.py status
+uv run python scripts/ensure_data.py ensure
+uv run python scripts/ensure_data.py update --only joint
+
+# 单条底层脚本仍可独立执行
+uv run python scripts/build_joint_analysis.py
+uv run python scripts/build_multiscale_evidence.py
+uv run python scripts/fetch_visual_tiles.py
+uv run --extra remote python scripts/fetch_google_satellite_embedding.py
+```
+
+### 自动修复边界
+
+- `bootstrap`：基础 GeoJSON/CSV/JSON 缺失或损坏时，优先通过 `git show HEAD:<path>` 原子恢复；源码压缩包环境才回退到 GitHub，私有仓库需提供 `GITHUB_TOKEN`。
+- `tiles`、`embedding`：仅在缓存缺失时由启动流程联网获取；`data update` 才会主动刷新。
+- `joint`、`evidence`：输出缺失、损坏，或脚本/输入比输出更新时自动重建。
+- `grid`：东京电力原始 CSV 禁止进入 Git，程序不会自动下载；已提交的筛查摘要可由 `bootstrap` 恢复。只有用户自行放入两个原始 CSV 后，才可执行 `build --only grid`。
+- 自动流程失败时不会带着半套数据启动服务器，而会显示具体任务、缺失输入和恢复方法。
 
 ## 可审计数值与三语界面
 
@@ -189,11 +227,14 @@ Dynamic World 只保留在数据决策记录的“评估后排除”一栏，不
 ## 项目结构
 
 ```text
-terrai_integrated_spatial_platform/
+terrai-spatial-intelligence/
 ├── pyproject.toml              # uv 项目、Python 版本和 remote 可选依赖
 ├── uv.lock                     # 可复现环境锁文件
 ├── terrai_spatial/             # 统一 serve / build / fetch / validate CLI
-├── scripts/                    # 可追溯的数据获取与派生管线
+│   └── data_tasks.py           # 启动与手动命令共享的数据任务注册表
+├── scripts/                    # 可直接执行的数据获取、恢复与派生管线
+│   ├── ensure_data.py          # status / ensure / update 脚本入口
+│   └── bootstrap_packaged_data.py # 从 Git 恢复缺失基础快照
 ├── data/                       # 原始快照、标准化数据和分析结果
 ├── index.html                  # 静态应用入口
 ├── app.js                      # 地图与分析模块
