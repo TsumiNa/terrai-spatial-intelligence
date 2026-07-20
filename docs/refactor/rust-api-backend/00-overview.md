@@ -50,6 +50,19 @@ The honest sequence is: measure, fix the data layer, measure again, and only the
 
 Given the reason for the rewrite is throughput under concurrent queries, embedding the runtime that motivated the rewrite deserves scrutiny. Separation is the safer default unless a specific case proves otherwise.
 
+## Scope
+
+When it starts, the rewrite covers the request-serving layer only: the routes in `terrai_spatial/api.py` and the loading, caching, filtering, sorting and ranking in `terrai_spatial/data_service.py` — roughly 380 lines behind an unchanged public contract.
+
+Outside the scope in every scenario: the data pipelines in `scripts/`, the task registry in `terrai_spatial/data_tasks.py`, and the geospatial and modelling work that depends on rasterio, pyproj, numpy and the SL model stack. Those stay in Python and move further toward preprocessing rather than being ported.
+
+## Consequences of committing to this direction
+
+- **Two languages, permanently.** This is not a migration away from Python; it is a split by role. Contributors need both toolchains, and the repository grows a second build.
+- **The public contract becomes load-bearing.** Today the dataset keys and response shapes are an internal convention. Once two implementations must agree on them, they are an interface, and changing one becomes a coordinated change.
+- **The narrow seam must be defended before the rewrite, not during it.** Every leak of dataset paths, ad-hoc query logic or response shaping outside `data_service.py` enlarges the eventual port. This is the only cost being paid today.
+- **Preprocessing takes on more.** "Move Python work into preprocessing" means outputs the pipelines do not currently produce — precomputed aggregates, indexes, or a query-friendly store. That work lands in Python before any Rust exists.
+
 ## What must survive the rewrite
 
 - **Auditability.** Every displayed value keeps its route back to source, formula and limitation. This is the product's core claim and it is expressed today in the API responses, not only in the browser.
@@ -59,4 +72,16 @@ Given the reason for the rewrite is throughput under concurrent queries, embeddi
 
 ## Non-goals
 
-Nothing here is scheduled. No PR stages are planned, no language evaluation has been run, and no performance measurement exists yet to justify starting. When it starts, this folder gains numbered plan files like any other refactor.
+Not in this direction at all: replacing the pipelines, changing the FL → SL → AL architecture, adding write paths, or altering the public dataset keys. A rewrite that changes the contract is two migrations rather than one.
+
+## Stage map
+
+**None planned.** No numbered plan files exist because no stage can be written honestly yet: there is no performance measurement to size the problem, and the storage-layer alternatives above have not been tried.
+
+The entry condition for planning stages is all three of:
+
+1. the business scope is settled, so the query patterns that must be fast are known;
+2. a measurement exists showing the latency, and showing that the storage and query layer alone does not resolve it;
+3. the embedded-versus-separated question above has an answer.
+
+When those hold, this folder gains `NN-topic-prN.md` files like any other refactor.
