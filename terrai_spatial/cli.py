@@ -366,15 +366,17 @@ def contract_failures() -> list[str]:
 
 def command_validate(_: argparse.Namespace) -> None:
     failures = contract_failures() + data_task_failures()
-    json_count = len(
-        list((ROOT / "data").rglob("*.json")) + list((ROOT / "data").rglob("*.geojson"))
-    )
-
     if failures:
         print("TerrAI validation failed:")
         for failure in failures:
             print(f"  - {failure}")
         raise SystemExit(1)
+
+    # Counted only once validation has passed, and without materialising the
+    # paths: these numbers exist for the success message alone.
+    json_count = sum(1 for _ in (ROOT / "data").rglob("*.json")) + sum(
+        1 for _ in (ROOT / "data").rglob("*.geojson")
+    )
     print(
         "TerrAI validation passed: "
         f"{len(REQUIRED_FILES)} required assets, {json_count} JSON/GeoJSON files, "
