@@ -7,10 +7,12 @@ import pytest
 
 from terrai_spatial.cli import (
     REFACTOR_PLAN_PATTERN,
+    REFACTOR_STATES_NEEDING_REASON,
     ROOT,
     contract_failures,
     localized_document,
     multilingual_documents,
+    refactor_status_failures,
     validate_json,
 )
 
@@ -176,3 +178,56 @@ def test_call_sequence_document_tracks_runtime_in_three_languages(language: str 
     assert call_structure.count("sequenceDiagram") == 3
     for token in ("GET /bootstrap", "GET /assets/tiles/", "GET /features/solar", "SQLite"):
         assert token in call_structure
+
+
+# --- refactor plan status -----------------------------------------------------
+# Without a machine-readable status, progress across a multi-stage refactor can
+# only be learned by opening every file and comparing it against reality.
+
+
+def plan(directory: Path, status: str) -> Path:
+    return write(directory, "01-topic-pr1.md", f"# Title\n\n- Status: {status}\n")
+
+
+@pytest.mark.parametrize("state", ["Planned", "In progress", "Completed"])
+def test_refactor_status_accepts_a_self_sufficient_state(tmp_path: Path, state: str) -> None:
+    assert refactor_status_failures(plan(tmp_path, state)) == []
+
+
+@pytest.mark.parametrize(
+    "status",
+    [
+        "Blocked — no subsurface dataset is integrated",
+        "Superseded by docs/refactor/maplibre-migration/",
+        "Planned — direction only, no PR stages written yet",
+    ],
+)
+def test_refactor_status_accepts_a_qualifier_after_the_state(tmp_path: Path, status: str) -> None:
+    assert refactor_status_failures(plan(tmp_path, status)) == []
+
+
+@pytest.mark.parametrize("state", REFACTOR_STATES_NEEDING_REASON)
+def test_refactor_status_rejects_a_stuck_state_without_a_reason(tmp_path: Path, state: str) -> None:
+    # "Blocked" alone says something is stuck without saying on what.
+    failures = refactor_status_failures(plan(tmp_path, state))
+    assert "must be followed by a reason" in failures[0]
+    assert refactor_status_failures(plan(tmp_path, f"{state} —")) == failures
+
+
+@pytest.mark.parametrize("status", ["Completed-ish", "In progressss", "Plannedish", "mostly done"])
+def test_refactor_status_rejects_near_misses_and_free_text(tmp_path: Path, status: str) -> None:
+    assert "must be one of" in refactor_status_failures(plan(tmp_path, status))[0]
+
+
+def test_refactor_status_rejects_a_missing_line(tmp_path: Path) -> None:
+    path = write(tmp_path, "01-topic-pr1.md", "# Title\n\n- Refactor: something\n")
+    assert "missing a status line" in refactor_status_failures(path)[0]
+
+
+def test_every_refactor_document_declares_a_known_state() -> None:
+    documents = sorted((ROOT / "docs/refactor").rglob("*.md"))
+    assert documents
+    for path in documents:
+        if path.name.endswith((".ja.md", ".zh.md")):
+            continue
+        assert refactor_status_failures(path) == [], path

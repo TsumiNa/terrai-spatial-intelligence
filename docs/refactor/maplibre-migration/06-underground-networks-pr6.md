@@ -1,6 +1,6 @@
 # PR6 Plan: Underground Utility Networks on the Map
 
-- Status: Blocked on data
+- Status: Blocked — the dataset this stage renders is not integrated yet
 - Refactor: `maplibre-migration`
 - PR: #6
 

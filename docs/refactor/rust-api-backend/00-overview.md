@@ -1,7 +1,7 @@
 # Rust API Backend
 
 - Date recorded: 2026-07-20
-- Status: **direction only — not started, no PR stages planned**
+- Status: Planned — direction only, no PR stages written yet
 - Precondition: the business scope is settled
 
 ## Why this is recorded now

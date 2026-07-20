@@ -1,6 +1,6 @@
 # PR7 Plan: Standalone Site Scene
 
-- Status: Blocked on data
+- Status: Blocked — the dataset this stage renders is not integrated yet
 - Refactor: `maplibre-migration`
 - PR: #7
 

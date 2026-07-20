@@ -52,6 +52,14 @@ Put concrete English plans in files named `NN-topic-prXa.md`:
 - Plans split within the same PR reuse `NN` and add parts such as `pr1a`, `pr1b`, and `pr1c`.
 - The next PR advances the number, for example `02-topic-pr2.md`.
 - Each plan states status, goal, scope, non-goals, implementation steps, and acceptance criteria.
+- **The status line is mandatory and its first word is one of a fixed set.** Write it as the first bullet under the title: `- Status: Planned`. Without it a reader cannot tell a finished refactor from an abandoned one, and folder progress cannot be counted. Permitted states:
+  - `Planned` — agreed, not started.
+  - `In progress` — being implemented now.
+  - `Blocked` — cannot start or continue. A reason is **required**: `Blocked — no subsurface dataset is integrated`. The state alone is a validation failure, because it says something is stuck without saying on what.
+  - `Completed` — merged and its acceptance criteria verified.
+  - `Superseded` — abandoned or replaced. Naming the replacement is **required**: `Superseded by docs/refactor/<name>/`.
+
+  The state must stand alone or be followed by a space, so `Completed-ish` is a failure rather than a near miss. Update the line in the same change that changes the fact, not afterwards.
 
 Follow `.github/instructions/branch-and-pr-workflow.instructions.md` when mapping plans to branches, commits, and PRs.
 

@@ -1,5 +1,6 @@
 # PR1 — GSI Evacuation Foundation Data
 
+- Status: Completed
 ## Goal
 
 Make GSI designated evacuation data a reproducible national FL base for the Yokohama demo and reconcile it with Yokohama City's local disaster-base dataset.

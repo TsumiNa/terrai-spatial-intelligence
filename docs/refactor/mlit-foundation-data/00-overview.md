@@ -6,6 +6,7 @@ TerrAI currently demonstrates terrain, roads, facilities, solar context, satelli
 
 The requested sources span two distribution families with different constraints:
 
+- Status: Completed — merged as PR #3
 - National Land Numerical Information datasets, mostly current CC BY 4.0 / PDL-compatible releases.
 - National Land Survey datasets, which require attribution, prohibit unchanged redistribution, and may trigger Survey Act procedures when background-map survey成果 are reproduced or used.
 
