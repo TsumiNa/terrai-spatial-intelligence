@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import unittest
 
-from terrai_spatial.api import app
-from terrai_spatial.data_service import DATASETS, service
+from terrai_spatial.data_service import DATASETS, DatasetNotFoundError, service
 
 
-class ExhibitionApiTests(unittest.TestCase):
+class DataServiceTests(unittest.TestCase):
     def test_health_reports_all_file_backed_datasets_ready(self) -> None:
         health = service.health()
         self.assertEqual(health["status"], "ready")
@@ -41,17 +40,13 @@ class ExhibitionApiTests(unittest.TestCase):
         self.assertEqual(scores, sorted(scores, reverse=True))
         self.assertTrue(all(feature["properties"]["status"] == "preferred" for feature in result["features"]))
 
-    def test_fastapi_exposes_health_data_query_and_analysis_routes(self) -> None:
-        paths = {route.path for route in app.routes}
-        for path in (
-            "/api/v1/health",
-            "/api/v1/catalog",
-            "/api/v1/bootstrap",
-            "/api/v1/datasets/{key}",
-            "/api/v1/features/{key}",
-            "/api/v1/recommendations/{analysis}",
-        ):
-            self.assertIn(path, paths)
+    def test_unknown_dataset_key_is_rejected(self) -> None:
+        with self.assertRaises(DatasetNotFoundError):
+            service.load("no-such-dataset")
+
+    def test_feature_query_rejects_a_dataset_that_is_not_a_feature_collection(self) -> None:
+        with self.assertRaisesRegex(ValueError, "not a GeoJSON FeatureCollection"):
+            service.query_features("jointSummary")
 
 
 if __name__ == "__main__":
