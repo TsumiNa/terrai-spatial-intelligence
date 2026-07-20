@@ -4,7 +4,7 @@
 
 Status: Factor of Concept
 
-Date: 2026-07-20
+Date: 2026-07-21
 
 ## 1. One-sentence definition
 
@@ -46,6 +46,12 @@ FL stores acquired real-world evidence and deterministic transformations that pr
 - Customer data entering FL is not automatically shared across customers; tenancy and permissions are later Factor of Develop work.
 
 Current FL includes GSI, OpenStreetMap, Yokohama open data, NASA POWER, TEPCO public CSV, and Google Satellite Embedding. The embedding remains external FL even though it was produced by a foundation model.
+
+#### Source precedence and time contract
+
+- When a national dataset and a local dataset cover the same domain, TerrAI uses the national dataset as the coverage base. Local data independently validates matching records and adds local attributes or explicitly labelled supplemental records; it never silently overwrites the national record.
+- Every FL dataset must carry a `retrieved_at` timestamp. When the publisher supplies a publication, update, effective, observation, or coverage time, FL preserves it separately as source-time metadata such as `source_updated_at`; if the publisher supplies none, FL records the value as unknown with a reason instead of inventing a date.
+- Reconciled records retain the provenance and timestamps of every contributing source. Source disagreements remain visible for review, and periodic refreshes compare timestamps and content rather than treating the latest download as automatically authoritative.
 
 ### SL · Synthetic Data Layer
 

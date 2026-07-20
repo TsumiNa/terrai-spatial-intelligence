@@ -2,9 +2,9 @@
 
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
-- FL 状態：接続済み
+- FL 状態：地方検証・補足 source として接続済み
 - Snapshot：2026-04-01
-- 種類：公式施設名、住所、位置
+- 種類：地方施設区分、定義、名称、住所、位置
 
 ## データの内容
 
@@ -13,8 +13,8 @@
 - **粒度** — 公式の防災施設 1 件につき 1 行（地域防災拠点、避難場所などの区分は `Type` で判別）。
 - **データ量** — `2026-04-01` スナップショット（`hinanjo_20260401.csv`）で施設 628 行。
 - **時点** — 日付付きスナップショット。市は独自の頻度で再公開し、ファイル名にスナップショット日付を保持しています。
-- **デモに到達する範囲** — 横浜デモの小さな矩形内にある施設のみが空間フィルタを通過するため、`data/yokohama/official_facility_resilience.geojson` は 628 行のうち現在 **2** 地物のみを保持します。
-- **既知の欠測と留意点** — 施設の identity・区分・住所・座標は公式情報です。一方で本 project が付加する `matched_roof_area_m2`、`pv_kwp_proxy`、`nearest_road_m`、`served_high_risk_buildings`、`resilience_score` はいずれも他レイヤから計算した PoC 代理値であり、市による施設評価ではありません。本ファイルは指定状況を示すものであり、現在の構造状態・使用中の収容力・運用即応性については何も述べていません。
+- **デモに到達する範囲** — study window 内には地域防災拠点が 2 件あります。岩崎小学校は一致する全国 GSI 避難所を検証し、桜台小学校は GSI 指定避難所 base にないため明示的な地方補足として残ります。GSI が追加する 1 避難所と合わせ、照合済み output は現在 **3** 施設です。
+- **既知の欠測と留意点** — 施設 identity、地方区分、住所、座標は公式情報です。一方、本 project が付加する `matched_roof_area_m2`、`pv_kwp_proxy`、`nearest_road_m`、`served_high_risk_buildings`、`resilience_score` は他 layer から計算した PoC proxy であり、市による評価ではありません。本 file は現在の構造状態、使用中の収容力、運用即応性を示しません。
 
 ## 出典
 
@@ -22,7 +22,7 @@
 
 ## 本 project での利用
 
-保土ケ谷 study window 内の公式2拠点を公共施設レジリエンス改修の実行対象とします。位置、名称、住所は公式観測です。最近屋根、PV容量、道路距離、250 m high-risk 建物関連は TerrAI proxy です。出力：`data/yokohama/official_facility_resilience.geojson`。
+本 dataset は単独の施設 source ではなくなりました。GSI 指定避難所を全国 coverage base とし、横浜 record は名称一致の検証、地方区分/定義の追加、不一致地方公式施設の label 付き補足に使います。位置、名称、住所は公式観測です。最近屋根、PV容量、道路距離、250 m high-risk 建物関連は TerrAI proxy です。出力：`data/yokohama/official_facility_resilience.geojson`。
 
 ## License
 
