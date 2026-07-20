@@ -6,7 +6,7 @@
 
 TerrAI's shared foundation is divided into Foundation Data Layer (FL), Synthetic Data Layer (SL), and Application Layer (AL). Public/official observations and deterministic transformations that preserve meaning belong to FL. Future sparse imputations that pass held-out, calibration, and applicability gates belong to SL. Current slope, road-resilience, solar-siting, and joint scores belong to AL.
 
-The first stage was a Factor of Concept and did not define schemas, databases, or orchestration. The later exhibition refactor added a minimal read-only API without changing the three-layer boundary. See [`FL_SL_AL_CONCEPT.en.md`](../architecture/FL_SL_AL_CONCEPT.en.md); rationale is retained in [`fl-sl-al-platform/00-overview.en.md`](../refactor/fl-sl-al-platform/00-overview.en.md).
+The first stage was a Factor of Concept and did not define schemas, databases, or orchestration. The later exhibition refactor added a minimal read-only API without changing the three-layer boundary. See [`FL_SL_AL_CONCEPT.en.md`](../architecture/FL_SL_AL_CONCEPT.en.md); rationale is retained in [`fl-sl-al-platform/00-overview.md`](../refactor/fl-sl-al-platform/00-overview.md).
 
 ## Customer exhibition UI and minimal FastAPI separation (2026-07-20)
 

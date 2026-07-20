@@ -1,6 +1,6 @@
 ---
-description: 'Use when creating, editing, or reorganizing repository documentation. Keep public and developer entrypoints distinct, classify docs into the fixed five-folder structure, and maintain every document as a Chinese/Japanese/English group.'
-applyTo: '**/{README,README.ja,README.en,CONTRIBUTING,CONTRIBUTING.ja,CONTRIBUTING.en}.md,docs/**'
+description: 'Use when creating, editing, or reorganizing repository documentation. Keep public and developer entrypoints distinct, classify docs into the fixed five-folder structure, and apply multilingual maintenance only to architecture, data, and summary.'
+applyTo: '**/{README,CONTRIBUTING}.md,docs/**'
 ---
 
 # Repository Documentation Boundaries
@@ -10,11 +10,11 @@ applyTo: '**/{README,README.ja,README.en,CONTRIBUTING,CONTRIBUTING.ja,CONTRIBUTI
 - `README.md` is user-facing: product purpose, audience, installation, quick start, primary CLI/API usage, concise examples, and links to deeper documentation.
 - `CONTRIBUTING.md` is developer-facing: repository layout, local development, testing, coding/documentation conventions, branch/PR workflow, and contribution expectations.
 - Do not put internal architecture rationale, refactor history, or long evaluation reports in the root entrypoints. Link to the appropriate `docs/` document.
-- Root `README` and `CONTRIBUTING` are also trilingual groups.
+- Root `README.md` and `CONTRIBUTING.md` are English-only by default.
 
-## Language groups
+## Language policy
 
-Every Markdown document under `docs/`, plus root `README` and `CONTRIBUTING`, must exist as one semantic group:
+Only documents in `docs/architecture/`, `docs/data/`, and `docs/summary/` must exist as one semantic group:
 
 - Simplified Chinese canonical file: `name.md`
 - Japanese file: `name.ja.md`
@@ -22,9 +22,11 @@ Every Markdown document under `docs/`, plus root `README` and `CONTRIBUTING`, mu
 
 All three must link to one another near the title. Create, rename, move, and update all three in the same change. Keep meaning, status, links, diagrams, and commands aligned even when wording is not a literal translation.
 
+Every other documentation location uses one English `.md` file by default. This includes root `README.md` and `CONTRIBUTING.md`, `docs/README.md`, `docs/refactor/`, and `docs/others/`. Do not create `.ja.md` or `.en.md` partners there unless a specific requirement justifies them; English is the unsuffixed canonical file.
+
 ## Fixed `docs/` structure
 
-Only `docs/README.md`, `docs/README.ja.md`, and `docs/README.en.md` may be files directly under `docs/`. `docs/` contains exactly these five top-level directories; do not create another category:
+Only the English `docs/README.md` index may be placed directly under `docs/`. `docs/` contains exactly these five top-level directories; do not create another category:
 
 1. `architecture/`
 2. `refactor/`
@@ -40,9 +42,9 @@ Store the currently valid system structure: component responsibilities, stable c
 
 Use one independent folder per refactor: `docs/refactor/<refactor-name>/`. This folder fully replaces ADR; do not create `docs/adr/`.
 
-Each refactor folder must contain a trilingual `00-overview` group. It records the context, problem, decision and rationale, considered alternatives, consequences, scope, non-goals, and the map of planned PR stages.
+Each refactor folder must contain an English `00-overview.md`. It records the context, problem, decision and rationale, considered alternatives, consequences, scope, non-goals, and the map of planned PR stages.
 
-Put concrete plans in files named `NN-topic-prXa.md`, with matching `.ja.md` and `.en.md` files:
+Put concrete English plans in files named `NN-topic-prXa.md`:
 
 - `NN` is the planned PR sequence number, starting at `01`.
 - Plans split within the same PR reuse `NN` and add parts such as `pr1a`, `pr1b`, and `pr1c`.
@@ -60,7 +62,7 @@ Document every dataset integrated into the Foundation Data Layer in its own tril
 - license or governing terms;
 - extra cautions for commercial use, redistribution, attribution, third-party rights, freshness, and fitness for decision-making.
 
-`docs/data/README.*` is the catalog. Candidate datasets that are not integrated belong in an evaluation under `summary/`, not as integrated data cards.
+`docs/data/README.*` is the trilingual catalog. Candidate datasets that are not integrated belong in an evaluation under `summary/`, not as integrated data cards.
 
 ### `docs/summary/`
 
@@ -68,12 +70,13 @@ Store summaries produced while validating or evaluating features: experiments, c
 
 ### `docs/others/`
 
-Use only when a text genuinely cannot fit `architecture`, `refactor`, `data`, or `summary`. State in the document why the four primary categories do not apply. Reclassify it when a clearer home emerges.
+Use English by default and only when a text genuinely cannot fit `architecture`, `refactor`, `data`, or `summary`. State in the document why the four primary categories do not apply. Reclassify it when a clearer home emerges.
 
 ## Change checklist
 
-- Move or update all three language files together.
+- In `architecture`, `data`, and `summary`, move or update all three language files together.
+- Elsewhere, maintain the English `.md` file and do not require translation partners.
 - Repair all repository links after a move; do not leave aliases in obsolete folders.
-- Run `uv run python -m terrai_spatial validate`; document discovery is automatic.
+- Run `uv run python -m terrai_spatial validate`; multilingual discovery is automatic within the three scoped directories.
 - For data cards, verify source, project use, license, and commercial cautions.
 - For refactors, verify `00-overview` and plan filenames before opening or updating the PR.

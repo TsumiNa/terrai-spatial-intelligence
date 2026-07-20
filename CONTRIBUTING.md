@@ -1,24 +1,22 @@
-# TerrAI 开发与贡献
+# TerrAI Development and Contribution
 
-[中文](CONTRIBUTING.md) | [日本語](CONTRIBUTING.ja.md) | [English](CONTRIBUTING.en.md)
-
-## 本地开发
+## Local development
 
 ```bash
 uv sync
 uv run python -m terrai_spatial validate
-uv run python -m unittest discover -s tests -v
+uv run python -m unittest discover -v
 uv run python -m terrai_spatial serve --port 4176
 ```
 
-前端位于 `frontend/`，FastAPI 与数据服务位于 `terrai_spatial/`，可直接执行的数据任务位于 `scripts/`，文件型基础数据及缓存位于 `data/`。
+The frontend lives in `frontend/`; FastAPI and data services in `terrai_spatial/`; directly executable data tasks in `scripts/`; and file-backed foundation data and caches in `data/`.
 
-## 文档约定
+## Documentation convention
 
-项目文档集中在 `docs/` 的 `architecture`、`refactor`、`data`、`summary`、`others` 五类中。每份文档必须同时提供中文 `.md`、日文 `.ja.md` 与英文 `.en.md`。详细边界与命名规则见 [repository-doc-boundaries.instructions.md](.github/instructions/repository-doc-boundaries.instructions.md)。
+Project documentation belongs in the five `docs/` categories: `architecture`, `refactor`, `data`, `summary`, and `others`. Documents in `architecture`, `data`, and `summary` require Chinese `.md`, Japanese `.ja.md`, and English `.en.md` versions. All other locations use English-only `.md` documents by default. See [repository-doc-boundaries.instructions.md](.github/instructions/repository-doc-boundaries.instructions.md) for detailed boundaries and naming.
 
-新增或修改文档后运行 `uv run python -m terrai_spatial validate`。校验器会自动发现文档，不需要维护手写文件清单；它会检查三语伙伴、目录边界、语言导航、refactor 命名和数据卡必需章节。
+Run `uv run python -m terrai_spatial validate` after adding or changing documentation. The validator discovers documents under the three multilingual directories automatically and checks their language partners and navigation. It also enforces directory boundaries, refactor naming, and required data-card sections.
 
-## 分支与 PR
+## Branches and PRs
 
-遵循 [branch-and-pr-workflow.instructions.md](.github/instructions/branch-and-pr-workflow.instructions.md)：一个目标对应一个 branch/PR；已有同目标 PR 时继续在原分支提交；把可审查阶段写入对应 `docs/refactor/<refactor>/` 计划。
+Follow [branch-and-pr-workflow.instructions.md](.github/instructions/branch-and-pr-workflow.instructions.md): use one branch/PR per objective; continue on an existing branch when its PR has the same objective; and record reviewable stages in the relevant `docs/refactor/<refactor>/` plan.

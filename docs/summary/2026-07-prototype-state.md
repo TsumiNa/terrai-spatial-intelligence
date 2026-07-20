@@ -314,10 +314,11 @@ terrai-spatial-intelligence/
 ├── scripts/                    # 可直接执行的数据获取、恢复与派生管线
 │   ├── ensure_data.py          # status / ensure / update 脚本入口
 │   └── bootstrap_packaged_data.py # 从 Git 恢复缺失基础快照
-├── architecture/               # 前端—后端调用结构与三语 Mermaid 时序图
 ├── docs/
-│   ├── architecture/           # FL → SL → AL 概念定义与成熟度边界
-│   ├── adr/                    # 可追溯的架构决策记录
-│   └── refactor/               # 重构原因、步骤与复核指南
+│   ├── architecture/           # 当前概念与前后端调用结构；中日英三语
+│   ├── data/                   # 已接入 FL 数据卡与许可说明；中日英三语
+│   ├── refactor/               # 英文重构总览与按 PR 拆分的计划
+│   ├── summary/                # 验证、评估与项目决策；中日英三语
+│   └── others/                 # 最后手段的未分类英文文档
 └── data/                       # FL 文件快照、标准化数据和分析结果；暂不使用数据库
 ```

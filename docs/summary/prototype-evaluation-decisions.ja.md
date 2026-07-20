@@ -6,7 +6,7 @@
 
 TerrAI の共有基盤を Foundation Data Layer（FL）、Synthetic Data Layer（SL）、Application Layer（AL）に分けます。公開・公式観測と意味を変えない決定論的加工は FL、held-out・校正・適用性 gate を通った将来の疎補完は SL、現在の斜面・道路レジリエンス・太陽光適地・統合スコアは AL です。
 
-第一段階は Factor of Concept であり schema、DB、orchestration を定義しませんでした。後続の展示リファクタは最小読取 API を追加しましたが三層境界は変えません。詳細は [`FL_SL_AL_CONCEPT.ja.md`](../architecture/FL_SL_AL_CONCEPT.ja.md)、判断理由は [`fl-sl-al-platform/00-overview.ja.md`](../refactor/fl-sl-al-platform/00-overview.ja.md) を参照してください。
+第一段階は Factor of Concept であり schema、DB、orchestration を定義しませんでした。後続の展示リファクタは最小読取 API を追加しましたが三層境界は変えません。詳細は [`FL_SL_AL_CONCEPT.ja.md`](../architecture/FL_SL_AL_CONCEPT.ja.md)、判断理由は英語の [`fl-sl-al-platform/00-overview.md`](../refactor/fl-sl-al-platform/00-overview.md) を参照してください。
 
 ## 顧客展示 UI と最小 FastAPI 分離（2026-07-20）
 

@@ -21,7 +21,7 @@ FRONTEND_ROOT = ROOT / "frontend"
 DEFAULT_PIPELINES = ("joint", "evidence")
 
 DOCS_TOP_LEVEL_DIRECTORIES = {"architecture", "refactor", "data", "summary", "others"}
-ROOT_TRILINGUAL_DOCUMENTS = (Path("README.md"), Path("CONTRIBUTING.md"))
+MULTILINGUAL_DOCS_DIRECTORIES = ("architecture", "data", "summary")
 REFACTOR_PLAN_PATTERN = re.compile(r"^\d{2}-[a-z0-9-]+-pr\d+[a-z]?\.md$")
 
 
@@ -29,14 +29,15 @@ def localized_document(path: Path, language: str) -> Path:
     return path.with_suffix(f".{language}.md")
 
 
-def canonical_documents() -> list[Path]:
-    """Discover canonical Chinese docs; localized partners are derived, never listed."""
-    documents = list(ROOT_TRILINGUAL_DOCUMENTS)
-    documents.extend(
-        path.relative_to(ROOT)
-        for path in sorted((ROOT / "docs").rglob("*.md"))
-        if not path.name.endswith((".ja.md", ".en.md"))
-    )
+def multilingual_documents() -> list[Path]:
+    """Discover canonical Chinese docs only where translations are required."""
+    documents: list[Path] = []
+    for directory in MULTILINGUAL_DOCS_DIRECTORIES:
+        documents.extend(
+            path.relative_to(ROOT)
+            for path in sorted((ROOT / "docs" / directory).rglob("*.md"))
+            if not path.name.endswith((".ja.md", ".en.md"))
+        )
     return documents
 
 REQUIRED_FILES = [
@@ -242,14 +243,14 @@ def command_validate(_: argparse.Namespace) -> None:
             "docs top-level directories must be exactly "
             f"{sorted(DOCS_TOP_LEVEL_DIRECTORIES)}; found {sorted(actual_directories)}"
         )
-    allowed_root_docs = {"README.md", "README.ja.md", "README.en.md"}
+    allowed_root_docs = {"README.md"}
     loose_docs = {path.name for path in docs_root.glob("*.md")} - allowed_root_docs
     for name in sorted(loose_docs):
         failures.append(f"loose document directly under docs/: {name}")
     if (docs_root / "adr").exists() and any((docs_root / "adr").iterdir()):
         failures.append("docs/adr is prohibited; preserve decisions in the refactor overview")
 
-    documents = canonical_documents()
+    documents = multilingual_documents()
     expected_document_paths: set[Path] = set()
     for canonical in documents:
         siblings = (
@@ -271,23 +272,27 @@ def command_validate(_: argparse.Namespace) -> None:
                 if f"({sibling})" not in content:
                     failures.append(f"trilingual navigation missing: {document}: {sibling}")
 
-    discovered_markdown = {
+    discovered_multilingual_markdown = {
         path.relative_to(ROOT)
-        for root in (ROOT, docs_root)
-        for path in (
-            root.glob("README*.md") if root == ROOT else root.rglob("*.md")
-        )
+        for directory in MULTILINGUAL_DOCS_DIRECTORIES
+        for path in (docs_root / directory).rglob("*.md")
     }
-    discovered_markdown.update(path.relative_to(ROOT) for path in ROOT.glob("CONTRIBUTING*.md"))
-    for orphan in sorted(discovered_markdown - expected_document_paths):
+    for orphan in sorted(discovered_multilingual_markdown - expected_document_paths):
         if orphan.name.endswith((".ja.md", ".en.md")):
             failures.append(f"localized document has no canonical Chinese partner: {orphan}")
+
+    for path in (ROOT / "README.md", ROOT / "CONTRIBUTING.md", docs_root / "README.md"):
+        if not path.is_file():
+            failures.append(f"missing English documentation entrypoint: {path.relative_to(ROOT)}")
+    for path in docs_root.rglob("*.md"):
+        if path.read_text(encoding="utf-8").count("```") % 2:
+            failures.append(f"unclosed code fence: {path.relative_to(ROOT)}")
 
     refactor_root = docs_root / "refactor"
     for refactor_folder in sorted(path for path in refactor_root.iterdir() if path.is_dir()):
         overview = refactor_folder.relative_to(ROOT) / "00-overview.md"
-        if overview not in documents:
-            failures.append(f"refactor folder missing 00-overview group: {refactor_folder.name}")
+        if not (ROOT / overview).is_file():
+            failures.append(f"refactor folder missing 00-overview.md: {refactor_folder.name}")
         for path in refactor_folder.glob("*.md"):
             if path.name.endswith((".ja.md", ".en.md")) or path.name == "00-overview.md":
                 continue
@@ -327,7 +332,7 @@ def command_validate(_: argparse.Namespace) -> None:
     print(
         "TerrAI validation passed: "
         f"{len(REQUIRED_FILES)} required assets, {json_count} JSON/GeoJSON files, "
-        f"{len(documents)} trilingual document groups"
+        f"{len(documents)} scoped trilingual document groups"
     )
 
 

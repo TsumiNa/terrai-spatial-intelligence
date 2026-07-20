@@ -174,4 +174,4 @@ sequenceDiagram
 - File cache, queries, aggregates, and queues: `terrai_spatial/data_service.py`
 - Dual-service startup and automatic data checks: `terrai_spatial/cli.py`
 - Task registry and dependencies: `terrai_spatial/data_tasks.py`
-- Refactor rationale and implementation plan: `docs/refactor/fl-sl-al-platform/01-exhibition-fastapi-pr1b.en.md`
+- Refactor rationale and implementation plan: `docs/refactor/fl-sl-al-platform/01-exhibition-fastapi-pr1b.md`

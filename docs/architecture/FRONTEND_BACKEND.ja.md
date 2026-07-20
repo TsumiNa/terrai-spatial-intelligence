@@ -174,4 +174,4 @@ sequenceDiagram
 - ファイルキャッシュ、検索、集計、キュー：`terrai_spatial/data_service.py`
 - 二サービス起動と自動データ確認：`terrai_spatial/cli.py`
 - タスク登録と依存関係：`terrai_spatial/data_tasks.py`
-- リファクタ理由と実装計画：`docs/refactor/fl-sl-al-platform/01-exhibition-fastapi-pr1b.ja.md`
+- リファクタ理由と実装計画（英語）：`docs/refactor/fl-sl-al-platform/01-exhibition-fastapi-pr1b.md`

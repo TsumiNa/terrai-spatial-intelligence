@@ -1,29 +1,27 @@
-# PR1a 计划：建立 FL → SL → AL 概念边界
+# PR1a Plan: Establish FL → SL → AL Conceptual Boundaries
 
-[中文](01-concept-layers-pr1a.md) | [日本語](01-concept-layers-pr1a.ja.md) | [English](01-concept-layers-pr1a.en.md)
+- Status: Completed
+- Refactor: `fl-sl-al-platform`
+- PR: #1 / part a
 
-- 状态：Completed
-- 所属重构：`fl-sl-al-platform`
-- PR：#1 / part a
+## Goal
 
-## 目标
+Define one FL/SL/AL vocabulary covering observed/synthetic/unresolved evidence, multiscale missingness, quality gates, and current maturity, so AL heuristics cannot be presented as model predictions.
 
-建立唯一的 FL、SL、AL 定义，明确 observed / synthetic / unresolved、多尺度 missing、证据质量闸门及当前成熟度，避免把 AL 启发式分数称为模型预测。
+## Scope
 
-## 范围
+1. Write the three-layer concept and Mermaid overview.
+2. Review `geo_pfn` sparse-context results and limit them to mechanism evidence.
+3. Map GSI, OSM, Yokohama, NASA POWER, TEPCO, and Satellite Embedding to FL.
+4. State that current Yokohama/Mobara surface SL count is zero.
+5. Add concept contract tests.
 
-1. 编写三层概念架构及 Mermaid 总览。
-2. 复核 `geo_pfn` 稀疏上下文实验，限定其为机制证据。
-3. 将 GSI、OSM、横滨开放数据、NASA POWER、TEPCO、Satellite Embedding 映射到 FL。
-4. 明确当前横滨/茂原地表 SL 数量为 0。
-5. 建立概念契约测试。
+## Non-goals
 
-## 非目标
+No schemas, inter-layer APIs, databases, model registry, customer permissions, or production surface model.
 
-不定义 schema、层间 API、数据库、模型注册、客户权限或生产地表模型。
+## Acceptance
 
-## 验收
-
-- 三层定义、替代方案、后果与非目标集中在 `00-overview` 和 `docs/architecture/FL_SL_AL_CONCEPT.md`。
-- AL 风险、适宜性、容量代理没有被标记为 SL。
-- 中日英版本语义一致并通过文档验证。
+- Definitions, alternatives, consequences, and non-goals live in `00-overview.md` and `docs/architecture/FL_SL_AL_CONCEPT.en.md`.
+- AL risk, suitability, and capacity proxies are never labeled SL.
+- The trilingual architecture document group passes documentation validation.

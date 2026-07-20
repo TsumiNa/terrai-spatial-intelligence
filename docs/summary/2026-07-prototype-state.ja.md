@@ -106,8 +106,8 @@ uv run python scripts/parse_tepco_grid.py
 Google Satellite Embedding は外部 FL で TerrAI SL ではありません。capacity proxy と risk/suitability score は透明 AL 計算です。所有、許認可、正式系統、構造安全は権威 data/due diligence まで unknown のままです。
 
 - [概念 architecture](../architecture/FL_SL_AL_CONCEPT.ja.md)
-- [refactor 背景と判断理由](../refactor/fl-sl-al-platform/00-overview.ja.md)
-- [本 PR の段階 plan](../refactor/fl-sl-al-platform/01-concept-layers-pr1a.ja.md)
+- [refactor 背景と判断理由（英語）](../refactor/fl-sl-al-platform/00-overview.md)
+- [本 PR の段階 plan（英語）](../refactor/fl-sl-al-platform/01-concept-layers-pr1a.md)
 - [frontend–backend 呼び出し時系列](../architecture/FRONTEND_BACKEND.ja.md)
 
 FastAPI v1 は最小 read/query/rank 境界だけを作り、正式 schema、model registry、orchestration、DB、tenant、deployment は後続です。
@@ -251,8 +251,12 @@ terrai-spatial-intelligence/
 │   ├── audit.js
 │   ├── i18n.js
 │   └── styles.css
-├── architecture/              # 三言語 call sequence
 ├── scripts/                   # acquisition/rebuild pipeline
-├── docs/                      # 三言語 concept/ADR/refactor
+├── docs/                      # architecture/data/summary は三言語、refactor は英語
+│   ├── architecture/          # 現行 concept と frontend/backend call sequence
+│   ├── data/                  # 接続済み FL dataset card と license 注意
+│   ├── refactor/              # 英語 refactor overview と PR plan
+│   ├── summary/               # 評価、検証、project decision
+│   └── others/                # 最終手段の未分類文書
 └── data/                      # FL snapshot/result、DB 未使用
 ```

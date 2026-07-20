@@ -1,28 +1,28 @@
-# PR1c 计划：文档信息架构与三语治理
+# PR1c Plan: Documentation Information Architecture and Scoped Multilingual Governance
 
-[中文](01-documentation-governance-pr1c.md) | [日本語](01-documentation-governance-pr1c.ja.md) | [English](01-documentation-governance-pr1c.en.md)
+- Status: Completed
+- Refactor: `fl-sl-al-platform`
+- PR: #1 / part c
 
-- 状态：Completed
-- 所属重构：`fl-sl-al-platform`
-- PR：#1 / part c
+## Goal
 
-## 目标
+Remove overlap among root `architecture/`, `docs/adr/`, flat refactor records, and root evaluation documents; establish a sustainable five-category docs structure with multilingual maintenance limited to customer- and evidence-facing documentation.
 
-消除根 `architecture/`、`docs/adr/`、扁平 refactor 记录和根级评估文档之间的重叠，形成可持续的五类 docs 结构，并保持所有文档中日英同步。
+## Plan
 
-## 计划
+1. Merge system-call documentation into `docs/architecture/`.
+2. Replace ADRs with one refactor folder and `00-overview` per refactor.
+3. Split integrated FL sources into per-dataset cards under `docs/data/`.
+4. Move evaluation, validation, and non-refactor decisions to `docs/summary/`.
+5. Use `docs/others/` only when no category fits.
+6. Slim the root README and put development workflow in CONTRIBUTING.
+7. Require trilingual groups only in `architecture`, `data`, and `summary`; use English elsewhere by default.
+8. Update repository instructions, references, and automated validation.
 
-1. 系统调用文档合并到 `docs/architecture/`。
-2. 用每个 refactor 的独立 folder 与 `00-overview` 取代 ADR。
-3. 按数据集拆分 `docs/data/` FL 数据卡。
-4. 把评估、验证和非 refactor 决策移到 `docs/summary/`。
-5. 只把无法分类的材料放到 `docs/others/`。
-6. 精简根 README，把开发流程放入 CONTRIBUTING。
-7. 更新 repository instructions、路径引用和自动验证。
+## Acceptance
 
-## 验收
-
-- `docs/` 顶层只包含 README 和 architecture/refactor/data/summary/others。
-- 不存在 `docs/adr/` 或根 `architecture/`。
-- 每个已接入 FL 数据集都有独立三语数据卡。
-- 每个 refactor folder 以 `00-overview` 开头，PR 文件按 `NN-topic-prXa` 命名。
+- `docs/` contains only README plus architecture/refactor/data/summary/others.
+- No `docs/adr/` or root `architecture/` remains.
+- Every integrated FL dataset has an independent trilingual card.
+- Every refactor folder starts with an English `00-overview.md`; PR files follow `NN-topic-prXa.md`.
+- Root, refactor, and others documentation is not subject to blanket trilingual validation.

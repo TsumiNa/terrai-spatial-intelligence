@@ -1,128 +1,125 @@
-# FL → SL → AL Factor of Concept 重构记录
+# FL → SL → AL Factor of Concept Refactor Record
 
-[中文](00-overview.md) | [日本語](00-overview.ja.md) | [English](00-overview.en.md)
+- Date: 2026-07-20
+- Branch: `refactor/fl-sl-al-concept`
+- Baseline: `main` / `4ceb7ba`
+- Type: conceptual refactor first; minimal frontend/backend separation added in the same PR's customer-exhibition stage
 
-- 日期：2026-07-20
-- 分支：`refactor/fl-sl-al-concept`
-- 基线：`main` / `4ceb7ba`
-- 类型：首阶段为概念重构；同一 PR 的客户展览阶段增加最小前后端分离
+## 1. Why
 
-## 1. 重构原因
+The Prototype shared a map, data, and audit foundation but was narrated as three application Demos. It did not explain multiscale missingness as a cross-application capability and could mix observations, deterministic processing, proxies, heuristics, and future imputations.
 
-原 Prototype 已经共用地图、数据和审计基础，但产品叙事仍以三个应用 Demo 为中心。它没有清楚解释多尺度数据缺失如何成为跨应用的能力，也容易让原始观测、确定性加工、代理指标、启发式评分与未来模型补值混在一起。
+The refactor defines TerrAI as accumulative data infrastructure plus application outputs:
 
-本次重构把 TerrAI 定义为一个可积累的数据基础设施加多个应用出口：
+1. **FL** accumulates public, commercial, and customer-authorized evidence while preserving multiscale missingness.
+2. **SL** uses locally validated scenario model portfolios to non-destructively augment predictable missingness with uncertainty and abstention.
+3. **AL** turns qualified FL/SL evidence into slope, road, solar, and other business outputs.
 
-1. **FL** 积累公开、商业及客户授权的真实证据，并如实保留多尺度 missing。
-2. **SL** 使用经过本地验证的场景模型群，在适合预测的 missing 上形成带不确定性和拒答能力的非破坏性增强层。
-3. **AL** 把合格 FL/SL 证据转成坡地暴露、道路韧性、光伏选址等业务出口。
+This preserves commercial readability and gives sparse-context prediction such as `geo_pfn` the correct architectural position.
 
-这样既保留了现有 Demo 的商业可读性，也为 `geo_pfn` 一类稀疏上下文预测能力留下正确位置。
+## 2. Evidence reviewed
 
-## 2. 复核过的依据
+- `TerrAI_Narrative_Product_Strategy_Update_v4.docx` §4 and §6–7: sparse subsurface prediction is an entry proof; reusable engine/delivery and controlled applications are the long-term assets.
+- `TsumiNa/geo_pfn` commit `07c7ee0`, `stage-report.html`, and `sparse-context-results.html`: model ranking changes with density, features, and training volume; interval coverage and row-level error ranking are distinct.
+- Current Prototype lineage: six external source groups form FL; current scores are transparent AL rules; no Yokohama/Mobara surface SL has passed held-out, calibration, and cross-area validation.
 
-- `TerrAI_Narrative_Product_Strategy_Update_v4.docx` 的 §4、§6–7：稀疏地下预测是入口技术证明；长期资产是可复用 engine/delivery 能力和受控 application。
-- `TsumiNa/geo_pfn` 提交 `07c7ee0` 的 `stage-report.html` 与 `sparse-context-results.html`：模型优劣会随上下文密度、特征和训练量变化，区间覆盖与逐样本误差排序也不是同一问题。
-- 当前 Prototype 的数据与评分血缘：6 组外部来源已经形成 FL；现有评分属于 AL 透明规则；横滨/茂原尚无经过 held-out、校准和跨区验证的地表 SL。
+Later `geo_pfn` training corrected the early overstatement that real features hurt; under-training was the main cause. The architecture therefore binds to model selection by scenario and sparsity, strong baselines, uncertainty, and abstention—not one fixed model or feature set.
 
-`geo_pfn` 的最新结论修正了早期“加入真实特征会变差”的过度概括：后续训练表明这主要与训练不足有关。重构因此不绑定某个固定模型或固定特征组合，而是采用按场景与稀疏度选择模型、与强基线比较、输出不确定性并允许拒答的概念。
+## 2.1 Decision, alternatives, and consequences
 
-## 2.1 决策、替代方案与后果
+Adopt FL → SL → AL instead of keeping an ambiguous “unified data foundation” or allowing every application to maintain its own imputation model. The unified label is simple but continues to mix facts, proxies, and predictions. Per-application models may ship quickly but trap customer learning, calibration, and audit inside one project instead of creating shared assets.
 
-采用 FL → SL → AL，而不是继续使用含混的“统一数据底座”，也不让每个应用分别维护自己的补值模型。统一底座虽然简单，却持续混淆事实、代理和预测；应用自建模型虽然短期快，却让客户学习、校准和审计留在单一项目中，无法成为共享资产。
+The accepted structure keeps observed and synthetic evidence distinguishable, gives model portfolios/applicability/abstention explicit positions, and lets new applications reuse validated SL. The cost is accepting that some areas remain unknown and later implementing versioning, permissions, model selection, and lineage. Ownership, statutory permission, formal grid access, and structural safety must never be model-imputed.
 
-采用三层后的正面结果是：观测与 synthetic 永久可区分；模型群、适用性和拒答有明确位置；新应用可以复用经过验证的 SL。对应成本是平台必须接受部分区域保持 unknown，并为版本、权限、模型选择和 lineage 预留后续开发。地权、法定许可、正式并网和结构安全等缺失不得模型补值。
+## 3. Implementation steps and commit intent
 
-## 3. 实施步骤与提交意图
+### Commit 1: `docs: define FL SL AL conceptual architecture`
 
-### 提交 1：`docs: define FL SL AL conceptual architecture`
+- Canonical three-layer definition, multiscale missingness, and observed/synthetic/unresolved boundaries.
+- Decision rationale, alternatives, consequences, and non-goals.
+- Corrected `geo_pfn` interpretation.
 
-- 写入唯一的三层概念定义、missing 的多尺度含义和 observed/synthetic/unresolved 边界。
-- 用 ADR 记录选择这一结构的原因、替代方案、后果与非目标。
-- 更新既有重构决策，校正 `geo_pfn` 证据表述。
+### Commit 2: `feat: add FL SL AL architecture lens`
 
-### 提交 2：`feat: add FL SL AL architecture lens`
+- Added the first internal architecture view and trilingual explanation.
+- Showed FL live, surface SL zero, and AL live.
+- Connected maturity and calibration evidence to the audit drawer without changing application results.
 
-- 在 Demo 中增加默认架构入口和中/日/英三语说明。
-- 展示 FL 已接入、地表 SL 为 0、AL 已接入的真实成熟度。
-- 将 FL 来源、SL 空状态、AL 出口和地下校准证据接入现有审计抽屉。
-- 保留所有既有应用和地图交互，不改变其计算结果。
+### Commit 3: `docs: map prototype maturity and validate concept`
 
-### 提交 3：`docs: map prototype maturity and validate concept`
+- Connected README, concept, decision rationale, and refactor record.
+- Added concept contracts preventing AL heuristics from being relabeled as SL.
+- Recorded review and Factor of Develop boundaries.
 
-- 在 README 中建立从运行说明到概念架构、ADR 和重构记录的入口。
-- 加入概念契约测试与 CLI 验证，防止后续界面把 AL 启发式误标为 SL。
-- 记录 PR 复核路径、验收结果与 Factor of Develop 的边界。
+### Commit 4: `feat: rebuild exhibition demo with FastAPI backend`
 
-### 提交 4：`feat: rebuild exhibition demo with FastAPI backend`
+- Customer navigation now exposes business entry points, results, reliability, and audit instead of internal maturity.
+- Static files moved to `frontend/`; one `/api/v1/bootstrap` contract loads exhibition data.
+- Python data service handles caching, query, aggregation, regional filtering, and action-queue ranking.
+- Independent JSON/GeoJSON remains current FL storage; no ORM, schema, write API, or database.
+- Added API and customer-boundary tests.
 
-- 客户导航只保留业务入口、结果、可靠性与审计，不再展示内部三层成熟度和模型壳子。
-- 将静态页面移动到 `frontend/`，并通过单一 `/api/v1/bootstrap` 契约加载展示数据。
-- 新增 FastAPI 文件数据服务，把汇总、条件/空间查询、区域筛选和行动队列排序移到 Python。
-- 保留独立 JSON/GeoJSON 作为当前 FL 存储，不引入数据库 schema、ORM 或写入 API。
-- 增加 API、客户界面边界和推荐结果的自动化契约测试。
+### Commit 5: `docs: record customer exhibition service boundary`
 
-### 提交 5：`docs: record customer exhibition service boundary`
+- Updated startup, independent services, API, and customer entry documentation.
+- Recorded frontend/FastAPI/pipeline boundaries and SQLite triggers.
+- Corrected the review path for customer and internal audiences.
 
-- 更新启动、独立前后端运行、API 接口和客户入口说明。
-- 记录静态前端、FastAPI、数据管线的责任边界及未来 SQLite 触发条件。
-- 修正 PR 复核步骤，使客户展示与内部概念文档各自服务正确受众。
+Exact hashes and diffs remain in Git and the PR Commits page; this record preserves product intent.
 
-精确提交哈希和每个提交的 diff 由本分支 Git 历史与 PR `Commits` 页面保留；本文记录每一步的产品意图，避免只看到最终文件而失去决策过程。
+## 4. Current asset mapping
 
-## 4. 当前资产映射
-
-| 当前资产 | 概念位置 | 理由 |
+| Asset | Layer | Reason |
 |---|---|---|
-| GSI、OSM、横滨开放数据、NASA POWER、东京电力 CSV | FL | 真实发布/观测证据及其本地快照 |
-| Google Satellite Embedding | FL | Google 生产的外部表征，不是 TerrAI 对 missing 的补值 |
-| DEM 派生坡度、坐标转换、空间聚合 | FL | 保持来源观测语义的确定性加工 |
-| 风险分、适宜分、联合分、容量代理 | AL | 透明业务规则与代理，不是训练模型生成的补值 |
-| `geo_pfn` 羽田实验 | SL 机制证据 | 证明特定稀疏上下文下的候选机制，不证明地表应用精度 |
-| 横滨/茂原地表 sparse imputation | 尚不存在 | 缺少本地目标标签、held-out、校准和跨区验证 |
+| GSI, OSM, Yokohama open data, NASA POWER, TEPCO CSV | FL | Published/observed evidence and local snapshots |
+| Google Satellite Embedding | FL | Google-produced external representation, not TerrAI imputation |
+| DEM slope, coordinate conversion, spatial aggregation | FL | Deterministic transformations preserving observational meaning |
+| Risk/suitability/joint scores and capacity proxies | AL | Transparent business rules and proxies |
+| `geo_pfn` Haneda experiment | SL mechanism evidence | Candidate mechanism in a sparse regime, not surface accuracy |
+| Yokohama/Mobara surface sparse imputation | Absent | No local targets, held-out, calibration, or cross-area validation |
 
-## 5. PR 复核顺序
+## 5. PR review order
 
-1. 启动 Demo，确认首屏一眼说明横滨城市韧性与茂原新能源两个客户场景。
-2. 依次进入项目组合和专项分析，确认地图、行动队列和一句话结果解释完整。
-3. 点击指标、队列分数和地图弹窗中的虚线值，确认来源、公式、不确定性与限制可追溯。
-4. 切换中文、日文、英文，并在窄屏下确认主功能仍可读、可操作。
-5. 打开 FastAPI `/docs`，确认健康、目录、数据、GeoJSON 查询和推荐队列接口。
-6. 内部架构复核再阅读 `FL_SL_AL_CONCEPT.md` 与 ADR，确认运行时结果没有把 AL 规则误标成 SL。
-7. 运行自动化校验，确认概念契约、API、数据任务和静态资源完整。
+1. Start the Demo and confirm the landing page immediately explains Yokohama resilience and Mobara renewable development.
+2. Review portfolio and specialist analyses: map, action queue, and one-line interpretation.
+3. Click dashed metrics, queue scores, and popup fields to inspect source, formula, uncertainty, and limitations.
+4. Switch Chinese, Japanese, and English; verify a narrow viewport.
+5. Open FastAPI `/docs` and inspect health, catalog, data, GeoJSON query, and recommendation routes.
+6. Read `docs/architecture/FL_SL_AL_CONCEPT.en.md` and confirm the runtime never labels AL rules as SL.
+7. Run automated validation for concept, API, data tasks, and assets.
 
-## 6. 明确留给 Factor of Develop
+## 6. Reserved for Factor of Develop
 
-- FL/SL/AL 的数据对象、字段、表和文件 schema；
-- 层间 API、任务编排、模型注册、版本与回滚协议；
-- 客户数据导入、权限、多租户隔离和跨客户学习规则；
-- 第一个地表目标变量、标签获取、缺测机制与模型组合；
-- SL 的 held-out、校准、跨时间/跨区验证和 AL 准入阈值；
-- 数据库、特征库、对象存储、在线推理和部署拓扑。
+- FL/SL/AL objects, fields, tables, and file schemas;
+- inter-layer APIs, orchestration, model registry, versioning, and rollback;
+- customer imports, permissions, tenant isolation, and cross-customer learning;
+- the first surface target, labels, missingness mechanism, and model portfolio;
+- SL held-out, calibration, time/area validation, and AL admission thresholds;
+- databases, feature stores, object stores, online inference, and deployment topology.
 
-这些决策必须由首个客户 PoC 的目标变量、风险承受度和数据授权来约束。本次概念重构不以虚构接口或占位 schema 提前锁定答案。
+These choices must be constrained by the first customer PoC's target, risk tolerance, and data authorization.
 
-## 7. 验收命令
+## 7. Acceptance commands
 
 ```bash
 node --check frontend/app.js
 node --check frontend/audit.js
 node --check frontend/i18n.js
-uv run python -m unittest discover -s tests -v
+uv run python -m unittest discover -v
 uvx ruff check .
 uv run python -m terrai_spatial validate
 git diff --check
 ```
 
-## 8. 客户展览与 FastAPI 后续重构
+## 8. Customer exhibition and FastAPI follow-up
 
-概念重构的首版把 FL/SL/AL 直接作为默认页面，适合内部对齐，但不适合客户展览。客户主要需要理解“有什么功能、结果意味着什么、是否可靠、如何追溯”，不需要在主流程中阅读内部成熟度或实验边界。因此同一 PR 继续完成第二阶段：
+The first concept UI was useful internally but unsuitable for an exhibition. The same PR therefore:
 
-1. 将 FL/SL/AL 定义保留在架构文档和 ADR，不再放进客户导航。
-2. 客户首屏改为项目机会、四个业务指标、地图、推荐队列和一句话结果解释。
-3. 将内部实验、Claude 对比和模型壳子说明移出运行时主界面。
-4. 静态文件移动到 `frontend/`；前端只通过 FastAPI 加载数据与推荐结果。
-5. 新增 Python 数据服务，承担 JSON/GeoJSON 缓存、查询、汇总和队列排序。
-6. 当前继续使用文件存储，以稳定 dataset key 隔离未来 SQLite 迁移。
+1. kept FL/SL/AL in internal documents, not customer navigation;
+2. changed the landing page to opportunity, four metrics, map, queue, and plain-language result;
+3. removed internal experiment, Claude comparison, and model-shell explanation from runtime;
+4. moved static files to `frontend/` and loaded data only through FastAPI;
+5. added Python JSON/GeoJSON cache, query, aggregation, and ranking;
+6. kept file storage behind stable dataset keys for later SQLite migration.
 
-详细职责与调用结构见 `docs/architecture/FRONTEND_BACKEND.md`。
+See `docs/architecture/FRONTEND_BACKEND.en.md`.

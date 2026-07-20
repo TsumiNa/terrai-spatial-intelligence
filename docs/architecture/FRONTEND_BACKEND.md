@@ -174,4 +174,4 @@ sequenceDiagram
 - 文件缓存、查询、汇总与队列：`terrai_spatial/data_service.py`
 - 启动双服务与自动数据检查：`terrai_spatial/cli.py`
 - 数据任务注册和依赖：`terrai_spatial/data_tasks.py`
-- 前后端职责与调用结构已合并保留在本文；重构过程见 [`fl-sl-al-platform`](../refactor/fl-sl-al-platform/00-overview.md)。
+- 前后端职责与调用结构已合并保留在本文；重构过程见英文 [`fl-sl-al-platform`](../refactor/fl-sl-al-platform/00-overview.md)。

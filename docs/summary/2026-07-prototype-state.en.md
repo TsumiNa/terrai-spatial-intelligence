@@ -106,8 +106,8 @@ uv run python scripts/parse_tepco_grid.py
 Google Satellite Embedding is external FL, not TerrAI SL. Capacity proxies and risk/suitability scores are transparent AL calculations. Ownership, permission, formal grid access, and structural safety remain unknown until authoritative data or due diligence.
 
 - [Concept architecture](../architecture/FL_SL_AL_CONCEPT.en.md)
-- [Refactor background and rationale](../refactor/fl-sl-al-platform/00-overview.en.md)
-- [This PR's staged plan](../refactor/fl-sl-al-platform/01-concept-layers-pr1a.en.md)
+- [Refactor background and rationale](../refactor/fl-sl-al-platform/00-overview.md)
+- [This PR's staged plan](../refactor/fl-sl-al-platform/01-concept-layers-pr1a.md)
 - [Frontend–backend call sequences](../architecture/FRONTEND_BACKEND.en.md)
 
 FastAPI v1 establishes only the minimal read/query/rank boundary. Formal schemas, model registry, orchestration, database, tenancy, and deployment remain later development.
@@ -256,8 +256,12 @@ terrai-spatial-intelligence/
 │   ├── audit.js                # observed/model/calculation audit
 │   ├── i18n.js                 # Chinese/Japanese/English UI dictionary
 │   └── styles.css              # map, queue, drawer, responsive UI
-├── architecture/              # implemented call sequences in three languages
 ├── scripts/                   # directly executable acquisition/rebuild pipelines
-├── docs/                      # concept, ADR, and refactor records in three languages
+├── docs/                      # architecture/data/summary are trilingual; refactor is English
+│   ├── architecture/          # current concepts and frontend/backend call sequences
+│   ├── data/                  # integrated FL dataset cards and license cautions
+│   ├── refactor/              # English refactor overviews and PR-stage plans
+│   ├── summary/               # evaluations, validation, and project decisions
+│   └── others/                # uncategorized documentation of last resort
 └── data/                      # FL snapshots and results; no database yet
 ```
