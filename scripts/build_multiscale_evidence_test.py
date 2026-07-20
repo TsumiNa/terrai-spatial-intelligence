@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.build_multiscale_evidence import read_csv_text
+from scripts.build_multiscale_evidence import read_csv_text, reconcile_facility_sources
 
 
 HEADER = "Type,Definition,Name,Address,Lat,Lon,Kana,Ward,WardCode\r\n"
@@ -67,3 +67,88 @@ def test_source_in_neither_encoding_raises(write_csv) -> None:
     path = write_csv(b"Type\r\n\x81\x20\r\n")
     with pytest.raises(UnicodeDecodeError):
         read_csv_text(path)
+
+
+def gsi_feature(
+    name: str,
+    designation_type: str,
+    coordinates: list[float],
+    *,
+    common_id: str,
+    hazards: list[str] | None = None,
+    address: str = "神奈川県横浜市保土ケ谷区岩崎町22-1",
+) -> dict:
+    return {
+        "type": "Feature",
+        "geometry": {"type": "Point", "coordinates": coordinates},
+        "properties": {
+            "name": name,
+            "address": address,
+            "designation_type": designation_type,
+            "common_id": common_id,
+            "hazards": hazards or [],
+            "source_updated_at": "2026-01-16",
+            "retrieved_at": "2026-07-21T00:00:00+00:00",
+        },
+    }
+
+
+def local_row(name: str, coordinates: list[float]) -> dict[str, str]:
+    return {
+        "Name": name,
+        "Definition": "local definition",
+        "Type": "地域防災拠点",
+        "Address": "local address",
+        "Ward": "保土ケ谷区",
+        "Lon": str(coordinates[0]),
+        "Lat": str(coordinates[1]),
+    }
+
+
+def test_national_shelters_are_base_and_local_rows_validate_or_supplement() -> None:
+    gsi = [
+        gsi_feature(
+            "横浜市立岩崎小学校",
+            "designated_shelter",
+            [139.5864, 35.4467],
+            common_id="S1",
+        ),
+        gsi_feature(
+            "横浜市立岩崎中学校",
+            "designated_shelter",
+            [139.5853, 35.4499],
+            common_id="S2",
+            address="神奈川県横浜市旭区テスト町1-1",
+        ),
+        gsi_feature(
+            "横浜市立岩崎小学校　体育館１４",
+            "designated_emergency_evacuation_place",
+            [139.5865, 35.4468],
+            common_id="E1",
+            hazards=["flood", "earthquake"],
+        ),
+        gsi_feature(
+            "横浜市立桜台小学校　体育館１０",
+            "designated_emergency_evacuation_place",
+            [139.5914, 35.4502],
+            common_id="E2",
+            hazards=["earthquake"],
+        ),
+    ]
+    local = [
+        local_row("岩崎小学校", [139.5864, 35.4467]),
+        local_row("桜台小学校", [139.5914, 35.4502]),
+    ]
+
+    records = reconcile_facility_sources(gsi, local)
+    by_name = {item["properties"]["name"]: item["properties"] for item in records}
+
+    assert len(records) == 3
+    assert by_name["横浜市立岩崎小学校"]["source_reconciliation"] == "national_base_local_validated"
+    assert by_name["横浜市立岩崎小学校"]["gsi_designated_hazards"] == ["earthquake", "flood"]
+    assert by_name["横浜市立岩崎中学校"]["source_reconciliation"] == "national_base_only"
+    assert by_name["横浜市立岩崎中学校"]["ward"] == "旭区"
+    assert by_name["桜台小学校"]["source_reconciliation"] == "local_supplement_not_in_national_shelter_base"
+    assert by_name["桜台小学校"]["gsi_designated_hazards"] == ["earthquake"]
+    assert by_name["桜台小学校"]["gsi_emergency_source_updated_at"] == "2026-01-16"
+    assert by_name["桜台小学校"]["local_source_updated_at"] == "2026-04-01"

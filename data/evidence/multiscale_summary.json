@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-07-20",
+  "generated_at": "2026-07-20T21:42:20+00:00",
   "official_facilities": {
-    "source_rows_in_study_area": 2,
-    "source": "Yokohama City regional disaster prevention bases, updated 2026-04-01",
-    "license": "CC BY 4.0",
+    "source_rows_in_study_area": 3,
+    "national_base_source": "GSI designated shelters, municipality 14100",
+    "national_source_updated_at": "2026-01-16",
+    "national_retrieved_at": "2026-07-20T21:25:42+00:00",
+    "local_validation_source": "Yokohama City regional disaster prevention bases",
+    "local_source_updated_at": "2026-04-01",
+    "local_retrieved_at": "2026-07-20",
+    "reconciliation_counts": {
+      "national_base_local_validated": 1,
+      "national_base_only": 1,
+      "local_supplement_not_in_national_shelter_base": 1
+    },
+    "source_policy": "National coverage is the base; local data validates and adds explicitly labelled records.",
+    "license": "GSI content terms / PDL 1.0 and Yokohama City CC BY 4.0",
     "important_note": "Official location is observed; roof match, PV capacity and resilience score are PoC proxies."
   },
   "satellite_embedding": {

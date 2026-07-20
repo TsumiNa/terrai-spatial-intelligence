@@ -1,0 +1,23 @@
+{
+  "municipality_code": "14100",
+  "municipality_name": "神奈川県横浜市",
+  "publication_started_at": "2017-02-22",
+  "source_updated_at": "2026-01-16",
+  "publication_note": null,
+  "publication_status": null,
+  "retrieved_at": "2026-07-20T21:25:42+00:00",
+  "source_scope": "national",
+  "source_urls": {
+    "designated_shelter": "https://hinanmap.gsi.go.jp/hinanjocp/defaultFtpData/geoJSON/14100_1.geojson",
+    "designated_emergency_evacuation_place": "https://hinanmap.gsi.go.jp/hinanjocp/defaultFtpData/geoJSON/14100_2.geojson",
+    "publication_history": "https://hinanmap.gsi.go.jp/hinanjocp/defaultFtpData/publicHistoryCSV/publicHistoryListData.csv"
+  },
+  "feature_counts": {
+    "designated_shelter": 459,
+    "designated_emergency_evacuation_place": 1796
+  },
+  "total_features": 2255,
+  "output": "data/external/gsi_evacuation/yokohama_evacuation.geojson",
+  "license": "GSI content terms / Public Data License 1.0 unless otherwise stated",
+  "use_notice": "Confirm the latest designation and operational details with the municipality before emergency use."
+}

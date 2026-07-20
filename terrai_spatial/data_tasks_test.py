@@ -8,7 +8,13 @@ from pathlib import Path
 
 import pytest
 
-from terrai_spatial.data_tasks import BOOTSTRAP_OUTPUTS, _ordered_names, ensure_data, task_state
+from terrai_spatial.data_tasks import (
+    BOOTSTRAP_OUTPUTS,
+    _ordered_names,
+    ensure_data,
+    task_state,
+    validate_json_outputs,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -79,7 +85,7 @@ def test_corrupt_packaged_json_is_incomplete(tmp_path: Path) -> None:
 
 
 def test_evidence_dependencies_are_ordered_before_the_task() -> None:
-    assert _ordered_names(["evidence"]) == ["bootstrap", "embedding", "evidence"]
+    assert _ordered_names(["evidence"]) == ["bootstrap", "embedding", "gsi_evacuation", "evidence"]
 
 
 def test_missing_local_grid_cache_runs_download_even_when_summary_exists(
@@ -114,3 +120,28 @@ def test_offline_start_accepts_committed_grid_summary_without_local_cache(tmp_pa
 
     assert states[-1].status == "ready"
     assert "local cache missing" in states[-1].reason
+
+
+def test_integrated_fl_sources_require_retrieval_and_source_time_metadata(tmp_path: Path) -> None:
+    registry = tmp_path / "data/external/source_registry.json"
+    registry.parent.mkdir(parents=True)
+    registry.write_text(
+        json.dumps(
+            {
+                "sources": [
+                    {"id": "complete", "status": "integrated", "retrieved_at": "2026-07-21", "source_updated_at": "2026-01-16"},
+                    {"id": "unknown-explained", "status": "integrated", "retrieved_at": "2026-07-21", "source_updated_at": None, "source_updated_at_note": "continuous source"},
+                    {"id": "missing-retrieval", "status": "integrated", "source_updated_at": "2026-01-16"},
+                    {"id": "missing-source-time", "status": "integrated", "retrieved_at": "2026-07-21"},
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    failures = validate_json_outputs(tmp_path)
+
+    assert failures == [
+        "integrated FL source lacks retrieved_at: missing-retrieval",
+        "integrated FL source lacks source_updated_at: missing-source-time",
+    ]

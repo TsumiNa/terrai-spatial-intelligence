@@ -88,6 +88,18 @@ TASKS = {
         network=True,
         remote_extra=True,
     ),
+    "gsi_evacuation": DataTask(
+        "gsi_evacuation",
+        "download and normalize GSI designated evacuation data for Yokohama",
+        "scripts/fetch_gsi_evacuation.py",
+        outputs=(
+            "data/external/gsi_evacuation/yokohama_evacuation.geojson",
+            "data/external/gsi_evacuation/metadata.json",
+        ),
+        network=True,
+        force_argument=True,
+        check_stale=False,
+    ),
     "grid": DataTask(
         "grid",
         "download the local-only TEPCO cache when needed and rebuild its screen",
@@ -129,6 +141,7 @@ TASKS = {
             "data/yokohama/road_priority.geojson",
             "data/mobara/site_cells.geojson",
             "data/external/yokohama/hinanjo_20260401.csv",
+            "data/external/gsi_evacuation/yokohama_evacuation.geojson",
             "data/google/satellite_embedding/embedding_evidence.geojson",
         ),
         outputs=(
@@ -137,7 +150,7 @@ TASKS = {
             "data/evidence/mobara_zones.geojson",
             "data/evidence/multiscale_summary.json",
         ),
-        dependencies=("bootstrap", "embedding"),
+        dependencies=("bootstrap", "embedding", "gsi_evacuation"),
     ),
 }
 
@@ -291,4 +304,20 @@ def validate_json_outputs(root: Path = ROOT) -> list[str]:
                     failures.append(f"invalid GeoJSON root: {relative}")
             except (OSError, json.JSONDecodeError) as error:
                 failures.append(f"invalid {relative}: {error}")
+    registry_path = root / "data/external/source_registry.json"
+    if registry_path.is_file():
+        try:
+            registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return failures
+        for source in registry.get("sources", []):
+            if source.get("status") != "integrated":
+                continue
+            source_id = source.get("id", "<unknown>")
+            if not source.get("retrieved_at"):
+                failures.append(f"integrated FL source lacks retrieved_at: {source_id}")
+            if "source_updated_at" not in source:
+                failures.append(f"integrated FL source lacks source_updated_at: {source_id}")
+            elif source["source_updated_at"] is None and not source.get("source_updated_at_note"):
+                failures.append(f"integrated FL source has unexplained source_updated_at: {source_id}")
     return failures

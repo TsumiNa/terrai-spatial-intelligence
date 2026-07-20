@@ -8,9 +8,10 @@ This directory documents datasets already integrated into the TerrAI Foundation 
 |---|---|---|
 | GSI DEM5A | Integrated | [Terrain elevation](gsi-dem5a/README.md) |
 | GSI maps and visual tiles | Integrated | [Standard/imagery/relief/slope](gsi-map-tiles/README.md) |
+| GSI designated evacuation data | Integrated, national base | [Shelters and hazard-specific emergency places](gsi-designated-evacuation/README.md) |
 | Google Satellite Embedding V1 | Integrated | [Annual remote-sensing representation](google-satellite-embedding/README.md) |
 | OpenStreetMap | Integrated | [Buildings, roads, and context](openstreetmap/README.md) |
-| Yokohama regional disaster bases | Integrated | [Official public facilities](yokohama-disaster-bases/README.md) |
+| Yokohama regional disaster bases | Integrated, local validation/supplement | [Official public facilities](yokohama-disaster-bases/README.md) |
 | NASA POWER | Integrated | [Solar climate context](nasa-power/README.md) |
 | TEPCO public system information | Integrated, redistribution restricted | [Regional grid-capacity screen](tepco-grid/README.md) |
 

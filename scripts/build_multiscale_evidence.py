@@ -7,6 +7,9 @@ import csv
 import io
 import json
 import math
+import re
+import unicodedata
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -20,6 +23,9 @@ BOUNDS = {
     "yokohama": (139.5835, 35.4426, 139.5935, 35.4504),
     "mobara": (140.2757, 35.4387, 140.2913, 35.4513),
 }
+
+LOCAL_SOURCE_UPDATED_AT = "2026-04-01"
+LOCAL_RETRIEVED_AT = "2026-07-20"
 
 
 def load(path: Path) -> dict:
@@ -99,60 +105,182 @@ def point_in_box(point: list[float], bounds: tuple[float, float, float, float]) 
     return west <= point[0] <= east and south <= point[1] <= north
 
 
+def facility_key(name: str | None) -> str:
+    """Return a stable school/facility name key across national and local labels."""
+    normalized = unicodedata.normalize("NFKC", name or "").strip()
+    normalized = re.split(r"\s+", normalized, maxsplit=1)[0]
+    return normalized.removeprefix("横浜市立")
+
+
+def yokohama_ward(address: str | None) -> str | None:
+    """Extract a Yokohama ward from an official address without assuming study bounds."""
+    normalized = unicodedata.normalize("NFKC", address or "")
+    match = re.search(r"横浜市([^区]+区)", normalized)
+    return match.group(1) if match else None
+
+
+def local_facility_rows(source: Path) -> list[dict[str, str]]:
+    with io.StringIO(read_csv_text(source), newline="") as handle:
+        return [
+            row
+            for row in csv.DictReader(handle)
+            if row["Ward"] == "保土ケ谷区"
+            and row["Type"] == "地域防災拠点"
+            and point_in_box([float(row["Lon"]), float(row["Lat"])], BOUNDS["yokohama"])
+        ]
+
+
+def reconcile_facility_sources(gsi_features: list[dict], local_rows: list[dict[str, str]]) -> list[dict]:
+    """Use GSI shelters as the base and Yokohama rows as validation/supplements."""
+    emergency_by_key: dict[str, dict] = {}
+    for feature in gsi_features:
+        props = feature["properties"]
+        if props["designation_type"] != "designated_emergency_evacuation_place":
+            continue
+        key = facility_key(props.get("name"))
+        evidence = emergency_by_key.setdefault(
+            key,
+            {
+                "hazards": set(),
+                "common_ids": [],
+                "source_updated_at": props.get("source_updated_at"),
+                "retrieved_at": props.get("retrieved_at"),
+            },
+        )
+        evidence["hazards"].update(props.get("hazards", []))
+        if props.get("common_id"):
+            evidence["common_ids"].append(props["common_id"])
+
+    local_by_key = {facility_key(row["Name"]): row for row in local_rows}
+    matched_local_keys: set[str] = set()
+    reconciled = []
+    for feature in gsi_features:
+        props = feature["properties"]
+        point = feature["geometry"]["coordinates"]
+        if props["designation_type"] != "designated_shelter" or not point_in_box(point, BOUNDS["yokohama"]):
+            continue
+        key = facility_key(props.get("name"))
+        local = local_by_key.get(key)
+        if local:
+            matched_local_keys.add(key)
+        emergency = emergency_by_key.get(
+            key,
+            {"hazards": set(), "common_ids": [], "source_updated_at": None, "retrieved_at": None},
+        )
+        reconciled.append(
+            {
+                "geometry": feature["geometry"],
+                "properties": {
+                    "name": props["name"],
+                    "type": "指定避難所",
+                    "definition": local["Definition"] if local else "災害対策基本法に基づく指定避難所",
+                    "address": props["address"],
+                    "ward": local["Ward"] if local else yokohama_ward(props.get("address")),
+                    "base_source_id": "gsi_designated_evacuation",
+                    "base_source_scope": "national",
+                    "source_reconciliation": "national_base_local_validated" if local else "national_base_only",
+                    "gsi_common_id": props.get("common_id"),
+                    "gsi_emergency_place_common_ids": emergency["common_ids"],
+                    "gsi_designated_hazards": sorted(emergency["hazards"]),
+                    "gsi_emergency_source_updated_at": emergency["source_updated_at"],
+                    "gsi_emergency_retrieved_at": emergency["retrieved_at"],
+                    "national_source_updated_at": props.get("source_updated_at"),
+                    "national_retrieved_at": props.get("retrieved_at"),
+                    "local_source_id": "yokohama_official_disaster_bases" if local else None,
+                    "local_name": local["Name"] if local else None,
+                    "local_type": local["Type"] if local else None,
+                    "local_source_updated_at": LOCAL_SOURCE_UPDATED_AT if local else None,
+                    "local_retrieved_at": LOCAL_RETRIEVED_AT if local else None,
+                },
+            }
+        )
+
+    for key, local in local_by_key.items():
+        if key in matched_local_keys:
+            continue
+        emergency = emergency_by_key.get(
+            key,
+            {"hazards": set(), "common_ids": [], "source_updated_at": None, "retrieved_at": None},
+        )
+        reconciled.append(
+            {
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [float(local["Lon"]), float(local["Lat"])],
+                },
+                "properties": {
+                    "name": local["Name"],
+                    "type": local["Type"],
+                    "definition": local["Definition"],
+                    "address": local["Address"],
+                    "ward": local["Ward"],
+                    "base_source_id": "yokohama_official_disaster_bases",
+                    "base_source_scope": "local_supplement",
+                    "source_reconciliation": "local_supplement_not_in_national_shelter_base",
+                    "gsi_common_id": None,
+                    "gsi_emergency_place_common_ids": emergency["common_ids"],
+                    "gsi_designated_hazards": sorted(emergency["hazards"]),
+                    "gsi_emergency_source_updated_at": emergency["source_updated_at"],
+                    "gsi_emergency_retrieved_at": emergency["retrieved_at"],
+                    "national_source_updated_at": None,
+                    "national_retrieved_at": None,
+                    "local_source_id": "yokohama_official_disaster_bases",
+                    "local_name": local["Name"],
+                    "local_type": local["Type"],
+                    "local_source_updated_at": LOCAL_SOURCE_UPDATED_AT,
+                    "local_retrieved_at": LOCAL_RETRIEVED_AT,
+                },
+            }
+        )
+    return reconciled
+
+
 def official_facilities(buildings: list[dict], roads: list[dict]) -> list[dict]:
     high_points = [centroid(item) for item in buildings if item["properties"]["risk_band"] == "high"]
-    source = DATA / "external" / "yokohama" / "hinanjo_20260401.csv"
+    local_source = DATA / "external" / "yokohama" / "hinanjo_20260401.csv"
+    gsi_source = load(DATA / "external" / "gsi_evacuation" / "yokohama_evacuation.geojson")
+    source_records = reconcile_facility_sources(gsi_source["features"], local_facility_rows(local_source))
     results = []
-    with io.StringIO(read_csv_text(source), newline="") as handle:
-        for row in csv.DictReader(handle):
-            if row["Ward"] != "保土ケ谷区" or row["Type"] != "地域防災拠点":
-                continue
-            point = [float(row["Lon"]), float(row["Lat"])]
-            if not point_in_box(point, BOUNDS["yokohama"]):
-                continue
-
-            nearest_building = min(buildings, key=lambda item: distance(point, centroid(item)))
-            building_distance = distance(point, centroid(nearest_building))
-            building_props = nearest_building["properties"]
-            nearest_road = min(roads, key=lambda item: point_line_distance(point, item["geometry"]["coordinates"]))
-            road_distance = point_line_distance(point, nearest_road["geometry"]["coordinates"])
-            served_high = sum(distance(point, high_point) <= 250 for high_point in high_points)
-            roof_area = building_props.get("footprint_m2", 0) if building_distance <= 90 else 0
-            pv_proxy = round(roof_area * 0.12, 1)
-            site_safety = clamp(100 - building_props.get("risk_score", 50))
-            access = clamp(0.65 * nearest_road["properties"]["priority_score"] + 0.35 * (100 - road_distance / 1.5))
-            demand = clamp(served_high / 30 * 100)
-            energy = clamp(pv_proxy / 70 * 100)
-            score = round(0.30 * site_safety + 0.25 * access + 0.30 * demand + 0.15 * energy)
-            results.append(
-                {
-                    "type": "Feature",
-                    "id": f"official-shelter-{len(results) + 1}",
-                    "geometry": {"type": "Point", "coordinates": point},
-                    "properties": {
-                        "name": row["Name"],
-                        "type": row["Type"],
-                        "definition": row["Definition"],
-                        "address": row["Address"],
-                        "ward": row["Ward"],
-                        "official_status": "observed_official",
-                        "resilience_score": score,
-                        "served_high_risk_buildings": served_high,
-                        "nearest_road_m": round(road_distance),
-                        "nearest_road_name": nearest_road["properties"].get("name") or "未命名道路",
-                        "nearest_road_priority": nearest_road["properties"]["priority_score"],
-                        "matched_roof_m": round(building_distance),
-                        "matched_roof_area_m2": round(roof_area, 1),
-                        "pv_kwp_proxy": pv_proxy,
-                        "site_safety_component": round(site_safety),
-                        "access_component": round(access),
-                        "community_need_component": round(demand),
-                        "energy_component": round(energy),
-                        "decision": "官方设施；优先核查屋顶结构、储能、备用电源与灾时道路连续性",
-                        "limitations": "建筑轮廓为最近邻匹配；容量和结构未经现场验证",
-                    },
-                }
-            )
+    for record in source_records:
+        point = record["geometry"]["coordinates"]
+        nearest_building = min(buildings, key=lambda item: distance(point, centroid(item)))
+        building_distance = distance(point, centroid(nearest_building))
+        building_props = nearest_building["properties"]
+        nearest_road = min(roads, key=lambda item: point_line_distance(point, item["geometry"]["coordinates"]))
+        road_distance = point_line_distance(point, nearest_road["geometry"]["coordinates"])
+        served_high = sum(distance(point, high_point) <= 250 for high_point in high_points)
+        roof_area = building_props.get("footprint_m2", 0) if building_distance <= 90 else 0
+        pv_proxy = round(roof_area * 0.12, 1)
+        site_safety = clamp(100 - building_props.get("risk_score", 50))
+        access = clamp(0.65 * nearest_road["properties"]["priority_score"] + 0.35 * (100 - road_distance / 1.5))
+        demand = clamp(served_high / 30 * 100)
+        energy = clamp(pv_proxy / 70 * 100)
+        score = round(0.30 * site_safety + 0.25 * access + 0.30 * demand + 0.15 * energy)
+        results.append(
+            {
+                "type": "Feature",
+                "id": f"official-shelter-{len(results) + 1}",
+                "geometry": record["geometry"],
+                "properties": {
+                    **record["properties"],
+                    "official_status": "observed_official",
+                    "resilience_score": score,
+                    "served_high_risk_buildings": served_high,
+                    "nearest_road_m": round(road_distance),
+                    "nearest_road_name": nearest_road["properties"].get("name") or "未命名道路",
+                    "nearest_road_priority": nearest_road["properties"]["priority_score"],
+                    "matched_roof_m": round(building_distance),
+                    "matched_roof_area_m2": round(roof_area, 1),
+                    "pv_kwp_proxy": pv_proxy,
+                    "site_safety_component": round(site_safety),
+                    "access_component": round(access),
+                    "community_need_component": round(demand),
+                    "energy_component": round(energy),
+                    "decision": "官方设施；优先核查屋顶结构、储能、备用电源与灾时道路连续性",
+                    "limitations": "建筑轮廓为最近邻匹配；容量和结构未经现场验证",
+                },
+            }
+        )
     return sorted(results, key=lambda item: item["properties"]["resilience_score"], reverse=True)
 
 
@@ -243,6 +371,7 @@ def main() -> None:
     roads = load(DATA / "yokohama" / "road_priority.geojson")["features"]
     solar = load(DATA / "mobara" / "site_cells.geojson")["features"]
     embeddings = load(DATA / "google" / "satellite_embedding" / "embedding_evidence.geojson")["features"]
+    gsi_metadata = load(DATA / "external" / "gsi_evacuation" / "metadata.json")
     facilities = official_facilities(buildings, roads)
     yoko_zones = build_zones("yokohama", 4, 4, buildings, roads, solar, facilities, embeddings)
     mobara_zones = build_zones("mobara", 5, 4, buildings, roads, solar, facilities, embeddings)
@@ -253,11 +382,27 @@ def main() -> None:
     write(
         DATA / "evidence" / "multiscale_summary.json",
         {
-            "generated_at": "2026-07-20",
+            "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
             "official_facilities": {
                 "source_rows_in_study_area": len(facilities),
-                "source": "Yokohama City regional disaster prevention bases, updated 2026-04-01",
-                "license": "CC BY 4.0",
+                "national_base_source": "GSI designated shelters, municipality 14100",
+                "national_source_updated_at": gsi_metadata["source_updated_at"],
+                "national_retrieved_at": gsi_metadata["retrieved_at"],
+                "local_validation_source": "Yokohama City regional disaster prevention bases",
+                "local_source_updated_at": LOCAL_SOURCE_UPDATED_AT,
+                "local_retrieved_at": LOCAL_RETRIEVED_AT,
+                "reconciliation_counts": {
+                    status: sum(
+                        item["properties"]["source_reconciliation"] == status for item in facilities
+                    )
+                    for status in (
+                        "national_base_local_validated",
+                        "national_base_only",
+                        "local_supplement_not_in_national_shelter_base",
+                    )
+                },
+                "source_policy": "National coverage is the base; local data validates and adds explicitly labelled records.",
+                "license": "GSI content terms / PDL 1.0 and Yokohama City CC BY 4.0",
                 "important_note": "Official location is observed; roof match, PV capacity and resilience score are PoC proxies.",
             },
             "satellite_embedding": {
