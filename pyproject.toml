@@ -19,4 +19,13 @@ remote = [
 
 [tool.uv]
 package = false
-default-groups = []
+default-groups = ["dev"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["terrai_spatial", "scripts"]
+python_files = ["*_test.py"]

@@ -105,7 +105,7 @@ These choices must be constrained by the first customer PoC's target, risk toler
 node --check frontend/app.js
 node --check frontend/audit.js
 node --check frontend/i18n.js
-uv run python -m unittest discover -p "*_test.py" -v
+uv run pytest
 uvx ruff check .
 uv run python -m terrai_spatial validate
 git diff --check

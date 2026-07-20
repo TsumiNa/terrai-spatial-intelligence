@@ -5,7 +5,7 @@
 ```bash
 uv sync
 uv run python -m terrai_spatial validate
-uv run python -m unittest discover -p "*_test.py" -v
+uv run pytest
 uv run python -m terrai_spatial serve --port 4176
 ```
 
