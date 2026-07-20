@@ -1,5 +1,11 @@
 # TerrAI 重构决策记录
 
+## FL → SL → AL 概念架构（2026-07-20）
+
+TerrAI 的共享底座正式分为 Foundation Data Layer（FL）、Synthetic Data Layer（SL）和 Application Layer（AL）。当前开源/官方观测与不改变观测语义的确定性加工属于 FL；未来经过 held-out、校准和适用性闸门的稀疏补值属于 SL；现有坡地暴露、道路韧性、光伏选址及联合评分属于 AL。
+
+本次只完成 Factor of Concept，不定义 schema、API、数据库或调度。完整定义见 [`docs/architecture/FL_SL_AL_CONCEPT.md`](docs/architecture/FL_SL_AL_CONCEPT.md)，决策理由见 [`docs/adr/0001-fl-sl-al-conceptual-layers.md`](docs/adr/0001-fl-sl-al-conceptual-layers.md)。
+
 ## 从三个 Claude Demo 吸收了什么
 
 | Claude Demo | 并入 TerrAI 的部分 | 舍弃或改写的部分 |
@@ -24,9 +30,9 @@
 
 ## 与 geo_pfn 稀疏上下文实验的关系
 
-`TsumiNa/geo_pfn` 当前实验固定 48 个查询孔，从 192 个候选孔中抽取 3–192 个整孔上下文。坐标+深度特征下，geo-PFN 在 25–50 个孔的中等稀疏区间达到约 20.0 RMSE，比 TabICL 低约 4–6；极稀疏时没有稳定优势，稠密时 HGBT 仍是强基线。加入真实地质特征目前会使 geo-PFN 变差约 1–2 RMSE，说明先验真实性仍需修复。
+`TsumiNa/geo_pfn` 当前实验固定 48 个查询孔，从 192 个候选孔中抽取 3–192 个整孔上下文。坐标+深度特征下，geo-PFN 在 25–50 个孔的中等稀疏区间达到约 20 RMSE，比 TabICL 低约 3–6；极稀疏时没有稳定点预测优势，稠密时 HGBT/TabICL 仍是强基线。后续训练已将“真实特征使模型变差”修正为主要是训练不足：2M LCSG 随训练表增加由约 22.9 改善至 17.7，17M 在 N=25 的 LCSG 达约 19.0。剩余缺口集中在特征摄取、稀疏目标训练、区间锐度与跨站点验证，而不是简单增加一个“更真实”的先验。
 
-因此平台只借用三项机制：相似对象的完整上下文、按上下文密度选择模型、所有推断保留不确定性。地下 Su 实验不会被转述成地表风险或遥感模块的精度证明。
+因此平台只借用四项机制：相似对象的完整 coherent 上下文、按上下文密度和场景选择模型、所有推断保留不确定性、支持拒答。地下 Su 实验不会被转述成地表风险或遥感模块的精度证明。
 
 ## Demo → PoC → MVP 的验证闸门
 
