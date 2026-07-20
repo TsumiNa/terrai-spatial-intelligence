@@ -88,6 +88,18 @@ TASKS = {
         network=True,
         remote_extra=True,
     ),
+    "gsi_evacuation": DataTask(
+        "gsi_evacuation",
+        "download and normalize GSI designated evacuation data for Yokohama",
+        "scripts/fetch_gsi_evacuation.py",
+        outputs=(
+            "data/external/gsi_evacuation/yokohama_evacuation.geojson",
+            "data/external/gsi_evacuation/metadata.json",
+        ),
+        network=True,
+        force_argument=True,
+        check_stale=False,
+    ),
     "grid": DataTask(
         "grid",
         "download the local-only TEPCO cache when needed and rebuild its screen",
@@ -129,6 +141,7 @@ TASKS = {
             "data/yokohama/road_priority.geojson",
             "data/mobara/site_cells.geojson",
             "data/external/yokohama/hinanjo_20260401.csv",
+            "data/external/gsi_evacuation/yokohama_evacuation.geojson",
             "data/google/satellite_embedding/embedding_evidence.geojson",
         ),
         outputs=(
@@ -137,7 +150,7 @@ TASKS = {
             "data/evidence/mobara_zones.geojson",
             "data/evidence/multiscale_summary.json",
         ),
-        dependencies=("bootstrap", "embedding"),
+        dependencies=("bootstrap", "embedding", "gsi_evacuation"),
     ),
 }
 

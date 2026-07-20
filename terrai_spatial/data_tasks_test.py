@@ -79,7 +79,7 @@ def test_corrupt_packaged_json_is_incomplete(tmp_path: Path) -> None:
 
 
 def test_evidence_dependencies_are_ordered_before_the_task() -> None:
-    assert _ordered_names(["evidence"]) == ["bootstrap", "embedding", "evidence"]
+    assert _ordered_names(["evidence"]) == ["bootstrap", "embedding", "gsi_evacuation", "evidence"]
 
 
 def test_missing_local_grid_cache_runs_download_even_when_summary_exists(
