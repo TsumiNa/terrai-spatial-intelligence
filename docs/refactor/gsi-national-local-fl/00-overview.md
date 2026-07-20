@@ -15,6 +15,7 @@ The acquisition script, source registry, evidence fusion, architecture documenta
 
 ## Scope
 
+- Status: Completed — merged as PR #2
 - Download and normalize GSI designated shelters and designated emergency evacuation places for Yokohama.
 - Record source update time and retrieval time in generated FL artifacts.
 - Use GSI records as the national base in the facility evidence view.

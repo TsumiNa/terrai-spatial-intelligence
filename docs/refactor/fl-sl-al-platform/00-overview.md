@@ -1,5 +1,6 @@
 # FL → SL → AL Factor of Concept Refactor Record
 
+- Status: Completed — merged as PR #1
 - Date: 2026-07-20
 - Branch: `refactor/fl-sl-al-concept`
 - Baseline: `main` / `4ceb7ba`

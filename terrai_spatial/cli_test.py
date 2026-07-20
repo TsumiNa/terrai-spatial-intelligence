@@ -7,10 +7,12 @@ import pytest
 
 from terrai_spatial.cli import (
     REFACTOR_PLAN_PATTERN,
+    REFACTOR_PLAN_STATES,
     ROOT,
     contract_failures,
     localized_document,
     multilingual_documents,
+    refactor_status_failures,
     validate_json,
 )
 
@@ -176,3 +178,38 @@ def test_call_sequence_document_tracks_runtime_in_three_languages(language: str 
     assert call_structure.count("sequenceDiagram") == 3
     for token in ("GET /bootstrap", "GET /assets/tiles/", "GET /features/solar", "SQLite"):
         assert token in call_structure
+
+
+# --- refactor plan status -----------------------------------------------------
+# Without a machine-readable status, progress across a multi-stage refactor can
+# only be learned by opening every file and comparing it against reality.
+
+
+def test_refactor_status_accepts_every_permitted_state(tmp_path: Path) -> None:
+    for state in REFACTOR_PLAN_STATES:
+        path = write(tmp_path, "01-topic-pr1.md", f"# Title\n\n- Status: {state}\n")
+        assert refactor_status_failures(path) == [], state
+
+
+def test_refactor_status_accepts_a_qualifier_after_the_state(tmp_path: Path) -> None:
+    path = write(tmp_path, "01-topic-pr1.md", "# Title\n\n- Status: Blocked — no dataset yet\n")
+    assert refactor_status_failures(path) == []
+
+
+def test_refactor_status_rejects_a_missing_line(tmp_path: Path) -> None:
+    path = write(tmp_path, "01-topic-pr1.md", "# Title\n\n- Refactor: something\n")
+    assert "missing a status line" in refactor_status_failures(path)[0]
+
+
+def test_refactor_status_rejects_free_text(tmp_path: Path) -> None:
+    path = write(tmp_path, "01-topic-pr1.md", "# Title\n\n- Status: mostly done I think\n")
+    assert "must start with one of" in refactor_status_failures(path)[0]
+
+
+def test_every_refactor_document_declares_a_known_state() -> None:
+    documents = sorted((ROOT / "docs/refactor").rglob("*.md"))
+    assert documents
+    for path in documents:
+        if path.name.endswith((".ja.md", ".zh.md")):
+            continue
+        assert refactor_status_failures(path) == [], path

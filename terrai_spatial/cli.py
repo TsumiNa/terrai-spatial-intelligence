@@ -23,6 +23,8 @@ DEFAULT_PIPELINES = ("joint", "evidence")
 DOCS_TOP_LEVEL_DIRECTORIES = {"architecture", "refactor", "data", "summary", "others"}
 MULTILINGUAL_DOCS_DIRECTORIES = ("architecture", "data", "summary")
 REFACTOR_PLAN_PATTERN = re.compile(r"^\d{2}-[a-z0-9-]+-pr\d+[a-z]?\.md$")
+REFACTOR_PLAN_STATES = ("Planned", "In progress", "Blocked", "Completed", "Superseded")
+REFACTOR_STATUS_PATTERN = re.compile(r"^- Status: *(?P<state>.+)$", re.MULTILINE)
 
 
 def localized_document(path: Path, language: str) -> Path:
@@ -168,6 +170,19 @@ def data_task_failures() -> list[str]:
         for state in status_rows()
         if state.status != "ready"
     ]
+
+
+def refactor_status_failures(path: Path) -> list[str]:
+    """Check one refactor document declares a status from the fixed set."""
+
+    match = REFACTOR_STATUS_PATTERN.search(path.read_text(encoding="utf-8"))
+    relative = path.relative_to(ROOT) if path.is_relative_to(ROOT) else path
+    if not match:
+        return [f"refactor plan missing a status line: {relative}"]
+    state = match.group("state").strip()
+    if not any(state.startswith(known) for known in REFACTOR_PLAN_STATES):
+        return [f"refactor plan status must start with one of {REFACTOR_PLAN_STATES}: {relative}: {state}"]
+    return []
 
 
 def contract_failures() -> list[str]:
@@ -332,6 +347,12 @@ def contract_failures() -> list[str]:
                 continue
             if not REFACTOR_PLAN_PATTERN.fullmatch(path.name):
                 failures.append(f"invalid refactor plan filename: {path.relative_to(ROOT)}")
+        # Without a status line, a reader cannot tell a finished refactor from an
+        # abandoned one, and folder progress cannot be counted.
+        for path in sorted(refactor_folder.glob("*.md")):
+            if path.name.endswith((".ja.md", ".zh.md")):
+                continue
+            failures.extend(refactor_status_failures(path))
 
     data_headings = {
         "en": (
