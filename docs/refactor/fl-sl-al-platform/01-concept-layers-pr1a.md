@@ -22,6 +22,6 @@ No schemas, inter-layer APIs, databases, model registry, customer permissions, o
 
 ## Acceptance
 
-- Definitions, alternatives, consequences, and non-goals live in `00-overview.md` and `docs/architecture/FL_SL_AL_CONCEPT.en.md`.
+- Definitions, alternatives, consequences, and non-goals live in `00-overview.md` and `docs/architecture/FL_SL_AL_CONCEPT.md`.
 - AL risk, suitability, and capacity proxies are never labeled SL.
 - The trilingual architecture document group passes documentation validation.

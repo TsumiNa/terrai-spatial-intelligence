@@ -1,6 +1,6 @@
 # TerrAI FL → SL → AL 概念アーキテクチャ
 
-[中文](FL_SL_AL_CONCEPT.md) | [日本語](FL_SL_AL_CONCEPT.ja.md) | [English](FL_SL_AL_CONCEPT.en.md)
+[English](FL_SL_AL_CONCEPT.md) | [日本語](FL_SL_AL_CONCEPT.ja.md) | [中文](FL_SL_AL_CONCEPT.zh.md)
 
 状態：Factor of Concept
 

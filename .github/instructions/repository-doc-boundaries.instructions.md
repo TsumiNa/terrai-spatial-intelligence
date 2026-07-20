@@ -14,11 +14,11 @@ applyTo: '**/{README,CONTRIBUTING}.md,docs/**'
 
 ## Language policy
 
-Only documents in `docs/architecture/`, `docs/data/`, and `docs/summary/` must exist as one semantic group:
+Only documents in `docs/architecture/`, `docs/data/`, and `docs/summary/` must exist as one semantic group. English is always the default, unsuffixed file:
 
-- Simplified Chinese canonical file: `name.md`
+- English canonical file: `name.md`
 - Japanese file: `name.ja.md`
-- English file: `name.en.md`
+- Simplified Chinese file: `name.zh.md`
 
 All three must link to one another near the title. Create, rename, move, and update all three in the same change. Keep meaning, status, links, diagrams, and commands aligned even when wording is not a literal translation.
 
@@ -37,6 +37,8 @@ Only the English `docs/README.md` index may be placed directly under `docs/`. `d
 ### `docs/architecture/`
 
 Store the currently valid system structure: component responsibilities, stable conceptual or runtime boundaries, data/control flow, and frontend–backend call structure. Architecture documents describe what is true now. Put migration steps and commit/PR history in `refactor/`, not here.
+
+Architecture groups may remain directly under `docs/architecture/`, using `name.md`, `name.ja.md`, and `name.zh.md`.
 
 ### `docs/refactor/`
 
@@ -62,11 +64,13 @@ Document every dataset integrated into the Foundation Data Layer in its own tril
 - license or governing terms;
 - extra cautions for commercial use, redistribution, attribution, third-party rights, freshness, and fitness for decision-making.
 
-`docs/data/README.*` is the trilingual catalog. Candidate datasets that are not integrated belong in an evaluation under `summary/`, not as integrated data cards.
+Every document group must have its own direct subfolder: `docs/data/<dataset-or-catalog>/README.md`, `README.ja.md`, and `README.zh.md`. Do not place Markdown files directly under `docs/data/`. `docs/data/catalog/` is the trilingual catalog. Candidate datasets that are not integrated belong in an evaluation under `summary/`, not as integrated data cards.
 
 ### `docs/summary/`
 
 Store summaries produced while validating or evaluating features: experiments, comparisons, feasibility reviews, prototype-state reports, and important project decisions that are not refactor plans. A summary may explain evidence and conclusions, but must not become the normative current architecture or an active migration plan.
+
+Every summary group must have its own direct subfolder: `docs/summary/<summary-name>/README.md`, `README.ja.md`, and `README.zh.md`. Do not place Markdown files directly under `docs/summary/`.
 
 ### `docs/others/`
 
@@ -75,6 +79,8 @@ Use English by default and only when a text genuinely cannot fit `architecture`,
 ## Change checklist
 
 - In `architecture`, `data`, and `summary`, move or update all three language files together.
+- Keep English in the unsuffixed `.md`; never use `.en.md` in a multilingual group.
+- Keep each data and summary group in its own direct subfolder with `README.*` filenames.
 - Elsewhere, maintain the English `.md` file and do not require translation partners.
 - Repair all repository links after a move; do not leave aliases in obsolete folders.
 - Run `uv run python -m terrai_spatial validate`; multilingual discovery is automatic within the three scoped directories.

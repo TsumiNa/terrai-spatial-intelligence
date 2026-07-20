@@ -1,6 +1,6 @@
 # TerrAI フロントエンド—バックエンド構造と呼び出し
 
-[中文](FRONTEND_BACKEND.md) | [日本語](FRONTEND_BACKEND.ja.md) | [English](FRONTEND_BACKEND.en.md)
+[English](FRONTEND_BACKEND.md) | [日本語](FRONTEND_BACKEND.ja.md) | [中文](FRONTEND_BACKEND.zh.md)
 
 状態：現在の Demo 実装
 

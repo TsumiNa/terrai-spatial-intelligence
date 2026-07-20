@@ -85,7 +85,7 @@ Exact hashes and diffs remain in Git and the PR Commits page; this record preser
 3. Click dashed metrics, queue scores, and popup fields to inspect source, formula, uncertainty, and limitations.
 4. Switch Chinese, Japanese, and English; verify a narrow viewport.
 5. Open FastAPI `/docs` and inspect health, catalog, data, GeoJSON query, and recommendation routes.
-6. Read `docs/architecture/FL_SL_AL_CONCEPT.en.md` and confirm the runtime never labels AL rules as SL.
+6. Read `docs/architecture/FL_SL_AL_CONCEPT.md` and confirm the runtime never labels AL rules as SL.
 7. Run automated validation for concept, API, data tasks, and assets.
 
 ## 6. Reserved for Factor of Develop
@@ -105,7 +105,7 @@ These choices must be constrained by the first customer PoC's target, risk toler
 node --check frontend/app.js
 node --check frontend/audit.js
 node --check frontend/i18n.js
-uv run python -m unittest discover -v
+uv run python -m unittest discover -p "*_test.py" -v
 uvx ruff check .
 uv run python -m terrai_spatial validate
 git diff --check
@@ -122,4 +122,4 @@ The first concept UI was useful internally but unsuitable for an exhibition. The
 5. added Python JSON/GeoJSON cache, query, aggregation, and ranking;
 6. kept file storage behind stable dataset keys for later SQLite migration.
 
-See `docs/architecture/FRONTEND_BACKEND.en.md`.
+See `docs/architecture/FRONTEND_BACKEND.md`.

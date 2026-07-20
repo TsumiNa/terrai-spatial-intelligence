@@ -30,13 +30,13 @@ def localized_document(path: Path, language: str) -> Path:
 
 
 def multilingual_documents() -> list[Path]:
-    """Discover canonical Chinese docs only where translations are required."""
+    """Discover canonical English docs only where translations are required."""
     documents: list[Path] = []
     for directory in MULTILINGUAL_DOCS_DIRECTORIES:
         documents.extend(
             path.relative_to(ROOT)
             for path in sorted((ROOT / "docs" / directory).rglob("*.md"))
-            if not path.name.endswith((".ja.md", ".en.md"))
+            if not path.name.endswith((".ja.md", ".zh.md"))
         )
     return documents
 
@@ -190,8 +190,8 @@ def command_validate(_: argparse.Namespace) -> None:
             "Foundation Data Layer",
             "Synthetic Data Layer",
             "Application Layer",
-            "本次明确不做",
-            "observed、synthetic 与 unresolved",
+            "Explicit non-goals",
+            "observed, synthetic, and unresolved",
         ),
     }
     for relative, required_tokens in concept_contract.items():
@@ -256,9 +256,9 @@ def command_validate(_: argparse.Namespace) -> None:
         siblings = (
             canonical.name,
             localized_document(canonical, "ja").name,
-            localized_document(canonical, "en").name,
+            localized_document(canonical, "zh").name,
         )
-        group = (canonical, localized_document(canonical, "ja"), localized_document(canonical, "en"))
+        group = (canonical, localized_document(canonical, "ja"), localized_document(canonical, "zh"))
         expected_document_paths.update(group)
         for document in group:
             path = ROOT / document
@@ -278,8 +278,8 @@ def command_validate(_: argparse.Namespace) -> None:
         for path in (docs_root / directory).rglob("*.md")
     }
     for orphan in sorted(discovered_multilingual_markdown - expected_document_paths):
-        if orphan.name.endswith((".ja.md", ".en.md")):
-            failures.append(f"localized document has no canonical Chinese partner: {orphan}")
+        if orphan.name.endswith((".ja.md", ".zh.md")):
+            failures.append(f"localized document has no canonical English partner: {orphan}")
 
     for path in (ROOT / "README.md", ROOT / "CONTRIBUTING.md", docs_root / "README.md"):
         if not path.is_file():
@@ -288,30 +288,43 @@ def command_validate(_: argparse.Namespace) -> None:
         if path.read_text(encoding="utf-8").count("```") % 2:
             failures.append(f"unclosed code fence: {path.relative_to(ROOT)}")
 
+    required_group_files = {"README.md", "README.ja.md", "README.zh.md"}
+    for category in ("data", "summary"):
+        category_root = docs_root / category
+        for loose in sorted(category_root.glob("*.md")):
+            failures.append(f"document group must be inside a subfolder: {loose.relative_to(ROOT)}")
+        for folder in sorted(path for path in category_root.iterdir() if path.is_dir()):
+            actual = {path.name for path in folder.glob("*.md")}
+            if actual != required_group_files:
+                failures.append(
+                    f"{category} group {folder.name} must contain exactly "
+                    f"{sorted(required_group_files)}; found {sorted(actual)}"
+                )
+
     refactor_root = docs_root / "refactor"
     for refactor_folder in sorted(path for path in refactor_root.iterdir() if path.is_dir()):
         overview = refactor_folder.relative_to(ROOT) / "00-overview.md"
         if not (ROOT / overview).is_file():
             failures.append(f"refactor folder missing 00-overview.md: {refactor_folder.name}")
         for path in refactor_folder.glob("*.md"):
-            if path.name.endswith((".ja.md", ".en.md")) or path.name == "00-overview.md":
+            if path.name == "00-overview.md":
                 continue
             if not REFACTOR_PLAN_PATTERN.fullmatch(path.name):
                 failures.append(f"invalid refactor plan filename: {path.relative_to(ROOT)}")
 
     data_headings = {
+        "en": ("## Source", "## Use in this project", "## License", "## Commercial-use cautions"),
         "zh": ("## 来源", "## 在本项目中的使用", "## License", "## 商业使用注意"),
         "ja": ("## 出典", "## 本 project での利用", "## License", "## 商用利用時の注意"),
-        "en": ("## Source", "## Use in this project", "## License", "## Commercial-use cautions"),
     }
-    for canonical in sorted((docs_root / "data").glob("*.md")):
-        if canonical.name == "README.md" or canonical.name.endswith((".ja.md", ".en.md")):
+    for canonical in sorted((docs_root / "data").glob("*/README.md")):
+        if canonical.parent.name == "catalog":
             continue
         relative = canonical.relative_to(ROOT)
         for language, document in (
-            ("zh", relative),
+            ("en", relative),
             ("ja", localized_document(relative, "ja")),
-            ("en", localized_document(relative, "en")),
+            ("zh", localized_document(relative, "zh")),
         ):
             path = ROOT / document
             if not path.is_file():

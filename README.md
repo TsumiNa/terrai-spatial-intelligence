@@ -21,10 +21,10 @@ The first online startup checks and obtains automatable data, then rebuilds miss
 
 ## Documentation
 
-- [Product and runtime state](docs/summary/2026-07-prototype-state.en.md)
-- [System architecture](docs/architecture/FRONTEND_BACKEND.en.md)
-- [FL → SL → AL concept](docs/architecture/FL_SL_AL_CONCEPT.en.md)
-- [Integrated data and licenses](docs/data/README.en.md)
+- [Product and runtime state](docs/summary/2026-07-prototype-state/README.md)
+- [System architecture](docs/architecture/FRONTEND_BACKEND.md)
+- [FL → SL → AL concept](docs/architecture/FL_SL_AL_CONCEPT.md)
+- [Integrated data and licenses](docs/data/catalog/README.md)
 - [Refactor plan](docs/refactor/fl-sl-al-platform/00-overview.md)
 - [Development and contribution](CONTRIBUTING.md)
 
