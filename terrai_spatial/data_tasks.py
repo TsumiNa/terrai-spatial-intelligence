@@ -304,4 +304,20 @@ def validate_json_outputs(root: Path = ROOT) -> list[str]:
                     failures.append(f"invalid GeoJSON root: {relative}")
             except (OSError, json.JSONDecodeError) as error:
                 failures.append(f"invalid {relative}: {error}")
+    registry_path = root / "data/external/source_registry.json"
+    if registry_path.is_file():
+        try:
+            registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return failures
+        for source in registry.get("sources", []):
+            if source.get("status") != "integrated":
+                continue
+            source_id = source.get("id", "<unknown>")
+            if not source.get("retrieved_at"):
+                failures.append(f"integrated FL source lacks retrieved_at: {source_id}")
+            if "source_updated_at" not in source:
+                failures.append(f"integrated FL source lacks source_updated_at: {source_id}")
+            elif source["source_updated_at"] is None and not source.get("source_updated_at_note"):
+                failures.append(f"integrated FL source has unexplained source_updated_at: {source_id}")
     return failures
