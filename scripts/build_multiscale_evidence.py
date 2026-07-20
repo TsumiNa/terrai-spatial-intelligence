@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import csv
+import io
 import json
 import math
 from pathlib import Path
@@ -29,6 +30,22 @@ def load(path: Path) -> dict:
 def write(path: Path, value: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def read_csv_text(path: Path) -> str:
+    """Read a source CSV as text, rewriting a Shift_JIS download as UTF-8 in place.
+
+    Yokohama publishes its open-data CSVs in Shift_JIS, so a refreshed download
+    is converted on first use and every later read is plain UTF-8.
+    """
+    raw = path.read_bytes()
+    try:
+        return raw.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = raw.decode("cp932")
+    path.write_text(text, encoding="utf-8", newline="")
+    print(f"Converted {path.name} from Shift_JIS to UTF-8")
+    return text
 
 
 def feature_collection(features: list[dict]) -> dict:
@@ -86,7 +103,7 @@ def official_facilities(buildings: list[dict], roads: list[dict]) -> list[dict]:
     high_points = [centroid(item) for item in buildings if item["properties"]["risk_band"] == "high"]
     source = DATA / "external" / "yokohama" / "hinanjo_20260401.csv"
     results = []
-    with source.open(encoding="cp932", newline="") as handle:
+    with io.StringIO(read_csv_text(source), newline="") as handle:
         for row in csv.DictReader(handle):
             if row["Ward"] != "保土ケ谷区" or row["Type"] != "地域防災拠点":
                 continue
