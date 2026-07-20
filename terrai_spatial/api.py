@@ -1,0 +1,106 @@
+"""FastAPI application for the TerrAI exhibition demo."""
+
+from __future__ import annotations
+
+from typing import Annotated
+
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
+from .data_service import DatasetNotFoundError, ROOT, service
+
+
+app = FastAPI(
+    title="TerrAI Spatial Intelligence API",
+    version="1.0.0",
+    description="Read-only file-backed APIs for the TerrAI commercial exhibition prototype.",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[],
+    allow_origin_regex=r"^https?://(127\.0\.0\.1|localhost)(:\d+)?$",
+    allow_credentials=False,
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/api/v1/health", tags=["reliability"])
+def health() -> dict:
+    """Return API and packaged-dataset readiness."""
+
+    return service.health()
+
+
+@app.get("/api/v1/catalog", tags=["reliability"])
+def catalog() -> dict:
+    """Return the auditable file-backed dataset catalog."""
+
+    return {"datasets": service.catalog()}
+
+
+@app.get("/api/v1/bootstrap", tags=["exhibition"])
+def bootstrap() -> dict:
+    """Return the complete local exhibition payload through one stable contract."""
+
+    return service.bootstrap()
+
+
+@app.get("/api/v1/datasets/{key}", tags=["data"])
+def dataset(key: str) -> dict:
+    """Return one JSON or GeoJSON dataset by stable public key."""
+
+    try:
+        value = service.load(key)
+    except (DatasetNotFoundError, FileNotFoundError) as error:
+        raise HTTPException(status_code=404, detail=f"unknown or unavailable dataset: {key}") from error
+    if not isinstance(value, dict):
+        raise HTTPException(status_code=422, detail=f"dataset {key} is not an object")
+    return value
+
+
+@app.get("/api/v1/features/{key}", tags=["query"])
+def features(
+    key: str,
+    where: str | None = None,
+    equals: str | None = None,
+    minimum: float | None = None,
+    maximum: float | None = None,
+    sort: str | None = None,
+    descending: bool = True,
+    limit: Annotated[int, Query(ge=1, le=5000)] = 5000,
+    bbox: Annotated[list[float] | None, Query(min_length=4, max_length=4)] = None,
+) -> dict:
+    """Filter, sort and spatially window a GeoJSON FeatureCollection."""
+
+    try:
+        return service.query_features(
+            key,
+            where=where,
+            equals=equals,
+            minimum=minimum,
+            maximum=maximum,
+            sort=sort,
+            descending=descending,
+            limit=limit,
+            bbox=tuple(bbox) if bbox else None,
+        )
+    except (DatasetNotFoundError, FileNotFoundError) as error:
+        raise HTTPException(status_code=404, detail=f"unknown or unavailable dataset: {key}") from error
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@app.get("/api/v1/recommendations/{analysis}", tags=["analysis"])
+def recommendations(analysis: str) -> dict:
+    """Return a server-ranked action queue for one exhibition analysis."""
+
+    try:
+        return service.recommendation(analysis)
+    except DatasetNotFoundError as error:
+        raise HTTPException(status_code=404, detail=f"unknown analysis: {analysis}") from error
+
+
+app.mount("/api/v1/assets", StaticFiles(directory=ROOT / "data"), name="data-assets")
