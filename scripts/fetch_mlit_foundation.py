@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import fiona
-from fiona.transform import transform_geom
+from fiona.transform import transform, transform_geom
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -150,17 +150,34 @@ def _target_contexts(region: str) -> Iterable[tuple[str, tuple[float, float, flo
     return CONTEXTS.items() if region == "both" else ((region, CONTEXTS[region]),)
 
 
+def _bbox_in_crs(
+    bbox: tuple[float, float, float, float],
+    target_crs: Any,
+) -> tuple[float, float, float, float]:
+    """Transform all WGS84 bbox corners before source-side filtering."""
+    min_x, min_y, max_x, max_y = bbox
+    xs, ys = transform(
+        "EPSG:4326",
+        target_crs,
+        [min_x, min_x, max_x, max_x],
+        [min_y, max_y, min_y, max_y],
+    )
+    return min(xs), min(ys), max(xs), max(ys)
+
+
 def _read_features(path: Path, dataset: Dataset, archive: Archive, retrieved_at: str) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     with fiona.open(path) as source:
         source_crs = source.crs_wkt or source.crs
+        if not source_crs:
+            raise RuntimeError(f"source layer has no CRS: {path}")
         for region, bbox in _target_contexts(archive.region):
-            for raw in source.filter(bbox=bbox):
+            source_bbox = _bbox_in_crs(bbox, source_crs)
+            for raw in source.filter(bbox=source_bbox):
                 geometry = raw.get("geometry")
                 if not geometry:
                     continue
-                if source_crs:
-                    geometry = transform_geom(source_crs, "EPSG:4326", geometry, antimeridian_cutting=True)
+                geometry = transform_geom(source_crs, "EPSG:4326", geometry, antimeridian_cutting=True)
                 if hasattr(geometry, "__geo_interface__"):
                     geometry = dict(geometry.__geo_interface__)
                 properties = {key: _json_value(value) for key, value in dict(raw["properties"]).items()}
