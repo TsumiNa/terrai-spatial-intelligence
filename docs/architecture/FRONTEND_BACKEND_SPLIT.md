@@ -1,5 +1,7 @@
 # 客户展览版前后端分离
 
+[中文](FRONTEND_BACKEND_SPLIT.md) | [日本語](FRONTEND_BACKEND_SPLIT.ja.md) | [English](FRONTEND_BACKEND_SPLIT.en.md)
+
 状态：Implemented for Demo
 日期：2026-07-20
 

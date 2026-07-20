@@ -1,5 +1,7 @@
 # FL → SL → AL Factor of Concept 重构记录
 
+[中文](2026-07-fl-sl-al-factor-of-concept.md) | [日本語](2026-07-fl-sl-al-factor-of-concept.ja.md) | [English](2026-07-fl-sl-al-factor-of-concept.en.md)
+
 - 日期：2026-07-20
 - 分支：`refactor/fl-sl-al-concept`
 - 基线：`main` / `4ceb7ba`

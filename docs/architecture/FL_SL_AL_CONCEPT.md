@@ -1,7 +1,10 @@
 # TerrAI FL → SL → AL 概念架构
 
-状态：Factor of Concept（概念重构）  
-日期：2026-07-20  
+[中文](FL_SL_AL_CONCEPT.md) | [日本語](FL_SL_AL_CONCEPT.ja.md) | [English](FL_SL_AL_CONCEPT.en.md)
+
+状态：Factor of Concept（概念重构）
+
+日期：2026-07-20
 适用范围：TerrAI Spatial Intelligence Prototype
 
 ## 1. 一句话定义
@@ -129,4 +132,3 @@ TerrAI 所说的 missing 不限于表格空单元格：
 - `TerrAI_Narrative_Product_Strategy_Update_v4.docx`：§4 将稀疏地层参数预测定义为进入 Cyber Port 的局部技术证明而非完整产品；§6–7 定义共享 engine、delivery、application 与 held-out/uncertainty 要求。
 - [`TsumiNa/geo_pfn`](https://github.com/TsumiNa/geo_pfn)，复核提交 `07c7ee0`。
 - [`sparse-context-results.html`](https://github.com/TsumiNa/geo_pfn/blob/main/docs/sparse-context-results.html) 与 [`stage-report.html`](https://github.com/TsumiNa/geo_pfn/blob/main/docs/stage-report.html)。
-

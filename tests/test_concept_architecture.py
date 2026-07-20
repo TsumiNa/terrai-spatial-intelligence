@@ -6,6 +6,19 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
+TRILINGUAL_DOCUMENTS = (
+    "README.md",
+    "DATA_SOURCES.md",
+    "REFACTOR_DECISIONS.md",
+    "REMOTE_SENSING_PLAN.md",
+    "architecture/README.md",
+    "data/external/tepco/README.md",
+    "docs/adr/0001-fl-sl-al-conceptual-layers.md",
+    "docs/architecture/FL_SL_AL_CONCEPT.md",
+    "docs/architecture/FRONTEND_BACKEND_SPLIT.md",
+    "docs/refactor/2026-07-fl-sl-al-factor-of-concept.md",
+)
+
 
 def read(relative: str) -> str:
     return (PROJECT_ROOT / relative).read_text(encoding="utf-8")
@@ -53,16 +66,26 @@ class ConceptArchitectureTests(unittest.TestCase):
             self.assertIn(relative, readme)
 
     def test_frontend_backend_call_document_tracks_runtime(self) -> None:
-        call_structure = read("architecture/README.md")
-        self.assertEqual(call_structure.count("sequenceDiagram"), 3)
-        for token in (
-            "GET /bootstrap",
-            "GET /assets/tiles/",
-            "GET /features/solar",
-            "当前不会再次请求 API",
-            "SQLite",
-        ):
-            self.assertIn(token, call_structure)
+        for relative in ("architecture/README.md", "architecture/README.ja.md", "architecture/README.en.md"):
+            call_structure = read(relative)
+            self.assertEqual(call_structure.count("sequenceDiagram"), 3)
+            for token in ("GET /bootstrap", "GET /assets/tiles/", "GET /features/solar", "SQLite"):
+                self.assertIn(token, call_structure)
+
+    def test_all_documentation_has_chinese_japanese_and_english(self) -> None:
+        for relative in TRILINGUAL_DOCUMENTS:
+            canonical = Path(relative)
+            siblings = (
+                canonical,
+                canonical.with_suffix(".ja.md"),
+                canonical.with_suffix(".en.md"),
+            )
+            for sibling in siblings:
+                self.assertTrue((PROJECT_ROOT / sibling).is_file(), sibling)
+                content = read(str(sibling))
+                self.assertEqual(content.count("```") % 2, 0, f"unclosed code fence: {sibling}")
+                for linked in siblings:
+                    self.assertIn(f"({linked.name})", content, f"{sibling} -> {linked.name}")
 
 
 if __name__ == "__main__":

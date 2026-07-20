@@ -1,5 +1,7 @@
 # TerrAI Spatial Intelligence Platform — Integrated PoC
 
+[中文](README.md) | [日本語](README.ja.md) | [English](README.en.md)
+
 面向客户展示的空间决策 Demo：用地图和优先队列直接回答“哪里值得先行动、为什么、证据是否可信”。当前覆盖横滨城市韧性与茂原光伏开发；每个指标、队列结果和地图字段都能追溯来源、公式与适用限制。
 
 项目采用独立静态前端和 FastAPI 后端。前端只负责数据加载、地图和审计交互；Python 后端负责文件数据读取、健康检查、条件/空间查询、汇总及推荐队列排序。基础数据暂时保留为独立 JSON/GeoJSON，数据库与 SQLite 留到后续开发。
@@ -312,6 +314,7 @@ terrai-spatial-intelligence/
 ├── scripts/                    # 可直接执行的数据获取、恢复与派生管线
 │   ├── ensure_data.py          # status / ensure / update 脚本入口
 │   └── bootstrap_packaged_data.py # 从 Git 恢复缺失基础快照
+├── architecture/               # 前端—后端调用结构与三语 Mermaid 时序图
 ├── docs/
 │   ├── architecture/           # FL → SL → AL 概念定义与成熟度边界
 │   ├── adr/                    # 可追溯的架构决策记录

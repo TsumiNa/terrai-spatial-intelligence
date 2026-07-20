@@ -1,5 +1,7 @@
 # TerrAI 前端—后端调用结构
 
+[中文](README.md) | [日本語](README.ja.md) | [English](README.en.md)
+
 状态：当前 Demo 实现
 
 更新日期：2026-07-21

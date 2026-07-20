@@ -1,5 +1,7 @@
 # TerrAI 遥感与地形数据接入计划
 
+[中文](REMOTE_SENSING_PLAN.md) | [日本語](REMOTE_SENSING_PLAN.ja.md) | [English](REMOTE_SENSING_PLAN.en.md)
+
 ## 已经接入并本地缓存
 
 | 数据 | 原生级别 | 在平台中的用途 | 不能代表什么 |

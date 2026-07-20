@@ -19,6 +19,24 @@ ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_ROOT = ROOT / "frontend"
 DEFAULT_PIPELINES = ("joint", "evidence")
 
+TRILINGUAL_DOCUMENTS = (
+    "README.md",
+    "DATA_SOURCES.md",
+    "REFACTOR_DECISIONS.md",
+    "REMOTE_SENSING_PLAN.md",
+    "architecture/README.md",
+    "data/external/tepco/README.md",
+    "docs/adr/0001-fl-sl-al-conceptual-layers.md",
+    "docs/architecture/FL_SL_AL_CONCEPT.md",
+    "docs/architecture/FRONTEND_BACKEND_SPLIT.md",
+    "docs/refactor/2026-07-fl-sl-al-factor-of-concept.md",
+)
+
+
+def localized_document(relative: str, language: str) -> str:
+    path = Path(relative)
+    return str(path.with_suffix(f".{language}.md"))
+
 REQUIRED_FILES = [
     "frontend/index.html",
     "frontend/styles.css",
@@ -27,11 +45,6 @@ REQUIRED_FILES = [
     "frontend/app.js",
     "terrai_spatial/api.py",
     "terrai_spatial/data_service.py",
-    "architecture/README.md",
-    "docs/architecture/FL_SL_AL_CONCEPT.md",
-    "docs/architecture/FRONTEND_BACKEND_SPLIT.md",
-    "docs/adr/0001-fl-sl-al-conceptual-layers.md",
-    "docs/refactor/2026-07-fl-sl-al-factor-of-concept.md",
     "frontend/vendor/leaflet.js",
     "frontend/vendor/leaflet.css",
     "terrai_spatial/data_tasks.py",
@@ -46,6 +59,10 @@ REQUIRED_FILES = [
     "data/joint/joint_summary.json",
     "data/google/satellite_embedding/summary.json",
     "data/evidence/multiscale_summary.json",
+] + list(TRILINGUAL_DOCUMENTS) + [
+    localized_document(relative, language)
+    for relative in TRILINGUAL_DOCUMENTS
+    for language in ("ja", "en")
 ]
 
 
@@ -217,6 +234,22 @@ def command_validate(_: argparse.Namespace) -> None:
         for token in required_tokens:
             if token not in content:
                 failures.append(f"exhibition contract missing: {relative}: {token}")
+
+    for relative in TRILINGUAL_DOCUMENTS:
+        canonical = Path(relative)
+        siblings = (
+            canonical.name,
+            canonical.with_suffix(".ja.md").name,
+            canonical.with_suffix(".en.md").name,
+        )
+        for document in (canonical, canonical.with_suffix(".ja.md"), canonical.with_suffix(".en.md")):
+            path = ROOT / document
+            if not path.is_file():
+                continue
+            content = path.read_text(encoding="utf-8")
+            for sibling in siblings:
+                if f"({sibling})" not in content:
+                    failures.append(f"trilingual navigation missing: {document}: {sibling}")
     client_html = (ROOT / "frontend/index.html").read_text(encoding="utf-8")
     if 'data-module="architecture"' in client_html:
         failures.append("internal architecture module leaked into the customer navigation")

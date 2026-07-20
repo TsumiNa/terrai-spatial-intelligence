@@ -1,5 +1,7 @@
 # TerrAI 重构决策记录
 
+[中文](REFACTOR_DECISIONS.md) | [日本語](REFACTOR_DECISIONS.ja.md) | [English](REFACTOR_DECISIONS.en.md)
+
 ## FL → SL → AL 概念架构（2026-07-20）
 
 TerrAI 的共享底座正式分为 Foundation Data Layer（FL）、Synthetic Data Layer（SL）和 Application Layer（AL）。当前开源/官方观测与不改变观测语义的确定性加工属于 FL；未来经过 held-out、校准和适用性闸门的稀疏补值属于 SL；现有坡地暴露、道路韧性、光伏选址及联合评分属于 AL。
