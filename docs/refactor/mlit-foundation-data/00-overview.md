@@ -70,4 +70,3 @@ Rejected because the individual W05 page explicitly says non-commercial. The loc
 ## Delivery plan
 
 - [01-mlit-source-pack-pr1.md](01-mlit-source-pack-pr1.md): integrate and document the complete MLIT source pack in one independently verifiable PR.
-
