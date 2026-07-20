@@ -46,14 +46,14 @@ For these, decide the PR sequence **before editing any file**. Do not open one b
 Record the plan under `docs/refactor/<refactor-slug>/` before implementation:
 
 - `00-overview.md` — why the refactor exists, the decision with alternatives and consequences, explicit non-goals, and the ordered list of planned PRs.
-- one `NN-slug-prN[a].md` per planned PR, each with **Goal**, **Scope**, **Non-goals**, and **Acceptance** sections. `REFACTOR_PLAN_PATTERN` in `terrai_spatial/cli.py` enforces the filename shape.
+- one plan file per planned PR, each with **Goal**, **Scope**, **Non-goals**, and **Acceptance** sections. Follow the plan-filename convention in `repository-doc-boundaries.instructions.md`; documentation validation enforces it.
 
 If the user requests a complex refactor without a plan, propose the split and get agreement before writing code.
 
 ### Requirements for every PR in the sequence
 
 1. **One stated purpose.** The title names a single outcome. If stating the goal requires "and", it is probably two PRs.
-2. **Independently verifiable.** Each PR lists its own acceptance commands and leaves the full suite and `uv run python -m terrai_spatial validate` passing when it merges. A PR that only turns green after a *later* PR is not independently verifiable — merge it with that PR, or reorder the sequence.
+2. **Independently verifiable.** Each PR lists its own acceptance commands in its plan file and leaves the repository's test suite and validation checks passing when it merges. A PR that only turns green after a *later* PR is not independently verifiable — merge it with that PR, or reorder the sequence.
 3. **Independently reviewable.** Someone reading only this PR and its plan file should understand what changed and why, without reading the rest of the sequence. "Part 2 of the refactor" is not a description.
 4. **Independently revertible.** Reverting one PR must not break the PRs that landed before it.
 5. **No mixing of mechanical and semantic change.** A pure move/rename is one PR; a behavior change is another. But when a move breaks literal-path or literal-string references, update those references **in the same PR that moves the files** — never split a move from the reference updates it invalidates.
