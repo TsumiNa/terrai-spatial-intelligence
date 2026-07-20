@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import sys
 import zipfile
 from pathlib import Path
 
@@ -10,6 +11,8 @@ import pytest
 
 from terrai_spatial.data_tasks import (
     BOOTSTRAP_OUTPUTS,
+    TASKS,
+    _run,
     _ordered_names,
     ensure_data,
     task_state,
@@ -145,3 +148,33 @@ def test_integrated_fl_sources_require_retrieval_and_source_time_metadata(tmp_pa
         "integrated FL source lacks retrieved_at: missing-retrieval",
         "integrated FL source lacks source_updated_at: missing-source-time",
     ]
+
+
+def test_every_task_runs_on_the_current_interpreter(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """No task may shell out to a package manager.
+
+    Pipelines used to run under `uv run --extra remote`, which installed the
+    geospatial stack mid-startup whenever an output went missing. The stack is
+    a base dependency now, so a missing output must never trigger an install.
+
+    `_run` is called directly rather than through `ensure_data`: a task with
+    dependencies would otherwise stop at the first dependency and never reach
+    the one under test, letting the assertions pass without running.
+    """
+    commands: list[list[str]] = []
+    monkeypatch.setattr(
+        "terrai_spatial.data_tasks.subprocess.run",
+        lambda command, **kwargs: commands.append([str(part) for part in command]),
+    )
+
+    for name, task in TASKS.items():
+        commands.clear()
+        _run(task, tmp_path, force=True, allow_network=True)
+
+        assert len(commands) == 1, f"{name} did not run exactly one command"
+        command = commands[0]
+        assert command[0] == sys.executable, f"{name} did not use the current interpreter"
+        assert Path(command[1]).name == Path(task.script).name, name
+        assert "--extra" not in command and "--group" not in command, name

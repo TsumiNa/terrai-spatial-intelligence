@@ -30,7 +30,7 @@ All Python execution, dependency management, and environment setup goes through 
 - **Run everything through `uv run`**, e.g. `uv run python -m terrai_spatial serve --port 4176`. This guarantees the correct interpreter and dependencies from the project's managed environment.
 - **Add/remove dependencies with `uv add <package>` / `uv remove <package>`.** Do not hand-edit the `dependencies` array in `pyproject.toml` without also updating `uv.lock` — let `uv` regenerate the lockfile instead of editing it manually.
 - **Requires Python >= 3.11** (`requires-python` in `pyproject.toml`).
-- **Optional `remote` dependency group** (`numpy`, `pillow`, `pyproj`, `rasterio`) is not installed by default. Use `uv sync --extra remote` or `uv run --extra remote ...` when working on remote-sensing code paths (`scripts/fetch_google_satellite_embedding.py`, raster/GeoTIFF handling, etc.).
+- **The geospatial stack is a base dependency** (`fiona`, `numpy`, `pillow`, `pyproj`, `rasterio`). There is no optional extra: `uv sync` installs everything the pipelines need, so no code path installs dependencies at runtime.
 - **`[tool.uv] package = false`**: this repository is not built or installed as an importable package, and there is no `[build-system]` section. Do not add build-backend config or attempt `pip install -e .`.
 - **Tests use `pytest`** (dev dependency group, installed by default via `default-groups = ["dev"]`). Write plain test functions with bare `assert`, not `unittest.TestCase` classes. Use the `tmp_path` and `monkeypatch` fixtures rather than `tempfile` and `unittest.mock.patch`.
 

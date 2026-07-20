@@ -72,7 +72,7 @@ uv run python scripts/ensure_data.py update --only joint
 uv run python scripts/build_joint_analysis.py
 uv run python scripts/build_multiscale_evidence.py
 uv run python scripts/fetch_visual_tiles.py
-uv run --extra remote python scripts/fetch_google_satellite_embedding.py
+uv run python scripts/fetch_google_satellite_embedding.py
 uv run python scripts/fetch_tepco_grid.py
 uv run python scripts/update_tepco_grid.py
 uv run python scripts/parse_tepco_grid.py
@@ -151,7 +151,7 @@ FastAPI v1 establishes only the minimal read/query/rank boundary. Formal schemas
 - 64-D cosine change, similarity, and future few-label transfer; no land-class interpretation or current score input.
 
 ```bash
-uv run --extra remote python -m terrai_spatial fetch embedding
+uv run python -m terrai_spatial fetch embedding
 ```
 
 ### Dynamic World: removed

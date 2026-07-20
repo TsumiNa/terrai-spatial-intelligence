@@ -88,7 +88,7 @@ uv run python scripts/ensure_data.py update --only joint
 uv run python scripts/build_joint_analysis.py
 uv run python scripts/build_multiscale_evidence.py
 uv run python scripts/fetch_visual_tiles.py
-uv run --extra remote python scripts/fetch_google_satellite_embedding.py
+uv run python scripts/fetch_google_satellite_embedding.py
 uv run python scripts/fetch_tepco_grid.py
 uv run python scripts/update_tepco_grid.py
 uv run python scripts/parse_tepco_grid.py
@@ -170,7 +170,7 @@ FastAPI v1 只建立演示所需的最小读取、查询和排序边界，不提
 重新裁剪只会读取 COG 的必要字节范围：
 
 ```bash
-uv run --extra remote python -m terrai_spatial fetch embedding
+uv run python -m terrai_spatial fetch embedding
 ```
 
 ### Dynamic World：已从 Demo 与数据管线移除
