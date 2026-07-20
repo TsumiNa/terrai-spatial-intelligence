@@ -22,6 +22,9 @@ REQUIRED_FILES = [
     "i18n.js",
     "audit.js",
     "app.js",
+    "docs/architecture/FL_SL_AL_CONCEPT.md",
+    "docs/adr/0001-fl-sl-al-conceptual-layers.md",
+    "docs/refactor/2026-07-fl-sl-al-factor-of-concept.md",
     "vendor/leaflet.js",
     "vendor/leaflet.css",
     "terrai_spatial/data_tasks.py",
@@ -112,6 +115,33 @@ def command_validate(_: argparse.Namespace) -> None:
         for token in forbidden:
             if token in content:
                 failures.append(f"removed runtime dependency still referenced: {path.name}: {token}")
+
+    concept_contract = {
+        "index.html": (
+            'data-module="architecture"',
+            'id="architecture-board"',
+            "当前评分是透明 AL 启发式，不是 SL 预测",
+        ),
+        "app.js": (
+            "function renderArchitecture()",
+            'metric("地表 SL 补值", 0',
+        ),
+        "docs/architecture/FL_SL_AL_CONCEPT.md": (
+            "Foundation Data Layer",
+            "Synthetic Data Layer",
+            "Application Layer",
+            "本次明确不做",
+            "observed、synthetic 与 unresolved",
+        ),
+    }
+    for relative, required_tokens in concept_contract.items():
+        path = ROOT / relative
+        if not path.is_file():
+            continue
+        content = path.read_text(encoding="utf-8")
+        for token in required_tokens:
+            if token not in content:
+                failures.append(f"concept contract missing: {relative}: {token}")
 
     if failures:
         print("TerrAI validation failed:")
