@@ -1,8 +1,8 @@
 # TerrAI Spatial Intelligence Platform — Integrated PoC
 
-一个以 **Foundation Data Layer（FL）→ Synthetic Data Layer（SL）→ Application Layer（AL）** 为产品骨架的空间智能 Prototype。当前版本完成的是 **Factor of Concept**：把真实/授权证据、未来稀疏预测增强和业务应用出口明确分层；不提前设计各层 schema、API 或服务调度。
+面向客户展示的空间决策 Demo：用地图和优先队列直接回答“哪里值得先行动、为什么、证据是否可信”。当前覆盖横滨城市韧性与茂原光伏开发；每个指标、队列结果和地图字段都能追溯来源、公式与适用限制。
 
-当前成熟度是 **FL 已接入、地表 SL 仅定义概念边界、AL Demo 已接入**。页面里的风险分、适宜分和联合分仍是可审计的 AL 启发式计算，不是已经完成验证的 SL 模型预测。
+项目采用独立静态前端和 FastAPI 后端。前端只负责数据加载、地图和审计交互；Python 后端负责文件数据读取、健康检查、条件/空间查询、汇总及推荐队列排序。基础数据暂时保留为独立 JSON/GeoJSON，数据库与 SQLite 留到后续开发。
 
 ## 运行
 
@@ -12,9 +12,24 @@
 uv run python -m terrai_spatial serve --port 4176
 ```
 
-然后访问 `http://localhost:4176/`。平台运行不需要后端、数据库或 API Key；底图、分析结果与 2023–2024 Satellite Embedding 裁剪均已缓存到本地。
+然后访问 `http://localhost:4176/`。同一命令会启动：
 
-`serve` 启动服务器前会自动检查数据任务：缺失的打包基础数据优先从本地 Git 历史恢复，缺失的公开遥感/地图缓存会调用对应下载脚本，缺失或早于输入的派生结果会自动重建。东京电力原始本地缓存缺失时，也会从其官方 ZIP 自动下载到 Git 忽略目录，再解析摘要；因此标准 GitHub 克隆首次在线启动也会补齐原 CSV。每个实际执行的任务都会打印到终端，不会静默修改数据。若需要严格离线启动，可使用 `--offline`；若只想原样启动静态文件，可使用 `--no-ensure-data`。
+- 客户展示前端：`http://127.0.0.1:4176/`
+- FastAPI 后端与交互文档：`http://127.0.0.1:8000/docs`
+
+运行不需要数据库或外部 API Key；底图、分析结果与 2023–2024 Satellite Embedding 裁剪均已缓存到本地。
+
+`serve` 启动双端服务前会自动检查数据任务：缺失的打包基础数据优先从本地 Git 历史恢复，缺失的公开遥感/地图缓存会调用对应下载脚本，缺失或早于输入的派生结果会自动重建。东京电力原始本地缓存缺失时，也会从其官方 ZIP 自动下载到 Git 忽略目录，再解析摘要；因此标准 GitHub 克隆首次在线启动也会补齐原 CSV。每个实际执行的任务都会打印到终端，不会静默修改数据。若需要严格离线启动，可使用 `--offline`；若已确认数据完整，可使用 `--no-ensure-data`。
+
+前后端也可以分别启动：
+
+```bash
+# 后端：API 与 /docs
+uv run python -m terrai_spatial api --port 8000
+
+# 前端：默认连接 http://127.0.0.1:8000/api/v1
+uv run python -m terrai_spatial frontend --port 4176
+```
 
 常用工程命令：
 
@@ -43,7 +58,21 @@ uv run python -m terrai_spatial build
 uv run python -m terrai_spatial build --only joint
 ```
 
-`uv.lock` 固定 Python 项目环境；基础运行和本地重建没有第三方 Python 依赖。只有重新获取 Satellite Embedding 时才安装 `remote` 可选依赖。
+`uv.lock` 固定 FastAPI、Uvicorn 与 Python 项目环境。只有重新获取 Satellite Embedding 时才安装 `remote` 可选依赖。
+
+## FastAPI 接口
+
+| 接口 | 用途 |
+|---|---|
+| `GET /api/v1/health` | 服务与 18 个文件数据集的完整性状态 |
+| `GET /api/v1/catalog` | 数据文件目录、类型、记录数和更新时间 |
+| `GET /api/v1/bootstrap` | 前端首屏需要的完整展示契约 |
+| `GET /api/v1/datasets/{key}` | 按稳定 key 读取一个 JSON/GeoJSON |
+| `GET /api/v1/features/{key}` | 按字段、数值范围、bbox、排序和 limit 查询 GeoJSON |
+| `GET /api/v1/recommendations/{analysis}` | 获取 Python 服务端排序后的行动队列 |
+| `/api/v1/assets/*` | 本地地图瓦片与遥感图像资产 |
+
+前端不直接读取 `data/` 路径；文件位置、缓存与排序逻辑集中在 Python 数据服务中。
 
 数据任务也可以直接作为脚本运行：
 
@@ -80,7 +109,7 @@ uv run python scripts/parse_tepco_grid.py
 - **计算数据**显示公式、当前对象的代入数据、结果和数据血缘。现有风险分、适宜分、联合分均标为启发式计算，而不是预测概率。
 - 顶部“中 / 日 / EN”可即时切换；选择保存在浏览器本地，URL 也支持 `?lang=zh|ja|en`。
 
-## FL → SL → AL 概念架构
+## 内部产品架构记录（不在客户界面展示）
 
 | 层 | 概念职责 | 当前 Prototype 状态 |
 |---|---|---|
@@ -94,7 +123,7 @@ uv run python scripts/parse_tepco_grid.py
 - [ADR-0001：采用 FL → SL → AL](docs/adr/0001-fl-sl-al-conceptual-layers.md)
 - [本次 Factor of Concept 重构记录](docs/refactor/2026-07-fl-sl-al-factor-of-concept.md)
 
-本次明确不定义数据对象/字段 schema、层间 API、任务编排、模型注册、数据库、多租户权限或部署拓扑；这些属于客户数据与目标变量明确后的 **Factor of Develop**。
+FastAPI v1 只建立演示所需的最小读取、查询和排序边界，不提前定义正式数据对象 schema、模型注册、任务编排、数据库、多租户权限或部署拓扑；这些仍属于客户数据与目标变量明确后的后续开发。
 
 ### 当前成本结论
 
@@ -114,17 +143,16 @@ uv run python scripts/parse_tepco_grid.py
 | NASA POWER | 茂原太阳辐照气候背景 | 免费 API；当前结果已缓存 | NASA 数据通常开放；应致谢且不得暗示 NASA 背书；不等于场址级发电量 |
 | 东京电力公开系統信息 | 茂原区域级并网容量预筛 | 免费公开 ZIP/CSV；缺失时可从官方 URL 自动下载到本地 | **不是开放许可数据**；原说明标注禁止转载，且容量不是并网承诺；原文件不进 Git，仅作内部筛查，公开产品需复核权利与接续検討 |
 
-## 九个入口
+## 八个客户入口
 
-1. **FL → SL → AL 架构**：查看三层定义、当前成熟度、证据闸门与不可补值边界。
-2. **双区域总览**：在横滨城市韧性与茂原新能源开发之间切换。
-3. **多尺度证据**：横滨与茂原的 10 m Satellite Embedding 年度变化、相似表征和 100–300 m 决策区。
-4. **坡地暴露**：横滨保土谷区 2,128 栋建筑的地形暴露初筛。
-5. **道路韧性**：272 段道路的巡检与连续性优先级。
-6. **官方设施韧性**：研究窗口内两处横滨市官方地域防灾据点的改造机会队列。
-7. **设施—道路—社区**：官方设施、候选补充节点、社区需求与道路走廊的同域联算。
-8. **光伏选址**：千叶茂原市 70 个候选网格的适宜性筛查。
-9. **开发约束**：茂原可交付候选、现有规则排除项与东京电力公开容量快照。
+1. **决策总览**：在横滨城市韧性与茂原新能源开发之间切换。
+2. **城市韧性项目**：查看社区光储节点与复合巡检走廊。
+3. **光伏开发准备度**：查看可交付候选、规则冲突与东京电力公开容量信号。
+4. **建筑坡地风险**：横滨保土谷区 2,128 栋建筑的地形暴露初筛。
+5. **道路连续性**：272 段道路的巡检与社区影响优先级。
+6. **公共设施改造**：两处横滨市官方地域防灾据点的改造机会队列。
+7. **光伏候选地**：千叶茂原市 70 个候选网格的适宜性筛查。
+8. **证据与可靠性**：10 m Satellite Embedding 年度变化、相似表征和逐项审计。
 
 ## Google 遥感数据的取舍
 
@@ -270,8 +298,16 @@ Dynamic World 只保留在数据决策记录的“评估后排除”一栏，不
 terrai-spatial-intelligence/
 ├── pyproject.toml              # uv 项目、Python 版本和 remote 可选依赖
 ├── uv.lock                     # 可复现环境锁文件
-├── terrai_spatial/             # 统一 serve / build / fetch / validate CLI
+├── terrai_spatial/             # FastAPI 后端与统一 CLI
+│   ├── api.py                  # health / catalog / data / query / recommendations API
+│   ├── data_service.py         # JSON/GeoJSON 读取、缓存、查询、汇总与服务端排序
 │   └── data_tasks.py           # 启动与手动命令共享的数据任务注册表
+├── frontend/                   # 独立静态客户展示前端
+│   ├── index.html              # 展览型信息架构
+│   ├── app.js                  # API 加载、地图与交互展示
+│   ├── audit.js                # 原始/模型/计算三类审计契约
+│   ├── i18n.js                 # 中日英界面词典
+│   └── styles.css              # 地图、结果队列、审计抽屉与响应式样式
 ├── scripts/                    # 可直接执行的数据获取、恢复与派生管线
 │   ├── ensure_data.py          # status / ensure / update 脚本入口
 │   └── bootstrap_packaged_data.py # 从 Git 恢复缺失基础快照
@@ -279,10 +315,5 @@ terrai-spatial-intelligence/
 │   ├── architecture/           # FL → SL → AL 概念定义与成熟度边界
 │   ├── adr/                    # 可追溯的架构决策记录
 │   └── refactor/               # 重构原因、步骤与复核指南
-├── data/                       # 原始快照、标准化数据和分析结果
-├── index.html                  # 静态应用入口
-├── app.js                      # 地图与分析模块
-├── audit.js                    # 原始/模型/计算三类审计契约
-├── i18n.js                     # 中日英界面词典
-└── styles.css                  # 地图、审计抽屉与响应式样式
+└── data/                       # FL 文件快照、标准化数据和分析结果；暂不使用数据库
 ```

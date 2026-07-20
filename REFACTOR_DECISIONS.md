@@ -4,7 +4,15 @@
 
 TerrAI 的共享底座正式分为 Foundation Data Layer（FL）、Synthetic Data Layer（SL）和 Application Layer（AL）。当前开源/官方观测与不改变观测语义的确定性加工属于 FL；未来经过 held-out、校准和适用性闸门的稀疏补值属于 SL；现有坡地暴露、道路韧性、光伏选址及联合评分属于 AL。
 
-本次只完成 Factor of Concept，不定义 schema、API、数据库或调度。完整定义见 [`docs/architecture/FL_SL_AL_CONCEPT.md`](docs/architecture/FL_SL_AL_CONCEPT.md)，决策理由见 [`docs/adr/0001-fl-sl-al-conceptual-layers.md`](docs/adr/0001-fl-sl-al-conceptual-layers.md)。
+该阶段只完成 Factor of Concept，不定义 schema、数据库或调度。后续客户展览重构增加了最小只读 API，但不改变三层概念边界。完整定义见 [`docs/architecture/FL_SL_AL_CONCEPT.md`](docs/architecture/FL_SL_AL_CONCEPT.md)，决策理由见 [`docs/adr/0001-fl-sl-al-conceptual-layers.md`](docs/adr/0001-fl-sl-al-conceptual-layers.md)。
+
+## 客户展览 UI 与最小 FastAPI 分离（2026-07-20）
+
+- 客户主界面移除 FL/SL/AL 成熟度与内部实验说明，改为功能入口、结果解释、服务可靠性和逐项审计。
+- 静态前端移动到 frontend/，只通过 /api/v1 加载数据；不再直接读取 data/ 文件路径。
+- FastAPI 负责文件缓存、健康状态、目录、GeoJSON 查询、汇总和推荐队列排序；数据重建仍由 Python 脚本与任务注册表负责。
+- 当前 FL 继续使用独立 JSON/GeoJSON，不引入数据库；dataset key 为未来 SQLite 迁移保留前端隔离层。
+- 详细边界见 docs/architecture/FRONTEND_BACKEND_SPLIT.md。
 
 ## 从三个 Claude Demo 吸收了什么
 
