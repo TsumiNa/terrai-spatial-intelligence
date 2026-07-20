@@ -11,15 +11,17 @@ Before editing or creating any file, check `.github/instructions/` for instructi
 - Re-read the directory each time — instruction files are added/updated independently of this document, so do not rely solely on the summary below.
 - If an instruction's `applyTo` pattern matches your target file, its rules are mandatory, not optional guidance.
 - If two instructions conflict, prefer the more specific `applyTo` pattern and ask the user if the conflict is not resolvable.
+- **When writing or editing an instruction file, keep it free of project-specific commands, module paths, and code symbols.** Instructions state what must be true; they must not name the CLI command, script, or constant that currently enforces it — those drift with every refactor and turn the instruction into a source of wrong information. Put the concrete commands here in `AGENTS.md` or in `CONTRIBUTING.md` instead.
 
 Current instruction files (may be incomplete — always verify against the directory):
 
-| File                                               | Applies to                               | Covers                                                                         |
-| -------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------ |
-| `branch-and-pr-workflow.instructions.md`           | `**`                                     | When to branch, when to open a PR, when to stay on the current branch          |
-| `in-branch-api-compat.instructions.md`             | (all)                                    | No compatibility wrappers/aliases for in-progress API changes unless requested |
-| `minimal-implementation-and-tests.instructions.md` | `**`                                     | Minimal abstraction/scope, required test coverage for new logic                |
-| `repository-doc-boundaries.instructions.md`        | `**/{README,CONTRIBUTING}.md`, `docs/**` | README vs CONTRIBUTING split, `docs/` folder structure and language versions   |
+| File                                               | Applies to                               | Covers                                                                      |
+| -------------------------------------------------- | ---------------------------------------- | --------------------------------------------------------------------------- |
+| `branch-and-pr-workflow.instructions.md`           | `**`                                     | Branching, PR timing, and splitting a refactor into verifiable PR sequences |
+| `in-branch-api-compat.instructions.md`             | (all)                                    | No compatibility wrappers/aliases for in-progress API changes               |
+| `minimal-implementation-and-tests.instructions.md` | `**`                                     | Minimal abstraction/scope, required test coverage for new logic             |
+| `repository-doc-boundaries.instructions.md`        | `**/{README,CONTRIBUTING}.md`, `docs/**` | Root entrypoints, `docs/` structure, language policy                        |
+| `docs-data-cards.instructions.md`                  | `docs/data/**`                           | Dataset card sections, including `## Data description`                      |
 
 ## 2. Python environment: this project uses `uv`
 
@@ -30,21 +32,18 @@ All Python execution, dependency management, and environment setup goes through 
 - **Requires Python >= 3.11** (`requires-python` in `pyproject.toml`).
 - **Optional `remote` dependency group** (`numpy`, `pillow`, `pyproj`, `rasterio`) is not installed by default. Use `uv sync --extra remote` or `uv run --extra remote ...` when working on remote-sensing code paths (`scripts/fetch_google_satellite_embedding.py`, raster/GeoTIFF handling, etc.).
 - **`[tool.uv] package = false`**: this repository is not built or installed as an importable package, and there is no `[build-system]` section. Do not add build-backend config or attempt `pip install -e .`.
-- **Tests use the standard library `unittest`**, not pytest. Tests are **colocated** next to the source file they exercise and named `<source>_test.py`, per `minimal-implementation-and-tests.instructions.md`. There is no `tests/` tree.
+- **Tests use `pytest`** (dev dependency group, installed by default via `default-groups = ["dev"]`). Write plain test functions with bare `assert`, not `unittest.TestCase` classes. Use the `tmp_path` and `monkeypatch` fixtures rather than `tempfile` and `unittest.mock.patch`.
 
-  Run the suite — the `-p` pattern is required, because unittest's default `test*.py` does not match this layout:
-
-  ```bash
-  uv run python -m unittest discover -p "*_test.py" -v
-  ```
-
-  Run a single test with the dotted path:
+  Tests are **colocated** next to the source file they exercise and named `<source>_test.py`, per `minimal-implementation-and-tests.instructions.md`. There is no `tests/` tree. `[tool.pytest.ini_options]` in `pyproject.toml` sets `testpaths` and `python_files = ["*_test.py"]`.
 
   ```bash
-  uv run python -m unittest terrai_spatial.data_service_test.DataServiceTests.test_bootstrap_contains_ranked_server_side_recommendations -v
+  uv run pytest                                   # whole suite
+  uv run pytest terrai_spatial/cli_test.py        # one file
+  uv run pytest -k feature_query                  # by name
+  uv run pytest terrai_spatial/data_service_test.py::test_health_reports_all_file_backed_datasets_ready
   ```
 
-  `scripts/__init__.py` exists only so discovery recurses into `scripts/`; do not remove it.
+  `scripts/__init__.py` makes `scripts` a package so `from scripts.<module> import ...` resolves from the repository root; do not remove it.
 
   | Source                            | Test                                    |
   | --------------------------------- | --------------------------------------- |
