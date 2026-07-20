@@ -155,19 +155,35 @@ def validate_json(path: Path) -> tuple[bool, str]:
     return True, "ok"
 
 
-def command_validate(_: argparse.Namespace) -> None:
+def data_task_failures() -> list[str]:
+    """Report data pipelines that are not ready.
+
+    This reads working-copy file modification times, so a checkout that rewrites
+    a pipeline input reports `stale` even though repository content is correct.
+    Keep it out of `contract_failures` for that reason.
+    """
+
+    return [
+        f"data task {state.name}: {state.status}: {state.reason}"
+        for state in status_rows()
+        if state.status != "ready"
+    ]
+
+
+def contract_failures() -> list[str]:
+    """Report every violation that is decided by repository content alone.
+
+    Required assets, JSON validity, documentation structure and language groups,
+    and the runtime string contracts. Deterministic for a given checkout.
+    """
+
     failures: list[str] = validate_json_outputs()
-    for state in status_rows():
-        if state.status != "ready":
-            failures.append(f"data task {state.name}: {state.status}: {state.reason}")
     for relative in REQUIRED_FILES:
         path = ROOT / relative
         if not path.is_file():
             failures.append(f"missing: {relative}")
 
-    json_count = 0
     for path in sorted((ROOT / "data").rglob("*.json")) + sorted((ROOT / "data").rglob("*.geojson")):
-        json_count += 1
         ok, message = validate_json(path)
         if not ok:
             failures.append(f"invalid {path.relative_to(ROOT)}: {message}")
@@ -345,16 +361,26 @@ def command_validate(_: argparse.Namespace) -> None:
     client_html = (ROOT / "frontend/index.html").read_text(encoding="utf-8")
     if 'data-module="architecture"' in client_html:
         failures.append("internal architecture module leaked into the customer navigation")
+    return failures
 
+
+def command_validate(_: argparse.Namespace) -> None:
+    failures = contract_failures() + data_task_failures()
     if failures:
         print("TerrAI validation failed:")
         for failure in failures:
             print(f"  - {failure}")
         raise SystemExit(1)
+
+    # Counted only once validation has passed, and without materialising the
+    # paths: these numbers exist for the success message alone.
+    json_count = sum(1 for _ in (ROOT / "data").rglob("*.json")) + sum(
+        1 for _ in (ROOT / "data").rglob("*.geojson")
+    )
     print(
         "TerrAI validation passed: "
         f"{len(REQUIRED_FILES)} required assets, {json_count} JSON/GeoJSON files, "
-        f"{len(documents)} scoped trilingual document groups"
+        f"{len(multilingual_documents())} scoped trilingual document groups"
     )
 
 
