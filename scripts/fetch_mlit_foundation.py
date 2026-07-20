@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import shutil
 import tempfile
 import urllib.request
 import zipfile

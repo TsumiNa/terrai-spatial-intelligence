@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned
+Completed
 
 ## Goal
 
@@ -45,3 +45,12 @@ Make the requested MLIT datasets reproducibly downloadable, normalized, timestam
 - The W05 river output is absent from Git, bootstrap, and public API dataset keys.
 - Each new FL output carries source and retrieval timestamps and can be queried by a stable on-demand dataset key.
 - All required data cards exist in English, Japanese, and Chinese with matching facts and commands.
+
+## Completion evidence
+
+- Live official-archive rebuild completed on 2026-07-21 with 50,859 clipped features across ten on-demand datasets.
+- Every committed GeoJSON carries dataset-level and feature-level source/retrieval provenance; `metadata.json` additionally records archive SHA-256 and HTTP `Last-Modified` where supplied.
+- W05 remains a separate manual task whose generated files are Git-ignored and whose key is absent from `ALL_DATASETS` and the API.
+- Full suite: 66 tests passed.
+- Repository validation: 34 JSON/GeoJSON files and 26 trilingual document groups passed.
+- Ruff passed for every changed Python file.
