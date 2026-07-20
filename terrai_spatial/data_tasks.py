@@ -21,6 +21,7 @@ class DataTask:
     inputs: tuple[str, ...] = ()
     outputs: tuple[str, ...] = ()
     output_globs: tuple[str, ...] = ()
+    cache_outputs: tuple[str, ...] = ()
     manifest: str | None = None
     dependencies: tuple[str, ...] = ()
     network: bool = False
@@ -29,6 +30,7 @@ class DataTask:
     force_argument: bool = False
     offline_argument: bool = False
     check_stale: bool = True
+    repair_missing_cache: bool = False
 
 
 @dataclass(frozen=True)
@@ -91,9 +93,15 @@ TASKS = {
         "download the local-only TEPCO cache when needed and rebuild its screen",
         "scripts/update_tepco_grid.py",
         outputs=("data/mobara/tepco_grid_screen.json",),
+        cache_outputs=(
+            "data/external/tepco/csv_yosochoryu_chiba_soudensen.csv",
+            "data/external/tepco/csv_yosochoryu_chiba_hendensyo.csv",
+            "data/external/tepco/download_metadata.local.json",
+        ),
         force_argument=True,
         offline_argument=True,
         check_stale=False,
+        repair_missing_cache=True,
     ),
     "joint": DataTask(
         "joint",
@@ -180,6 +188,9 @@ def task_state(name: str, root: Path = ROOT) -> TaskState:
         return TaskState(name, "missing", f"missing outputs: {', '.join(missing_outputs)}")
     if missing_inputs:
         return TaskState(name, "ready", "outputs are present; optional rebuild inputs are unavailable")
+    missing_cache = [item for item in task.cache_outputs if not _valid_file(root / item)]
+    if missing_cache:
+        return TaskState(name, "ready", f"derived output is present; local cache missing: {', '.join(missing_cache)}")
     if task.network or not task.check_stale or not outputs:
         return TaskState(name, "ready", "cached outputs are present")
     source_paths = [root / task.script, *(root / item for item in task.inputs)]
@@ -236,6 +247,7 @@ def ensure_data(
     for name in _ordered_names(selected):
         task = TASKS[name]
         state = task_state(name, root)
+        missing_cache = [item for item in task.cache_outputs if not _valid_file(root / item)]
         if state.status == "blocked":
             raise RuntimeError(f"{name} cannot run: {state.reason}")
         force_requested = force and (
@@ -244,6 +256,7 @@ def ensure_data(
         )
         should_run = force_requested
         should_run = should_run or state.status in {"missing", "stale"}
+        should_run = should_run or (task.repair_missing_cache and allow_network and bool(missing_cache))
         if not should_run:
             print(f"[TerrAI data] {name}: {state.status} — {state.reason}", flush=True)
             results.append(state)

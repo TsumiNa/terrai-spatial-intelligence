@@ -12,7 +12,7 @@ uv run python -m terrai_spatial serve --port 4176
 
 然后访问 `http://localhost:4176/`。平台运行不需要后端、数据库或 API Key；底图、分析结果与 2023–2024 Satellite Embedding 裁剪均已缓存到本地。
 
-`serve` 启动服务器前会自动检查数据任务：缺失的打包基础数据优先从本地 Git 历史恢复，缺失的公开遥感/地图缓存会调用对应下载脚本，缺失或早于输入的派生结果会自动重建。东京电力标准化筛查摘要缺失时，也会从其官方 ZIP 按需下载到 Git 忽略的本地缓存，再解析摘要。每个实际执行的任务都会打印到终端，不会静默修改数据。若需要严格离线启动，可使用 `--offline`；若只想原样启动静态文件，可使用 `--no-ensure-data`。
+`serve` 启动服务器前会自动检查数据任务：缺失的打包基础数据优先从本地 Git 历史恢复，缺失的公开遥感/地图缓存会调用对应下载脚本，缺失或早于输入的派生结果会自动重建。东京电力原始本地缓存缺失时，也会从其官方 ZIP 自动下载到 Git 忽略目录，再解析摘要；因此标准 GitHub 克隆首次在线启动也会补齐原 CSV。每个实际执行的任务都会打印到终端，不会静默修改数据。若需要严格离线启动，可使用 `--offline`；若只想原样启动静态文件，可使用 `--no-ensure-data`。
 
 常用工程命令：
 
@@ -66,8 +66,8 @@ uv run python scripts/parse_tepco_grid.py
 - `bootstrap`：基础 GeoJSON/CSV/JSON 缺失或损坏时，优先通过 `git show HEAD:<path>` 原子恢复；源码压缩包环境才回退到 GitHub，私有仓库需提供 `GITHUB_TOKEN`。
 - `tiles`、`embedding`：仅在缓存缺失时由启动流程联网获取；`data update` 才会主动刷新。
 - `joint`、`evidence`：输出缺失、损坏，或脚本/输入比输出更新时自动重建。
-- `grid`：筛查摘要缺失时自动从东京电力官方 URL 下载 ZIP、校验并只解压两份预期 CSV，然后重建摘要；原 ZIP、CSV 和包含哈希/下载时间的本地元数据均由 `.gitignore` 排除。已有摘要时启动不会重复下载；`data update --only grid`、`fetch tepco` 或 `build --only grid` 会主动刷新。
-- `--offline`：禁止联网；如果筛查摘要缺失但本地东京电力 ZIP/CSV 缓存完整，仍可解析，否则明确停止而不带着半套数据启动。
+- `grid`：在线首次启动发现本地原始缓存缺失时，自动从东京电力官方 URL 下载 ZIP、校验并只解压两份预期 CSV，然后重建摘要；原 ZIP、CSV 和包含哈希/下载时间的本地元数据均由 `.gitignore` 排除。缓存完整后启动不会重复下载；`data update --only grid`、`fetch tepco` 或 `build --only grid` 会主动刷新。
+- `--offline`：禁止联网；已有仓库内筛查摘要时，即使本地原 CSV 缺失也能启动；如果摘要缺失但本地东京电力 ZIP/CSV 缓存完整，仍可解析，否则明确停止而不带着半套数据启动。
 - 自动流程失败时不会带着半套数据启动服务器，而会显示具体任务、缺失输入和恢复方法。
 
 ## 可审计数值与三语界面

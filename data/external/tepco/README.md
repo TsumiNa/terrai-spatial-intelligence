@@ -9,6 +9,6 @@ The application can download them directly from TEPCO's official URL. No manual 
 3. The downloader validates the ZIP, extracts only `csv_yosochoryu_chiba_soudensen.csv` and `csv_yosochoryu_chiba_hendensyo.csv`, and writes `download_metadata.local.json` with retrieval time, HTTP metadata and SHA-256 hashes.
 4. The parser writes the Demo's standardized screening summary to `data/mobara/tepco_grid_screen.json`.
 
-If that summary is missing, the normal `terrai serve` startup check runs the same download-and-parse path automatically. It does not download again when a complete summary is already present. `--offline` permits rebuilding from an existing local ZIP/CSV cache and rejects any network request.
+On the first online `terrai serve` startup after a standard Git clone, the startup check sees that this Git-ignored local cache is missing and runs the same download-and-parse path automatically. It does not download again once the cache is complete. `--offline` can display an existing committed summary without the local source cache, or rebuild from an existing local ZIP/CSV cache, while rejecting every network request.
 
 Do not commit or redistribute the downloaded source files without confirming permission with TEPCO Power Grid.

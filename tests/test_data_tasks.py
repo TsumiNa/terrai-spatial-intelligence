@@ -84,7 +84,7 @@ class DataTaskStateTests(unittest.TestCase):
     def test_evidence_dependencies_are_ordered_before_the_task(self) -> None:
         self.assertEqual(_ordered_names(["evidence"]), ["bootstrap", "embedding", "evidence"])
 
-    def test_missing_grid_summary_runs_the_download_and_parse_pipeline(self) -> None:
+    def test_missing_local_grid_cache_runs_download_even_when_summary_exists(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             scripts = root / "scripts"
@@ -96,6 +96,7 @@ class DataTaskStateTests(unittest.TestCase):
             with zipfile.ZipFile(source, "w") as archive:
                 archive.writestr("csv_yosochoryu_chiba_soudensen.csv", preamble)
                 archive.writestr("csv_yosochoryu_chiba_hendensyo.csv", preamble)
+            write_json(root / "data/mobara/tepco_grid_screen.json")
             with patch.dict(os.environ, {"TERRAI_TEPCO_CHIBA_URL": source.as_uri()}):
                 states = ensure_data(root=root, selected=["grid"], allow_network=True)
             self.assertEqual(states[-1].status, "ready")
@@ -103,6 +104,14 @@ class DataTaskStateTests(unittest.TestCase):
             self.assertTrue(output.is_file())
             self.assertEqual(json.loads(output.read_text(encoding="utf-8"))["chiba_summary"]["transmission_line_rows"], 0)
             self.assertTrue((root / "data/external/tepco/download_metadata.local.json").is_file())
+
+    def test_offline_start_accepts_committed_grid_summary_without_local_cache(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_json(root / "data/mobara/tepco_grid_screen.json")
+            states = ensure_data(root=root, selected=["grid"], allow_network=False)
+            self.assertEqual(states[-1].status, "ready")
+            self.assertIn("local cache missing", states[-1].reason)
 
 
 if __name__ == "__main__":
