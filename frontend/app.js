@@ -163,7 +163,7 @@ function openAudit(record, returnFocus = document.activeElement) {
   document.getElementById("audit-value").textContent = t(auditText(record.value));
   document.getElementById("audit-sections").innerHTML = record.sections.map(item => {
     const value = escapeHtml(t(auditText(item.value)));
-    const rendered = item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${value}</a>` : value;
+    const rendered = item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${value}</a>` : value;
     return `<section class="audit-section"><span>${escapeHtml(auditText(item.label))}</span><p>${rendered}</p></section>`;
   }).join("");
   document.getElementById("audit-caveat").textContent = t(auditText(record.caveat));
