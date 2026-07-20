@@ -25,21 +25,22 @@ class ConceptArchitectureTests(unittest.TestCase):
         ):
             self.assertIn(token, concept)
 
-    def test_demo_exposes_architecture_and_keeps_surface_sl_empty(self) -> None:
-        html = read("index.html")
-        app = read("app.js")
-        self.assertIn('data-module="architecture"', html)
-        self.assertIn('id="architecture-board"', html)
-        self.assertIn("当前评分是透明 AL 启发式，不是 SL 预测", html)
-        self.assertIn('metric("地表 SL 补值", 0', app)
-        self.assertIn('params.get("module") : "architecture"', app)
+    def test_customer_ui_keeps_internal_architecture_out_of_primary_navigation(self) -> None:
+        html = read("frontend/index.html")
+        app = read("frontend/app.js")
+        self.assertNotIn('data-module="architecture"', html)
+        self.assertNotIn('id="architecture-board"', html)
+        self.assertNotIn("function renderArchitecture()", app)
+        self.assertIn('data-module="overview"', html)
+        self.assertIn('data-module="evidence"', html)
+        self.assertIn("证据与可靠性", html)
 
     def test_architecture_language_contract_has_japanese_and_english(self) -> None:
-        translations = read("i18n.js")
-        source = '"FL → SL → AL 架构"'
+        translations = read("frontend/i18n.js")
+        source = '"证据与可靠性"'
         self.assertGreaterEqual(translations.count(source), 2)
-        self.assertIn('"FL → SL → AL architecture"', translations)
-        self.assertIn('"FL → SL → AL アーキテクチャ"', translations)
+        self.assertIn('"Evidence & reliability"', translations)
+        self.assertIn('"証拠と信頼性"', translations)
 
     def test_readme_links_decision_and_refactor_history(self) -> None:
         readme = read("README.md")
@@ -53,4 +54,3 @@ class ConceptArchitectureTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

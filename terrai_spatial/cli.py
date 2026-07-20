@@ -6,6 +6,8 @@ import argparse
 import json
 import subprocess
 import sys
+import threading
+import time
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -14,19 +16,23 @@ from .data_tasks import TASKS, ensure_data, status_rows, validate_json_outputs
 
 
 ROOT = Path(__file__).resolve().parents[1]
+FRONTEND_ROOT = ROOT / "frontend"
 DEFAULT_PIPELINES = ("joint", "evidence")
 
 REQUIRED_FILES = [
-    "index.html",
-    "styles.css",
-    "i18n.js",
-    "audit.js",
-    "app.js",
+    "frontend/index.html",
+    "frontend/styles.css",
+    "frontend/i18n.js",
+    "frontend/audit.js",
+    "frontend/app.js",
+    "terrai_spatial/api.py",
+    "terrai_spatial/data_service.py",
     "docs/architecture/FL_SL_AL_CONCEPT.md",
+    "docs/architecture/FRONTEND_BACKEND_SPLIT.md",
     "docs/adr/0001-fl-sl-al-conceptual-layers.md",
     "docs/refactor/2026-07-fl-sl-al-factor-of-concept.md",
-    "vendor/leaflet.js",
-    "vendor/leaflet.css",
+    "frontend/vendor/leaflet.js",
+    "frontend/vendor/leaflet.css",
     "terrai_spatial/data_tasks.py",
     "scripts/ensure_data.py",
     "scripts/bootstrap_packaged_data.py",
@@ -68,10 +74,51 @@ def command_serve(args: argparse.Namespace) -> None:
     if not args.no_ensure_data:
         print("[TerrAI data] checking startup data", flush=True)
         ensure_data(allow_network=not args.offline)
-    handler = partial(SimpleHTTPRequestHandler, directory=ROOT)
+    import uvicorn
+
+    config = uvicorn.Config(
+        "terrai_spatial.api:app",
+        host=args.api_host,
+        port=args.api_port,
+        log_level="warning",
+    )
+    api_server = uvicorn.Server(config)
+    api_thread = threading.Thread(target=api_server.run, name="terrai-api", daemon=True)
+    api_thread.start()
+    deadline = time.monotonic() + 10
+    while not api_server.started and api_thread.is_alive() and time.monotonic() < deadline:
+        time.sleep(0.05)
+    if not api_server.started:
+        raise SystemExit(f"TerrAI API failed to start on http://{args.api_host}:{args.api_port}")
+
+    handler = partial(SimpleHTTPRequestHandler, directory=FRONTEND_ROOT)
     server = ThreadingHTTPServer((args.host, args.port), handler)
-    print(f"TerrAI demo: http://{args.host}:{args.port}/", flush=True)
+    print(f"TerrAI frontend: http://{args.host}:{args.port}/", flush=True)
+    print(f"TerrAI API:      http://{args.api_host}:{args.api_port}/docs", flush=True)
     print("Press Ctrl+C to stop.", flush=True)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+        api_server.should_exit = True
+        api_thread.join(timeout=5)
+
+
+def command_api(args: argparse.Namespace) -> None:
+    if not args.no_ensure_data:
+        ensure_data(allow_network=not args.offline)
+    import uvicorn
+
+    uvicorn.run("terrai_spatial.api:app", host=args.host, port=args.port, log_level="info")
+
+
+def command_frontend(args: argparse.Namespace) -> None:
+    handler = partial(SimpleHTTPRequestHandler, directory=FRONTEND_ROOT)
+    server = ThreadingHTTPServer((args.host, args.port), handler)
+    print(f"TerrAI frontend: http://{args.host}:{args.port}/", flush=True)
+    print("Requires the API on http://127.0.0.1:8000 by default. Press Ctrl+C to stop.", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
@@ -108,7 +155,12 @@ def command_validate(_: argparse.Namespace) -> None:
         if not ok:
             failures.append(f"invalid {path.relative_to(ROOT)}: {message}")
 
-    runtime_files = [ROOT / "index.html", ROOT / "app.js", ROOT / "audit.js", ROOT / "styles.css"]
+    runtime_files = [
+        ROOT / "frontend/index.html",
+        ROOT / "frontend/app.js",
+        ROOT / "frontend/audit.js",
+        ROOT / "frontend/styles.css",
+    ]
     forbidden = ("dynamic_world", "fetch_dynamic_world", "Dynamic World ·")
     for path in runtime_files:
         content = path.read_text(encoding="utf-8")
@@ -117,15 +169,6 @@ def command_validate(_: argparse.Namespace) -> None:
                 failures.append(f"removed runtime dependency still referenced: {path.name}: {token}")
 
     concept_contract = {
-        "index.html": (
-            'data-module="architecture"',
-            'id="architecture-board"',
-            "当前评分是透明 AL 启发式，不是 SL 预测",
-        ),
-        "app.js": (
-            "function renderArchitecture()",
-            'metric("地表 SL 补值", 0',
-        ),
         "docs/architecture/FL_SL_AL_CONCEPT.md": (
             "Foundation Data Layer",
             "Synthetic Data Layer",
@@ -143,6 +186,34 @@ def command_validate(_: argparse.Namespace) -> None:
             if token not in content:
                 failures.append(f"concept contract missing: {relative}: {token}")
 
+    exhibition_contract = {
+        "frontend/index.html": (
+            'data-module="overview"',
+            'data-module="evidence"',
+            "证据与可靠性",
+            "点击任意虚线数值查看来源、公式与限制",
+        ),
+        "frontend/app.js": (
+            'fetchJson(`${API_BASE}/bootstrap`)',
+            "state.data.recommendations.slope.features",
+            "state.data.facilitySummary",
+        ),
+        "terrai_spatial/api.py": (
+            '/api/v1/health',
+            '/api/v1/bootstrap',
+            '/api/v1/features/{key}',
+            '/api/v1/recommendations/{analysis}',
+        ),
+    }
+    for relative, required_tokens in exhibition_contract.items():
+        content = (ROOT / relative).read_text(encoding="utf-8")
+        for token in required_tokens:
+            if token not in content:
+                failures.append(f"exhibition contract missing: {relative}: {token}")
+    client_html = (ROOT / "frontend/index.html").read_text(encoding="utf-8")
+    if 'data-module="architecture"' in client_html:
+        failures.append("internal architecture module leaked into the customer navigation")
+
     if failures:
         print("TerrAI validation failed:")
         for failure in failures:
@@ -158,9 +229,23 @@ def build_parser() -> argparse.ArgumentParser:
     serve = subparsers.add_parser("serve", help="serve the static demo locally")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=4176)
+    serve.add_argument("--api-host", default="127.0.0.1")
+    serve.add_argument("--api-port", type=int, default=8000)
     serve.add_argument("--offline", action="store_true", help="repair local derivatives but do not download missing data")
     serve.add_argument("--no-ensure-data", action="store_true", help="skip the automatic startup data check")
     serve.set_defaults(func=command_serve)
+
+    api = subparsers.add_parser("api", help="run the FastAPI data and analysis service")
+    api.add_argument("--host", default="127.0.0.1")
+    api.add_argument("--port", type=int, default=8000)
+    api.add_argument("--offline", action="store_true", help="repair local derivatives but do not download data")
+    api.add_argument("--no-ensure-data", action="store_true", help="skip the automatic startup data check")
+    api.set_defaults(func=command_api)
+
+    frontend = subparsers.add_parser("frontend", help="serve only the static exhibition frontend")
+    frontend.add_argument("--host", default="127.0.0.1")
+    frontend.add_argument("--port", type=int, default=4176)
+    frontend.set_defaults(func=command_frontend)
 
     build = subparsers.add_parser("build", help="rebuild redistributable derived data")
     build.add_argument("--only", choices=["all", "grid", *DEFAULT_PIPELINES], default="all")
