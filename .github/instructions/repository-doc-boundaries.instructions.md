@@ -64,7 +64,7 @@ Document every dataset integrated into the Foundation Data Layer in its own tril
 - license or governing terms;
 - extra cautions for commercial use, redistribution, attribution, third-party rights, freshness, and fitness for decision-making.
 
-Every document group must have its own direct subfolder: `docs/data/<dataset-or-catalog>/README.md`, `README.ja.md`, and `README.zh.md`. Do not place Markdown files directly under `docs/data/`. `docs/data/catalog/` is the trilingual catalog. Candidate datasets that are not integrated belong in an evaluation under `summary/`, not as integrated data cards.
+`docs/data/README.md`, `README.ja.md`, and `README.zh.md` form the catalog and are the only Markdown files allowed directly under `docs/data/`. Every dataset card has its own direct subfolder: `docs/data/<dataset>/README.md`, `README.ja.md`, and `README.zh.md`. Candidate datasets that are not integrated belong in an evaluation under `summary/`, not as integrated data cards.
 
 ### `docs/summary/`
 
@@ -80,7 +80,7 @@ Use English by default and only when a text genuinely cannot fit `architecture`,
 
 - In `architecture`, `data`, and `summary`, move or update all three language files together.
 - Keep English in the unsuffixed `.md`; never use `.en.md` in a multilingual group.
-- Keep each data and summary group in its own direct subfolder with `README.*` filenames.
+- Keep each dataset card and summary group in its own direct subfolder with `README.*` filenames; the data catalog is the sole `docs/data/README.*` exception.
 - Elsewhere, maintain the English `.md` file and do not require translation partners.
 - Repair all repository links after a move; do not leave aliases in obsolete folders.
 - Run `uv run python -m terrai_spatial validate`; multilingual discovery is automatic within the three scoped directories.

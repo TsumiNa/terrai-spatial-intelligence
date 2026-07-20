@@ -117,7 +117,7 @@ FastAPI v1 は最小 read/query/rank 境界だけを作り、正式 schema、mod
 - **実行時有料 data/analysis service：0。** offline でも全 module を表示可能。
 - **core 再生成に DB 購入/Earth Engine 不要。** Satellite Embedding は公開 COG mirror、他は公開 download/API と local compute。
 - 無料アクセスは無条件商用ではありません。GSI は出典/加工/測量法/第三者制約、OSM は ODbL、TEPCO CSV は無料読込可能でも open license でなく再公開前 review 必須。
-- 接続済み data の個別説明は [`docs/data`](../../data/catalog/README.ja.md)、候補評価は [`open-data-landscape`](../open-data-landscape/README.ja.md)。
+- 接続済み data の個別説明は [`docs/data`](../../data/README.ja.md)、候補評価は [`open-data-landscape`](../open-data-landscape/README.ja.md)。
 
 ### Demo が使う外部6 source group
 

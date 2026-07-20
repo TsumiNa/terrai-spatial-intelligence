@@ -291,8 +291,13 @@ def command_validate(_: argparse.Namespace) -> None:
     required_group_files = {"README.md", "README.ja.md", "README.zh.md"}
     for category in ("data", "summary"):
         category_root = docs_root / category
-        for loose in sorted(category_root.glob("*.md")):
-            failures.append(f"document group must be inside a subfolder: {loose.relative_to(ROOT)}")
+        loose = {path.name for path in category_root.glob("*.md")}
+        allowed_loose = required_group_files if category == "data" else set()
+        if loose != allowed_loose:
+            failures.append(
+                f"{category} root Markdown files must be exactly {sorted(allowed_loose)}; "
+                f"found {sorted(loose)}"
+            )
         for folder in sorted(path for path in category_root.iterdir() if path.is_dir()):
             actual = {path.name for path in folder.glob("*.md")}
             if actual != required_group_files:
@@ -318,8 +323,6 @@ def command_validate(_: argparse.Namespace) -> None:
         "ja": ("## 出典", "## 本 project での利用", "## License", "## 商用利用時の注意"),
     }
     for canonical in sorted((docs_root / "data").glob("*/README.md")):
-        if canonical.parent.name == "catalog":
-            continue
         relative = canonical.relative_to(ROOT)
         for language, document in (
             ("en", relative),

@@ -117,7 +117,7 @@ FastAPI v1 establishes only the minimal read/query/rank boundary. Formal schemas
 - **Paid runtime data/analysis services: zero.** All modules can be shown offline.
 - **Core regeneration needs no database purchase or Earth Engine.** Satellite Embedding reads a public COG mirror; other sources use public downloads/APIs and local compute.
 - Free access is not unrestricted commercial reuse: GSI has attribution/processing/Survey Act/third-party limits; OSM has ODbL; TEPCO CSV is free to read but not open-licensed and requires rights review before republication.
-- Per-dataset notes for integrated data are in [`docs/data`](../../data/catalog/README.md); candidate evaluations are in [`open-data-landscape`](../open-data-landscape/README.md).
+- Per-dataset notes for integrated data are in [`docs/data`](../../data/README.md); candidate evaluations are in [`open-data-landscape`](../open-data-landscape/README.md).
 
 ### Six external source groups used by the Demo
 

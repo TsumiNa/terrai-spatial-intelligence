@@ -20,9 +20,9 @@ class ConceptArchitectureTests(unittest.TestCase):
         self.assertIn("observed, synthetic, and unresolved", concept)
         self.assertNotIn("本次明确不做", concept)
 
-    def test_multilingual_discovery_is_scoped_and_uses_zh_partner(self) -> None:
+    def test_multilingual_discovery_uses_english_japanese_and_chinese(self) -> None:
         documents = multilingual_documents()
-        self.assertIn(Path("docs/architecture/FL_SL_AL_CONCEPT.md"), documents)
+        self.assertIn(Path("docs/data/README.md"), documents)
         self.assertIn(Path("docs/data/gsi-dem5a/README.md"), documents)
         self.assertIn(Path("docs/summary/2026-07-prototype-state/README.md"), documents)
         self.assertNotIn(Path("docs/refactor/fl-sl-al-platform/00-overview.md"), documents)
@@ -34,31 +34,23 @@ class ConceptArchitectureTests(unittest.TestCase):
             ):
                 self.assertTrue((PROJECT_ROOT / sibling).is_file(), sibling)
 
-    def test_data_and_summary_groups_each_have_their_own_subfolder(self) -> None:
+    def test_data_catalog_is_at_root_and_records_use_subfolders(self) -> None:
         expected = {"README.md", "README.ja.md", "README.zh.md"}
-        for category in ("data", "summary"):
-            root = PROJECT_ROOT / "docs" / category
-            self.assertFalse(list(root.glob("*.md")))
-            for folder in (path for path in root.iterdir() if path.is_dir()):
-                self.assertEqual({path.name for path in folder.glob("*.md")}, expected, folder)
+        data_root = PROJECT_ROOT / "docs/data"
+        self.assertEqual({path.name for path in data_root.glob("*.md")}, expected)
+        for folder in (path for path in data_root.iterdir() if path.is_dir()):
+            self.assertEqual({path.name for path in folder.glob("*.md")}, expected, folder)
 
-    def test_non_scoped_documentation_is_english_only(self) -> None:
-        for relative in (
-            "README",
-            "CONTRIBUTING",
-            "docs/README",
-            "docs/refactor/fl-sl-al-platform/00-overview",
-        ):
-            self.assertTrue((PROJECT_ROOT / f"{relative}.md").is_file())
-            self.assertFalse((PROJECT_ROOT / f"{relative}.ja.md").exists())
-            self.assertFalse((PROJECT_ROOT / f"{relative}.zh.md").exists())
+        summary_root = PROJECT_ROOT / "docs/summary"
+        self.assertFalse(list(summary_root.glob("*.md")))
+        for folder in (path for path in summary_root.iterdir() if path.is_dir()):
+            self.assertEqual({path.name for path in folder.glob("*.md")}, expected, folder)
 
     def test_root_readme_links_default_english_documents(self) -> None:
         readme = read("README.md")
         for target in (
             "docs/architecture/FRONTEND_BACKEND.md",
-            "docs/architecture/FL_SL_AL_CONCEPT.md",
-            "docs/data/catalog/README.md",
+            "docs/data/README.md",
             "docs/summary/2026-07-prototype-state/README.md",
         ):
             self.assertIn(target, readme)

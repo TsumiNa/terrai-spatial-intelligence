@@ -133,7 +133,7 @@ FastAPI v1 只建立演示所需的最小读取、查询和排序边界，不提
 - **Demo 运行时付费数据/分析服务：0 项。** 断网后仍可展示全部模块。
 - **重新生成现有核心数据：不需要购买数据库或 Earth Engine。** Satellite Embedding 从公开 COG 镜像按需读取；其他来源为公开下载/API，并在本地处理。
 - “免费访问”不等于“无条件商用”：GSI 有署名、加工说明和部分测量法/第三方权利限制；OpenStreetMap 有 ODbL 署名与数据库共享要求；东京电力 CSV 可免费读取，但不是开放许可数据，公开再发布前必须复核。
-- 当前已接入数据逐项说明见 [`docs/data`](../../data/catalog/README.zh.md)；候选数据评估见 [`open-data-landscape`](../open-data-landscape/README.zh.md)。
+- 当前已接入数据逐项说明见 [`docs/data`](../../data/README.zh.md)；候选数据评估见 [`open-data-landscape`](../open-data-landscape/README.zh.md)。
 
 ### Demo 当前实际使用的 6 组外部来源
 
