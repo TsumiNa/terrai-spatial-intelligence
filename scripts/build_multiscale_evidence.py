@@ -112,6 +112,13 @@ def facility_key(name: str | None) -> str:
     return normalized.removeprefix("横浜市立")
 
 
+def yokohama_ward(address: str | None) -> str | None:
+    """Extract a Yokohama ward from an official address without assuming study bounds."""
+    normalized = unicodedata.normalize("NFKC", address or "")
+    match = re.search(r"横浜市([^区]+区)", normalized)
+    return match.group(1) if match else None
+
+
 def local_facility_rows(source: Path) -> list[dict[str, str]]:
     with io.StringIO(read_csv_text(source), newline="") as handle:
         return [
@@ -168,7 +175,7 @@ def reconcile_facility_sources(gsi_features: list[dict], local_rows: list[dict[s
                     "type": "指定避難所",
                     "definition": local["Definition"] if local else "災害対策基本法に基づく指定避難所",
                     "address": props["address"],
-                    "ward": local["Ward"] if local else "保土ケ谷区",
+                    "ward": local["Ward"] if local else yokohama_ward(props.get("address")),
                     "base_source_id": "gsi_designated_evacuation",
                     "base_source_scope": "national",
                     "source_reconciliation": "national_base_local_validated" if local else "national_base_only",

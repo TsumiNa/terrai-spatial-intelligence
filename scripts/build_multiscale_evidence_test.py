@@ -76,13 +76,14 @@ def gsi_feature(
     *,
     common_id: str,
     hazards: list[str] | None = None,
+    address: str = "神奈川県横浜市保土ケ谷区岩崎町22-1",
 ) -> dict:
     return {
         "type": "Feature",
         "geometry": {"type": "Point", "coordinates": coordinates},
         "properties": {
             "name": name,
-            "address": "official address",
+            "address": address,
             "designation_type": designation_type,
             "common_id": common_id,
             "hazards": hazards or [],
@@ -117,6 +118,7 @@ def test_national_shelters_are_base_and_local_rows_validate_or_supplement() -> N
             "designated_shelter",
             [139.5853, 35.4499],
             common_id="S2",
+            address="神奈川県横浜市旭区テスト町1-1",
         ),
         gsi_feature(
             "横浜市立岩崎小学校　体育館１４",
@@ -145,6 +147,7 @@ def test_national_shelters_are_base_and_local_rows_validate_or_supplement() -> N
     assert by_name["横浜市立岩崎小学校"]["source_reconciliation"] == "national_base_local_validated"
     assert by_name["横浜市立岩崎小学校"]["gsi_designated_hazards"] == ["earthquake", "flood"]
     assert by_name["横浜市立岩崎中学校"]["source_reconciliation"] == "national_base_only"
+    assert by_name["横浜市立岩崎中学校"]["ward"] == "旭区"
     assert by_name["桜台小学校"]["source_reconciliation"] == "local_supplement_not_in_national_shelter_base"
     assert by_name["桜台小学校"]["gsi_designated_hazards"] == ["earthquake"]
     assert by_name["桜台小学校"]["gsi_emergency_source_updated_at"] == "2026-01-16"
