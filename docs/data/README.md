@@ -14,5 +14,16 @@ This directory documents datasets already integrated into the TerrAI Foundation 
 | Yokohama regional disaster bases | Integrated, local validation/supplement | [Official public facilities](yokohama-disaster-bases/README.md) |
 | NASA POWER | Integrated | [Solar climate context](nasa-power/README.md) |
 | TEPCO public system information | Integrated, redistribution restricted | [Regional grid-capacity screen](tepco-grid/README.md) |
+| MLIT 1:50,000 land classification | Integrated, on demand | [Geology and soil](mlit-land-classification-50k/README.md) |
+| MLIT all-period flood history | Integrated, on demand | [Observed flood history](mlit-flood-history/README.md) |
+| MLIT land history survey | Integrated, on demand | [Landform and former use](mlit-land-history/README.md) |
+| MLIT A33 landslide warning zones | Integrated, on demand | [Landslide constraints](mlit-a33-landslide/README.md) |
+| MLIT A53 multi-stage inundation | Integrated, on demand | [Flood-frequency scenarios](mlit-a53-multistage-flood/README.md) |
+| MLIT L01 published land price | Integrated, on demand | [2026 reference prices](mlit-l01-published-land-price/README.md) |
+| MLIT A56 embankment regulation | Integrated, on demand | [Regulatory screening](mlit-a56-embankment-regulation/README.md) |
+| MLIT N02 railway | Integrated, on demand | [Lines and stations](mlit-n02-railway/README.md) |
+| MLIT L03-b detailed land use | Integrated, on demand | [2021 100 m mesh](mlit-l03b-land-use/README.md) |
+| MLIT L02 prefectural land-price survey | Integrated, on demand | [2025 reference prices](mlit-l02-prefectural-land-price/README.md) |
+| MLIT W05 river | Local evaluation only, non-commercial | [Restricted river cache](mlit-w05-river/README.md) |
 
 Confirmed but not integrated and excluded sources are summarized in [`docs/summary/open-data-landscape/`](../summary/open-data-landscape/README.md). Machine-readable status is in `data/external/source_registry.json`.
