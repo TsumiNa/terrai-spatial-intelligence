@@ -1,0 +1,224 @@
+{
+  "retrieved_at": "2026-07-20T22:13:15+00:00",
+  "datasets": {
+    "landClassification50k": {
+      "dataset_id": "kokjo-land-classification-50k",
+      "output": "data/mlit/land_classification_50k.geojson",
+      "source_updated_at": "current download; map-sheet vintage varies",
+      "retrieved_at": "2026-07-20T22:13:15+00:00",
+      "license": "Public Data License 1.0; Survey Act and redistribution cautions apply",
+      "feature_count": 735,
+      "downloads": [
+        {
+          "url": "https://nlftp.mlit.go.jp/kokjo/tochimizu/F3/GIS/Yokohama.zip",
+          "region": "yokohama",
+          "sha256": "d995f824705dc69f8d0f707bbfcabc3395ee488a9748cce27843d89c0150654d",
+          "last_modified": "Mon, 25 Dec 2017 14:51:02 GMT",
+          "layers": 2
+        },
+        {
+          "url": "https://nlftp.mlit.go.jp/kokjo/tochimizu/F3/GIS/Chiba.zip",
+          "region": "mobara",
+          "sha256": "890dd0ef0e9f81a4a6d50def1704827eaa8ceef6667b68b2d2379f031b1eb227",
+          "last_modified": "Mon, 25 Dec 2017 14:50:44 GMT",
+          "layers": 2
+        }
+      ]
+    },
+    "floodHistory": {
+      "dataset_id": "kokjo-all-period-flood-history",
+      "output": "data/mlit/flood_history.geojson",
+      "source_updated_at": "2025-03",
+      "retrieved_at": "2026-07-20T22:13:15+00:00",
+      "license": "Public Data License 1.0; attribution/edit notice and redistribution cautions apply",
+      "feature_count": 44,
+      "downloads": [
+        {
+          "url": "https://nlftp.mlit.go.jp/kokjo/tochimizu/FC/GIS/1896_2019_sinsui_add24.zip",
+          "region": "both",
+          "sha256": "8603bb783ca7fb94658efe292544b1e67b0e3757d5cae39ab7cfa72ab6debdd6",
+          "last_modified": "Fri, 10 Jan 2025 11:46:00 GMT",
+          "layers": 60
+        }
+      ]
+    },
+    "landHistory": {
+      "dataset_id": "kokjo-land-history-gis",
+      "output": "data/mlit/land_history.geojson",
+      "source_updated_at": "2011 survey package",
+      "retrieved_at": "2026-07-20T22:13:15+00:00",
+      "license": "Public Data License 1.0; Survey Act and redistribution cautions apply",
+      "feature_count": 3780,
+      "downloads": [
+        {
+          "url": "https://nlftp.mlit.go.jp/kokjo/inspect/landclassification/land/land_history_2011/mapdata/533904/533904_gisdata.zip",
+          "region": "yokohama",
+          "sha256": "3d7c5588a9ecfcc3b186a5dd270d05da06db81c976a242fc3f3dd44267e32078",
+          "last_modified": "Mon, 09 Dec 2013 10:09:40 GMT",
+          "layers": 17
+        },
+        {
+          "url": "https://nlftp.mlit.go.jp/kokjo/inspect/landclassification/land/land_history_2011/mapdata/534020/534020_gisdata.zip",
+          "region": "mobara",
+          "sha256": "a872fb81f3a0201b2be7e44da7792f68ffaaed649a04de32a3c1325e81ba88cc",
+          "last_modified": "Mon, 09 Dec 2013 10:09:34 GMT",
+          "layers": 12
+        }
+      ]
+    },
+    "landslideWarning": {
+      "dataset_id": "ksj-a33-2025",
+      "output": "data/mlit/landslide_warning.geojson",
+      "source_updated_at": "2025-08-01",
+      "retrieved_at": "2026-07-20T22:13:15+00:00",
+      "license": "CC BY 4.0 with provider-specific partial restrictions",
+      "feature_count": 12890,
+      "downloads": [
+        {
+          "url": "https://nlftp.mlit.go.jp/ksj/gml/data/A33/A33-25/A33-25_14_GEOJSON.zip",
+          "region": "yokohama",
+          "sha256": "654e7f967c43aebc89510a4ec1230e02e0bece4395c2e044609b0f3fafdeb726",
+          "last_modified": "Tue, 21 Apr 2026 05:37:23 GMT",
+          "layers": 1
+        },
+        {
+          "url": "https://nlftp.mlit.go.jp/ksj/gml/data/A33/A33-25/A33-25_12_GEOJSON.zip",
+          "region": "mobara",
+          "sha256": "12c7e0120b0b9ca4a19ad3ec4b2054ef21e55c0599cfbb1dd2ea1d7bfc509e8e",
+          "last_modified": "Tue, 21 Apr 2026 05:37:14 GMT",
+          "layers": 1
+        }
+      ]
+    },
+    "multistageFlood": {
+      "dataset_id": "ksj-a53-2025",
+      "output": "data/mlit/multistage_flood.geojson",
+      "source_updated_at": "2025 release",
+      "retrieved_at": "2026-07-20T22:13:15+00:00",
+      "license": "CC BY 4.0",
+      "feature_count": 1532,
+      "downloads": [
+        {
+          "url": "https://nlftp.mlit.go.jp/ksj/gml/data/A53/A53-25/A53-25_83_GEOJSON.zip",
+          "region": "both",
+          "sha256": "7e196c5c5eb9bfd2ddd3dba8995a30d0b38b5caca3831844c4bc1fbff1311d7d",
+          "last_modified": "Thu, 30 Apr 2026 02:20:19 GMT",
+          "layers": 42
+        }
+      ]
+    },
+    "publishedLandPrice": {
+      "dataset_id": "ksj-l01-2026",
+      "output": "data/mlit/published_land_price.geojson",
+      "source_updated_at": "2026-01-01",
+      "retrieved_at": "2026-07-20T22:13:15+00:00",
+      "license": "CC BY 4.0",
+      "feature_count": 281,
+      "downloads": [
+        {
+          "url": "https://nlftp.mlit.go.jp/ksj/gml/data/L01/L01-26/L01-26_14_GML.zip",
+          "region": "yokohama",
+          "sha256": "aba41590222a9c25a2513e03aa5d1a27896e3e4c6142eeda5cf59e1472bdeb35",
+          "last_modified": "Mon, 16 Mar 2026 01:11:53 GMT",
+          "layers": 1
+        },
+        {
+          "url": "https://nlftp.mlit.go.jp/ksj/gml/data/L01/L01-26/L01-26_12_GML.zip",
+          "region": "mobara",
+          "sha256": "16f686f492b12cb22d5e0c0e7af6e8edcd6491d91c83bb22c453aa392be8d064",
+          "last_modified": "Mon, 16 Mar 2026 01:11:50 GMT",
+          "layers": 1
+        }
+      ]
+    },
+    "embankmentRegulation": {
+      "dataset_id": "ksj-a56-2025",
+      "output": "data/mlit/embankment_regulation.geojson",
+      "source_updated_at": "2025-07-18",
+      "retrieved_at": "2026-07-20T22:13:15+00:00",
+      "license": "CC BY 4.0; regulatory boundaries must not be modified",
+      "feature_count": 31,
+      "downloads": [
+        {
+          "url": "https://nlftp.mlit.go.jp/ksj/gml/data/A56/A56-25/A56-25_14_GML.zip",
+          "region": "yokohama",
+          "sha256": "fbd1892c32c403c6620c8d9a9ed334aca297b1624a8c6019c68db97d687cd374",
+          "last_modified": "Wed, 15 Apr 2026 01:25:55 GMT",
+          "layers": 1
+        },
+        {
+          "url": "https://nlftp.mlit.go.jp/ksj/gml/data/A56/A56-25/A56-25_12_GML.zip",
+          "region": "mobara",
+          "sha256": "980f0721f892a5e94b656d2210847d58edb6c82beb61cdaa876730efab0f26a9",
+          "last_modified": "Wed, 15 Apr 2026 01:25:53 GMT",
+          "layers": 1
+        }
+      ]
+    },
+    "railway": {
+      "dataset_id": "ksj-n02-2025",
+      "output": "data/mlit/railway.geojson",
+      "source_updated_at": "2025-12-31",
+      "retrieved_at": "2026-07-20T22:13:15+00:00",
+      "license": "CC BY 4.0",
+      "feature_count": 267,
+      "downloads": [
+        {
+          "url": "https://nlftp.mlit.go.jp/ksj/gml/data/N02/N02-25/N02-25_GML.zip",
+          "region": "both",
+          "sha256": "aaf76af133b2e771e538fabc4646d2e443dc1d5a67b221382a28d744e706cc9f",
+          "last_modified": "Tue, 07 Apr 2026 08:15:28 GMT",
+          "layers": 2
+        }
+      ]
+    },
+    "landUseMesh": {
+      "dataset_id": "ksj-l03b-2021",
+      "output": "data/mlit/land_use_mesh.geojson",
+      "source_updated_at": "2021",
+      "retrieved_at": "2026-07-20T22:13:15+00:00",
+      "license": "Public Data License 1.0",
+      "feature_count": 31132,
+      "downloads": [
+        {
+          "url": "https://nlftp.mlit.go.jp/ksj/gml/data/L03-b/L03-b-21/L03-b-21_5339-jgd2011_GML.zip",
+          "region": "yokohama",
+          "sha256": "f6bbebb3fa80cf5f62fa9b2dc3291522b1aecca3a0e0c3bf047906afaa66c88b",
+          "last_modified": "Wed, 24 May 2023 00:51:13 GMT",
+          "layers": 1
+        },
+        {
+          "url": "https://nlftp.mlit.go.jp/ksj/gml/data/L03-b/L03-b-21/L03-b-21_5340-jgd2011_GML.zip",
+          "region": "mobara",
+          "sha256": "2f95b11dc0ea34926e42ff9ca36384e73603c4803154c701f12d2f377552b16f",
+          "last_modified": "Wed, 24 May 2023 00:51:13 GMT",
+          "layers": 1
+        }
+      ]
+    },
+    "prefecturalLandPrice": {
+      "dataset_id": "ksj-l02-2025",
+      "output": "data/mlit/prefectural_land_price.geojson",
+      "source_updated_at": "2025-07-01",
+      "retrieved_at": "2026-07-20T22:13:15+00:00",
+      "license": "CC BY 4.0",
+      "feature_count": 167,
+      "downloads": [
+        {
+          "url": "https://nlftp.mlit.go.jp/ksj/gml/data/L02/L02-25/L02-25_14_GML.zip",
+          "region": "yokohama",
+          "sha256": "d5d5eed97003d417adcf194c5d45061680119510e90d2906a7d247058a2925f5",
+          "last_modified": "Thu, 11 Sep 2025 11:13:55 GMT",
+          "layers": 1
+        },
+        {
+          "url": "https://nlftp.mlit.go.jp/ksj/gml/data/L02/L02-25/L02-25_12_GML.zip",
+          "region": "mobara",
+          "sha256": "faaf05f1e3fa026e140317804cf715ab4c4d48da0f73135a89c2ef032a01f3bd",
+          "last_modified": "Thu, 11 Sep 2025 11:13:53 GMT",
+          "layers": 1
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "dataset_id": "ksj-w05-river",
+  "integration_status": "local_only_restricted",
+  "commercial_api": false,
+  "reason": "The official W05 dataset page labels this legacy river dataset non-commercial.",
+  "official_page": "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-W05.html",
+  "refresh_task": "uv run python -m terrai_spatial data update --only mlit_river"
+}
