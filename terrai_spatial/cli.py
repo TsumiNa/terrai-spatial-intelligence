@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import threading
@@ -19,23 +20,24 @@ ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_ROOT = ROOT / "frontend"
 DEFAULT_PIPELINES = ("joint", "evidence")
 
-TRILINGUAL_DOCUMENTS = (
-    "README.md",
-    "DATA_SOURCES.md",
-    "REFACTOR_DECISIONS.md",
-    "REMOTE_SENSING_PLAN.md",
-    "architecture/README.md",
-    "data/external/tepco/README.md",
-    "docs/adr/0001-fl-sl-al-conceptual-layers.md",
-    "docs/architecture/FL_SL_AL_CONCEPT.md",
-    "docs/architecture/FRONTEND_BACKEND_SPLIT.md",
-    "docs/refactor/2026-07-fl-sl-al-factor-of-concept.md",
-)
+DOCS_TOP_LEVEL_DIRECTORIES = {"architecture", "refactor", "data", "summary", "others"}
+ROOT_TRILINGUAL_DOCUMENTS = (Path("README.md"), Path("CONTRIBUTING.md"))
+REFACTOR_PLAN_PATTERN = re.compile(r"^\d{2}-[a-z0-9-]+-pr\d+[a-z]?\.md$")
 
 
-def localized_document(relative: str, language: str) -> str:
-    path = Path(relative)
-    return str(path.with_suffix(f".{language}.md"))
+def localized_document(path: Path, language: str) -> Path:
+    return path.with_suffix(f".{language}.md")
+
+
+def canonical_documents() -> list[Path]:
+    """Discover canonical Chinese docs; localized partners are derived, never listed."""
+    documents = list(ROOT_TRILINGUAL_DOCUMENTS)
+    documents.extend(
+        path.relative_to(ROOT)
+        for path in sorted((ROOT / "docs").rglob("*.md"))
+        if not path.name.endswith((".ja.md", ".en.md"))
+    )
+    return documents
 
 REQUIRED_FILES = [
     "frontend/index.html",
@@ -59,10 +61,6 @@ REQUIRED_FILES = [
     "data/joint/joint_summary.json",
     "data/google/satellite_embedding/summary.json",
     "data/evidence/multiscale_summary.json",
-] + list(TRILINGUAL_DOCUMENTS) + [
-    localized_document(relative, language)
-    for relative in TRILINGUAL_DOCUMENTS
-    for language in ("ja", "en")
 ]
 
 
@@ -222,7 +220,7 @@ def command_validate(_: argparse.Namespace) -> None:
             '/api/v1/features/{key}',
             '/api/v1/recommendations/{analysis}',
         ),
-        "architecture/README.md": (
+        "docs/architecture/FRONTEND_BACKEND.md": (
             "sequenceDiagram",
             "GET /bootstrap",
             "GET /assets/tiles/",
@@ -235,21 +233,88 @@ def command_validate(_: argparse.Namespace) -> None:
             if token not in content:
                 failures.append(f"exhibition contract missing: {relative}: {token}")
 
-    for relative in TRILINGUAL_DOCUMENTS:
-        canonical = Path(relative)
+    docs_root = ROOT / "docs"
+    actual_directories = {
+        path.name for path in docs_root.iterdir() if path.is_dir() and any(path.iterdir())
+    }
+    if actual_directories != DOCS_TOP_LEVEL_DIRECTORIES:
+        failures.append(
+            "docs top-level directories must be exactly "
+            f"{sorted(DOCS_TOP_LEVEL_DIRECTORIES)}; found {sorted(actual_directories)}"
+        )
+    allowed_root_docs = {"README.md", "README.ja.md", "README.en.md"}
+    loose_docs = {path.name for path in docs_root.glob("*.md")} - allowed_root_docs
+    for name in sorted(loose_docs):
+        failures.append(f"loose document directly under docs/: {name}")
+    if (docs_root / "adr").exists() and any((docs_root / "adr").iterdir()):
+        failures.append("docs/adr is prohibited; preserve decisions in the refactor overview")
+
+    documents = canonical_documents()
+    expected_document_paths: set[Path] = set()
+    for canonical in documents:
         siblings = (
             canonical.name,
-            canonical.with_suffix(".ja.md").name,
-            canonical.with_suffix(".en.md").name,
+            localized_document(canonical, "ja").name,
+            localized_document(canonical, "en").name,
         )
-        for document in (canonical, canonical.with_suffix(".ja.md"), canonical.with_suffix(".en.md")):
+        group = (canonical, localized_document(canonical, "ja"), localized_document(canonical, "en"))
+        expected_document_paths.update(group)
+        for document in group:
+            path = ROOT / document
+            if not path.is_file():
+                failures.append(f"missing trilingual partner: {document}")
+                continue
+            content = path.read_text(encoding="utf-8")
+            if content.count("```") % 2:
+                failures.append(f"unclosed code fence: {document}")
+            for sibling in siblings:
+                if f"({sibling})" not in content:
+                    failures.append(f"trilingual navigation missing: {document}: {sibling}")
+
+    discovered_markdown = {
+        path.relative_to(ROOT)
+        for root in (ROOT, docs_root)
+        for path in (
+            root.glob("README*.md") if root == ROOT else root.rglob("*.md")
+        )
+    }
+    discovered_markdown.update(path.relative_to(ROOT) for path in ROOT.glob("CONTRIBUTING*.md"))
+    for orphan in sorted(discovered_markdown - expected_document_paths):
+        if orphan.name.endswith((".ja.md", ".en.md")):
+            failures.append(f"localized document has no canonical Chinese partner: {orphan}")
+
+    refactor_root = docs_root / "refactor"
+    for refactor_folder in sorted(path for path in refactor_root.iterdir() if path.is_dir()):
+        overview = refactor_folder.relative_to(ROOT) / "00-overview.md"
+        if overview not in documents:
+            failures.append(f"refactor folder missing 00-overview group: {refactor_folder.name}")
+        for path in refactor_folder.glob("*.md"):
+            if path.name.endswith((".ja.md", ".en.md")) or path.name == "00-overview.md":
+                continue
+            if not REFACTOR_PLAN_PATTERN.fullmatch(path.name):
+                failures.append(f"invalid refactor plan filename: {path.relative_to(ROOT)}")
+
+    data_headings = {
+        "zh": ("## 来源", "## 在本项目中的使用", "## License", "## 商业使用注意"),
+        "ja": ("## 出典", "## 本 project での利用", "## License", "## 商用利用時の注意"),
+        "en": ("## Source", "## Use in this project", "## License", "## Commercial-use cautions"),
+    }
+    for canonical in sorted((docs_root / "data").glob("*.md")):
+        if canonical.name == "README.md" or canonical.name.endswith((".ja.md", ".en.md")):
+            continue
+        relative = canonical.relative_to(ROOT)
+        for language, document in (
+            ("zh", relative),
+            ("ja", localized_document(relative, "ja")),
+            ("en", localized_document(relative, "en")),
+        ):
             path = ROOT / document
             if not path.is_file():
                 continue
             content = path.read_text(encoding="utf-8")
-            for sibling in siblings:
-                if f"({sibling})" not in content:
-                    failures.append(f"trilingual navigation missing: {document}: {sibling}")
+            for heading in data_headings[language]:
+                if heading not in content:
+                    failures.append(f"data card missing section: {document}: {heading}")
     client_html = (ROOT / "frontend/index.html").read_text(encoding="utf-8")
     if 'data-module="architecture"' in client_html:
         failures.append("internal architecture module leaked into the customer navigation")
@@ -259,7 +324,11 @@ def command_validate(_: argparse.Namespace) -> None:
         for failure in failures:
             print(f"  - {failure}")
         raise SystemExit(1)
-    print(f"TerrAI validation passed: {len(REQUIRED_FILES)} required assets, {json_count} JSON/GeoJSON files")
+    print(
+        "TerrAI validation passed: "
+        f"{len(REQUIRED_FILES)} required assets, {json_count} JSON/GeoJSON files, "
+        f"{len(documents)} trilingual document groups"
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
