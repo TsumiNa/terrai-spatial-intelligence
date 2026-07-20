@@ -5,6 +5,16 @@
 - FL 状態：接続済み、原 data 再配布制限
 - 範囲：千葉送電線・変電設備「系統の予想潮流等」
 
+## データの内容
+
+- **形式** — CSV 2 ファイルを収めた ZIP アーカイブ（UTF-8 BOM 付き）。各 CSV はヘッダ行の前に 6 行のメタデータ前文を持つため、1 行目をヘッダとみなす素朴な読み取りでは正しく解析できません。
+- **ファイル** — `csv_yosochoryu_chiba_soudensen.csv`（送電線）と `csv_yosochoryu_chiba_hendensyo.csv`（変電所・変圧器）。
+- **範囲** — 東京電力パワーグリッド供給区域のうち千葉エリア。設備は ID と名称のみで識別され、CSV には**座標も形状も含まれません**。
+- **データ量** — 現行スナップショットで送電線 175 行、変圧器 201 行。
+- **project が読むフィールド** — `equipment_id`、`name`、`voltage_kv`（kV）、`circuits`、設備容量、`operating_capacity_before_control_mw`（MW）、`existing_olr_mw`（MW）、`operating_capacity_mw`（MW）、`constraint`、および `flow_from` / `flow_to` の端点。
+- **時点と完全性** — 派生成果には HTTP 応答由来の `source_file_last_modified_at` と、アーカイブおよび展開後 CSV それぞれの SHA-256 を記録し、スクリーニング結果を特定のダウンロードに紐付けられるようにしています。
+- **既知の欠測と留意点** — 形状が無いため値を区画や候補セルへ割り当てることはできず、パイプラインは名称テキストによる照合のみを行います。公開容量はスクリーニング指標であって系統連系の保証ではありません。発行元の注意書きが再配布を禁じているため、生の ZIP・CSV・取得メタデータは Git 管理外とし、派生スクリーニング結果のみをコミットしています。
+
 ## 出典
 
 東京電力 Power Grid 公式ページ：https://www.tepco.co.jp/pg/consignment/system/index-j.html 。downloader は実 ZIP の HTTP `Last-Modified`、ETag、取得時刻、byte、SHA-256 を記録し、page 公告日を snapshot に固定しません。

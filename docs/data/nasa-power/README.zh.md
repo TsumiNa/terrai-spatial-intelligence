@@ -6,6 +6,16 @@
 - 指标：`ALLSKY_SFC_SW_DWN`
 - 气候期：2001–2020
 
+## 数据内容
+
+- **格式** — NASA POWER 气候平均值 API 返回的 JSON，缓存至 `data/mobara/solar_summary.json`。这是点位查询，不是栅格下载。
+- **变量** — `ALLSKY_SFC_SW_DWN`：全天空地表向下短波辐射，即水平面总辐照量（GHI）。
+- **单位与缓存值** — API 单位为 kWh/m²/日。缓存中保存 `daily_ghi_kwh_m2` = 3.7747、`annual_ghi_kwh_m2` = 1,378，以及 12 项 `monthly_ghi` 月度分解。
+- **时间覆盖** — 2001–2020 年气候平均（20 年均值），并非任一具体年份。
+- **空间粒度** — POWER 提供约 0.5° 纬度 × 0.625° 经度的全球再分析网格。单个网格单元即覆盖整个茂原演示范围，因此场地内该值不发生变化。
+- **数据量** — 一次点位查询，产出 12 个月度值加 1 个年均值。
+- **已知缺失与限制** — 单一网格单元不含场地内部差异，无法区分不同候选单元。气候平均值不是 P50/P90 发电量估算，且不包含遮挡、地形、朝向、温度、积灰与设备损耗。
+
 ## 来源
 
 NASA POWER Climatology API：https://power.larc.nasa.gov/docs/services/api/temporal/climatology/

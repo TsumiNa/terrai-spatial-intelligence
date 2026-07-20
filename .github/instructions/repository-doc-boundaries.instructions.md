@@ -57,14 +57,9 @@ Follow `.github/instructions/branch-and-pr-workflow.instructions.md` when mappin
 
 ### `docs/data/`
 
-Document every dataset integrated into the Foundation Data Layer in its own trilingual dataset card. The card must include:
+Document every dataset integrated into the Foundation Data Layer in its own trilingual dataset card. `docs/data/README.md`, `README.ja.md`, and `README.zh.md` form the catalog and are the only Markdown files allowed directly under `docs/data/`. Every dataset card has its own direct subfolder: `docs/data/<dataset>/README.md`, `README.ja.md`, and `README.zh.md`. Candidate datasets that are not integrated belong in an evaluation under `summary/`, not as integrated data cards.
 
-- source/publisher and acquisition endpoint;
-- how the project uses it, including local outputs or transformations;
-- license or governing terms;
-- extra cautions for commercial use, redistribution, attribution, third-party rights, freshness, and fitness for decision-making.
-
-`docs/data/README.md`, `README.ja.md`, and `README.zh.md` form the catalog and are the only Markdown files allowed directly under `docs/data/`. Every dataset card has its own direct subfolder: `docs/data/<dataset>/README.md`, `README.ja.md`, and `README.zh.md`. Candidate datasets that are not integrated belong in an evaluation under `summary/`, not as integrated data cards.
+Card structure and required content — including the `## Data description` section that describes format, coverage, resolution, vintage, fields, units, and known gaps — are specified in `.github/instructions/docs-data-cards.instructions.md`.
 
 ### `docs/summary/`
 
@@ -83,6 +78,6 @@ Use English by default and only when a text genuinely cannot fit `architecture`,
 - Keep each dataset card and summary group in its own direct subfolder with `README.*` filenames; the data catalog is the sole `docs/data/README.*` exception.
 - Elsewhere, maintain the English `.md` file and do not require translation partners.
 - Repair all repository links after a move; do not leave aliases in obsolete folders.
-- Run `uv run python -m terrai_spatial validate`; multilingual discovery is automatic within the three scoped directories.
-- For data cards, verify source, project use, license, and commercial cautions.
+- Run the repository's documentation validation; multilingual discovery is automatic within the three scoped directories.
+- For data cards, verify data description, source, project use, license, and commercial cautions; see `docs-data-cards.instructions.md`.
 - For refactors, verify `00-overview` and plan filenames before opening or updating the PR.

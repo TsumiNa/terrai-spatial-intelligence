@@ -318,9 +318,15 @@ def command_validate(_: argparse.Namespace) -> None:
                 failures.append(f"invalid refactor plan filename: {path.relative_to(ROOT)}")
 
     data_headings = {
-        "en": ("## Source", "## Use in this project", "## License", "## Commercial-use cautions"),
-        "zh": ("## 来源", "## 在本项目中的使用", "## License", "## 商业使用注意"),
-        "ja": ("## 出典", "## 本 project での利用", "## License", "## 商用利用時の注意"),
+        "en": (
+            "## Data description",
+            "## Source",
+            "## Use in this project",
+            "## License",
+            "## Commercial-use cautions",
+        ),
+        "zh": ("## 数据内容", "## 来源", "## 在本项目中的使用", "## License", "## 商业使用注意"),
+        "ja": ("## データの内容", "## 出典", "## 本 project での利用", "## License", "## 商用利用時の注意"),
     }
     for canonical in sorted((docs_root / "data").glob("*/README.md")):
         relative = canonical.relative_to(ROOT)

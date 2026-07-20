@@ -6,6 +6,16 @@
 - Snapshot：2026-04-01
 - 種類：公式施設名、住所、位置
 
+## データの内容
+
+- **形式** — 単一 CSV。市は CP932（Shift-JIS）で公開しますが、証拠パイプラインが初回読み込み時にファイルを UTF-8 へその場で変換するため、本リポジトリにキャッシュされている複製は UTF-8 です。新規にダウンロードした複製は CP932 のままで、素朴な UTF-8 読み取りは失敗します。
+- **列** — `Type`、`Definition`、`Name`、`Address`、`Lat`、`Lon`、`Kana`、`Ward`、`WardCode`。`Lat` / `Lon` は WGS84 の十進度です。
+- **粒度** — 公式の防災施設 1 件につき 1 行（地域防災拠点、避難場所などの区分は `Type` で判別）。
+- **データ量** — `2026-04-01` スナップショット（`hinanjo_20260401.csv`）で施設 628 行。
+- **時点** — 日付付きスナップショット。市は独自の頻度で再公開し、ファイル名にスナップショット日付を保持しています。
+- **デモに到達する範囲** — 横浜デモの小さな矩形内にある施設のみが空間フィルタを通過するため、`data/yokohama/official_facility_resilience.geojson` は 628 行のうち現在 **2** 地物のみを保持します。
+- **既知の欠測と留意点** — 施設の identity・区分・住所・座標は公式情報です。一方で本 project が付加する `matched_roof_area_m2`、`pv_kwp_proxy`、`nearest_road_m`、`served_high_risk_buildings`、`resilience_score` はいずれも他レイヤから計算した PoC 代理値であり、市による施設評価ではありません。本ファイルは指定状況を示すものであり、現在の構造状態・使用中の収容力・運用即応性については何も述べていません。
+
 ## 出典
 
 横浜市地域防災拠点・帰宅困難者一時滞在施設 CSV：https://www.city.yokohama.lg.jp/bousai-kyukyu-bohan/bousai-saigai/data/shiryodata/data/data.files/hinanjo.csv

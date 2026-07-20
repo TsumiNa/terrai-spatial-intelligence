@@ -5,6 +5,16 @@
 - FL 状态：已接入，原始数据再分发受限
 - 范围：千叶县送电线与变电设备“系統の予想潮流等”
 
+## 数据内容
+
+- **格式** — 包含两个 CSV 文件的 ZIP 压缩包（UTF-8 带 BOM）。每个 CSV 在表头行之前有 6 行元数据前言，因此把第 1 行当作表头的朴素读取方式会解析错误。
+- **文件** — `csv_yosochoryu_chiba_soudensen.csv`（输电线路）与 `csv_yosochoryu_chiba_hendensyo.csv`（变电站与变压器）。
+- **覆盖范围** — 东京电力 Power Grid 供电区域中的千叶地区。设备仅以 ID 和名称标识，CSV 中**不含坐标、不含几何**。
+- **数据量** — 当前快照含输电线路 175 行、变压器 201 行。
+- **项目读取的字段** — `equipment_id`、`name`、`voltage_kv`（kV）、`circuits`、设备容量、`operating_capacity_before_control_mw`（MW）、`existing_olr_mw`（MW）、`operating_capacity_mw`（MW）、`constraint`，以及 `flow_from` / `flow_to` 两端。
+- **时点与完整性** — 派生成果记录了来自 HTTP 响应的 `source_file_last_modified_at`，以及压缩包和每个解压 CSV 的 SHA-256，使筛查结果可以绑定到某次确切下载。
+- **已知缺失与限制** — 由于没有几何信息，数值无法分配到地块或候选单元，管线仅按名称文本匹配。公开容量是筛查指标，绝不构成并网可用性的保证。因发布方声明禁止再分发，原始 ZIP、CSV 与获取元数据均已加入 Git 忽略，仓库只提交派生的筛查结果。
+
 ## 来源
 
 东京电力 Power Grid 官方页面：https://www.tepco.co.jp/pg/consignment/system/index-j.html 。程序记录实际 ZIP 的 HTTP `Last-Modified`、ETag、下载时间、字节数和 SHA-256，不把网页公告日期写死为快照。

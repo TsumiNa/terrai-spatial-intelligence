@@ -6,6 +6,16 @@
 - Variable: `ALLSKY_SFC_SW_DWN`
 - Climatology period: 2001–2020
 
+## Data description
+
+- **Format** — JSON returned by the NASA POWER climatology API, cached into `data/mobara/solar_summary.json`. It is a point query, not a raster download.
+- **Variable** — `ALLSKY_SFC_SW_DWN`: all-sky surface shortwave downward irradiance, i.e. global horizontal irradiance (GHI).
+- **Units and cached values** — the API returns kWh/m²/day. The cache stores `daily_ghi_kwh_m2` = 3.7747, `annual_ghi_kwh_m2` = 1,378, and a twelve-entry `monthly_ghi` breakdown.
+- **Temporal coverage** — a 2001–2020 climatology, i.e. a twenty-year average, not any individual year.
+- **Spatial granularity** — POWER serves a global reanalysis grid of roughly 0.5° latitude × 0.625° longitude. One grid cell covers the entire Mobara demo area, so the value does not vary across the site.
+- **Volume** — one queried point, yielding twelve monthly values plus an annual mean.
+- **Known gaps** — a single grid cell carries no intra-site variation, so it cannot distinguish one candidate cell from another. Climatological means are not P50/P90 production estimates, and the value excludes shading, terrain, orientation, temperature, soiling, and equipment losses.
+
 ## Source
 
 NASA POWER Climatology API: https://power.larc.nasa.gov/docs/services/api/temporal/climatology/
