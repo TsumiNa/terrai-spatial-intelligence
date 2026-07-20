@@ -7,27 +7,53 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          139.5867118,
-          35.44666612
+          139.586434,
+          35.446691
         ]
       },
       "properties": {
-        "name": "岩崎小学校",
-        "type": "地域防災拠点",
+        "name": "横浜市立岩崎小学校",
+        "type": "指定避難所",
         "definition": "被災した住民の避難生活の場所、情報受伝達、備蓄機能を備えた拠点です。",
         "address": "神奈川県横浜市保土ケ谷区岩崎町22-1",
         "ward": "保土ケ谷区",
+        "base_source_id": "gsi_designated_evacuation",
+        "base_source_scope": "national",
+        "source_reconciliation": "national_base_local_validated",
+        "gsi_common_id": "E1410000534111",
+        "gsi_emergency_place_common_ids": [
+          "E1410000534201",
+          "E1410000534205",
+          "E1410000534204",
+          "E1410000534203",
+          "E1410000534202"
+        ],
+        "gsi_designated_hazards": [
+          "earthquake",
+          "flood",
+          "landslide_debris_flow",
+          "storm_surge"
+        ],
+        "gsi_emergency_source_updated_at": "2026-01-16",
+        "gsi_emergency_retrieved_at": "2026-07-20T21:25:42+00:00",
+        "national_source_updated_at": "2026-01-16",
+        "national_retrieved_at": "2026-07-20T21:25:42+00:00",
+        "local_source_id": "yokohama_official_disaster_bases",
+        "local_name": "岩崎小学校",
+        "local_type": "地域防災拠点",
+        "local_source_updated_at": "2026-04-01",
+        "local_retrieved_at": "2026-07-20",
         "official_status": "observed_official",
-        "resilience_score": 84,
-        "served_high_risk_buildings": 102,
-        "nearest_road_m": 38,
+        "resilience_score": 85,
+        "served_high_risk_buildings": 106,
+        "nearest_road_m": 13,
         "nearest_road_name": "Road 125735204",
         "nearest_road_priority": 50,
-        "matched_roof_m": 30,
+        "matched_roof_m": 8,
         "matched_roof_area_m2": 730,
         "pv_kwp_proxy": 87.6,
         "site_safety_component": 80,
-        "access_component": 59,
+        "access_component": 64,
         "community_need_component": 100,
         "energy_component": 100,
         "decision": "官方设施；优先核查屋顶结构、储能、备用电源与灾时道路连续性",
@@ -37,6 +63,64 @@
     {
       "type": "Feature",
       "id": "official-shelter-2",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.585296,
+          35.449903
+        ]
+      },
+      "properties": {
+        "name": "横浜市立岩崎中学校",
+        "type": "指定避難所",
+        "definition": "災害対策基本法に基づく指定避難所",
+        "address": "神奈川県横浜市保土ケ谷区桜ケ丘2-6-1",
+        "ward": "保土ケ谷区",
+        "base_source_id": "gsi_designated_evacuation",
+        "base_source_scope": "national",
+        "source_reconciliation": "national_base_only",
+        "gsi_common_id": "E1410000540111",
+        "gsi_emergency_place_common_ids": [
+          "E1410000540204",
+          "E1410000540203",
+          "E1410000540202",
+          "E1410000540201"
+        ],
+        "gsi_designated_hazards": [
+          "earthquake",
+          "flood",
+          "landslide_debris_flow",
+          "storm_surge"
+        ],
+        "gsi_emergency_source_updated_at": "2026-01-16",
+        "gsi_emergency_retrieved_at": "2026-07-20T21:25:42+00:00",
+        "national_source_updated_at": "2026-01-16",
+        "national_retrieved_at": "2026-07-20T21:25:42+00:00",
+        "local_source_id": null,
+        "local_name": null,
+        "local_type": null,
+        "local_source_updated_at": null,
+        "local_retrieved_at": null,
+        "official_status": "observed_official",
+        "resilience_score": 85,
+        "served_high_risk_buildings": 75,
+        "nearest_road_m": 22,
+        "nearest_road_name": "Road 158525946",
+        "nearest_road_priority": 76,
+        "matched_roof_m": 13,
+        "matched_roof_area_m2": 2167,
+        "pv_kwp_proxy": 260.0,
+        "site_safety_component": 68,
+        "access_component": 79,
+        "community_need_component": 100,
+        "energy_component": 100,
+        "decision": "官方设施；优先核查屋顶结构、储能、备用电源与灾时道路连续性",
+        "limitations": "建筑轮廓为最近邻匹配；容量和结构未经现场验证"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "official-shelter-3",
       "geometry": {
         "type": "Point",
         "coordinates": [
@@ -50,6 +134,31 @@
         "definition": "被災した住民の避難生活の場所、情報受伝達、備蓄機能を備えた拠点です。",
         "address": "神奈川県横浜市保土ケ谷区桜ケ丘一丁目13-1",
         "ward": "保土ケ谷区",
+        "base_source_id": "yokohama_official_disaster_bases",
+        "base_source_scope": "local_supplement",
+        "source_reconciliation": "local_supplement_not_in_national_shelter_base",
+        "gsi_common_id": null,
+        "gsi_emergency_place_common_ids": [
+          "E1410000539201",
+          "E1410000539204",
+          "E1410000539203",
+          "E1410000539202"
+        ],
+        "gsi_designated_hazards": [
+          "earthquake",
+          "flood",
+          "landslide_debris_flow",
+          "storm_surge"
+        ],
+        "gsi_emergency_source_updated_at": "2026-01-16",
+        "gsi_emergency_retrieved_at": "2026-07-20T21:25:42+00:00",
+        "national_source_updated_at": null,
+        "national_retrieved_at": null,
+        "local_source_id": "yokohama_official_disaster_bases",
+        "local_name": "桜台小学校",
+        "local_type": "地域防災拠点",
+        "local_source_updated_at": "2026-04-01",
+        "local_retrieved_at": "2026-07-20",
         "official_status": "observed_official",
         "resilience_score": 76,
         "served_high_risk_buildings": 58,

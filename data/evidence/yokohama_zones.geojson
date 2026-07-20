@@ -315,58 +315,6 @@
     },
     {
       "type": "Feature",
-      "id": "YOKOHAMA-41",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              139.5835,
-              35.44845
-            ],
-            [
-              139.58599999999998,
-              35.44845
-            ],
-            [
-              139.58599999999998,
-              35.4504
-            ],
-            [
-              139.5835,
-              35.4504
-            ],
-            [
-              139.5835,
-              35.44845
-            ]
-          ]
-        ]
-      },
-      "properties": {
-        "building_count": 117,
-        "high_risk_buildings": 22,
-        "high_risk_share_pct": 18.8,
-        "max_road_priority": 90,
-        "official_facilities": 0,
-        "action_score": 77,
-        "action": "设施服务缺口",
-        "region": "yokohama",
-        "zone_id": "YOKOHAMA-41",
-        "embedding_change_score": 65.8,
-        "embedding_support_cells": 6,
-        "embedding_used_in_score": false,
-        "context_density": "dense",
-        "evidence_scales": [
-          "10m raster",
-          "object",
-          "100–300m neighborhood",
-          "regional gate"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
       "id": "YOKOHAMA-21",
       "geometry": {
         "type": "Polygon",
@@ -719,6 +667,58 @@
         "zone_id": "YOKOHAMA-32",
         "embedding_change_score": 61.5,
         "embedding_support_cells": 4,
+        "embedding_used_in_score": false,
+        "context_density": "dense",
+        "evidence_scales": [
+          "10m raster",
+          "object",
+          "100–300m neighborhood",
+          "regional gate"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "YOKOHAMA-41",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5835,
+              35.44845
+            ],
+            [
+              139.58599999999998,
+              35.44845
+            ],
+            [
+              139.58599999999998,
+              35.4504
+            ],
+            [
+              139.5835,
+              35.4504
+            ],
+            [
+              139.5835,
+              35.44845
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "building_count": 117,
+        "high_risk_buildings": 22,
+        "high_risk_share_pct": 18.8,
+        "max_road_priority": 90,
+        "official_facilities": 1,
+        "action_score": 57,
+        "action": "道路与建筑联合复核",
+        "region": "yokohama",
+        "zone_id": "YOKOHAMA-41",
+        "embedding_change_score": 65.8,
+        "embedding_support_cells": 6,
         "embedding_used_in_score": false,
         "context_density": "dense",
         "evidence_scales": [

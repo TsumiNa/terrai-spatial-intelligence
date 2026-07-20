@@ -29,6 +29,7 @@ DATASETS: dict[str, str] = {
     "delivery": "data/joint/solar_delivery_cells.geojson",
     "jointSummary": "data/joint/joint_summary.json",
     "gridScreen": "data/mobara/tepco_grid_screen.json",
+    "gsiEvacuation": "data/external/gsi_evacuation/yokohama_evacuation.geojson",
     "facilities": "data/yokohama/official_facility_resilience.geojson",
     "embeddingEvidence": "data/google/satellite_embedding/embedding_evidence.geojson",
     "embeddingSummary": "data/google/satellite_embedding/summary.json",
@@ -38,7 +39,7 @@ DATASETS: dict[str, str] = {
 }
 
 SOURCE_GROUPS = (
-    {"name": "GSI", "role": "terrain and visual basemaps", "access": "public"},
+    {"name": "GSI", "role": "terrain, designated evacuation and visual basemaps", "access": "public"},
     {"name": "OpenStreetMap", "role": "buildings, roads and context", "access": "public"},
     {"name": "Yokohama Open Data", "role": "official disaster facilities", "access": "public"},
     {"name": "NASA POWER", "role": "solar climate baseline", "access": "public"},
