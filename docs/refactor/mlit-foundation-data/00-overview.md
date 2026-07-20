@@ -15,7 +15,7 @@ The legacy W05 river dataset is explicitly marked non-commercial and must not si
 
 Add one MLIT source-pack pipeline that downloads official archives, normalizes and clips redistributable layers to practical Yokohama/Mobara context windows, records source and retrieval timestamps, and exposes the resulting FL files through on-demand API keys.
 
-Keep the W05 river pipeline separate, opt-in, local-only, Git-ignored, and absent from customer bootstrap/API output because its source page explicitly marks commercial use as prohibited.
+Exclude the W05 river pipeline, code and outputs because its source page explicitly marks commercial use as prohibited. Retain only a trilingual evaluation summary so a future commercially licensed source can be assessed without presenting W05 as FL.
 
 Do not add the new layers to the existing frontend bootstrap payload. The API will distinguish application/bootstrap datasets from larger on-demand FL datasets, preventing every exhibition page load from transferring all source layers.
 
@@ -35,11 +35,15 @@ Rejected because it would bloat Git, redistribute unnecessary originals, and vio
 
 ### Treat the legacy river dataset like the open datasets
 
-Rejected because the individual W05 page explicitly says non-commercial. The local-only task preserves technical accessibility without misrepresenting commercial rights.
+Rejected because the individual W05 page explicitly says non-commercial.
+
+### Retain an opt-in local W05 downloader
+
+Initially implemented, then removed after review. Even a Git-ignored task would create a shadow integration and encourage dependencies that cannot graduate into the commercial product.
 
 ## Scope
 
-- MLIT river data (W05), local-only and non-commercial.
+- W05 river source evaluation documentation only; no downloader, output, task or API integration.
 - 1:50,000 land classification basic survey.
 - All-period flood-history GIS.
 - Land-history survey GIS.
@@ -65,7 +69,7 @@ Rejected because the individual W05 page explicitly says non-commercial. The loc
 - FL gains authoritative inputs relevant to all three current application domains.
 - Initial rebuilds require substantial network transfer and optional geospatial dependencies; committed normalized clips keep normal demo startup offline.
 - New source layers are queryable on demand but remain outside business scores until an AL-specific validation and audit design is added.
-- Restricted-source behavior is enforced by task/API boundaries rather than documentation alone.
+- Restricted-source behavior is enforced by complete exclusion from tasks, outputs and APIs; only the evaluation record remains.
 
 ## Delivery plan
 

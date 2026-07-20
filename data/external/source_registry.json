@@ -236,15 +236,14 @@
     {
       "id": "ksj_w05_river",
       "theme": "river_network",
-      "status": "local_only_restricted",
+      "status": "confirmed_not_integrated",
       "source_updated_at": "2008",
       "retrieved_at": null,
-      "format": "GeoJSON local cache",
+      "format": "GML / Shapefile archive",
       "access_cost": "free direct download",
       "license": "legacy terms: non-commercial",
       "official_page": "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-W05.html",
-      "local_output": "data/external/mlit_restricted/river.local.geojson (Git-ignored)",
-      "rights_limit": "Never exposed by the exhibition API or committed; commercial use requires a different licensed source"
+      "rights_limit": "No downloader, local output, API key, or FL integration is retained; commercial use requires a different licensed source"
     },
     {
       "id": "esa_worldcover_2020_2021",

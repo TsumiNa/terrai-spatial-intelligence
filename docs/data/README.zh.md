@@ -24,6 +24,5 @@
 | MLIT N02 铁路 | 已接入，按需 | [线路与车站](mlit-n02-railway/README.zh.md) |
 | MLIT L03-b 土地利用细分 | 已接入，按需 | [2021年100米网格](mlit-l03b-land-use/README.zh.md) |
 | MLIT L02 都道府县地价调查 | 已接入，按需 | [2025基准地](mlit-l02-prefectural-land-price/README.zh.md) |
-| MLIT W05 河川 | 仅本地评估，非商业 | [受限河流缓存](mlit-w05-river/README.zh.md) |
 
 已确认但尚未接入、以及评估后排除的数据，见 [`docs/summary/open-data-landscape/`](../summary/open-data-landscape/README.zh.md)。机器可读状态见 `data/external/source_registry.json`。

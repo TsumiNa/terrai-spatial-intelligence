@@ -45,7 +45,7 @@ FL stores acquired real-world evidence and deterministic transformations that pr
 - Format conversion, coordinate normalization, quality checks, and deterministic slope from DEM remain FL; they do not invent unobserved facts.
 - Customer data entering FL is not automatically shared across customers; tenancy and permissions are later Factor of Develop work.
 
-Current FL includes GSI, MLIT land/hazard/transport/price layers, OpenStreetMap, Yokohama open data, NASA POWER, TEPCO public CSV, and Google Satellite Embedding. The embedding remains external FL even though it was produced by a foundation model. Large MLIT layers are catalogued and queried on demand rather than included in the frontend bootstrap. Non-commercial sources remain local-only and outside the customer API.
+Current FL includes GSI, MLIT land/hazard/transport/price layers, OpenStreetMap, Yokohama open data, NASA POWER, TEPCO public CSV, and Google Satellite Embedding. The embedding remains external FL even though it was produced by a foundation model. Large MLIT layers are catalogued and queried on demand rather than included in the frontend bootstrap. Sources prohibited for commercial use are excluded from integration; their evaluation may remain as documentation.
 
 #### Source precedence and time contract
 

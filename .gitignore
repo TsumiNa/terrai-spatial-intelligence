@@ -8,7 +8,3 @@ __pycache__/
 data/external/tepco/*.zip
 data/external/tepco/*.csv
 data/external/tepco/*.local.json
-
-# MLIT W05 is explicitly non-commercial. Keep it outside the exhibition API.
-data/external/mlit_restricted/*.geojson
-data/external/mlit_restricted/*.local.json

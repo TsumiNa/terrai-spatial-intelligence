@@ -24,6 +24,5 @@
 | MLIT N02 鉄道 | 接続済み・オンデマンド | [路線・駅](mlit-n02-railway/README.ja.md) |
 | MLIT L03-b 土地利用細分 | 接続済み・オンデマンド | [2021年100mメッシュ](mlit-l03b-land-use/README.ja.md) |
 | MLIT L02 都道府県地価調査 | 接続済み・オンデマンド | [2025年基準地](mlit-l02-prefectural-land-price/README.ja.md) |
-| MLIT W05 河川 | ローカル評価のみ・非商用 | [制限付き河川cache](mlit-w05-river/README.ja.md) |
 
 接続確認済み未使用および除外 source は [`docs/summary/open-data-landscape/`](../summary/open-data-landscape/README.ja.md) を参照してください。機械可読状態は `data/external/source_registry.json` にあります。
