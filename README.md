@@ -122,6 +122,7 @@ uv run python scripts/parse_tepco_grid.py
 - [完整概念架构](docs/architecture/FL_SL_AL_CONCEPT.md)
 - [ADR-0001：采用 FL → SL → AL](docs/adr/0001-fl-sl-al-conceptual-layers.md)
 - [本次 Factor of Concept 重构记录](docs/refactor/2026-07-fl-sl-al-factor-of-concept.md)
+- [前端—后端调用结构与 Mermaid 时序图](architecture/README.md)
 
 FastAPI v1 只建立演示所需的最小读取、查询和排序边界，不提前定义正式数据对象 schema、模型注册、任务编排、数据库、多租户权限或部署拓扑；这些仍属于客户数据与目标变量明确后的后续开发。
 

@@ -27,6 +27,7 @@ REQUIRED_FILES = [
     "frontend/app.js",
     "terrai_spatial/api.py",
     "terrai_spatial/data_service.py",
+    "architecture/README.md",
     "docs/architecture/FL_SL_AL_CONCEPT.md",
     "docs/architecture/FRONTEND_BACKEND_SPLIT.md",
     "docs/adr/0001-fl-sl-al-conceptual-layers.md",
@@ -203,6 +204,12 @@ def command_validate(_: argparse.Namespace) -> None:
             '/api/v1/bootstrap',
             '/api/v1/features/{key}',
             '/api/v1/recommendations/{analysis}',
+        ),
+        "architecture/README.md": (
+            "sequenceDiagram",
+            "GET /bootstrap",
+            "GET /assets/tiles/",
+            "GET /features/solar",
         ),
     }
     for relative, required_tokens in exhibition_contract.items():

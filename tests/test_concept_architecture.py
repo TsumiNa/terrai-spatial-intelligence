@@ -45,11 +45,24 @@ class ConceptArchitectureTests(unittest.TestCase):
     def test_readme_links_decision_and_refactor_history(self) -> None:
         readme = read("README.md")
         for relative in (
+            "architecture/README.md",
             "docs/architecture/FL_SL_AL_CONCEPT.md",
             "docs/adr/0001-fl-sl-al-conceptual-layers.md",
             "docs/refactor/2026-07-fl-sl-al-factor-of-concept.md",
         ):
             self.assertIn(relative, readme)
+
+    def test_frontend_backend_call_document_tracks_runtime(self) -> None:
+        call_structure = read("architecture/README.md")
+        self.assertEqual(call_structure.count("sequenceDiagram"), 3)
+        for token in (
+            "GET /bootstrap",
+            "GET /assets/tiles/",
+            "GET /features/solar",
+            "当前不会再次请求 API",
+            "SQLite",
+        ):
+            self.assertIn(token, call_structure)
 
 
 if __name__ == "__main__":
