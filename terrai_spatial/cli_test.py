@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import argparse
 import json
 from pathlib import Path
 
@@ -9,7 +8,7 @@ import pytest
 from terrai_spatial.cli import (
     REFACTOR_PLAN_PATTERN,
     ROOT,
-    command_validate,
+    contract_failures,
     localized_document,
     multilingual_documents,
     validate_json,
@@ -96,8 +95,9 @@ def test_refactor_plan_pattern_rejects_other_filenames(name: str) -> None:
 # Contracts `command_validate` does not itself enforce, plus its success path.
 
 
-def test_validate_accepts_the_current_repository() -> None:
-    command_validate(argparse.Namespace())
+def test_repository_content_satisfies_every_contract() -> None:
+    """Content only. Data-pipeline readiness is mtime-derived and belongs to the CLI, not here."""
+    assert contract_failures() == []
 
 
 def test_concept_document_defines_layers_and_development_non_goals() -> None:
