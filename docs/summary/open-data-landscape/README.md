@@ -113,7 +113,7 @@ Updated 2026-07-20. This inventory covers data used, confirmed script-accessible
 ## TEPCO public system information (integrated)
 
 - Chiba transmission-line and transformer “Expected Power Flows, etc.” CSV. The program versions data from actual ZIP `Last-Modified` and local retrieval time, not a hard-coded page announcement date.
-- On the first online startup after a normal clone, the task downloads the official Chiba ZIP, validates it and two expected CSVs, extracts atomically to `data/external/tepco/`, then parses. Complete caches are not repeatedly downloaded; `uv run python -m terrai_spatial fetch tepco` refreshes.
+- On the first online startup after a normal clone, the task downloads the official Chiba ZIP, validates it and two expected CSVs, extracts atomically to `data/external/tepco/`, then parses. Complete caches are not repeatedly downloaded; `uv run python -m terrai_spatial fetch grid` refreshes.
 - `download_metadata.local.json` stores URL, retrieval time, HTTP `Last-Modified`/ETag, byte counts, and SHA-256 for ZIP/CSVs. It and raw files are Git-ignored.
 - Standard output: `data/mobara/tepco_grid_screen.json`.
 - Mobara signal: transformer-local spare-capacity proxy 5 MW; 0 MW after upstream constraints; normal-operation output control may apply.

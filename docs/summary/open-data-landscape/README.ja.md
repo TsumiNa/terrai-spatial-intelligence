@@ -113,7 +113,7 @@
 ## TEPCO 公開系統情報（接続済み）
 
 - 千葉送電線・変電設備「系統の予想潮流等」CSV。version は実 ZIP `Last-Modified` と local 取得時刻で記録。
-- 通常 clone 後の初回 online 起動で公式千葉 ZIP と期待2 CSV を検証・原子展開し解析。cache 完成後は再 download せず、`uv run python -m terrai_spatial fetch tepco` で更新。
+- 通常 clone 後の初回 online 起動で公式千葉 ZIP と期待2 CSV を検証・原子展開し解析。cache 完成後は再 download せず、`uv run python -m terrai_spatial fetch grid` で更新。
 - `download_metadata.local.json` に URL、取得時刻、HTTP metadata、byte、SHA-256。原 file と共に Git ignore。
 - 出力：`data/mobara/tepco_grid_screen.json`。
 - 茂原 signal：変電所単体空容量 proxy 5 MW、上位制約後0 MW、平常時出力制御可能性。

@@ -99,7 +99,7 @@ uv run python scripts/parse_tepco_grid.py
 - `bootstrap`：基础 GeoJSON/CSV/JSON 缺失或损坏时，优先通过 `git show HEAD:<path>` 原子恢复；源码压缩包环境才回退到 GitHub，私有仓库需提供 `GITHUB_TOKEN`。
 - `tiles`、`embedding`：仅在缓存缺失时由启动流程联网获取；`data update` 才会主动刷新。
 - `joint`、`evidence`：输出缺失、损坏，或脚本/输入比输出更新时自动重建。
-- `grid`：在线首次启动发现本地原始缓存缺失时，自动从东京电力官方 URL 下载 ZIP、校验并只解压两份预期 CSV，然后重建摘要；原 ZIP、CSV 和包含哈希/下载时间的本地元数据均由 `.gitignore` 排除。缓存完整后启动不会重复下载；`data update --only grid`、`fetch tepco` 或 `build --only grid` 会主动刷新。
+- `grid`：在线首次启动发现本地原始缓存缺失时，自动从东京电力官方 URL 下载 ZIP、校验并只解压两份预期 CSV，然后重建摘要；原 ZIP、CSV 和包含哈希/下载时间的本地元数据均由 `.gitignore` 排除。缓存完整后启动不会重复下载；`data update --only grid`、`fetch grid` 或 `build --only grid` 会主动刷新。
 - `--offline`：禁止联网；已有仓库内筛查摘要时，即使本地原 CSV 缺失也能启动；如果摘要缺失但本地东京电力 ZIP/CSV 缓存完整，仍可解析，否则明确停止而不带着半套数据启动。
 - 自动流程失败时不会带着半套数据启动服务器，而会显示具体任务、缺失输入和恢复方法。
 
@@ -237,7 +237,7 @@ uv run python -m terrai_spatial build --only evidence
 主动下载当前官方版本并重新解析：
 
 ```bash
-uv run python -m terrai_spatial fetch tepco
+uv run python -m terrai_spatial fetch grid
 # 等价的数据任务命令
 uv run python -m terrai_spatial data update --only grid
 # 底层脚本

@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
 import pytest
 
+from terrai_spatial.data_tasks import TASKS
 from terrai_spatial.cli import (
     REFACTOR_PLAN_PATTERN,
     REFACTOR_STATES_NEEDING_REASON,
     ROOT,
     contract_failures,
+    build_parser,
     localized_document,
     multilingual_documents,
     refactor_status_failures,
@@ -231,3 +234,50 @@ def test_every_refactor_document_declares_a_known_state() -> None:
         if path.name.endswith((".ja.md", ".zh.md")):
             continue
         assert refactor_status_failures(path) == [], path
+# --- fetch targets ------------------------------------------------------------
+
+
+def fetch_choices() -> set[str]:
+    """Read the fetch task choices, locating the actions by role not by position."""
+
+    parser = build_parser()
+    subparsers = next(
+        action for action in parser._actions if isinstance(action, argparse._SubParsersAction)
+    )
+    task = next(action for action in subparsers.choices["fetch"]._actions if action.dest == "task")
+    return set(task.choices)
+
+
+def fetch_accepts(name: str) -> bool:
+    """Behavioural check, touching no argparse internals at all."""
+
+    try:
+        build_parser().parse_args(["fetch", name])
+    except SystemExit:
+        return False
+    return True
+
+
+def test_fetch_offers_every_task_that_downloads() -> None:
+    """Derived, not listed: gsi_evacuation and mlit were missing while it was hand-written."""
+    expected = {name for name, task in TASKS.items() if task.network or task.repair_missing_cache}
+    assert fetch_choices() == expected
+
+
+def test_fetch_uses_task_names_so_one_vocabulary_spans_the_cli() -> None:
+    # `fetch tepco` used to alias the `grid` task, while `data --only` wanted `grid`.
+    assert fetch_choices() <= set(TASKS)
+    assert "tepco" not in fetch_choices()
+
+
+def test_fetch_includes_grid_even_though_it_declares_no_network() -> None:
+    assert TASKS["grid"].network is False
+    assert "grid" in fetch_choices()
+
+
+def test_fetch_parses_every_downloading_task_and_rejects_others() -> None:
+    for name, task in TASKS.items():
+        downloads = task.network or task.repair_missing_cache
+        assert fetch_accepts(name) is downloads, name
+    assert not fetch_accepts("tepco")
+    assert not fetch_accepts("no-such-task")

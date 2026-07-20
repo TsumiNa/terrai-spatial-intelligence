@@ -64,7 +64,7 @@ uv run python -m terrai_spatial frontend         # static files only; expects AP
 uv run python -m terrai_spatial data status      # per-task readiness table
 uv run python -m terrai_spatial data ensure      # repair missing/stale derived data
 uv run python -m terrai_spatial build --only joint
-uv run python -m terrai_spatial fetch tepco      # tiles | embedding | tepco
+uv run python -m terrai_spatial fetch grid       # any task that downloads; see --help
 uv run python -m terrai_spatial validate         # asset + JSON + contract checks
 ```
 

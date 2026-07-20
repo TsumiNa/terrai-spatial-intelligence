@@ -83,7 +83,7 @@ uv run python scripts/parse_tepco_grid.py
 - `bootstrap`：欠落/破損 base GeoJSON/CSV/JSON を `git show HEAD:<path>` で原子的復旧。source archive は GitHub fallback、private repository は `GITHUB_TOKEN` 必須。
 - `tiles`、`embedding`：cache 不足時だけ起動時 download。`data update` は強制更新。
 - `joint`、`evidence`：出力不足/破損、または script/input より古ければ再構築。
-- `grid`：最初の online 起動で公式 TEPCO ZIP、期待2 CSV を検証・展開し summary を再構築。raw と hash/time metadata は Git ignore。明示更新は `data update --only grid`、`fetch tepco`、`build --only grid`。
+- `grid`：最初の online 起動で公式 TEPCO ZIP、期待2 CSV を検証・展開し summary を再構築。raw と hash/time metadata は Git ignore。明示更新は `data update --only grid`、`fetch grid`、`build --only grid`。
 - `--offline`：network 禁止。commit 済み summary は raw CSV なしで利用でき、既存 ZIP/CSV cache から再構築可。不足時は明確に停止。
 - 復旧失敗時は partial data で server を起動せず、task、input、復旧方法を表示。
 
@@ -205,7 +205,7 @@ TEPCO 千葉「系統の予想潮流等」を接続済みです。Git は標準 
 - 茂原：local空容量 proxy 5 MW、上位制約後0 MW、平常時出力制御可能性。
 
 ```bash
-uv run python -m terrai_spatial fetch tepco
+uv run python -m terrai_spatial fetch grid
 uv run python -m terrai_spatial data update --only grid
 uv run python scripts/update_tepco_grid.py --force
 uv run python scripts/update_tepco_grid.py --offline
