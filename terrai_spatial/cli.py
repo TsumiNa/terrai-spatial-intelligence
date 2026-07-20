@@ -24,6 +24,7 @@ DOCS_TOP_LEVEL_DIRECTORIES = {"architecture", "refactor", "data", "summary", "ot
 MULTILINGUAL_DOCS_DIRECTORIES = ("architecture", "data", "summary")
 REFACTOR_PLAN_PATTERN = re.compile(r"^\d{2}-[a-z0-9-]+-pr\d+[a-z]?\.md$")
 REFACTOR_PLAN_STATES = ("Planned", "In progress", "Blocked", "Completed", "Superseded")
+REFACTOR_STATES_NEEDING_REASON = ("Blocked", "Superseded")
 REFACTOR_STATUS_PATTERN = re.compile(r"^- Status: *(?P<state>.+)$", re.MULTILINE)
 
 
@@ -173,15 +174,30 @@ def data_task_failures() -> list[str]:
 
 
 def refactor_status_failures(path: Path) -> list[str]:
-    """Check one refactor document declares a status from the fixed set."""
+    """Check one refactor document declares a status from the fixed set.
+
+    The state must be the whole value or be followed by a space, so `Completed`
+    is accepted while `Completed-ish` and `In progressss` are not. `Blocked` and
+    `Superseded` mean nothing without their reason, so a qualifier is required.
+    """
 
     match = REFACTOR_STATUS_PATTERN.search(path.read_text(encoding="utf-8"))
     relative = path.relative_to(ROOT) if path.is_relative_to(ROOT) else path
     if not match:
-        return [f"refactor plan missing a status line: {relative}"]
+        return [f"refactor document missing a status line: {relative}"]
+
     state = match.group("state").strip()
-    if not any(state.startswith(known) for known in REFACTOR_PLAN_STATES):
-        return [f"refactor plan status must start with one of {REFACTOR_PLAN_STATES}: {relative}: {state}"]
+    for known in REFACTOR_PLAN_STATES:
+        if state == known or state.startswith(f"{known} "):
+            qualifier = state[len(known) :].strip(" —–-:,")
+            break
+    else:
+        return [
+            f"refactor document status must be one of {REFACTOR_PLAN_STATES}: {relative}: {state}"
+        ]
+
+    if known in REFACTOR_STATES_NEEDING_REASON and not qualifier:
+        return [f"refactor document status '{known}' must be followed by a reason: {relative}"]
     return []
 
 
