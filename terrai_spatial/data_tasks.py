@@ -61,6 +61,20 @@ EMBEDDING_OUTPUTS = (
     "data/google/satellite_embedding/mobara_latent_2024.png",
 )
 
+MLIT_OUTPUTS = (
+    "data/mlit/land_classification_50k.geojson",
+    "data/mlit/flood_history.geojson",
+    "data/mlit/land_history.geojson",
+    "data/mlit/landslide_warning.geojson",
+    "data/mlit/multistage_flood.geojson",
+    "data/mlit/published_land_price.geojson",
+    "data/mlit/embankment_regulation.geojson",
+    "data/mlit/railway.geojson",
+    "data/mlit/land_use_mesh.geojson",
+    "data/mlit/prefectural_land_price.geojson",
+    "data/mlit/metadata.json",
+)
+
 TASKS = {
     "bootstrap": DataTask(
         "bootstrap",
@@ -97,6 +111,16 @@ TASKS = {
             "data/external/gsi_evacuation/metadata.json",
         ),
         network=True,
+        force_argument=True,
+        check_stale=False,
+    ),
+    "mlit": DataTask(
+        "mlit",
+        "download and subset open MLIT foundation datasets for both demo contexts",
+        "scripts/fetch_mlit_foundation.py",
+        outputs=MLIT_OUTPUTS,
+        network=True,
+        remote_extra=True,
         force_argument=True,
         check_stale=False,
     ),

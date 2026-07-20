@@ -19,6 +19,8 @@ Open:
 
 The first online startup checks and obtains automatable data, then rebuilds missing or stale derivatives. Add `--offline` for strict offline operation.
 
+The MLIT foundation pack is rebuilt from official archives with `uv run python -m terrai_spatial data update --only mlit`. Its large layers are available through the catalog and dataset/feature APIs on demand, not included in the frontend bootstrap. The legacy W05 river layer is excluded because its official terms prohibit commercial use; its evaluation is retained in `docs/summary/` for a future sourcing decision.
+
 ## Documentation
 
 - [Product and runtime state](docs/summary/2026-07-prototype-state/README.md)

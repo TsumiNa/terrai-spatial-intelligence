@@ -38,8 +38,25 @@ DATASETS: dict[str, str] = {
     "multiscaleSummary": "data/evidence/multiscale_summary.json",
 }
 
+# Large FL layers are queryable but deliberately excluded from the exhibition
+# bootstrap. Clients request only the spatial window needed by an analysis.
+FOUNDATION_DATASETS: dict[str, str] = {
+    "landClassification50k": "data/mlit/land_classification_50k.geojson",
+    "floodHistory": "data/mlit/flood_history.geojson",
+    "landHistory": "data/mlit/land_history.geojson",
+    "landslideWarning": "data/mlit/landslide_warning.geojson",
+    "multistageFlood": "data/mlit/multistage_flood.geojson",
+    "publishedLandPrice": "data/mlit/published_land_price.geojson",
+    "embankmentRegulation": "data/mlit/embankment_regulation.geojson",
+    "railway": "data/mlit/railway.geojson",
+    "landUseMesh": "data/mlit/land_use_mesh.geojson",
+    "prefecturalLandPrice": "data/mlit/prefectural_land_price.geojson",
+}
+ALL_DATASETS = {**DATASETS, **FOUNDATION_DATASETS}
+
 SOURCE_GROUPS = (
     {"name": "GSI", "role": "terrain, designated evacuation and visual basemaps", "access": "public"},
+    {"name": "MLIT", "role": "land, hazard, transport and price foundation layers", "access": "public; dataset-specific terms"},
     {"name": "OpenStreetMap", "role": "buildings, roads and context", "access": "public"},
     {"name": "Yokohama Open Data", "role": "official disaster facilities", "access": "public"},
     {"name": "NASA POWER", "role": "solar climate baseline", "access": "public"},
@@ -61,7 +78,7 @@ class DataService:
 
     def path_for(self, key: str) -> Path:
         try:
-            relative = DATASETS[key]
+            relative = ALL_DATASETS[key]
         except KeyError as error:
             raise DatasetNotFoundError(key) from error
         return self.root / relative
@@ -79,16 +96,19 @@ class DataService:
 
     def catalog(self) -> list[dict[str, Any]]:
         rows = []
-        for key, relative in DATASETS.items():
+        for key, relative in ALL_DATASETS.items():
             path = self.root / relative
             exists = path.is_file()
-            value = self.load(key) if exists else None
+            # Do not deserialize large on-demand layers merely to render health
+            # or catalog metadata; that would defeat their delivery boundary.
+            value = self.load(key) if exists and key in DATASETS else None
             rows.append(
                 {
                     "key": key,
                     "path": relative,
                     "ready": exists,
                     "kind": "geojson" if relative.endswith(".geojson") else "json",
+                    "delivery": "bootstrap" if key in DATASETS else "on_demand",
                     "feature_count": len(value.get("features", [])) if isinstance(value, dict) else None,
                     "modified_at": (
                         datetime.fromtimestamp(path.stat().st_mtime, tz=UTC).isoformat() if exists else None
