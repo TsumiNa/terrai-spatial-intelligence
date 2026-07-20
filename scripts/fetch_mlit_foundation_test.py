@@ -4,6 +4,11 @@ from pathlib import Path
 
 import pytest
 
+# fetch_mlit_foundation imports fiona, which lives in the optional `remote`
+# extra. Without this guard a default install cannot even collect the suite:
+# the ImportError aborts the whole run, not just this module.
+pytest.importorskip("fiona", reason="requires the `remote` extra")
+
 from scripts.fetch_mlit_foundation import _bbox_in_crs, _extract, _json_value, _layers
 
 
