@@ -2,14 +2,20 @@ from __future__ import annotations
 
 import pytest
 
-from terrai_spatial.data_service import DATASETS, DatasetNotFoundError, service
+from terrai_spatial.data_service import DATASETS, FOUNDATION_DATASETS, DatasetNotFoundError, service
 
 
 def test_health_reports_all_file_backed_datasets_ready() -> None:
     health = service.health()
     assert health["status"] == "ready"
-    assert health["datasets_ready"] == len(DATASETS)
-    assert health["datasets_total"] == len(DATASETS)
+    assert health["datasets_ready"] == len(DATASETS) + len(FOUNDATION_DATASETS)
+    assert health["datasets_total"] == len(DATASETS) + len(FOUNDATION_DATASETS)
+
+
+def test_foundation_datasets_are_on_demand_not_bootstrapped() -> None:
+    catalog = {row["key"]: row for row in service.catalog()}
+    assert catalog["landslideWarning"]["delivery"] == "on_demand"
+    assert "landslideWarning" not in service.bootstrap()
 
 
 def test_bootstrap_contains_ranked_server_side_recommendations() -> None:

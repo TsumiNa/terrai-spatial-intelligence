@@ -61,6 +61,20 @@ EMBEDDING_OUTPUTS = (
     "data/google/satellite_embedding/mobara_latent_2024.png",
 )
 
+MLIT_OUTPUTS = (
+    "data/mlit/land_classification_50k.geojson",
+    "data/mlit/flood_history.geojson",
+    "data/mlit/land_history.geojson",
+    "data/mlit/landslide_warning.geojson",
+    "data/mlit/multistage_flood.geojson",
+    "data/mlit/published_land_price.geojson",
+    "data/mlit/embankment_regulation.geojson",
+    "data/mlit/railway.geojson",
+    "data/mlit/land_use_mesh.geojson",
+    "data/mlit/prefectural_land_price.geojson",
+    "data/mlit/metadata.json",
+)
+
 TASKS = {
     "bootstrap": DataTask(
         "bootstrap",
@@ -99,6 +113,30 @@ TASKS = {
         network=True,
         force_argument=True,
         check_stale=False,
+    ),
+    "mlit": DataTask(
+        "mlit",
+        "download and subset open MLIT foundation datasets for both demo contexts",
+        "scripts/fetch_mlit_foundation.py",
+        outputs=MLIT_OUTPUTS,
+        network=True,
+        remote_extra=True,
+        force_argument=True,
+        check_stale=False,
+    ),
+    "mlit_river": DataTask(
+        "mlit_river",
+        "download the non-commercial MLIT W05 river layer to a local-only cache",
+        "scripts/fetch_mlit_river.py",
+        outputs=("data/mlit/river_access.json",),
+        cache_outputs=("data/external/mlit_restricted/river.local.geojson", "data/external/mlit_restricted/metadata.local.json"),
+        network=True,
+        remote_extra=True,
+        automatic=False,
+        force_argument=True,
+        offline_argument=True,
+        check_stale=False,
+        repair_missing_cache=True,
     ),
     "grid": DataTask(
         "grid",
