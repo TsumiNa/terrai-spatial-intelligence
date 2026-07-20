@@ -114,7 +114,7 @@
 ## 东京电力公开系統信息（已接入）
 
 - 数据：千叶县送电线与变电设备“系統の予想潮流等”CSV。东京电力页面于 2026-07-16 公告追加 CSV；程序不把页面公告日期写死为数据快照，而以实际 ZIP 响应的 `Last-Modified` 和本地下载时间记录版本。
-- 自动获取：标准 GitHub 克隆首次在线启动发现本地原始缓存缺失时，任务从官方千叶县 ZIP URL 下载，验证 ZIP 与两份预期文件，原子解压到 `data/external/tepco/`，再运行标准化解析。缓存完整后不重复下载；也可执行 `uv run python -m terrai_spatial fetch tepco` 主动刷新。
+- 自动获取：标准 GitHub 克隆首次在线启动发现本地原始缓存缺失时，任务从官方千叶县 ZIP URL 下载，验证 ZIP 与两份预期文件，原子解压到 `data/external/tepco/`，再运行标准化解析。缓存完整后不重复下载；也可执行 `uv run python -m terrai_spatial fetch grid` 主动刷新。
 - 本地审计：`download_metadata.local.json` 保存实际 URL、下载时间、HTTP `Last-Modified`/ETag、ZIP 与两份 CSV 的字节数和 SHA-256。该文件与原始 ZIP/CSV 一起被 Git 忽略，避免自动更新弄脏仓库或变相分发原数据。
 - 标准化输出：`data/mobara/tepco_grid_screen.json`。
 - 茂原筛查信号：配电变电所自身空容量代理 5 MW，考虑上位系统后为 0 MW，且存在平常时出力控制可能。

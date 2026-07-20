@@ -73,9 +73,21 @@ def command_build(args: argparse.Namespace) -> None:
     ensure_data(selected=selected, allow_network=args.only == "grid", force=True)
 
 
+def downloadable_tasks() -> tuple[str, ...]:
+    """Tasks that reach the network, derived rather than listed.
+
+    `grid` declares `network=False` because its committed summary is enough to
+    start offline, but it downloads the TEPCO cache when that cache is missing,
+    so it belongs here too.
+    """
+
+    return tuple(
+        sorted(name for name, task in TASKS.items() if task.network or task.repair_missing_cache)
+    )
+
+
 def command_fetch(args: argparse.Namespace) -> None:
-    task = "grid" if args.dataset == "tepco" else args.dataset
-    ensure_data(selected=[task], allow_network=True, force=True)
+    ensure_data(selected=[args.task], allow_network=True, force=True)
 
 
 def command_data(args: argparse.Namespace) -> None:
@@ -451,7 +463,7 @@ def build_parser() -> argparse.ArgumentParser:
     build.set_defaults(func=command_build)
 
     fetch = subparsers.add_parser("fetch", help="refresh remote data assets")
-    fetch.add_argument("dataset", choices=("tiles", "embedding", "tepco"))
+    fetch.add_argument("task", choices=downloadable_tasks())
     fetch.set_defaults(func=command_fetch)
 
     data = subparsers.add_parser("data", help="inspect, repair or update all data tasks")

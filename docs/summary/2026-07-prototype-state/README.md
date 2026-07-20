@@ -83,7 +83,7 @@ uv run python scripts/parse_tepco_grid.py
 - `bootstrap`: atomically restore missing/corrupt base GeoJSON/CSV/JSON via `git show HEAD:<path>`; source archives fall back to GitHub and private repositories require `GITHUB_TOKEN`.
 - `tiles`, `embedding`: startup downloads only when cache is missing; `data update` forces refresh.
 - `joint`, `evidence`: rebuild when output is missing/corrupt or older than scripts/inputs.
-- `grid`: first online startup downloads the official TEPCO ZIP, validates and extracts only two expected CSVs, and rebuilds the summary. Raw ZIP/CSV and hash/time metadata are Git-ignored. `data update --only grid`, `fetch tepco`, and `build --only grid` refresh deliberately.
+- `grid`: first online startup downloads the official TEPCO ZIP, validates and extracts only two expected CSVs, and rebuilds the summary. Raw ZIP/CSV and hash/time metadata are Git-ignored. `data update --only grid`, `fetch grid`, and `build --only grid` refresh deliberately.
 - `--offline`: forbids network. A committed screening summary can run without raw CSV; an existing ZIP/CSV cache can rebuild. Otherwise startup stops explicitly.
 - Failed repair never starts with a partial dataset; it reports the task, missing input, and recovery action.
 
@@ -207,7 +207,7 @@ TEPCO Chiba “Expected Power Flows, etc.” is integrated. Git stores only the 
 - Mobara substation: 5 MW local spare-capacity proxy, 0 MW after upstream constraints, with possible normal-operation output control.
 
 ```bash
-uv run python -m terrai_spatial fetch tepco
+uv run python -m terrai_spatial fetch grid
 uv run python -m terrai_spatial data update --only grid
 uv run python scripts/update_tepco_grid.py --force
 uv run python scripts/update_tepco_grid.py --offline
