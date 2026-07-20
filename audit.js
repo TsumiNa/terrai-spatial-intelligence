@@ -116,6 +116,22 @@
       return raw(label, shown, "TEPCO Power Grid 系統の予想潮流等（千葉県CSV）", "茂原配電用変電所 / 上位系統考慮後空容量", snapshot, "data/mobara/tepco_grid_screen.json", ml("公开值为暂定简化筛查信息，不保证接入；正式结论需要接续検討。原资料并非开放许可数据。", "公開値は暫定的な簡略スクリーニング情報で、接続を保証しません。正式判断には接続検討が必要で、原資料はオープンライセンスではありません。", "The public value is provisional screening information and does not guarantee connection. A formal connection study is required; the source is not openly licensed."), "https://www.tepco.co.jp/pg/consignment/system/index-j.html");
     }
 
+    if (label === "FL 实际来源") {
+      return raw(label, shown, "TerrAI source registry", "integrated source groups", "Demo snapshot 2026-07", "data/external/source_registry.json", ml("这里按来源组计数，只表示当前 Demo 的 FL 覆盖，不是全部可用空间数据的数量。", "出典グループ数であり、現在のDemoのFL被覆のみを示します。利用可能な全空間データ数ではありません。", "This counts source groups in the current Demo FL, not every spatial dataset available."));
+    }
+
+    if (label === "地表 SL 补值") {
+      return model(label, shown, "No surface sparse-prediction model integrated", ml("FL missing → applicability check → candidate synthetic value/distribution", "FL missing → 適用性判定 → synthetic候補値・分布", "FL missing → applicability check → candidate synthetic value/distribution"), ml("当前为0：横滨/茂原尚无完成本地held-out与校准的SL模型。", "現在0件：横浜・茂原でローカルheld-outと較正を完了したSLモデルはありません。", "Currently zero: no Yokohama/Mobara SL model has completed local held-out validation and calibration."), ml("概念边界已定义；实现与验证留待客户数据PoC。", "概念境界のみ定義済み。実装・検証は顧客データPoCで行います。", "The conceptual boundary is defined; implementation and validation await a customer-data PoC."), "TerrAI FL → SL → AL concept", "docs/architecture/FL_SL_AL_CONCEPT.md");
+    }
+
+    if (label === "AL 核心出口") {
+      return calculation(label, shown, "count(core application families)", "slope exposure + road resilience + solar siting = 3", "TerrAI Application Layer concept map", ml("设施韧性、联合走廊和开发约束是三个核心出口的组合/扩展视图，不重复计为新的基础能力。", "施設レジリエンス、複合回廊、開発制約は3つの中核出口の組合せ・拡張ビューです。", "Facility resilience, compound corridors and development constraints are combined/extended views of the three core exits."));
+    }
+
+    if (label === "极稀疏校准证据") {
+      return model(label, shown, "geo-PFN 2M @24k · Haneda sparse protocol", ml("240个真实钻孔；固定48个查询孔；N=3个完整上下文孔；bar-distribution预测区间。", "実240孔、固定48 query孔、N=3の完全context孔、bar-distribution予測区間。", "240 real boreholes; 48 fixed query holes; N=3 whole context holes; bar-distribution prediction intervals."), ml("承诺90%的区间实际命中91.0%；LCSG在N≤6仍有轻微过度自信，逐行误差排序能力也有限。", "90%宣言区間の実命中率は91.0%。LCSGはN≤6で軽い過信があり、行単位の誤差順位付けも限定的です。", "Promised-90% intervals hit 91.0%; LCSG remains mildly over-confident at N≤6 and row-level error ranking is limited."), ml("这是地下Su实验的机制证据，不是坡地、道路或光伏模块的地表精度。", "地下Su実験の機構証拠であり、斜面・道路・太陽光モジュールの地表精度ではありません。", "This is mechanism evidence from subsurface Su, not surface accuracy for slope, road or solar modules."), "TsumiNa/geo_pfn · sparse uncertainty evaluation", "https://github.com/TsumiNa/geo_pfn/blob/main/docs/uncertainty-sparse.html");
+    }
+
     if (["屋顶容量代理"].includes(label)) {
       return calculation(label, shown, "Σ(roof footprint m² × 0.60 usable share × 0.20 kWp/m²) = Σ(footprint × 0.12)", `${note} → ${shown}`, "OpenStreetMap building footprint → TerrAI proxy", ml("不含屋顶朝向、遮挡、结构承载、设备间距和消防通道。", "屋根方位、日影、構造耐力、機器間隔、消防動線は未考慮です。", "Roof orientation, shading, structural capacity, equipment spacing and fire access are not included."));
     }

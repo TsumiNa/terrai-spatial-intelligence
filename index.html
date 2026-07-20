@@ -18,6 +18,9 @@
 
       <nav class="nav" aria-label="分析模块" data-i18n-aria="分析模块">
         <p class="nav-label" data-i18n="统一工作台">统一工作台</p>
+        <button class="nav-item nav-architecture" data-module="architecture">
+          <span class="nav-icon">≋</span><span data-i18n="FL → SL → AL 架构">FL → SL → AL 架构</span><b>CONCEPT</b>
+        </button>
         <button class="nav-item active" data-module="overview">
           <span class="nav-icon">⌂</span><span data-i18n="双区域总览">双区域总览</span>
         </button>
@@ -47,13 +50,14 @@
       </nav>
 
       <div class="foundation-card">
-        <div class="foundation-title"><span class="pulse"></span><span data-i18n="数据底座在线">数据底座在线</span></div>
+        <div class="foundation-title"><span class="pulse"></span><span data-i18n="FL · 基础数据在线">FL · 基础数据在线</span></div>
         <div class="foundation-row"><span data-i18n="地形">地形</span><strong>GSI DEM5A</strong></div>
         <div class="foundation-row"><span data-i18n="遥感表征">遥感表征</span><strong>Google AEF · 10 m</strong></div>
         <div class="foundation-row"><span data-i18n="资产 / 道路">资产 / 道路</span><strong>OpenStreetMap</strong></div>
         <div class="foundation-row"><span data-i18n="公共设施">公共设施</span><strong data-i18n="横滨市 · 2026">横滨市 · 2026</strong></div>
         <div class="foundation-row"><span data-i18n="太阳能">太阳能</span><strong>NASA POWER</strong></div>
-        <small data-i18n="当前 Demo 零付费数据服务 · 来源状态可追溯">当前 Demo 零付费数据服务 · 来源状态可追溯</small>
+        <div class="foundation-row foundation-future"><span data-i18n="SL · 稀疏预测">SL · 稀疏预测</span><strong data-i18n="概念就绪 · 未接入">概念就绪 · 未接入</strong></div>
+        <small data-i18n="FL 观测与 SL 合成保持可区分">FL 观测与 SL 合成保持可区分</small>
       </div>
     </aside>
 
@@ -98,6 +102,56 @@
             </div>
           </div>
           <div id="map" aria-label="空间分析地图" data-i18n-aria="空间分析地图"></div>
+          <section class="architecture-board" id="architecture-board" aria-label="FL SL AL 概念架构" data-i18n-aria="FL SL AL 概念架构" hidden>
+            <div class="architecture-flow">
+              <article class="layer-card layer-fl">
+                <div class="layer-card-head"><span>FL</span><i data-i18n="已接入">已接入</i></div>
+                <h3>Foundation Data Layer</h3>
+                <p data-i18n="真实世界观测与不改变观测语义的确定性加工。多尺度、允许缺测。">真实世界观测与不改变观测语义的确定性加工。多尺度、允许缺测。</p>
+                <ul>
+                  <li data-i18n="公开 / 商业 / 客户授权数据">公开 / 商业 / 客户授权数据</li>
+                  <li data-i18n="像素、对象、邻域、区域与时间">像素、对象、邻域、区域与时间</li>
+                  <li data-i18n="保留来源、时点、许可与 missing">保留来源、时点、许可与 missing</li>
+                </ul>
+                <small data-i18n="当前：GSI、OSM、AEF、横滨市、NASA、TEPCO">当前：GSI、OSM、AEF、横滨市、NASA、TEPCO</small>
+              </article>
+              <div class="layer-arrow" aria-hidden="true"><span>→</span><small data-i18n="判断缺测是否可预测">判断缺测是否可预测</small></div>
+              <article class="layer-card layer-sl">
+                <div class="layer-card-head"><span>SL</span><i data-i18n="概念层">概念层</i></div>
+                <h3>Synthetic Data Layer</h3>
+                <p data-i18n="在 FL 上非破坏性补值或增强；允许不确定，也允许拒答。">在 FL 上非破坏性补值或增强；允许不确定，也允许拒答。</p>
+                <ul>
+                  <li data-i18n="按场景与稀疏度选择模型群">按场景与稀疏度选择模型群</li>
+                  <li data-i18n="observed / synthetic / unresolved 不混写">observed / synthetic / unresolved 不混写</li>
+                  <li data-i18n="held-out、校准、跨区与人工复核">held-out、校准、跨区与人工复核</li>
+                </ul>
+                <small data-i18n="当前：地表 Demo 尚无 SL；geo_pfn 仅是地下机制证据">当前：地表 Demo 尚无 SL；geo_pfn 仅是地下机制证据</small>
+              </article>
+              <div class="layer-arrow" aria-hidden="true"><span>→</span><small data-i18n="通过证据质量闸门">通过证据质量闸门</small></div>
+              <article class="layer-card layer-al">
+                <div class="layer-card-head"><span>AL</span><i data-i18n="Demo 已接入">Demo 已接入</i></div>
+                <h3>Application Layer</h3>
+                <p data-i18n="把合格证据转成特定场景的规则、排序、核查与行动出口。">把合格证据转成特定场景的规则、排序、核查与行动出口。</p>
+                <ul>
+                  <li data-i18n="坡地暴露筛查">坡地暴露筛查</li>
+                  <li data-i18n="道路韧性与设施联动">道路韧性与设施联动</li>
+                  <li data-i18n="光伏选址与开发约束">光伏选址与开发约束</li>
+                </ul>
+                <small data-i18n="当前评分是透明 AL 启发式，不是 SL 预测">当前评分是透明 AL 启发式，不是 SL 预测</small>
+              </article>
+            </div>
+            <div class="architecture-gates">
+              <span data-i18n="识别多尺度 missing">识别多尺度 missing</span><i>→</i>
+              <span data-i18n="选择 coherent context">选择 coherent context</span><i>→</i>
+              <span data-i18n="模型选择 / 不确定性 / 拒答">模型选择 / 不确定性 / 拒答</span><i>→</i>
+              <span data-i18n="AL 场景闸门与人工复核">AL 场景闸门与人工复核</span>
+            </div>
+            <div class="architecture-boundary">
+              <strong data-i18n="概念边界">概念边界</strong>
+              <p data-i18n="不是所有 missing 都应填补：地权、许可、正式并网和结构安全必须保持 unknown，直到权威数据或现场尽调完成。">不是所有 missing 都应填补：地权、许可、正式并网和结构安全必须保持 unknown，直到权威数据或现场尽调完成。</p>
+              <a href="docs/architecture/FL_SL_AL_CONCEPT.md" target="_blank" rel="noreferrer" data-i18n="阅读完整架构说明">阅读完整架构说明</a>
+            </div>
+          </section>
           <div class="map-note" id="map-note"></div>
         </div>
 

@@ -206,6 +206,14 @@ function clearMap() {
   closeAudit();
 }
 
+function setArchitectureMode(active) {
+  document.getElementById("map").hidden = active;
+  document.getElementById("architecture-board").hidden = !active;
+  document.querySelector(".map-toolbar").hidden = active;
+  document.getElementById("map-note").hidden = active;
+  document.querySelector(".map-card").classList.toggle("concept-mode", active);
+}
+
 function useBasemap(basemapKey, resetView = false) {
   state.basemap = basemapKey;
   const region = REGIONS[state.region];
@@ -360,6 +368,35 @@ function popup(title, eyebrow, fields) {
 
 function riskColor(band) {
   return band === "high" ? colors.red : band === "medium" ? colors.amber : colors.green;
+}
+
+function renderArchitecture() {
+  document.getElementById("region-pill").innerHTML = "FL <span>→</span> SL <span>→</span> AL";
+  setHeader(
+    "概念架构", "从数据基础设施到可扩展应用出口", "FACTOR OF CONCEPT · FL → SL → AL",
+    "让观测、合成与应用决策各归其位",
+    "FL 保留多尺度现实证据和真实缺测；SL 只在验证通过后补值并披露不确定性；AL 把合格证据转成场景行动。",
+    "<span>Foundation Data</span><i>→</i><span>Synthetic Data</span><i>→</i><strong>Applications</strong>"
+  );
+  setEvidenceStatus([
+    ["observed", "FL", "当前 Demo 已接入"],
+    ["pending", "SL", "地表补值尚未接入"],
+    ["proxy", "AL", "启发式应用已接入"]
+  ]);
+  setMetrics([
+    metric("FL 实际来源", 6, "组", "公开 / 官方观测与表征", colors.green),
+    metric("地表 SL 补值", 0, "项", "概念已定义，尚未接入", colors.blue),
+    metric("AL 核心出口", 3, "类", "坡地 · 道路 · 光伏", colors.amber),
+    metric("极稀疏校准证据", 91.0, "%", "geo_pfn N=3 · 地下实验", colors.forest)
+  ]);
+
+  setQueueHeading("LAYER READINESS", "当前分层成熟度", 3);
+  document.getElementById("queue").innerHTML = `<div class="concept-status-list">
+    <article class="concept-status" style="--status-color:${colors.green}"><span>FL · LIVE</span><strong>${escapeHtml(t("开放数据管线已运行"))}</strong><p>${escapeHtml(t("已缓存多尺度观测、来源和许可；客户私有数据尚未进入。"))}</p></article>
+    <article class="concept-status" style="--status-color:${colors.blue}"><span>SL · CONCEPT</span><strong>${escapeHtml(t("稀疏预测边界已定义"))}</strong><p>${escapeHtml(t("geo_pfn 提供地下机制证据；当前横滨与茂原没有 synthetic 补值。"))}</p></article>
+    <article class="concept-status" style="--status-color:${colors.amber}"><span>AL · DEMO</span><strong>${escapeHtml(t("三个核心应用出口已运行"))}</strong><p>${escapeHtml(t("当前分数是透明规则与代理，不是 SL 模型预测。"))}</p></article>
+  </div>`;
+  document.getElementById("method-card").innerHTML = `<strong>${escapeHtml(t("本次重构边界"))}</strong><br>${escapeHtml(t("只建立 FL → SL → AL 的概念分层；schema、API、数据库、调度和模型服务留给 Factor of Develop。"))}`;
 }
 
 function renderOverview() {
@@ -729,11 +766,13 @@ function renderDevelopment() {
 function renderModule(module, preserveView = false) {
   clearMap();
   state.module = module;
+  setArchitectureMode(module === "architecture");
   if (!preserveView) {
-    const defaults = { overview: "urban", evidence: "yokohama_change", slope: "all", roads: "all", facilities: "official", solar: "all", joint: "hubs", development: "delivery" };
+    const defaults = { architecture: "layers", overview: "urban", evidence: "yokohama_change", slope: "all", roads: "all", facilities: "official", solar: "all", joint: "hubs", development: "delivery" };
     state.view = defaults[module] || "all";
   }
   document.querySelectorAll(".nav-item").forEach(button => button.classList.toggle("active", button.dataset.module === module));
+  if (module === "architecture") renderArchitecture();
   if (module === "overview") renderOverview();
   if (module === "evidence") renderEvidence();
   if (module === "slope") renderSlope();
@@ -745,7 +784,7 @@ function renderModule(module, preserveView = false) {
   translateElementText(document.getElementById("method-card"));
   translateElementText(document.getElementById("map-note"));
   applyStaticTranslations();
-  window.setTimeout(() => map.invalidateSize(), 50);
+  if (module !== "architecture") window.setTimeout(() => map.invalidateSize(), 50);
 }
 
 document.addEventListener("click", event => {
@@ -782,7 +821,7 @@ Promise.all(Object.entries(PATHS).map(([key, path]) => fetchJson(path).then(data
     const params = new URLSearchParams(window.location.search);
     const requestedLanguage = params.get("lang") || localStorage.getItem("terrai-language") || "zh";
     state.lang = LANGS.includes(requestedLanguage) ? requestedLanguage : "zh";
-    const initialModule = ["overview", "evidence", "slope", "roads", "facilities", "solar", "joint", "development"].includes(params.get("module")) ? params.get("module") : "overview";
+    const initialModule = ["architecture", "overview", "evidence", "slope", "roads", "facilities", "solar", "joint", "development"].includes(params.get("module")) ? params.get("module") : "architecture";
     const initialView = params.get("view");
     if (Object.hasOwn(BASEMAPS, params.get("basemap"))) state.basemap = params.get("basemap");
     renderModule(initialModule);
