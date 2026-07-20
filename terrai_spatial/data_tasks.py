@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -25,7 +24,6 @@ class DataTask:
     manifest: str | None = None
     dependencies: tuple[str, ...] = ()
     network: bool = False
-    remote_extra: bool = False
     automatic: bool = True
     force_argument: bool = False
     offline_argument: bool = False
@@ -100,7 +98,6 @@ TASKS = {
         "scripts/fetch_google_satellite_embedding.py",
         outputs=EMBEDDING_OUTPUTS,
         network=True,
-        remote_extra=True,
     ),
     "gsi_evacuation": DataTask(
         "gsi_evacuation",
@@ -120,7 +117,6 @@ TASKS = {
         "scripts/fetch_mlit_foundation.py",
         outputs=MLIT_OUTPUTS,
         network=True,
-        remote_extra=True,
         force_argument=True,
         check_stale=False,
     ),
@@ -257,14 +253,7 @@ def _ordered_names(selected: list[str] | None) -> list[str]:
 
 
 def _run(task: DataTask, root: Path, force: bool, allow_network: bool) -> None:
-    script = root / task.script
-    if task.remote_extra:
-        uv = shutil.which("uv")
-        if not uv:
-            raise RuntimeError("uv is required to install the remote-data extras")
-        command = [uv, "run", "--extra", "remote", "python", str(script)]
-    else:
-        command = [sys.executable, str(script)]
+    command = [sys.executable, str(root / task.script)]
     if force and task.force_argument:
         command.append("--force")
     if not allow_network and task.offline_argument:

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import shutil
+import sys
 import zipfile
 from pathlib import Path
 
@@ -10,6 +12,7 @@ import pytest
 
 from terrai_spatial.data_tasks import (
     BOOTSTRAP_OUTPUTS,
+    TASKS,
     _ordered_names,
     ensure_data,
     task_state,
@@ -145,3 +148,28 @@ def test_integrated_fl_sources_require_retrieval_and_source_time_metadata(tmp_pa
         "integrated FL source lacks retrieved_at: missing-retrieval",
         "integrated FL source lacks source_updated_at: missing-source-time",
     ]
+
+
+def test_every_task_runs_on_the_current_interpreter(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """No task may shell out to a package manager.
+
+    Pipelines used to run under `uv run --extra remote`, which installed the
+    geospatial stack mid-startup whenever an output went missing. The stack is
+    a base dependency now, so a missing output must never trigger an install.
+    """
+    commands: list[list[str]] = []
+
+    def capture(command, **kwargs):
+        commands.append([str(part) for part in command])
+        raise RuntimeError("stop before the script runs")
+
+    monkeypatch.setattr("terrai_spatial.data_tasks.subprocess.run", capture)
+    write_json(tmp_path / "data/mobara/tepco_grid_screen.json")
+
+    for name in TASKS:
+        commands.clear()
+        with contextlib.suppress(RuntimeError):
+            ensure_data(root=tmp_path, selected=[name], allow_network=True, force=True)
+        for command in commands:
+            assert command[0] == sys.executable, f"{name} did not use the current interpreter"
+            assert "--extra" not in command and "--group" not in command, name

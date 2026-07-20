@@ -72,7 +72,7 @@ uv run python scripts/ensure_data.py update --only joint
 uv run python scripts/build_joint_analysis.py
 uv run python scripts/build_multiscale_evidence.py
 uv run python scripts/fetch_visual_tiles.py
-uv run --extra remote python scripts/fetch_google_satellite_embedding.py
+uv run python scripts/fetch_google_satellite_embedding.py
 uv run python scripts/fetch_tepco_grid.py
 uv run python scripts/update_tepco_grid.py
 uv run python scripts/parse_tepco_grid.py
@@ -151,7 +151,7 @@ FastAPI v1 は最小 read/query/rank 境界だけを作り、正式 schema、mod
 - 64D cosine 変化、類似、将来少数label転移。土地class解釈・現score入力なし。
 
 ```bash
-uv run --extra remote python -m terrai_spatial fetch embedding
+uv run python -m terrai_spatial fetch embedding
 ```
 
 ### Dynamic World：削除
