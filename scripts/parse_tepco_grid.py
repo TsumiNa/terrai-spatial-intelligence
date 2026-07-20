@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import csv
+from email.utils import parsedate_to_datetime
 import json
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "external" / "tepco"
 OUTPUT = ROOT / "data" / "mobara" / "tepco_grid_screen.json"
+METADATA = RAW / "download_metadata.local.json"
 
 
 def number(value: str):
@@ -86,17 +88,40 @@ def parse_transformers(path: Path) -> list[dict]:
     return result
 
 
+def provenance() -> dict:
+    if not METADATA.is_file():
+        return {}
+    value = json.loads(METADATA.read_text(encoding="utf-8"))
+    source_file_last_modified_at = None
+    if value.get("http_last_modified"):
+        try:
+            source_file_last_modified_at = parsedate_to_datetime(value["http_last_modified"]).date().isoformat()
+        except (TypeError, ValueError):
+            pass
+    return {
+        "source_file_last_modified_at": source_file_last_modified_at,
+        "download_url": value.get("resolved_url") or value.get("download_url"),
+        "archive_sha256": (value.get("archive") or {}).get("sha256"),
+        "raw_file_sha256": {
+            name: details.get("sha256") for name, details in value.get("files", {}).items()
+        },
+    }
+
+
 def main() -> None:
     lines = parse_lines(RAW / "csv_yosochoryu_chiba_soudensen.csv")
     transformers = parse_transformers(RAW / "csv_yosochoryu_chiba_hendensyo.csv")
     mobara_lines = [item for item in lines if "茂原" in " ".join(str(value) for value in item.values())]
     mobara_transformers = [item for item in transformers if "茂原" in item["name"]]
     local_station = next((item for item in mobara_transformers if item["name"] == "茂原"), None)
+    source_provenance = provenance()
     value = {
-        "published_at": "2026-06-22",
-        "downloaded_at": "2026-07-20",
+        "source_file_last_modified_at": source_provenance.get("source_file_last_modified_at"),
         "source": "TEPCO Power Grid - 系統の予想潮流等に関する情報（千葉県CSV）",
         "source_url": "https://www.tepco.co.jp/pg/consignment/system/index-j.html",
+        "download_url": source_provenance.get("download_url"),
+        "archive_sha256": source_provenance.get("archive_sha256"),
+        "raw_file_sha256": source_provenance.get("raw_file_sha256", {}),
         "raw_files": [
             "data/external/tepco/csv_yosochoryu_chiba_soudensen.csv",
             "data/external/tepco/csv_yosochoryu_chiba_hendensyo.csv",
@@ -121,6 +146,7 @@ def main() -> None:
         },
         "important_note": "公开数值只是选址筛查证据，不是接续検討结果；CSV没有可直接用于宗地空间连接的完整设备几何。",
     }
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Parsed {len(lines)} line rows and {len(transformers)} transformer rows; Mobara matches: {len(mobara_lines)} lines / {len(mobara_transformers)} transformers")
 

@@ -238,8 +238,8 @@ function useRegion(regionKey) {
   document.getElementById("region-pill").innerHTML = `${escapeHtml(t(region.label))} <span>⌄</span>`;
 }
 
-function metric(label, value, unit, note, color) {
-  const record = AUDIT.metric(label, value, unit, note);
+function metric(label, value, unit, note, color, auditContext = {}) {
+  const record = AUDIT.metric(label, value, unit, note, auditContext);
   const translatedUnit = t(unit || "");
   const valueMarkup = `${escapeHtml(value)}${state.lang === "en" && translatedUnit ? " " : ""}<small>${escapeHtml(translatedUnit)}</small>`;
   return `<article class="metric" style="--metric-color:${color}">
@@ -691,7 +691,7 @@ function renderDevelopment() {
     metric("可交付单元", summary.solar_delivery_cells.count, "格", `${summary.solar_delivery_cells.area_ha} ha`, colors.blue),
     metric("规则排除", state.data.solarSummary.counts.reject, "格", "现有退距与坡度规则", colors.red),
     metric("已缓存视觉层", 4, "类", "标准 · 影像 · 起伏 · 坡度", colors.green),
-    metric("上位约束后空容量", grid.spare_with_upstream_mw, "MW", `自身 ${grid.spare_own_mw} MW · 仅公开筛查`, colors.red)
+    metric("上位约束后空容量", grid.spare_with_upstream_mw, "MW", `自身 ${grid.spare_own_mw} MW · 仅公开筛查`, colors.red, { snapshot: state.data.gridScreen.source_file_last_modified_at })
   ]);
   setTabs([["delivery", "可交付候选"], ["constraints", "现有排除项"]], view);
   const context = layerForFeatures(state.data.solarContext.features, {
@@ -706,11 +706,12 @@ function renderDevelopment() {
     ref = layerForFeatures(features, { style: feature => ({ color: "#fff", weight: 1, fillColor: feature.properties.delivery_band === "priority" ? colors.blue : colors.green, fillOpacity: .78 }) }, props => popup(props.cell_id, "可交付光伏单元", [["交付分", props.delivery_score], ["坡度", `${props.slope_deg}°`], ["道路", `${props.distance_road_m} m`], ["输电线", `${props.distance_grid_m} m`]]));
     setQueueHeading("DELIVERY-READY SOLAR", "联合踏勘队列", features.length);
     queue(features, props => ({ color: props.delivery_band === "priority" ? colors.blue : colors.green, title: `单元 ${props.cell_id}`, detail: `${props.area_ha} ha · 坡度 ${props.slope_deg}° · 输电线 ${props.distance_grid_m} m`, score: props.delivery_score }));
+    const gridSnapshot = state.data.gridScreen.source_file_last_modified_at || "—";
     const gridMethod = state.lang === "ja"
-      ? `東京電力 2026-06-22 スナップショット：茂原変電所の当該設備空容量代理は ${grid.spare_own_mw} MW、上位系統考慮後は ${grid.spare_with_upstream_mw} MW。平常時出力制御の可能性があるため、候補地調査前に系統接続の事前相談を推奨します。`
+      ? `東京電力ソースZIPの最終更新 ${gridSnapshot}：茂原変電所の当該設備空容量代理は ${grid.spare_own_mw} MW、上位系統考慮後は ${grid.spare_with_upstream_mw} MW。平常時出力制御の可能性があるため、候補地調査前に系統接続の事前相談を推奨します。`
       : state.lang === "en"
-        ? `TEPCO snapshot dated 2026-06-22: Mobara substation own spare-capacity proxy is ${grid.spare_own_mw} MW and ${grid.spare_with_upstream_mw} MW after upstream constraints. Normal-operation curtailment may occur; request a grid pre-consultation before surveying candidate sites.`
-        : `东京电力 2026-06-22 快照：茂原变电所自身空容量代理 ${grid.spare_own_mw} MW；考虑上位系统后 ${grid.spare_with_upstream_mw} MW；存在平常时出力控制可能。建议候选地踏勘前先做并网预咨询。`;
+        ? `TEPCO source ZIP last modified ${gridSnapshot}: Mobara substation own spare-capacity proxy is ${grid.spare_own_mw} MW and ${grid.spare_with_upstream_mw} MW after upstream constraints. Normal-operation curtailment may occur; request a grid pre-consultation before surveying candidate sites.`
+        : `东京电力源 ZIP 最后修改于 ${gridSnapshot}：茂原变电所自身空容量代理 ${grid.spare_own_mw} MW；考虑上位系统后 ${grid.spare_with_upstream_mw} MW；存在平常时出力控制可能。建议候选地踏勘前先做并网预咨询。`;
     document.getElementById("method-card").innerHTML = `<strong>${escapeHtml(t("并网先决信号"))}</strong><br>${escapeHtml(gridMethod)}`;
     document.getElementById("map-note").textContent = "容量CSV没有设备几何，当前作为茂原区域级门槛证据，不分配到单个网格，也不等同正式接续検討。";
   } else {

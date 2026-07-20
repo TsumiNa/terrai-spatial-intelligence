@@ -72,7 +72,7 @@
     );
   }
 
-  function metric(label, value, unit, note) {
+  function metric(label, value, unit, note, context = {}) {
     const shown = resultText(value, unit);
     const countFiles = {
       "横滨建筑资产": ["data/yokohama/building_risk.geojson", "all building features", "OpenStreetMap + GSI DEM5A"],
@@ -112,7 +112,8 @@
     }
 
     if (label === "上位约束后空容量") {
-      return raw(label, shown, "TEPCO Power Grid 系統の予想潮流等（千葉県CSV）", "茂原配電用変電所 / 上位系統考慮後空容量", "published 2026-06-22", "data/mobara/tepco_grid_screen.json", ml("公开值为暂定简化筛查信息，不保证接入；正式结论需要接续検討。原资料并非开放许可数据。", "公開値は暫定的な簡略スクリーニング情報で、接続を保証しません。正式判断には接続検討が必要で、原資料はオープンライセンスではありません。", "The public value is provisional screening information and does not guarantee connection. A formal connection study is required; the source is not openly licensed."), "https://www.tepco.co.jp/pg/consignment/system/index-j.html");
+      const snapshot = context.snapshot ? `source ZIP Last-Modified ${context.snapshot}` : "source date unavailable";
+      return raw(label, shown, "TEPCO Power Grid 系統の予想潮流等（千葉県CSV）", "茂原配電用変電所 / 上位系統考慮後空容量", snapshot, "data/mobara/tepco_grid_screen.json", ml("公开值为暂定简化筛查信息，不保证接入；正式结论需要接续検討。原资料并非开放许可数据。", "公開値は暫定的な簡略スクリーニング情報で、接続を保証しません。正式判断には接続検討が必要で、原資料はオープンライセンスではありません。", "The public value is provisional screening information and does not guarantee connection. A formal connection study is required; the source is not openly licensed."), "https://www.tepco.co.jp/pg/consignment/system/index-j.html");
     }
 
     if (["屋顶容量代理"].includes(label)) {

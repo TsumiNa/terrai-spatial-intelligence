@@ -1,8 +1,13 @@
 {
-  "published_at": "2026-06-22",
-  "downloaded_at": "2026-07-20",
+  "source_file_last_modified_at": "2026-07-13",
   "source": "TEPCO Power Grid - 系統の予想潮流等に関する情報（千葉県CSV）",
   "source_url": "https://www.tepco.co.jp/pg/consignment/system/index-j.html",
+  "download_url": "https://www.tepco.co.jp/pg/consignment/system/pdf/csv_yosochoryu_chiba.zip",
+  "archive_sha256": "62e6e1d3084b6ca315a0094cd35cc6f7181c4a722acf8c10de85561be726b8eb",
+  "raw_file_sha256": {
+    "csv_yosochoryu_chiba_soudensen.csv": "f9c4b2e3d0d78b810211c54d996f6f6094bd6d6084d47e2c1d882618eb896a34",
+    "csv_yosochoryu_chiba_hendensyo.csv": "662af89e8451e59e69d9b04a7cb20506aeeba952414cece96164253795fbad30"
+  },
   "raw_files": [
     "data/external/tepco/csv_yosochoryu_chiba_soudensen.csv",
     "data/external/tepco/csv_yosochoryu_chiba_hendensyo.csv"

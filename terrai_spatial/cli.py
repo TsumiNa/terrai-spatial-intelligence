@@ -41,11 +41,12 @@ REQUIRED_FILES = [
 
 def command_build(args: argparse.Namespace) -> None:
     selected = list(DEFAULT_PIPELINES) if args.only == "all" else [args.only]
-    ensure_data(selected=selected, allow_network=False, force=True)
+    ensure_data(selected=selected, allow_network=args.only == "grid", force=True)
 
 
 def command_fetch(args: argparse.Namespace) -> None:
-    ensure_data(selected=[args.dataset], allow_network=True, force=True)
+    task = "grid" if args.dataset == "tepco" else args.dataset
+    ensure_data(selected=[task], allow_network=True, force=True)
 
 
 def command_data(args: argparse.Namespace) -> None:
@@ -135,8 +136,8 @@ def build_parser() -> argparse.ArgumentParser:
     build.add_argument("--only", choices=["all", "grid", *DEFAULT_PIPELINES], default="all")
     build.set_defaults(func=command_build)
 
-    fetch = subparsers.add_parser("fetch", help="refresh remote open-data assets")
-    fetch.add_argument("dataset", choices=("tiles", "embedding"))
+    fetch = subparsers.add_parser("fetch", help="refresh remote data assets")
+    fetch.add_argument("dataset", choices=("tiles", "embedding", "tepco"))
     fetch.set_defaults(func=command_fetch)
 
     data = subparsers.add_parser("data", help="inspect, repair or update all data tasks")

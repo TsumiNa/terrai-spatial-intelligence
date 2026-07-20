@@ -2,11 +2,17 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
+from unittest.mock import patch
 
-from terrai_spatial.data_tasks import BOOTSTRAP_OUTPUTS, _ordered_names, task_state
+from terrai_spatial.data_tasks import BOOTSTRAP_OUTPUTS, _ordered_names, ensure_data, task_state
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def write_json(path: Path, *, geojson: bool = False) -> None:
@@ -77,6 +83,26 @@ class DataTaskStateTests(unittest.TestCase):
 
     def test_evidence_dependencies_are_ordered_before_the_task(self) -> None:
         self.assertEqual(_ordered_names(["evidence"]), ["bootstrap", "embedding", "evidence"])
+
+    def test_missing_grid_summary_runs_the_download_and_parse_pipeline(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            scripts = root / "scripts"
+            scripts.mkdir()
+            for name in ("fetch_tepco_grid.py", "parse_tepco_grid.py", "update_tepco_grid.py"):
+                shutil.copy2(PROJECT_ROOT / "scripts" / name, scripts / name)
+            source = root / "tepco-fixture.zip"
+            preamble = "\n".join(["metadata"] * 6) + "\n"
+            with zipfile.ZipFile(source, "w") as archive:
+                archive.writestr("csv_yosochoryu_chiba_soudensen.csv", preamble)
+                archive.writestr("csv_yosochoryu_chiba_hendensyo.csv", preamble)
+            with patch.dict(os.environ, {"TERRAI_TEPCO_CHIBA_URL": source.as_uri()}):
+                states = ensure_data(root=root, selected=["grid"], allow_network=True)
+            self.assertEqual(states[-1].status, "ready")
+            output = root / "data/mobara/tepco_grid_screen.json"
+            self.assertTrue(output.is_file())
+            self.assertEqual(json.loads(output.read_text(encoding="utf-8"))["chiba_summary"]["transmission_line_rows"], 0)
+            self.assertTrue((root / "data/external/tepco/download_metadata.local.json").is_file())
 
 
 if __name__ == "__main__":

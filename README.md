@@ -12,7 +12,7 @@ uv run python -m terrai_spatial serve --port 4176
 
 然后访问 `http://localhost:4176/`。平台运行不需要后端、数据库或 API Key；底图、分析结果与 2023–2024 Satellite Embedding 裁剪均已缓存到本地。
 
-`serve` 启动服务器前会自动检查数据任务：缺失的打包基础数据优先从本地 Git 历史恢复，缺失的公开遥感/地图缓存会调用对应下载脚本，缺失或早于输入的派生结果会自动重建。每个实际执行的任务都会打印到终端，不会静默修改数据。若需要严格离线启动，可使用 `--offline`；若只想原样启动静态文件，可使用 `--no-ensure-data`。
+`serve` 启动服务器前会自动检查数据任务：缺失的打包基础数据优先从本地 Git 历史恢复，缺失的公开遥感/地图缓存会调用对应下载脚本，缺失或早于输入的派生结果会自动重建。东京电力标准化筛查摘要缺失时，也会从其官方 ZIP 按需下载到 Git 忽略的本地缓存，再解析摘要。每个实际执行的任务都会打印到终端，不会静默修改数据。若需要严格离线启动，可使用 `--offline`；若只想原样启动静态文件，可使用 `--no-ensure-data`。
 
 常用工程命令：
 
@@ -32,6 +32,7 @@ uv run python -m terrai_spatial data update
 # 只更新指定任务，可重复 --only
 uv run python -m terrai_spatial data update --only tiles
 uv run python -m terrai_spatial data update --only embedding
+uv run python -m terrai_spatial data update --only grid
 
 # 依次重建可再发布的联合分析与多尺度证据
 uv run python -m terrai_spatial build
@@ -55,6 +56,9 @@ uv run python scripts/build_joint_analysis.py
 uv run python scripts/build_multiscale_evidence.py
 uv run python scripts/fetch_visual_tiles.py
 uv run --extra remote python scripts/fetch_google_satellite_embedding.py
+uv run python scripts/fetch_tepco_grid.py
+uv run python scripts/update_tepco_grid.py
+uv run python scripts/parse_tepco_grid.py
 ```
 
 ### 自动修复边界
@@ -62,7 +66,8 @@ uv run --extra remote python scripts/fetch_google_satellite_embedding.py
 - `bootstrap`：基础 GeoJSON/CSV/JSON 缺失或损坏时，优先通过 `git show HEAD:<path>` 原子恢复；源码压缩包环境才回退到 GitHub，私有仓库需提供 `GITHUB_TOKEN`。
 - `tiles`、`embedding`：仅在缓存缺失时由启动流程联网获取；`data update` 才会主动刷新。
 - `joint`、`evidence`：输出缺失、损坏，或脚本/输入比输出更新时自动重建。
-- `grid`：东京电力原始 CSV 禁止进入 Git，程序不会自动下载；已提交的筛查摘要可由 `bootstrap` 恢复。只有用户自行放入两个原始 CSV 后，才可执行 `build --only grid`。
+- `grid`：筛查摘要缺失时自动从东京电力官方 URL 下载 ZIP、校验并只解压两份预期 CSV，然后重建摘要；原 ZIP、CSV 和包含哈希/下载时间的本地元数据均由 `.gitignore` 排除。已有摘要时启动不会重复下载；`data update --only grid`、`fetch tepco` 或 `build --only grid` 会主动刷新。
+- `--offline`：禁止联网；如果筛查摘要缺失但本地东京电力 ZIP/CSV 缓存完整，仍可解析，否则明确停止而不带着半套数据启动。
 - 自动流程失败时不会带着半套数据启动服务器，而会显示具体任务、缺失输入和恢复方法。
 
 ## 可审计数值与三语界面
@@ -89,7 +94,7 @@ uv run --extra remote python scripts/fetch_google_satellite_embedding.py
 | OpenStreetMap | 建筑、道路、水体、土地利用、输电线 | 免费下载；已转为本地 GeoJSON | ODbL；公开衍生数据库要履行署名/共享相同方式义务；完整性不保证 |
 | 横滨市开放数据 | 官方地域防灾据点 | 免费 CSV | 默认 CC BY 4.0、允许商用；需署名，改动要标明，第三方权利另行处理 |
 | NASA POWER | 茂原太阳辐照气候背景 | 免费 API；当前结果已缓存 | NASA 数据通常开放；应致谢且不得暗示 NASA 背书；不等于场址级发电量 |
-| 东京电力公开系統信息 | 茂原区域级并网容量预筛 | 免费公开 CSV；当前结果已缓存 | **不是开放许可数据**；原说明标注禁止转载，且容量不是并网承诺；仅作内部筛查，公开产品需复核权利与接续検討 |
+| 东京电力公开系統信息 | 茂原区域级并网容量预筛 | 免费公开 ZIP/CSV；缺失时可从官方 URL 自动下载到本地 | **不是开放许可数据**；原说明标注禁止转载，且容量不是并网承诺；原文件不进 Git，仅作内部筛查，公开产品需复核权利与接续検討 |
 
 ## 八个入口
 
@@ -173,19 +178,35 @@ uv run python -m terrai_spatial build --only evidence
 
 ## 公开电网容量筛查
 
-平台已接入东京电力千叶县 2026-06-22 公开 CSV。Git 仓库只保留标准化筛查结果；带有“転載禁止”限制的原始 ZIP/CSV 仅保留在本地工作副本，不进入 Git 历史：
+平台已接入东京电力千叶县“系統の予想潮流等”CSV。Git 仓库不保存原始表，只保留 Demo 使用的标准化筛查摘要；带有“転載禁止”限制的原始 ZIP/CSV 与逐文件哈希元数据仅保留在本地工作副本，不进入 Git 历史。页面显示的快照日期取自下载响应的 `Last-Modified`，下载时间和 SHA-256 保存在本地审计元数据中：
 
 - 千叶县全表：175 条送电线、201 条变电设备记录。
 - 茂原匹配：4 条相关线路、1 个“茂原”配电变电所。
 - 茂原变电所：自身空容量代理 5 MW；计入上位系统约束后为 0 MW；公开表标注存在平常时出力控制可能。
 
-重新解析：
+主动下载当前官方版本并重新解析：
+
+```bash
+uv run python -m terrai_spatial fetch tepco
+# 等价的数据任务命令
+uv run python -m terrai_spatial data update --only grid
+# 底层脚本
+uv run python scripts/update_tepco_grid.py --force
+```
+
+仅使用已经存在的本地 ZIP/CSV 重新解析：
+
+```bash
+uv run python scripts/update_tepco_grid.py --offline
+```
+
+兼容的构建命令也会主动刷新官方 ZIP：
 
 ```bash
 uv run python -m terrai_spatial build --only grid
 ```
 
-执行前须按 `data/external/tepco/README.md` 从官方来源自行下载原文件。输出为 `data/mobara/tepco_grid_screen.json`。这些数值只用于区域级项目发现和并网预咨询排序，不是正式接续検討结果；原 CSV 也没有足够几何信息把容量准确分配到每个候选网格。
+输出为 `data/mobara/tepco_grid_screen.json`。程序下载不改变东京电力的权利条件：这些数值只用于区域级项目发现和并网预咨询排序，不是正式接续検討结果；原 CSV 也没有足够几何信息把容量准确分配到每个候选网格。完整缓存行为见 `data/external/tepco/README.md`。
 
 ## 重要边界
 

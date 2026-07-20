@@ -69,6 +69,8 @@
       "license": "not an open-data license; official notice marks redistribution prohibited",
       "official_page": "https://www.tepco.co.jp/pg/consignment/system/index-j.html",
       "download_url": "https://www.tepco.co.jp/pg/consignment/system/pdf/csv_yosochoryu_chiba.zip",
+      "automated_retrieval": true,
+      "local_cache": "data/external/tepco/ (Git-ignored ZIP, CSV and retrieval metadata)",
       "local_output": "data/mobara/tepco_grid_screen.json",
       "spatial_limit": "No complete equipment geometry for parcel-level allocation; values do not guarantee connection",
       "rights_limit": "Internal screening only until redistribution/commercial rights are confirmed with TEPCO"

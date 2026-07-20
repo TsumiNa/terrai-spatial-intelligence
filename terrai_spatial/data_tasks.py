@@ -48,7 +48,6 @@ BOOTSTRAP_OUTPUTS = (
     "data/mobara/context.geojson",
     "data/mobara/site_cells.geojson",
     "data/mobara/solar_summary.json",
-    "data/mobara/tepco_grid_screen.json",
 )
 
 EMBEDDING_OUTPUTS = (
@@ -89,15 +88,12 @@ TASKS = {
     ),
     "grid": DataTask(
         "grid",
-        "parse local-only TEPCO source files",
-        "scripts/parse_tepco_grid.py",
-        inputs=(
-            "data/external/tepco/csv_yosochoryu_chiba_soudensen.csv",
-            "data/external/tepco/csv_yosochoryu_chiba_hendensyo.csv",
-        ),
+        "download the local-only TEPCO cache when needed and rebuild its screen",
+        "scripts/update_tepco_grid.py",
         outputs=("data/mobara/tepco_grid_screen.json",),
-        dependencies=("bootstrap",),
-        automatic=False,
+        force_argument=True,
+        offline_argument=True,
+        check_stale=False,
     ),
     "joint": DataTask(
         "joint",

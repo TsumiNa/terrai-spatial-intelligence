@@ -30,7 +30,6 @@ FILES = (
     "data/mobara/context.geojson",
     "data/mobara/site_cells.geojson",
     "data/mobara/solar_summary.json",
-    "data/mobara/tepco_grid_screen.json",
 )
 
 
