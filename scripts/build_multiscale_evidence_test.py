@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.build_multiscale_evidence import read_csv_text, reconcile_facility_sources
+from scripts.build_multiscale_evidence import data_as_of, read_csv_text, reconcile_facility_sources
 
 
 HEADER = "Type,Definition,Name,Address,Lat,Lon,Kana,Ward,WardCode\r\n"
@@ -152,3 +152,31 @@ def test_national_shelters_are_base_and_local_rows_validate_or_supplement() -> N
     assert by_name["桜台小学校"]["gsi_designated_hazards"] == ["earthquake"]
     assert by_name["桜台小学校"]["gsi_emergency_source_updated_at"] == "2026-01-16"
     assert by_name["桜台小学校"]["local_source_updated_at"] == "2026-04-01"
+
+
+# --- data_as_of ---------------------------------------------------------------
+# The summary is a committed artifact, so its contents must be a function of the
+# inputs alone. These cover the failure that motivated it: a wall-clock value
+# dirtied the working tree on every rebuild.
+
+
+def test_data_as_of_picks_the_latest_provenance_date() -> None:
+    assert data_as_of("2026-01-16", "2026-07-20T21:25:42+00:00", "2026-04-01") == "2026-07-20"
+
+
+def test_data_as_of_normalises_mixed_date_and_timestamp_formats() -> None:
+    assert data_as_of("2026-07-20T23:59:59+00:00", "2026-07-20") == "2026-07-20"
+
+
+def test_data_as_of_ignores_missing_values() -> None:
+    assert data_as_of(None, "2026-04-01", None) == "2026-04-01"
+
+
+def test_data_as_of_returns_empty_when_nothing_is_known() -> None:
+    assert data_as_of() == ""
+    assert data_as_of(None, None) == ""
+
+
+def test_data_as_of_is_independent_of_argument_order() -> None:
+    dates = ("2026-01-16", "2026-07-20", "2026-04-01")
+    assert data_as_of(*dates) == data_as_of(*reversed(dates))

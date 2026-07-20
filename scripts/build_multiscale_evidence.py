@@ -9,7 +9,6 @@ import json
 import math
 import re
 import unicodedata
-from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -52,6 +51,22 @@ def read_csv_text(path: Path) -> str:
     path.write_text(text, encoding="utf-8", newline="")
     print(f"Converted {path.name} from Shift_JIS to UTF-8")
     return text
+
+
+def data_as_of(*timestamps: str | None) -> str:
+    """Latest provenance date among the inputs, as a plain date.
+
+    This summary is committed to the repository, so its contents must not
+    depend on when the build ran. A wall-clock value produces a diff on every
+    rebuild, which hides real changes and makes `git status` useless for
+    answering whether a rebuild changed anything.
+
+    The audit question is "as of what data", not "when did the script run" —
+    the latter is already in the Git history.
+    """
+
+    dates = sorted({value[:10] for value in timestamps if value})
+    return dates[-1] if dates else ""
 
 
 def feature_collection(features: list[dict]) -> dict:
@@ -382,7 +397,12 @@ def main() -> None:
     write(
         DATA / "evidence" / "multiscale_summary.json",
         {
-            "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+            "data_as_of": data_as_of(
+                gsi_metadata["source_updated_at"],
+                gsi_metadata["retrieved_at"],
+                LOCAL_SOURCE_UPDATED_AT,
+                LOCAL_RETRIEVED_AT,
+            ),
             "official_facilities": {
                 "source_rows_in_study_area": len(facilities),
                 "national_base_source": "GSI designated shelters, municipality 14100",
