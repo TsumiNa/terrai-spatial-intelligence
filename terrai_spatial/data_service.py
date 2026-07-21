@@ -60,6 +60,11 @@ ASSET_MANIFEST_DATASETS = {"uc24_16_nihonbashi", "uc24_13_sapporo"}
 # Optional site-scene inputs remain queryable in the catalog but do not change
 # the existing exhibition bootstrap's health denominator or visual chrome.
 HEALTH_EXCLUDED_DATASETS = ASSET_MANIFEST_DATASETS | {"osmSapporoUndergroundAccess"}
+SCENE_CATALOG_PATH = "data/scenes/underground/catalog.json"
+SCENE_HANDOFFS = {
+    "uc24_16_nihonbashi": "data/plateau/uc24_16_nihonbashi/scene_handoff.json",
+    "uc24_13_sapporo": "data/plateau/uc24_13_sapporo/scene_handoff.json",
+}
 
 SOURCE_GROUPS = (
     {"name": "GSI", "role": "terrain, designated evacuation and visual basemaps", "access": "public"},
@@ -82,6 +87,7 @@ class DataService:
     def __init__(self, root: Path = ROOT) -> None:
         self.root = root
         self._cache: dict[str, tuple[int, Any]] = {}
+        self._scene_cache: dict[str, tuple[int, Any]] = {}
 
     def path_for(self, key: str) -> Path:
         try:
@@ -100,6 +106,31 @@ class DataService:
             value = json.load(handle)
         self._cache[key] = (modified_ns, value)
         return deepcopy(value)
+
+    def _load_scene_file(self, relative: str) -> Any:
+        path = self.root / relative
+        modified_ns = path.stat().st_mtime_ns
+        cached = self._scene_cache.get(relative)
+        if cached and cached[0] == modified_ns:
+            return deepcopy(cached[1])
+        with path.open(encoding="utf-8") as handle:
+            value = json.load(handle)
+        self._scene_cache[relative] = (modified_ns, value)
+        return deepcopy(value)
+
+    def scene_catalog(self) -> dict[str, Any]:
+        """Return renderer-neutral scene discovery without adding a dataset key."""
+
+        return self._load_scene_file(SCENE_CATALOG_PATH)
+
+    def scene_handoff(self, owner_dataset_key: str) -> dict[str, Any]:
+        """Resolve scene metadata through its existing Foundation dataset key."""
+
+        try:
+            relative = SCENE_HANDOFFS[owner_dataset_key]
+        except KeyError as error:
+            raise DatasetNotFoundError(owner_dataset_key) from error
+        return self._load_scene_file(relative)
 
     def catalog(self) -> list[dict[str, Any]]:
         rows = []
@@ -139,6 +170,12 @@ class DataService:
                         else len(value.get("features", [])) if isinstance(value, dict) else None
                     ),
                     "asset_roots": asset_roots,
+                    "scene_handoff_path": SCENE_HANDOFFS.get(key),
+                    "scene_handoff_ready": (
+                        self._safe_manifest_file_exists(SCENE_HANDOFFS[key])
+                        if key in SCENE_HANDOFFS
+                        else None
+                    ),
                     "modified_at": (
                         datetime.fromtimestamp(path.stat().st_mtime, tz=UTC).isoformat() if exists else None
                     ),

@@ -160,6 +160,24 @@ TASKS = {
         automatic=False,
         check_stale=False,
     ),
+    "underground_scenes": DataTask(
+        "underground_scenes",
+        "rebuild renderer-neutral handoffs for the canonical underground scenes",
+        "scripts/build_underground_scenes.py",
+        inputs=(
+            "data/plateau/uc24_16_nihonbashi/manifest.json",
+            "data/plateau/uc24_16_nihonbashi/audit_index.json",
+            "data/plateau/uc24_13_sapporo/manifest.json",
+            "data/osm/sapporo_underground_access/features.geojson",
+            "data/osm/sapporo_underground_access/metadata.json",
+        ),
+        outputs=(
+            "data/scenes/underground/catalog.json",
+            "data/plateau/uc24_16_nihonbashi/scene_handoff.json",
+            "data/plateau/uc24_13_sapporo/scene_handoff.json",
+        ),
+        automatic=False,
+    ),
     "grid": DataTask(
         "grid",
         "download the local-only TEPCO cache when needed and rebuild its screen",

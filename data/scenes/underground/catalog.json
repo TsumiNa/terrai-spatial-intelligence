@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "coordinate_contract": "EPSG:4979 geographic -> EPSG:4978 ECEF -> scene-local ENU metres",
+  "scenes": [
+    {
+      "scene_id": "nihonbashi-utilities",
+      "purpose": "Observed underground utility and access-structure scene",
+      "owner_dataset_key": "uc24_16_nihonbashi",
+      "handoff_path": "data/plateau/uc24_16_nihonbashi/scene_handoff.json",
+      "geographic_extent_degrees_and_metres": [
+        139.76704257767426,
+        35.680906944422816,
+        139.7803025126254,
+        35.69172558142839,
+        2.3851870331777194,
+        15.77873420715332
+      ],
+      "origin_geographic_degrees_and_metres": [
+        139.77367254514985,
+        35.6863162629256,
+        9.08196062016552
+      ],
+      "evidence_availability": {
+        "terrain_buildings_context": "unresolved",
+        "utility_networks": "available",
+        "underground_structures": "not_applicable",
+        "access_topology": "available",
+        "boreholes": "unresolved",
+        "strata": "unresolved",
+        "predicted_fields": "unresolved"
+      }
+    },
+    {
+      "scene_id": "sapporo-station-underground",
+      "purpose": "Observed underground public-space scene with independent OSM access context",
+      "owner_dataset_key": "uc24_13_sapporo",
+      "handoff_path": "data/plateau/uc24_13_sapporo/scene_handoff.json",
+      "geographic_extent_degrees_and_metres": [
+        141.3495926317031,
+        43.05491638758432,
+        141.3569135210021,
+        43.07098084104361,
+        35.373282909818656,
+        57.879054470329336
+      ],
+      "origin_geographic_degrees_and_metres": [
+        141.3532530763526,
+        43.06294861431397,
+        46.626168690073996
+      ],
+      "evidence_availability": {
+        "terrain_buildings_context": "unresolved",
+        "utility_networks": "not_applicable",
+        "underground_structures": "available",
+        "access_topology": "available",
+        "boreholes": "unresolved",
+        "strata": "unresolved",
+        "predicted_fields": "unresolved"
+      }
+    }
+  ]
+}

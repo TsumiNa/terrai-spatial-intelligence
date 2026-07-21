@@ -30,6 +30,8 @@
 
 `data/plateau/uc24_16_nihonbashi/audit_index.json` は各 source feature ID を resource、glTF tile、正確な source attributes、欠落、取得時刻、archive hash に対応付けます。source depth attribute は絶対3D位置と分離し、二重に減算してはいけません。
 
+`data/plateau/uc24_16_nihonbashi/scene_handoff.json` は同じ dataset key が所有する派生 auxiliary metadata です。実測 source extent、可逆な `EPSG:4979` → `EPSG:4978` → local ENU-metre frame、WGS 84 楕円体高 reference、`unknown` の正高 datum を記録します。network 810 rows と access structure 311 rows を observed evidence として公開し、同一地点の terrain/building、borehole、strata、SL prediction は unresolved、札幌 public-space structure は not applicable とします。`data/scenes/underground/catalog.json` は新しい FL dataset key を登録せずこの scene を発見します。両 file は `uv run python -m terrai_spatial data ensure --only underground_scenes --offline` で決定論的に再生成でき、`/bootstrap` には入りません。
+
 ## License
 
 公式 catalog は [PLATEAU Site Policy 第3項](https://www.mlit.go.jp/plateau/site-policy/) を適用します。商用を含む再利用は原則として可能ですが、出典表示、編集表示、個別に示された第三者権利の確認が必要です。取得 manifest は公式 resource URL と license 文を保持します。

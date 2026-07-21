@@ -30,6 +30,8 @@ This is observed Foundation Data Layer evidence for the future underground-netwo
 
 `data/plateau/uc24_16_nihonbashi/audit_index.json` maps every source feature ID to its resource, glTF tile, exact source attributes, missingness, retrieval time and archive hash. Source depth attributes remain separate from absolute 3D position and must not be subtracted twice.
 
+`data/plateau/uc24_16_nihonbashi/scene_handoff.json` is derived auxiliary metadata owned by the same dataset key. It records the measured source extent, a reversible `EPSG:4979` → `EPSG:4978` → local ENU-metre frame, the WGS 84 ellipsoid-height reference, and `unknown` orthometric datum. It exposes 810 network rows and 311 access-structure rows as observed evidence; co-located terrain/buildings, boreholes, strata and SL predictions remain unresolved, while Sapporo public-space structures are not applicable. `data/scenes/underground/catalog.json` discovers this scene without registering another FL dataset key. Both files are rebuilt deterministically with `uv run python -m terrai_spatial data ensure --only underground_scenes --offline` and remain outside `/bootstrap`.
+
 ## License
 
 The official catalog applies the [PLATEAU Site Policy, section 3](https://www.mlit.go.jp/plateau/site-policy/). Reuse, including commercial reuse, is generally permitted with source attribution, indication of modifications and checks for separately identified third-party rights. The retrieval manifest preserves the official resource URLs and licence statement.

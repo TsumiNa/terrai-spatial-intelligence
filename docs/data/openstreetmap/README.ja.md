@@ -23,6 +23,8 @@ OpenStreetMap community database：https://www.openstreetmap.org/copyright 。De
 
 建物輪郭は斜面 exposure と屋根容量 proxy、道路は continuity/accessibility/solar logistics、水域・土地利用は setback/context、送電線は茂原距離 proxy に使います。札幌 OSM feature は scene `sapporo-station-underground` に独立した community access/topology context を与え、dataset key `osmSapporoUndergroundAccess` で on demand query できます。PLATEAU geometry とは分離し、検証・上書きしません。主な生成物は `data/yokohama/`、`data/mobara/`、`data/joint/`、`data/osm/sapporo_underground_access/` にあります。
 
+renderer-neutral な札幌 handoff `data/plateau/uc24_13_sapporo/scene_handoff.json` は、195-feature GeoJSON を固有の OSM snapshot time、query hash、ODbL license、audit path を持つ observed access topology として参照します。OSM feature を PLATEAU surface に snap せず、depth を推定せず、access tag の欠落を許可と解釈しません。handoff は `data/scenes/underground/catalog.json` から発見され、いずれも別の OSM dataset key を作らず `/bootstrap` に入りません。
+
 ## License
 
 Open Database License（ODbL）。OpenStreetMap contributors の出典表示が必要で、公開派生 DB は share-alike 義務を生じ得ます。

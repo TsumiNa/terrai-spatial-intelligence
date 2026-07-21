@@ -1,0 +1,163 @@
+{
+  "schema_version": "1.0",
+  "scene_id": "sapporo-station-underground",
+  "purpose": "Observed underground public-space scene with independent OSM access context",
+  "owner_dataset_key": "uc24_13_sapporo",
+  "foundation_layer_only": true,
+  "approved_roots": [
+    "data/external/plateau_uc24_13",
+    "data/plateau/uc24_13_sapporo",
+    "data/osm/sapporo_underground_access"
+  ],
+  "local_frame": {
+    "source_crs": "EPSG:4979",
+    "source_axis_order": [
+      "longitude_degrees",
+      "latitude_degrees",
+      "ellipsoid_height_metres"
+    ],
+    "world_crs": "EPSG:4978",
+    "world_axis_order": [
+      "ecef_x_metres",
+      "ecef_y_metres",
+      "ecef_z_metres"
+    ],
+    "local_axis_convention": {
+      "x": "east",
+      "y": "north",
+      "z": "up"
+    },
+    "local_unit": "metre",
+    "geographic_extent_degrees_and_metres": [
+      141.3495926317031,
+      43.05491638758432,
+      141.3569135210021,
+      43.07098084104361,
+      35.373282909818656,
+      57.879054470329336
+    ],
+    "origin_geographic_degrees_and_metres": [
+      141.3532530763526,
+      43.06294861431397,
+      46.626168690073996
+    ],
+    "origin_world_ecef_metres": [
+      -3645147.355273234,
+      2914755.3590473,
+      4332645.457167146
+    ],
+    "world_to_local_matrix_row_major": [
+      -0.6245170219552172,
+      -0.7810111966471331,
+      0.0,
+      -4.656612873077393e-10,
+      0.533275583611316,
+      -0.42642113299796824,
+      0.7306039756644768,
+      21333.369698477443,
+      -0.5706098853088659,
+      0.456274619110621,
+      0.6828014577776329,
+      -6368222.6397636905,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "local_to_world_matrix_row_major": [
+      -0.6245170219552172,
+      0.533275583611316,
+      -0.5706098853088659,
+      -3645147.355273234,
+      -0.7810111966471331,
+      -0.42642113299796824,
+      0.456274619110621,
+      2914755.3590473,
+      0.0,
+      0.7306039756644768,
+      0.6828014577776329,
+      4332645.457167146,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "height_reference": "WGS 84 ellipsoid per 3D Tiles boundingVolume.region semantics",
+    "vertical_datum": "WGS 84 ellipsoid (not an orthometric survey datum)",
+    "orthometric_vertical_datum": "unknown",
+    "round_trip_tolerance": {
+      "longitude_latitude_degrees": 1e-08,
+      "height_metres": 0.0001
+    }
+  },
+  "evidence_families": {
+    "terrain_buildings_context": {
+      "availability": "unresolved",
+      "reason": "No co-located terrain or above-ground building context is integrated"
+    },
+    "utility_networks": {
+      "availability": "not_applicable",
+      "reason": "The Nihonbashi utility sample must not be merged into Sapporo"
+    },
+    "underground_structures": {
+      "availability": "available",
+      "evidence_class": "observed",
+      "sources": [
+        {
+          "dataset_id": "plateau_uc24_13_sapporo",
+          "resource_ids": [
+            "b0d1e3b0-4137-47c0-b975-9410a92801fe",
+            "c1127937-6a66-4440-a242-25d814d9368a"
+          ],
+          "retrieved_at": "2026-07-21T10:44:35Z",
+          "source_updated_at": "2025-05-26T09:23:39.701566",
+          "license": {
+            "name": "PLATEAU Site Policy 「３．著作権について」に拠る",
+            "url": "https://www.mlit.go.jp/plateau/site-policy/"
+          },
+          "audit_index_path": "data/plateau/uc24_13_sapporo/manifest.json",
+          "asset_paths": [
+            "data/external/plateau_uc24_13/assets/sapporo-municipal-subway-station/tileset.json",
+            "data/external/plateau_uc24_13/assets/sapporo-underground-mall/tileset.json"
+          ],
+          "feature_count": 70718
+        }
+      ]
+    },
+    "access_topology": {
+      "availability": "available",
+      "evidence_class": "observed",
+      "sources": [
+        {
+          "dataset_id": "osm_sapporo_underground_access",
+          "resource_ids": [
+            "b937a5aa054757e296596c79e6ec3e65ccad7d04aee29ba69eb364eab0ef9887"
+          ],
+          "retrieved_at": "2026-07-21T10:53:05Z",
+          "source_updated_at": "2026-07-21T10:51:01Z",
+          "license": {
+            "name": "Open Database License (ODbL) 1.0",
+            "url": "https://opendatacommons.org/licenses/odbl/1-0/"
+          },
+          "audit_index_path": "data/osm/sapporo_underground_access/features.geojson",
+          "asset_paths": [
+            "data/osm/sapporo_underground_access/features.geojson"
+          ],
+          "feature_count": 195
+        }
+      ]
+    },
+    "boreholes": {
+      "availability": "unresolved",
+      "reason": "No qualified borehole observations are integrated"
+    },
+    "strata": {
+      "availability": "unresolved",
+      "reason": "No qualified strata observations are integrated"
+    },
+    "predicted_fields": {
+      "availability": "unresolved",
+      "reason": "No qualified SL prediction is integrated"
+    }
+  }
+}
