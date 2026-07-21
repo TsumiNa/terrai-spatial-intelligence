@@ -53,7 +53,11 @@ export type Violation = { file: string; value: string; reason: string };
 /** A colour named in a comment is not a colour being used, and this file's own
  *  patterns would otherwise trip it. */
 function withoutComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    // Trailing comments count too, but `https://` must survive: only strip a
+    // `//` that is not preceded by a colon.
+    .replace(/(?<!:)\/\/.*$/gm, "");
 }
 
 /** The utility is what follows the final `:`; everything before it is a variant. */

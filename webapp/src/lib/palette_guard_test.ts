@@ -1,14 +1,20 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { readdirSync, readFileSync } from "node:fs";
+import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 import { inspect, PALETTE_SOURCE, type Violation } from "./palette_guard";
 import { palette } from "./theme";
 
 const ROOT = new URL("../..", import.meta.url).pathname;
 
-async function sourceFiles(): Promise<string[]> {
-  const { globSync } = await import("node:fs");
-  return globSync("src/**/*.{svelte,ts}", { cwd: ROOT }).map((p: string) => p.replace(/\\/g, "/"));
+/** Walked by hand rather than with `fs.globSync`, which arrived in Node 22
+ *  while `package.json` declares `>=20`. */
+function sourceFiles(directory = join(ROOT, "src")): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const full = join(directory, entry.name);
+    if (entry.isDirectory()) return sourceFiles(full);
+    if (!/\.(svelte|ts)$/.test(entry.name)) return [];
+    return [relative(ROOT, full).replace(/\\/g, "/")];
+  });
 }
 
 function check(file: string, source: string): Violation[] {
@@ -71,29 +77,37 @@ describe("what it must not reject", () => {
 });
 
 describe("the repository conforms", () => {
-  it("has no colour written outside the palette", async () => {
+  it("has no colour written outside the palette", () => {
     // Test files are skipped: this one necessarily contains the violations it
     // asserts are caught, and a fixture is not a use.
-    const files = (await sourceFiles()).filter((file) => !file.endsWith("_test.ts"));
+    const files = sourceFiles().filter((file) => !file.endsWith("_test.ts"));
     const violations = files.flatMap((file) => inspect(file, readFileSync(join(ROOT, file), "utf8")));
     expect(violations).toEqual([]);
   });
 
-  it("scans the files that matter", async () => {
-    const files = (await sourceFiles()).filter((file) => !file.endsWith("_test.ts"));
+  it("scans the files that matter", () => {
+    const files = sourceFiles().filter((file) => !file.endsWith("_test.ts"));
     expect(files).toContain("src/lib/map/style-rules.ts");
     expect(files).toContain("src/lib/components/AuditDrawer.svelte");
     expect(files.length).toBeGreaterThan(15);
   });
 
-  it("declares every palette entry as a CSS token, so the two cannot drift", () => {
+  it("declares every palette entry as the matching CSS token, so the two cannot drift", () => {
+    // Asserted by name and value together. Checking only that the value appears
+    // somewhere would pass while `lime` and `hub` were swapped, or while a
+    // token had been renamed out from under its palette entry.
     const css = readFileSync(join(ROOT, "src/app.css"), "utf8");
-    const declared = new Set(
-      [...css.matchAll(/--color-[a-z-]+:\s*(#[0-9a-fA-F]{3,8})/g)].map((m) => m[1]!.toLowerCase()),
+    const tokens = new Map(
+      [...css.matchAll(/--color-([a-z-]+):\s*(#[0-9a-fA-F]{3,8})/g)].map((m) => [
+        m[1]!,
+        m[2]!.toLowerCase(),
+      ]),
     );
-    const missing = Object.entries(palette)
-      .filter(([, value]) => !declared.has(value.toLowerCase()))
-      .map(([name, value]) => `${name} (${value})`);
-    expect(missing).toEqual([]);
+    const kebab = (name: string) => name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+
+    const wrong = Object.entries(palette)
+      .filter(([name, value]) => tokens.get(kebab(name)) !== value.toLowerCase())
+      .map(([name, value]) => `--color-${kebab(name)} should be ${value}, is ${tokens.get(kebab(name)) ?? "absent"}`);
+    expect(wrong).toEqual([]);
   });
 });
