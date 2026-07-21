@@ -52,9 +52,11 @@ FOUNDATION_DATASETS: dict[str, str] = {
     "landUseMesh": "data/mlit/land_use_mesh.geojson",
     "prefecturalLandPrice": "data/mlit/prefectural_land_price.geojson",
     "uc24_16_nihonbashi": "data/plateau/uc24_16_nihonbashi/manifest.json",
+    "uc24_13_sapporo": "data/plateau/uc24_13_sapporo/manifest.json",
+    "osmSapporoUndergroundAccess": "data/osm/sapporo_underground_access/features.geojson",
 }
 ALL_DATASETS = {**DATASETS, **FOUNDATION_DATASETS}
-ASSET_MANIFEST_DATASETS = {"uc24_16_nihonbashi"}
+ASSET_MANIFEST_DATASETS = {"uc24_16_nihonbashi", "uc24_13_sapporo"}
 
 SOURCE_GROUPS = (
     {"name": "GSI", "role": "terrain, designated evacuation and visual basemaps", "access": "public"},
