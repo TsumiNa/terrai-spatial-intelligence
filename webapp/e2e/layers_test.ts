@@ -34,7 +34,8 @@ test("a queue selection frames its feature and its popup reaches an audit record
     await expect(page.locator(".audit-drawer"), module).toHaveClass(/open/);
     await expect(page.locator(".audit-drawer .audit-caveat p"), module).not.toBeEmpty();
     await page.keyboard.press("Escape");
-    await expect(page.locator(".audit-drawer"), module).not.toHaveClass(/open/);
+    // The dialog unmounts on close rather than dropping a class.
+    await expect(page.locator(".audit-drawer"), module).toHaveCount(0);
   }
 });
 

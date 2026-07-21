@@ -243,7 +243,6 @@ button { font: inherit; }
 .audit-caveat { margin-top: 15px; border-left: 3px solid var(--amber); background: #fbf6eb; padding: 12px 13px; border-radius: 3px 9px 9px 3px; }
 .audit-caveat strong { font-size: 12px; }
 .audit-caveat p { margin: 6px 0 0; color: #6f5c35; font-size: 13px; line-height: 1.65; }
-body.audit-open { overflow: hidden; }
 
 @media (max-width: 1100px) {
   .app-shell { grid-template-columns: 205px minmax(0, 1fr); }

@@ -51,5 +51,7 @@ test("opening an audit record shows its provenance end to end", async ({ page })
   await expect(drawer.locator(".audit-section").nth(2)).toContainText("building_risk.geojson");
   await expect(drawer.locator(".audit-caveat p")).not.toBeEmpty();
   await page.keyboard.press("Escape");
-  await expect(drawer).not.toHaveClass(/open/);
+  // The dialog primitive unmounts on close rather than toggling a class, so
+  // "gone" is the assertion now — and a stronger one than "unclassed".
+  await expect(drawer).toHaveCount(0);
 });
