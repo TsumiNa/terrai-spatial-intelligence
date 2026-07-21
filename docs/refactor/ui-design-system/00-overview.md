@@ -24,7 +24,7 @@ Three properties deliver that, and none of them is "install Tailwind":
 
 ## Decision
 
-Adopt **Tailwind CSS v4** with a theme locked to the existing TerrAI tokens, and **shadcn-svelte** for behaviour-hard overlay primitives only.
+Adopt **Tailwind CSS v4** with a theme locked to the existing TerrAI tokens, and **Bits UI** for behaviour-hard overlay primitives only.
 
 Tailwind is chosen for the reason above: with a locked `@theme` and the default palette removed, an off-system value has to be written as an arbitrary value (`bg-[#1f7a58]`, `p-[13px]`), which is greppable and therefore enforceable. Plain CSS gives no such signal. Svelte's scoped styles already solve collisions and naming, so that is not what Tailwind is buying here.
 
@@ -32,13 +32,16 @@ Two properties decide it, and both depend on the growth premise. Model output co
 
 Stylelint against plain CSS could enforce the same tokens, and at today's size that would be lighter. It was the better answer while the UI was ten components and stable. It stops being the better answer once most of the UI is yet to be written.
 
-shadcn-svelte components are copy-in, so they become this repository's code on arrival. That cuts both ways and shapes how they are used:
+Bits UI is taken directly rather than through shadcn-svelte, which was the earlier intention. shadcn-svelte contributes no behaviour: its components are copy-in wrappers around Bits UI, styled with Tailwind and carrying a specific visual language. Once the plan discards the styling and refuses the decorative components, roughly a tenth of it is left — some composition scaffolding worth a dozen lines to write.
+
+The decisive argument is the update path. Copy-in is an advantage for ordinary components, where nobody wants an upstream change to move their UI. It is a liability for accessibility primitives, where correctness *is* the value and correctness problems are discovered over time: new screen-reader behaviour, new browser semantics, new readings of WCAG. A versioned dependency receives those fixes; a copied snapshot receives them only if somebody tracks the upstream diff. **For this category, being a consumer beats being an owner.**
+
+Only the primitives are taken, and each is wrapped in a thin local component styled from the theme:
 
 - **Take** the primitives whose behaviour is hard and easy to get subtly wrong: Dialog, Popover, Select, Tooltip, Dropdown. Focus trapping, keyboard navigation and ARIA state machines are where hand-written overlays fail.
-- **Do not take** components that are a styled `div` — Card, Badge, Separator, Alert. They are five lines of local markup, they are what makes a product look like a template, and every copied file is code that must be reviewed forever.
-- **Restyle on arrival.** The default look is what makes shadcn products indistinguishable. TerrAI already has an identity — forest and lime palette, the serif brand mark, dashed underlines as the "auditable value" affordance. That identity survives; shadcn's does not enter.
+- **Do not take** anything that is a styled `div` — cards, badges, separators, alerts. They are five lines of local markup and they are what makes a product look like a template.
 
-Note that the accessibility behaviour comes from Bits UI underneath, which does not depend on Tailwind (`peerDependencies` are `svelte` and `@internationalized/date` only). If Tailwind is ever dropped, the primitives can stay.
+As of `bits-ui@2.18.1`, its `peerDependencies` are `svelte` and `@internationalized/date` only, so it pulls in no styling framework and the styling decision stays independent of the primitive decision. Recheck on upgrade rather than assuming it holds.
 
 ## Evidence this is needed
 
@@ -54,7 +57,7 @@ None of these are visible in a code diff to a reviewer who is not looking for th
 ## Non-goals
 
 - **No visual redesign.** Every stage before the last must leave the rendered output unchanged; that is what makes the snapshots meaningful. Deliberate design changes come later, as their own work, reviewed against a baseline that exists.
-- **No shadcn theme, no shadcn look.** Its tokens, radii and shadows do not enter the project.
+- **No component library's visual language.** No third-party tokens, radii or shadows enter the project; primitives arrive unstyled and are dressed from the theme.
 - **No component library for layout.** Grid and flex stay local to components.
 - **No change to `messages.ts`, `modules.ts`, `layers.ts`, or anything under `terrai_spatial/`.** This is styling and its guardrails only.
 - **Not a design-token expansion.** The twelve existing tokens are the system until a real need adds a thirteenth.
@@ -69,7 +72,7 @@ Ordered so that the safety net exists before anything it protects is touched.
 | 02 | [Tailwind with a locked theme](02-tailwind-locked-theme-pr2.md) | Install v4, express the twelve tokens as `@theme`, remove the default palette. Nothing restyled. |
 | 03 | [theme enforcement](03-theme-enforcement-pr3.md) | A check that fails on arbitrary values and off-theme colours. |
 | 04 | [port components to the theme](04-port-components-to-theme-pr4.md) | Restyle all ten components; delete the replaced rules from `app.css`. |
-| 05 | [overlay primitives](05-overlay-primitives-pr5.md) | shadcn-svelte Dialog for the audit drawer; the four defects above are fixed and asserted. |
+| 05 | [overlay primitives](05-overlay-primitives-pr5.md) | Bits UI Dialog for the audit drawer; the four defects above are fixed and asserted. |
 
 Each stage is its own pull request, states its own acceptance commands, and leaves the suite and validation passing when it merges. Stage 01 must merge before 02 begins: without a baseline, "the UI did not change" is an opinion.
 
@@ -82,7 +85,7 @@ Each stage is its own pull request, states its own acceptance commands, and leav
   - **During this refactor**, a screenshot diff is a defect. Do not regenerate to go green.
   - **During a deliberate redesign**, baselines are regenerated wholesale as part of reviewing that design. That is normal, and the diff is the artefact under review rather than a failure.
 - **The twelve tokens become a hard boundary, not a fixed set.** They are extracted from the design that exists today. The redesign will need more, and the site scene may need a subsurface scale. Extending the theme is a normal reviewed act; the boundary exists so that extension is *deliberate*, not so that the count stays at twelve. If adding a token feels like fighting the system, the system is being read wrong — the failure mode to prevent is a component reaching past the theme, not the theme growing.
-- **Copied shadcn components are owned code.** They do not update themselves, and each one must be reviewed on arrival like any other source file.
+- **Bits UI becomes a runtime dependency.** An upstream change can move behaviour, which is the cost of receiving upstream accessibility fixes. Pin it and read its changelog on upgrade.
 - **Class strings get longer.** Utility-first markup is harder to skim than a semantic class name. That cost is accepted because the reviewer's job moves from reading markup to reading violations and image diffs.
 
 ## Constraints that outrank styling
