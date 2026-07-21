@@ -13,6 +13,7 @@
     "generate:api": "uv run --directory .. python webapp/scripts/export_openapi.py && openapi-typescript openapi.json -o src/lib/api/schema.d.ts"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.61.1",
     "@sveltejs/vite-plugin-svelte": "^7.2.0",
     "@tsconfig/svelte": "^5.0.8",

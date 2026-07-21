@@ -1,6 +1,6 @@
 # UI Design System and Review Guardrails
 
-- Status: Planned
+- Status: In progress — stage 01 complete
 - Date: 2026-07-21
 - Baseline: `main` / `b8fcfc3`
 - Type: frontend styling platform; no change to analytical behaviour, data, or the API
@@ -94,5 +94,5 @@ Each stage is its own pull request, states its own acceptance commands, and leav
 ## Open questions
 
 1. What the redesign needs from the theme. The twelve tokens describe today's exploratory applications; the site scene in particular may want a subsurface scale that does not exist yet.
-2. Whether screenshot baselines are generated in CI or committed from a developer machine. There is no CI workflow in this repository yet, which stage 01 has to resolve one way or the other.
+2. ~~Where screenshot baselines are generated.~~ Resolved in stage 01: both platform variants are committed, and the Linux set comes from a `workflow_dispatch` job that uploads for review rather than committing.
 3. Whether the enforcement check lives in the JavaScript toolchain or in `terrai validate` alongside the other repository contracts.

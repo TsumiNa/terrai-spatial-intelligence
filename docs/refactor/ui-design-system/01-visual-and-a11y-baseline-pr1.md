@@ -1,6 +1,6 @@
 # PR1 Plan: Visual and Accessibility Baseline
 
-- Status: Planned
+- Status: Completed
 - Refactor: `ui-design-system`
 - PR: #1
 
@@ -13,7 +13,7 @@ Record what the UI looks like and how it behaves today, so every later stage can
 1. Playwright screenshot coverage of every module the exhibition can show, in all three languages, at a wide and a narrow viewport. Cover the audit drawer open as well as closed — it is the component most likely to regress.
 2. axe-core assertions on the same states, recording current violations rather than failing on them. The four known audit-drawer defects are expected to appear; they are fixed in stage 05, and the baseline is what proves it.
 3. Pin the Playwright browser version so baselines are reproducible.
-4. Decide and document where baselines are generated — CI or a developer machine — and write the regeneration command into `CONTRIBUTING.md`.
+4. Decide and document where baselines are generated — CI or a developer machine — and write the regeneration command into `CONTRIBUTING.md`. **Resolved: both platforms are committed; Linux comes from a `workflow_dispatch` job that uploads for review rather than committing.**
 
 ## Non-goals
 
