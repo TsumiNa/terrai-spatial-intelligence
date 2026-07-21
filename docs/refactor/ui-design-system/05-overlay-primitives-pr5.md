@@ -10,19 +10,20 @@ Replace the hand-rolled audit drawer overlay with a real dialog primitive, fixin
 
 ## Scope
 
-1. Add `bits-ui` and use **only** the primitives actually needed now. Dialog is required; Popover, Select, Tooltip and Dropdown come in only when a component needs them.
-2. Wrap each in a thin local component styled from the theme. Bits UI ships unstyled, so there is nothing to strip — but the wrapper is the seam that keeps primitive choice separate from appearance.
-3. Rebuild `AuditDrawer` on Dialog, fixing:
+1. Add `bits-ui`, pinned to an exact version, and use **only its Dialog**. Popover, Select, Tooltip and Dropdown are named in the overview as the primitives worth taking *eventually*; none of them is in this stage, and each waits for a component that actually needs it.
+2. Add `@internationalized/date`, which `bits-ui` declares as a peer dependency and which this repository does not yet have. Adding a peer dependency is not optional even when the primitive in use does not exercise it.
+3. Wrap the Dialog in a thin local component styled from the theme. Bits UI ships unstyled, so there is nothing to strip — but the wrapper is the seam that keeps primitive choice separate from appearance.
+4. Rebuild `AuditDrawer` on that wrapper, fixing:
    - the missing focus trap;
    - `aria-hidden` sitting on the drawer rather than the background;
    - the absent `role="dialog"` and `aria-modal="true"`;
    - focus being moved into an `aria-hidden` subtree.
-4. Delete the hand-rolled focus and return-focus handling that the primitive now owns.
-5. Turn the stage 01 axe baseline from "recorded" into "asserted" for the states now fixed.
+5. Delete the hand-rolled focus and return-focus handling that the primitive now owns.
+6. Delete the three `test.fail()` annotations in `a11y_test.ts`, which Playwright will demand once the defects are gone, and drop `aria-hidden-focus` from the recorded baseline.
 
 ## Non-goals
 
-No decorative components, and no component library beyond the primitives. Cards, badges, separators and alerts stay local markup. No visual change to the drawer.
+No primitive beyond Dialog, and no decorative components. Cards, badges, separators and alerts stay local markup. No visual change to the drawer.
 
 ## Implementation notes
 

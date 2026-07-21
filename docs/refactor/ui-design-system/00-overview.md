@@ -41,7 +41,7 @@ Only the primitives are taken, and each is wrapped in a thin local component sty
 - **Take** the primitives whose behaviour is hard and easy to get subtly wrong: Dialog, Popover, Select, Tooltip, Dropdown. Focus trapping, keyboard navigation and ARIA state machines are where hand-written overlays fail.
 - **Do not take** anything that is a styled `div` — cards, badges, separators, alerts. They are five lines of local markup and they are what makes a product look like a template.
 
-Bits UI does not depend on Tailwind (`peerDependencies` are `svelte` and `@internationalized/date` only), so the styling decision and the primitive decision stay independent of each other.
+As of `bits-ui@2.18.1`, its `peerDependencies` are `svelte` and `@internationalized/date` only, so it pulls in no styling framework and the styling decision stays independent of the primitive decision. Recheck on upgrade rather than assuming it holds.
 
 ## Evidence this is needed
 
