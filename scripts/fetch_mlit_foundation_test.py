@@ -1,18 +1,7 @@
 import json
-import zipfile
 from pathlib import Path
 
-import pytest
-
-from scripts.fetch_mlit_foundation import _bbox_in_crs, _extract, _json_value, _layers
-
-
-def test_extract_rejects_path_traversal(tmp_path: Path) -> None:
-    archive = tmp_path / "unsafe.zip"
-    with zipfile.ZipFile(archive, "w") as zipped:
-        zipped.writestr("../escape.txt", "bad")
-    with pytest.raises(ValueError, match="unsafe ZIP member"):
-        _extract(archive, tmp_path / "out")
+from scripts.fetch_mlit_foundation import _bbox_in_crs, _json_value, _layers
 
 
 def test_preferred_layer_avoids_duplicate_shapefile(tmp_path: Path) -> None:

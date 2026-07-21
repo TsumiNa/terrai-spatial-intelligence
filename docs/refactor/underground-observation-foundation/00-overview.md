@@ -1,6 +1,6 @@
 # Underground Observation Foundation
 
-- Status: In progress
+- Status: Completed
 - Date: 2026-07-21
 - Type: Foundation Data Layer acquisition and renderer handoff
 - Upstream datasets: Project PLATEAU UC24-16, Project PLATEAU UC24-13, OpenStreetMap

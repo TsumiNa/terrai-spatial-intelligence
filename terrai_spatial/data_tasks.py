@@ -8,6 +8,8 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+from .pipeline.io import json_file_failure, valid_data_file
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -233,27 +235,15 @@ TASKS = {
 }
 
 
-def _valid_file(path: Path) -> bool:
-    if not path.is_file() or path.stat().st_size == 0:
-        return False
-    if path.suffix not in {".json", ".geojson"}:
-        return True
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return False
-    return path.suffix != ".geojson" or value.get("type") == "FeatureCollection"
-
-
 def _existing_outputs(task: DataTask, root: Path) -> tuple[list[Path], list[str]]:
     paths = [root / item for item in task.outputs]
-    missing = [item for item, path in zip(task.outputs, paths, strict=True) if not _valid_file(path)]
+    missing = [item for item, path in zip(task.outputs, paths, strict=True) if not valid_data_file(path)]
     for pattern in task.output_globs:
         matches = [path for path in root.glob(pattern) if path.is_file() and path.stat().st_size > 0]
         paths.extend(matches)
         if not matches:
             missing.append(pattern)
-    if task.manifest and _valid_file(root / task.manifest):
+    if task.manifest and valid_data_file(root / task.manifest):
         manifest = json.loads((root / task.manifest).read_text(encoding="utf-8"))
         manifest_files = manifest.get("files", [])
         if not manifest_files:
@@ -264,7 +254,7 @@ def _existing_outputs(task: DataTask, root: Path) -> tuple[list[Path], list[str]
                 missing.append(f"{task.manifest}:unsafe path {relative}")
                 continue
             paths.append(path)
-            if not _valid_file(path):
+            if not valid_data_file(path):
                 missing.append(relative)
     return paths, missing
 
@@ -279,7 +269,7 @@ def task_state(name: str, root: Path = ROOT) -> TaskState:
         return TaskState(name, "missing", f"missing outputs: {', '.join(missing_outputs)}")
     if missing_inputs:
         return TaskState(name, "ready", "outputs are present; optional rebuild inputs are unavailable")
-    missing_cache = [item for item in task.cache_outputs if not _valid_file(root / item)]
+    missing_cache = [item for item in task.cache_outputs if not valid_data_file(root / item)]
     if missing_cache:
         return TaskState(name, "ready", f"derived output is present; local cache missing: {', '.join(missing_cache)}")
     if task.network or not task.check_stale or not outputs:
@@ -331,7 +321,7 @@ def ensure_data(
     for name in _ordered_names(selected):
         task = TASKS[name]
         state = task_state(name, root)
-        missing_cache = [item for item in task.cache_outputs if not _valid_file(root / item)]
+        missing_cache = [item for item in task.cache_outputs if not valid_data_file(root / item)]
         if state.status == "blocked":
             raise RuntimeError(f"{name} cannot run: {state.reason}")
         force_requested = force and (
@@ -369,12 +359,9 @@ def validate_json_outputs(root: Path = ROOT) -> list[str]:
             path = root / relative
             if path.suffix not in {".json", ".geojson"} or not path.is_file():
                 continue
-            try:
-                value = json.loads(path.read_text(encoding="utf-8"))
-                if path.suffix == ".geojson" and value.get("type") != "FeatureCollection":
-                    failures.append(f"invalid GeoJSON root: {relative}")
-            except (OSError, json.JSONDecodeError) as error:
-                failures.append(f"invalid {relative}: {error}")
+            failure = json_file_failure(path)
+            if failure:
+                failures.append(f"invalid {relative}: {failure}")
     registry_path = root / "data/external/source_registry.json"
     if registry_path.is_file():
         try:

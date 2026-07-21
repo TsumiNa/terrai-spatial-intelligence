@@ -3,17 +3,19 @@
 from __future__ import annotations
 
 import argparse
-import json
 import math
-import os
-import tempfile
+import sys
 from pathlib import Path, PurePosixPath
 from typing import Any
 
 from pyproj import Transformer
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from terrai_spatial.pipeline.io import read_json_object, write_json_atomic  # noqa: E402
+
 CATALOG_PATH = Path("data/scenes/underground/catalog.json")
 HANDOFF_PATHS = {
     "nihonbashi-utilities": Path("data/plateau/uc24_16_nihonbashi/scene_handoff.json"),
@@ -34,23 +36,7 @@ ECEF_TO_GEOGRAPHIC = Transformer.from_crs("EPSG:4978", "EPSG:4979", always_xy=Tr
 
 
 def _read_json(root: Path, relative: str) -> dict[str, Any]:
-    path = root / relative
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
-        raise RuntimeError(f"invalid scene input {relative}: {error}") from error
-    if not isinstance(value, dict):
-        raise RuntimeError(f"invalid scene input {relative}: root must be an object")
-    return value
-
-
-def _atomic_json(path: Path, value: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent, delete=False) as handle:
-        json.dump(value, handle, ensure_ascii=False, indent=2)
-        handle.write("\n")
-        temporary = Path(handle.name)
-    os.replace(temporary, path)
+    return read_json_object(root / relative, label=f"scene input {relative}")
 
 
 def _apply_matrix(matrix: list[float], point: tuple[float, float, float]) -> tuple[float, float, float]:
@@ -374,7 +360,7 @@ def build_scene_handoffs(root: Path = ROOT) -> dict[str, Any]:
     handoffs = [nihonbashi, sapporo]
     for handoff in handoffs:
         validate_handoff(handoff)
-        _atomic_json(root / HANDOFF_PATHS[handoff["scene_id"]], handoff)
+        write_json_atomic(root / HANDOFF_PATHS[handoff["scene_id"]], handoff)
 
     catalog = {
         "schema_version": "1.0",
@@ -399,7 +385,7 @@ def build_scene_handoffs(root: Path = ROOT) -> dict[str, Any]:
             for item in handoffs
         ],
     }
-    _atomic_json(root / CATALOG_PATH, catalog)
+    write_json_atomic(root / CATALOG_PATH, catalog)
     return catalog
 
 

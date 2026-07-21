@@ -4,23 +4,35 @@ from __future__ import annotations
 
 import argparse
 import base64
-import hashlib
 import json
 import math
 import os
 import shutil
-import stat
 import struct
+import sys
 import tempfile
 import zipfile
-from datetime import UTC, datetime
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 from typing import Any
-from urllib.parse import unquote, urlsplit
-from urllib.request import Request, urlopen
+from urllib.parse import urlsplit
 
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from terrai_spatial.pipeline.http import download_file, download_json  # noqa: E402
+from terrai_spatial.pipeline.io import (  # noqa: E402
+    file_sha256,
+    read_json_object,
+    safe_extract_zip,
+    safe_relative_path,
+    serialize_json,
+    write_json_atomic,
+    write_text_atomic,
+)
+from terrai_spatial.pipeline.provenance import utc_timestamp  # noqa: E402
+
 DEFAULT_SOURCE_MANIFEST = ROOT / "data/plateau/uc24_16_nihonbashi/source_manifest.json"
 OUTPUT_DIRECTORY = Path("data/plateau/uc24_16_nihonbashi")
 CACHE_DIRECTORY = Path("data/external/plateau_uc24_16")
@@ -51,92 +63,35 @@ AUDIT_FIELDS = (
 )
 
 
-def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def _atomic_json(path: Path, value: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent, delete=False) as handle:
-        json.dump(value, handle, ensure_ascii=False, indent=2)
-        handle.write("\n")
-        temporary = Path(handle.name)
-    os.replace(temporary, path)
-
-
 def _atomic_audit_json(path: Path, metadata: dict[str, Any], records: list[dict[str, Any]]) -> None:
     """Keep the complete audit index compact while retaining reviewable rows."""
 
-    path.parent.mkdir(parents=True, exist_ok=True)
-    prefix = json.dumps({**metadata, "features": []}, ensure_ascii=False, indent=2)
+    prefix = serialize_json({**metadata, "features": []})
     prefix = prefix.replace('"features": []', '"features": [', 1).removesuffix("\n}")
-    with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent, delete=False) as handle:
-        handle.write(prefix)
-        handle.write("\n")
-        for index, record in enumerate(records):
-            handle.write("    ")
-            handle.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")))
-            handle.write(",\n" if index + 1 < len(records) else "\n")
-        handle.write("  ]\n}\n")
-        temporary = Path(handle.name)
-    os.replace(temporary, path)
-
-
-def _safe_relative_path(value: str, *, label: str) -> PurePosixPath:
-    if not value or "\\" in value or "\x00" in value:
-        raise RuntimeError(f"unsafe {label}: {value!r}")
-    path = PurePosixPath(unquote(value))
-    if path.is_absolute() or ".." in path.parts:
-        raise RuntimeError(f"unsafe {label}: {value!r}")
-    return path
+    parts = [prefix, "\n"]
+    for index, record in enumerate(records):
+        parts.append("    ")
+        parts.append(json.dumps(record, ensure_ascii=False, separators=(",", ":")))
+        parts.append(",\n" if index + 1 < len(records) else "\n")
+    parts.append("  ]\n}\n")
+    write_text_atomic(path, "".join(parts))
 
 
 def extract_archive(archive_path: Path, destination: Path) -> Path:
     """Safely extract an archive and return its single tileset directory."""
 
-    destination.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(archive_path) as archive:
-        for member in archive.infolist():
-            relative = _safe_relative_path(member.filename, label="ZIP member")
-            mode = member.external_attr >> 16
-            if stat.S_ISLNK(mode):
-                raise RuntimeError(f"unsafe ZIP member: symbolic link {member.filename!r}")
-            target = destination.joinpath(*relative.parts)
-            resolved = target.resolve()
-            if resolved != destination.resolve() and destination.resolve() not in resolved.parents:
-                raise RuntimeError(f"unsafe ZIP member: {member.filename!r}")
-            if member.is_dir():
-                target.mkdir(parents=True, exist_ok=True)
-                continue
-            target.parent.mkdir(parents=True, exist_ok=True)
-            with archive.open(member) as source, target.open("wb") as output:
-                shutil.copyfileobj(source, output)
-
+    safe_extract_zip(archive_path, destination)
     tilesets = sorted(destination.rglob("tileset.json"))
     if len(tilesets) != 1:
         raise RuntimeError(f"archive must contain exactly one tileset.json; found {len(tilesets)}")
     return tilesets[0].parent
 
 
-def _json(path: Path, *, label: str) -> dict[str, Any]:
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
-        raise RuntimeError(f"invalid {label}: {path}: {error}") from error
-    if not isinstance(value, dict):
-        raise RuntimeError(f"invalid {label}: root is not an object: {path}")
-    return value
-
-
 def _local_uri(base: Path, uri: str, root: Path) -> Path:
     parsed = urlsplit(uri)
     if parsed.scheme or parsed.netloc or parsed.query or parsed.fragment:
         raise RuntimeError(f"tile content URI must be a local relative path: {uri!r}")
-    relative = _safe_relative_path(parsed.path, label="tile content URI")
+    relative = safe_relative_path(parsed.path, label="tile content URI")
     path = base.joinpath(*relative.parts).resolve()
     root_resolved = root.resolve()
     if path != root_resolved and root_resolved not in path.parents:
@@ -238,7 +193,7 @@ def _gltf_records(
     resource_id: str,
     utility_class: str,
 ) -> tuple[list[dict[str, Any]], set[str]]:
-    document = _json(gltf_path, label="glTF")
+    document = read_json_object(gltf_path, label="glTF")
     metadata = document.get("extensions", {}).get("EXT_structural_metadata")
     if "EXT_structural_metadata" not in document.get("extensionsUsed", []) or not isinstance(metadata, dict):
         raise RuntimeError(f"glTF lacks EXT_structural_metadata: {gltf_path.name}")
@@ -290,7 +245,7 @@ def inspect_tileset(
     if len(tilesets) != 1:
         raise RuntimeError(f"asset must contain exactly one tileset.json; found {len(tilesets)}")
     tileset_path = tilesets[0]
-    document = _json(tileset_path, label="3D Tiles tileset")
+    document = read_json_object(tileset_path, label="3D Tiles tileset")
     if document.get("asset", {}).get("version") != "1.1":
         raise RuntimeError("3D Tiles asset.version must be 1.1")
     root_tile = document.get("root")
@@ -343,34 +298,6 @@ def inspect_tileset(
     }
 
 
-def _request_json(url: str) -> tuple[dict[str, Any], dict[str, str | None]]:
-    request = Request(url, headers={"User-Agent": "TerrAI-Spatial-Intelligence/0.1"})
-    with urlopen(request, timeout=120) as response:
-        try:
-            value = json.load(response)
-        except json.JSONDecodeError as error:
-            raise RuntimeError(f"official package response is not JSON: {url}") from error
-        headers = {
-            "resolved_url": response.geturl(),
-            "http_last_modified": response.headers.get("Last-Modified"),
-            "http_etag": response.headers.get("ETag"),
-        }
-    if not isinstance(value, dict):
-        raise RuntimeError("official package response root is not an object")
-    return value, headers
-
-
-def _download(url: str, target: Path) -> dict[str, str | None]:
-    request = Request(url, headers={"User-Agent": "TerrAI-Spatial-Intelligence/0.1"})
-    with urlopen(request, timeout=300) as response, target.open("wb") as output:
-        shutil.copyfileobj(response, output)
-        return {
-            "resolved_url": response.geturl(),
-            "http_last_modified": response.headers.get("Last-Modified"),
-            "http_etag": response.headers.get("ETag"),
-        }
-
-
 def _relative(root: Path, path: Path) -> str:
     return path.resolve().relative_to(root.resolve()).as_posix()
 
@@ -384,13 +311,13 @@ def _asset_url(relative: str) -> str:
 def _validate_offline(root: Path, manifest_path: Path) -> dict[str, Any]:
     if not manifest_path.is_file():
         raise RuntimeError("offline cache is incomplete: retrieval manifest is missing")
-    manifest = _json(manifest_path, label="UC24-16 retrieval manifest")
+    manifest = read_json_object(manifest_path, label="UC24-16 retrieval manifest")
     missing = [relative for relative in manifest.get("files", []) if not (root / relative).is_file()]
     if missing:
         raise RuntimeError(f"offline cache is incomplete: missing {', '.join(missing[:3])}")
     for resource in manifest.get("resources", []):
         archive = root / resource["archive_path"]
-        if sha256(archive) != resource["archive_sha256"]:
+        if file_sha256(archive) != resource["archive_sha256"]:
             raise RuntimeError(f"offline cache archive hash mismatch: {resource['slug']}")
         tileset = root / resource["tileset_path"]
         inspect_tileset(
@@ -414,15 +341,15 @@ def fetch_uc24_16(
     if offline:
         return _validate_offline(root, retrieval_manifest_path)
 
-    source_manifest = _json(source_manifest_path, label="UC24-16 source manifest")
-    package, package_headers = _request_json(source_manifest["package_api"])
-    if package.get("success") is not True or not isinstance(package.get("result"), dict):
+    source_manifest = read_json_object(source_manifest_path, label="UC24-16 source manifest")
+    package, package_headers = download_json(source_manifest["package_api"], timeout=120)
+    if not isinstance(package, dict) or package.get("success") is not True or not isinstance(package.get("result"), dict):
         raise RuntimeError("official CKAN package_show request was not successful")
     package_result = package["result"]
     resources_by_id = {resource.get("id"): resource for resource in package_result.get("resources", [])}
-    previous = _json(retrieval_manifest_path, label="UC24-16 retrieval manifest") if retrieval_manifest_path.is_file() else {}
+    previous = read_json_object(retrieval_manifest_path, label="UC24-16 retrieval manifest") if retrieval_manifest_path.is_file() else {}
     previous_by_id = {resource["resource_id"]: resource for resource in previous.get("resources", [])}
-    retrieved_at = datetime.now(tz=UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    retrieved_at = utc_timestamp()
     archive_dir = cache_dir / "archives"
     assets_dir = cache_dir / "assets"
     archive_dir.mkdir(parents=True, exist_ok=True)
@@ -456,7 +383,7 @@ def fetch_uc24_16(
             except RuntimeError:
                 cached_inspection = None
             expected_archive_hash = prior.get("archive_sha256")
-            if expected_archive_hash and sha256(archive_path) != expected_archive_hash:
+            if expected_archive_hash and file_sha256(archive_path) != expected_archive_hash:
                 cached_inspection = None
 
         download_headers: dict[str, str | None]
@@ -464,7 +391,7 @@ def fetch_uc24_16(
             with tempfile.NamedTemporaryFile("wb", dir=cache_dir, delete=False) as handle:
                 temporary_archive = Path(handle.name)
             try:
-                download_headers = _download(official["url"], temporary_archive)
+                download_headers = download_file(official["url"], temporary_archive, timeout=300)
                 if not zipfile.is_zipfile(temporary_archive):
                     raise RuntimeError(f"UC24-16 resource is not a ZIP archive: {slug}")
                 with tempfile.TemporaryDirectory(dir=cache_dir) as temporary_directory:
@@ -515,7 +442,7 @@ def fetch_uc24_16(
                 "http_etag": download_headers["http_etag"],
                 "archive_path": archive_relative,
                 "archive_bytes": archive_path.stat().st_size,
-                "archive_sha256": sha256(archive_path),
+                "archive_sha256": file_sha256(archive_path),
                 "tileset_path": tileset_relative,
                 "tileset_url": _asset_url(tileset_relative),
                 **inspection,
@@ -576,7 +503,7 @@ def fetch_uc24_16(
         "unit_note": "source glTF structural metadata does not encode units for depth, diameter or length",
     }
     _atomic_audit_json(output_dir / "audit_index.json", audit_metadata, audit_records)
-    _atomic_json(retrieval_manifest_path, manifest)
+    write_json_atomic(retrieval_manifest_path, manifest)
     print(
         f"UC24-16 Nihonbashi cache ready: {len(manifest_resources)} resources, "
         f"{len(audit_records)} features"

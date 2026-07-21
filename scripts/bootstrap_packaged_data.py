@@ -4,17 +4,19 @@
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import subprocess
-import tempfile
-import urllib.error
+import sys
 import urllib.parse
-import urllib.request
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from terrai_spatial.pipeline.http import download_bytes  # noqa: E402
+from terrai_spatial.pipeline.io import valid_data_file, write_bytes_atomic  # noqa: E402
+
 BASE_URL = os.environ.get(
     "TERRAI_BOOTSTRAP_BASE_URL",
     "https://raw.githubusercontent.com/TsumiNa/terrai-spatial-intelligence/main",
@@ -55,36 +57,16 @@ def download(relative: str, offline: bool) -> None:
         if offline:
             raise RuntimeError(f"{relative} is unavailable in Git HEAD and network access is disabled")
         quoted = urllib.parse.quote(relative, safe="/")
-        headers = {"User-Agent": "TerrAI-data-bootstrap/1.0"}
+        headers = {}
         token = os.environ.get("GITHUB_TOKEN")
         if token:
             headers["Authorization"] = f"Bearer {token}"
-        request = urllib.request.Request(f"{BASE_URL}/{quoted}", headers=headers)
-        try:
-            with urllib.request.urlopen(request, timeout=45) as response:
-                payload = response.read()
-        except (urllib.error.URLError, TimeoutError) as error:
-            raise RuntimeError(f"failed to restore {relative} from {BASE_URL}: {error}") from error
+        payload = download_bytes(f"{BASE_URL}/{quoted}", timeout=45, headers=headers)
         source = BASE_URL
     if not payload:
         raise RuntimeError(f"empty bootstrap response for {relative}")
-    with tempfile.NamedTemporaryFile(dir=target.parent, prefix=f".{target.name}.", delete=False) as handle:
-        handle.write(payload)
-        temporary = Path(handle.name)
-    temporary.replace(target)
+    write_bytes_atomic(target, payload)
     print(f"Restored {relative} from {source}")
-
-
-def ready(path: Path) -> bool:
-    if not path.is_file() or path.stat().st_size == 0:
-        return False
-    if path.suffix not in {".json", ".geojson"}:
-        return True
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return False
-    return path.suffix != ".geojson" or value.get("type") == "FeatureCollection"
 
 
 def main() -> None:
@@ -95,7 +77,7 @@ def main() -> None:
     restored = 0
     for relative in FILES:
         target = ROOT / relative
-        if not args.force and ready(target):
+        if not args.force and valid_data_file(target):
             continue
         download(relative, args.offline)
         restored += 1

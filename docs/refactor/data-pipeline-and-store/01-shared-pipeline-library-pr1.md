@@ -1,6 +1,6 @@
 # PR1 Plan: Shared Pipeline Library
 
-- Status: Planned
+- Status: In progress
 - Refactor: `data-pipeline-and-store`
 
 ## Goal

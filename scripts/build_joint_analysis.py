@@ -10,10 +10,15 @@ from __future__ import annotations
 
 import json
 import math
+import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from terrai_spatial.pipeline.io import write_json_atomic  # noqa: E402
+
 DATA = ROOT / "data"
 LAT0 = math.radians(35.4465)
 M_PER_DEG_LAT = 111_320.0
@@ -23,13 +28,6 @@ M_PER_DEG_LON = M_PER_DEG_LAT * math.cos(LAT0)
 def load_json(path: Path) -> dict:
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)
-
-
-def write_json(path: Path, value: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as handle:
-        json.dump(value, handle, ensure_ascii=False, indent=2)
-        handle.write("\n")
 
 
 def xy(point: list[float]) -> tuple[float, float]:
@@ -195,10 +193,10 @@ def main() -> None:
     hubs = build_resilience_hubs(buildings, roads)
     delivery_cells = build_solar_delivery_cells(cells)
 
-    write_json(DATA / "joint" / "compound_corridors.geojson", feature_collection(corridors))
-    write_json(DATA / "joint" / "resilience_hubs.geojson", feature_collection(hubs))
-    write_json(DATA / "joint" / "solar_delivery_cells.geojson", feature_collection(delivery_cells))
-    write_json(
+    write_json_atomic(DATA / "joint" / "compound_corridors.geojson", feature_collection(corridors))
+    write_json_atomic(DATA / "joint" / "resilience_hubs.geojson", feature_collection(hubs))
+    write_json_atomic(DATA / "joint" / "solar_delivery_cells.geojson", feature_collection(delivery_cells))
+    write_json_atomic(
         DATA / "joint" / "joint_summary.json",
         {
             "generated_at": "2026-07-20",
