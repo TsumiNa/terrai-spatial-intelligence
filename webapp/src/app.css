@@ -1,6 +1,64 @@
+/* Imported by layer rather than as a whole, which deliberately leaves out
+ * Preflight, Tailwind's reset.
+ *
+ * Preflight is a restyle: it strips heading margins, list markers, border
+ * defaults and more. Pulling it in here changed 6% of the pixels on every
+ * screenshot, which is exactly what this stage is defined not to do. Adopting
+ * it is worth doing later as its own change, reviewed against regenerated
+ * baselines rather than smuggled in with the framework.
+ */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* The design system, and the whole of it.
+ *
+ * Tailwind's default palette, spacing scale and radii are cleared below, so a
+ * value that is not declared here does not exist as a utility. Writing an
+ * off-system colour then requires arbitrary-value syntax — `bg-[#1f7a58]` —
+ * which is visible in review and rejected by the check that stage 03 adds.
+ *
+ * These are a boundary, not a fixed set. The redesign will need more, and
+ * extending this block is a normal reviewed act. What must not happen is a
+ * component reaching past it.
+ */
+@theme {
+  --color-*: initial;
+  --color-ink: #10231e;
+  --color-muted: #667770;
+  --color-line: #dfe7e2;
+  --color-paper: #f4f7f3;
+  --color-white: #ffffff;
+  --color-forest: #164d3b;
+  --color-green: #1f7a58;
+  --color-lime: #a9d96e;
+  --color-amber: #e2a43c;
+  --color-red: #d75b4c;
+  --color-blue: #397ca3;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* Radii the existing design actually uses, named by role rather than size so
+   * a component asks for "a card corner" instead of picking 9px by eye. */
+  --radius-*: initial;
+  --radius-control: 6px;
+  --radius-card: 9px;
+  --radius-panel: 12px;
+  --radius-pill: 999px;
+
+  --shadow-*: initial;
+  --shadow-card: 0 14px 34px rgba(26, 55, 45, 0.09);
+
+  --font-*: initial;
+  --font-sans: Inter, "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+}
+
 /* Ported from frontend/styles.css. Leaflet-specific selectors and dead
    architecture-board styles were dropped; the map placeholder block is new
-   for the pre-MapLibre stages. */
+   for the pre-MapLibre stages.
+
+   These custom properties stay until stage 04 ports the components that read
+   them. They mirror the @theme block above rather than competing with it. */
 
 :root {
   --ink: #10231e;
