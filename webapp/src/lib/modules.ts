@@ -9,8 +9,18 @@
  */
 
 import { palette } from "./theme";
-import { field, metric, queueScore, type AuditRecord, type ModuleName } from "./audit";
-import { i18n } from "./i18n/i18n.svelte";
+import { field, metric, queueScore, undergroundField, type AuditRecord, type ModuleName, type UndergroundAuditContext } from "./audit";
+import {
+  ACCESS_CLASSES,
+  NETWORK_CLASSES,
+  UNDERGROUND_STYLE,
+  familyResources,
+  regionToDegrees,
+  type UndergroundFamily,
+  type UndergroundResource,
+  type UndergroundState,
+} from "./underground";
+import { i18n, type MessageKey } from "./i18n/i18n.svelte";
 import type { Bootstrap, Feature } from "./api/types";
 
 export const colors = {
@@ -23,7 +33,7 @@ export const colors = {
   gray: palette.gray,
 } as const;
 
-export type RegionKey = "yokohama" | "mobara";
+export type RegionKey = "yokohama" | "mobara" | "nihonbashi";
 
 export const MODULES: ModuleName[] = [
   "overview",
@@ -34,6 +44,7 @@ export const MODULES: ModuleName[] = [
   "solar",
   "joint",
   "development",
+  "underground",
 ];
 
 export const MODULE_VIEWS: Record<ModuleName, string[]> = {
@@ -45,6 +56,7 @@ export const MODULE_VIEWS: Record<ModuleName, string[]> = {
   solar: ["all", "preferred"],
   joint: ["hubs", "corridors"],
   development: ["delivery", "constraints"],
+  underground: ["networks", "access"],
 };
 
 export function normalizeView(module: ModuleName, view: string | null): string {
@@ -105,6 +117,8 @@ export interface ModuleVM {
   methodTitle: string;
   methodBody: string;
   mapNote: string;
+  /** Rendered over the map when the module's data is not present. */
+  notice?: { title: string; body: string };
 }
 
 type P = Record<string, any>;
@@ -138,9 +152,146 @@ function queueItems(
   });
 }
 
-export function buildModuleVM(module: ModuleName, requestedView: string | null, data: Bootstrap): ModuleVM {
+/** The i18n key of one underground utility class. */
+export function undergroundClassKey(utilityClass: string): MessageKey {
+  return `utility.${utilityClass}` as MessageKey;
+}
+
+/** A resource's published extent as a GeoJSON feature, for queue framing. */
+export function undergroundExtentFeature(resource: UndergroundResource): Feature {
+  const [west, south, east, north] = regionToDegrees(resource.bounding_region);
+  return {
+    type: "Feature",
+    id: resource.slug,
+    properties: { slug: resource.slug, utility_class: resource.utility_class },
+    geometry: {
+      type: "Polygon",
+      coordinates: [[[west, south], [east, south], [east, north], [west, north], [west, south]]],
+    },
+  };
+}
+
+export function undergroundAuditContext(resource: UndergroundResource, retrievedAt: string, sourceUrl: string): UndergroundAuditContext {
+  return {
+    sourceTitle: "Project PLATEAU UC24-16 地下埋設物モデル（示范样本 / demonstration sample）",
+    sourceUrl,
+    assetPath: `${resource.slug}/tileset.json`,
+    featureIds: [],
+    creationDates: [],
+    retrievedAt,
+  };
+}
+
+export function buildModuleVM(
+  module: ModuleName,
+  requestedView: string | null,
+  data: Bootstrap,
+  underground?: UndergroundState,
+): ModuleVM {
   const view = normalizeView(module, requestedView);
   const t = i18n.t.bind(i18n);
+
+  if (module === "underground") {
+    const manifest = underground?.status === "ready" ? underground.manifest : null;
+    const base = {
+      region: "nihonbashi" as RegionKey,
+      eyebrow: t("underground.eyebrow"),
+      title: t("underground.title"),
+      kicker: "UNDERGROUND OBSERVATION",
+      heroTitle: t("underground.heroTitle"),
+      description: t("underground.description"),
+      formula: null,
+      chips: [
+        { kind: "observed", label: "PLATEAU UC24-16", detail: t("chip.plateauSampleDetail") },
+        { kind: "pending", label: t("chip.mesureType"), detail: t("chip.mesureTypeDetail") },
+      ] as StatusChipVM[],
+      tabs: [
+        { view: "networks", label: t("underground.tabNetworks") },
+        { view: "access", label: t("underground.tabAccess") },
+      ],
+      activeView: view,
+      legend:
+        view === "networks"
+          ? NETWORK_CLASSES.map((utilityClass) => ({
+              label: t(undergroundClassKey(utilityClass)),
+              color: UNDERGROUND_STYLE.classColors[utilityClass],
+            }))
+          : [{ label: t("underground.legendAccess"), color: UNDERGROUND_STYLE.classColors.sewer_manhole }],
+      queueEyebrow: "UNDERGROUND OBSERVATION",
+      queueTitle: t("queueTitle.underground"),
+      queueExplanation: t("queueExpl.underground"),
+      methodTitle: t("methodCard.undergroundTitle"),
+      methodBody: t("methodCard.undergroundBody"),
+      mapNote: t("mapNote.underground"),
+    };
+    if (!manifest) {
+      const status = underground?.status ?? "unknown";
+      const notice =
+        status === "unavailable"
+          ? { title: t("underground.unavailableTitle"), body: t("underground.unavailableBody") }
+          : status === "error"
+            ? { title: t("loading.failed"), body: t("underground.errorBody") }
+            : { title: t("underground.loadingTitle"), body: t("underground.loadingBody") };
+      return { ...base, metrics: [], queueCount: 0, queueItems: [], notice };
+    }
+    const networks = familyResources(manifest, "networks");
+    const access = familyResources(manifest, "access");
+    const networkFeatures = networks.reduce((sum, resource) => sum + resource.feature_count, 0);
+    const accessFeatures = access.reduce((sum, resource) => sum + resource.feature_count, 0);
+    const snapshot = manifest.retrieved_at.slice(0, 10);
+    const resources = familyResources(manifest, view as UndergroundFamily);
+    return {
+      ...base,
+      metrics: [
+        {
+          label: t("metric.undergroundResources"),
+          value: String(manifest.resource_count),
+          unit: t("unit.kinds"),
+          note: t("metric.undergroundResourcesNote", { networks: networks.length, access: access.length }),
+          color: colors.forest,
+          audit: metric("metric.undergroundResources", manifest.resource_count, t("unit.kinds"), t("metric.undergroundResourcesNote", { networks: networks.length, access: access.length }), { snapshot }),
+        },
+        {
+          label: t("metric.undergroundNetworkFeatures"),
+          value: networkFeatures.toLocaleString(),
+          unit: t("unit.items"),
+          note: t("metric.undergroundNetworkFeaturesNote"),
+          color: colors.blue,
+          audit: metric("metric.undergroundNetworkFeatures", networkFeatures.toLocaleString(), t("unit.items"), t("metric.undergroundNetworkFeaturesNote"), { snapshot }),
+        },
+        {
+          label: t("metric.undergroundAccessFeatures"),
+          value: accessFeatures.toLocaleString(),
+          unit: t("unit.sites"),
+          note: t("metric.undergroundAccessFeaturesNote"),
+          color: colors.gray,
+          audit: metric("metric.undergroundAccessFeatures", accessFeatures.toLocaleString(), t("unit.sites"), t("metric.undergroundAccessFeaturesNote"), { snapshot }),
+        },
+        {
+          label: t("metric.undergroundSnapshot"),
+          value: snapshot,
+          unit: "",
+          note: t("metric.undergroundSnapshotNote"),
+          color: colors.green,
+          audit: metric("metric.undergroundSnapshot", snapshot, "", t("metric.undergroundSnapshotNote"), { snapshot }),
+        },
+      ],
+      queueCount: resources.length,
+      queueItems: resources.map((resource) => {
+        const context = undergroundAuditContext(resource, manifest.retrieved_at, manifest.package_page);
+        return {
+          title: t(undergroundClassKey(resource.utility_class)),
+          detail: t("queueDetail.underground", { features: resource.feature_count, gltf: resource.gltf_count }),
+          score: resource.feature_count,
+          scoreLabel: "FEATURES",
+          color: UNDERGROUND_STYLE.classColors[resource.utility_class],
+          scoreAudit: undergroundField("field.featureCount", resource.feature_count, context),
+          detailAudit: undergroundField("field.assetPath", `${resource.slug}/tileset.json`, context),
+          feature: undergroundExtentFeature(resource),
+        };
+      }),
+    };
+  }
 
   if (module === "overview") {
     const isUrban = view === "urban";
@@ -254,7 +405,7 @@ export function buildModuleVM(module: ModuleName, requestedView: string | null, 
   }
 
   if (module === "evidence") {
-    const [region, mode] = view.split("_") as [RegionKey, "change" | "latent"];
+    const [region, mode] = view.split("_") as ["yokohama" | "mobara", "change" | "latent"];
     const summary = data.embeddingSummary.regions[region];
     const zones = (region === "yokohama" ? data.yokohamaZones : data.mobaraZones).features;
     const evidence =

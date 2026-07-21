@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
 
-  import { createApiClient } from "./lib/api/client";
+  import { apiOrigin, createApiClient } from "./lib/api/client";
   import type { Bootstrap } from "./lib/api/types";
+  import type { UndergroundAuditIndex, UndergroundManifest } from "./lib/underground";
   import AuditDrawer from "./lib/components/AuditDrawer.svelte";
   import Hero from "./lib/components/Hero.svelte";
   import MapCard from "./lib/components/MapCard.svelte";
@@ -14,7 +15,7 @@
   import { buildModuleVM } from "./lib/modules";
   import { app } from "./lib/state.svelte";
 
-  const vm = $derived(app.data ? buildModuleVM(app.module, app.view, app.data) : null);
+  const vm = $derived(app.data ? buildModuleVM(app.module, app.view, app.data, app.underground) : null);
 
   $effect(() => {
     document.documentElement.lang = i18n.lang === "zh" ? "zh-CN" : i18n.lang;
@@ -22,6 +23,38 @@
 
   $effect(() => {
     if (vm) app.syncUrl(vm.activeView);
+  });
+
+  // The underground module's data is on demand: first entry checks /catalog
+  // readiness, then loads the manifest and audit index. Nothing is fetched
+  // until the module is opened, and an absent cache is an honest state.
+  $effect(() => {
+    if (app.module !== "underground" || app.underground.status !== "unknown") return;
+    app.setUndergroundLoading();
+    void (async () => {
+      try {
+        const client = createApiClient();
+        const catalog = await client.GET("/api/v1/catalog");
+        const rows = (catalog.data as { datasets?: { key: string; ready: boolean }[] } | undefined)?.datasets ?? [];
+        if (!rows.find((row) => row.key === "uc24_16_nihonbashi")?.ready) {
+          app.setUndergroundUnavailable();
+          return;
+        }
+        const origin = apiOrigin(window.location.search);
+        const [manifest, auditIndex] = await Promise.all([
+          client.GET("/api/v1/datasets/{key}", { params: { path: { key: "uc24_16_nihonbashi" } } }),
+          fetch(`${origin}/api/v1/assets/plateau/uc24_16_nihonbashi/audit_index.json`),
+        ]);
+        if (manifest.error || !manifest.data || !auditIndex.ok) throw new Error("underground manifest fetch failed");
+        app.setUndergroundReady(
+          manifest.data as unknown as UndergroundManifest,
+          (await auditIndex.json()) as UndergroundAuditIndex,
+        );
+      } catch (cause) {
+        console.error("underground data load failed", cause);
+        app.setUndergroundUnavailable("error");
+      }
+    })();
   });
 
   onMount(async () => {

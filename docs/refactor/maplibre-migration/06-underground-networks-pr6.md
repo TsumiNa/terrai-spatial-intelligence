@@ -1,8 +1,15 @@
 # PR6 Plan: Underground Utility Networks on the Map
 
-- Status: Planned
+- Status: Completed
 - Refactor: `maplibre-migration`
-- PR: #6
+- PR: #38
+
+## Completion record
+
+- **Shipped picking granularity: per-asset (one glTF tile), resolved through the audit index's `source_asset` key, degrading to feature-level exactly when the asset holds a single feature.** deck 9.3 does not surface `EXT_mesh_features` feature IDs through scenegraph picking, so the ladder's top rung was not reachable; the audit record lists the asset's feature ids and rolls up depth/diameter/material/measurement honestly.
+- Three renderer-compatibility shims live in `webapp/src/lib/map/underground-layers.ts`, each a pure function with tests: 3D Tiles 1.1 plural `contents` arrays are rewritten into single-`content` children (loaders.gl 4.x does not traverse them), JSON `.gltf` content is wrapped in a GLB container (the tile-content parser dispatches on binary magic only), and the tileset LOD target is forced to the leaves (the sample tilesets are small enough to load whole). A `Tile3DLayer` subclass drops its origin-distance picking cull, which skips sparse ~500 m network chunks whose origin projects off screen.
+- Measurement classes in the integrated data: every network feature carries `uro:mesureType: "2"`, access structures publish none. The legend and audit records show the code as published — no PLATEAU codelist for it is public, so it is not guessed into "surveyed" or "inferred". Material codes resolve through the published i-UR `UtilityNetworkElement_material` codelist.
+- The visual-baseline suite deliberately excludes the underground module: its chrome reflects the on-demand cache state and differs between a fetched dev machine and CI.
 
 ## Goal
 

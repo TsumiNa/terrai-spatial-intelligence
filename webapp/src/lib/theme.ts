@@ -31,6 +31,10 @@ export const palette = {
   hub: "#8fc85a",
   gray: "#a9b5af",
   transmission: "#8e5eaa",
+  // Underground utility networks follow the APWA one-call convention where the
+  // existing palette already matches (water blue, sewer green, gas amber/yellow,
+  // power red); communications orange is the one colour the palette lacked.
+  comms: "#d97a35",
   exposureOutline: "#7b342b",
   buildingOutline: "#687b74",
   buildingOutlineSoft: "#6e7e78",

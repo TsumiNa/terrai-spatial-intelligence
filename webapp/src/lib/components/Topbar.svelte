@@ -28,6 +28,8 @@
       {/each}
     </div>
     <span class="data-date">{i18n.t("topbar.snapshot")}</span>
-    <div class="region-pill">{vm?.region === "mobara" ? i18n.t("region.mobara") : i18n.t("region.yokohama")}</div>
+    <div class="region-pill">
+      {vm?.region === "mobara" ? i18n.t("region.mobara") : vm?.region === "nihonbashi" ? i18n.t("region.nihonbashi") : i18n.t("region.yokohama")}
+    </div>
   </div>
 </header>
