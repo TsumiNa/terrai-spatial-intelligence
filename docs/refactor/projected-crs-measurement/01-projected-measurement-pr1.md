@@ -1,7 +1,25 @@
 # PR1 Plan: Projected Measurement for the Build Pipelines
 
-- Status: In progress
+- Status: Completed
 - Refactor: `projected-crs-measurement`
+- PR: #44
+
+## Completion record
+
+- The measurement module landed inside the shared pipeline library
+  (`terrai_spatial/pipeline/measurement.py`), per the execution order that put the library
+  first. Polygon-area and centroid primitives were omitted: neither build script computes a
+  metric area or metric centroid today (zone binning stays geographic), so they wait for a
+  first real caller.
+- The regenerated diff carried **zero band changes**. Membership counts inside the 55/150/250 m
+  radii grew slightly (high-risk links 2587 → 2591 and 1345 → 1351) — the direction the
+  expected signature predicts, since the planar approximation overstated north–south
+  separations by ~0.335%. One corridor's `compound_score` moved +4; `solar_delivery_cells`,
+  both zone products and `multiscale_summary` are byte-identical.
+- `area_ha` and `footprint_m2` were confirmed as pre-existing packaged-input properties and
+  left untouched. The audit drawer's geospatial fields likewise surface packaged-snapshot
+  values, so the new trilingual text states the projected pipeline workflow without claiming
+  EPSG:6677 for values this PR did not regenerate.
 
 ## Goal
 
