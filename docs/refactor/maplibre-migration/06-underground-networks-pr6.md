@@ -23,7 +23,7 @@ The original plan assumed a network dataset at negative absolute elevation. What
 2. The underground view itself: camera pitch lowered toward the stage-03 `maxPitch` ceiling, surface translucency increased, no terrain. The nine tilesets render through deck.gl `Tile3DLayer` with depth reading relaxed so networks read through the surface rather than being occluded by it — verified not to draw over UI panels or the audit drawer.
 3. Depth, diameter, material and measurement type carried as data from the audit index. Clicking an element opens an audit record naming its source, creation/retrieval dates, measurement type, and the positional and vertical-reference caveats. **Picking granularity ladder**, resolved empirically against deck's structural-metadata support and recorded here at completion: per-feature where feature IDs reach deck picking; otherwise per-asset (one glTF tile, resolved through the audit index's `source_asset` key); otherwise per-resource (utility class). The audit record states which granularity it represents.
 4. A legend that distinguishes measurement classes from `uro:mesureType`, labels grounded in the published PLATEAU codelist; a code whose meaning cannot be confirmed from the codelist stays a code rather than being guessed into "surveyed" or "inferred".
-5. Utility-class colours join the palette in both declarations, per `color-palette.instructions.md`.
+5. Utility-class colours join the palette in both declarations, per `.github/instructions/color-palette.instructions.md`.
 
 ## Non-goals
 
