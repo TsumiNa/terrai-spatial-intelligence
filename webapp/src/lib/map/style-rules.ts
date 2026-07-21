@@ -21,9 +21,24 @@ export function rgba(hex: string, alpha = 1): RGBA {
   ];
 }
 
-/** The windowed foundation proving layer: context under the analysis, never
- *  competing with it — low-opacity fill, thin stroke, no picking. */
-export const WINDOWED_STYLE = { line: rgba(palette.blue, 0.75), fill: rgba(palette.blue, 0.12), width: 1 } as const;
+/** Foundation overlays: context under the analysis, never competing with
+ *  it — low-opacity fills, thin strokes. One entry per registry key; colours
+ *  reuse the locked palette rather than growing it. */
+export const FOUNDATION_DEFAULT_STYLE = { line: rgba(palette.gray, 0.8), fill: rgba(palette.gray, 0.12), width: 1 } as const;
+
+export const FOUNDATION_OVERLAY_STYLES: Record<string, { line: RGBA; fill: RGBA; width: number }> = {
+  landClassification50k: { line: rgba(palette.hub, 0.8), fill: rgba(palette.hub, 0.14), width: 1 },
+  floodHistory: { line: rgba(palette.blue, 0.85), fill: rgba(palette.blue, 0.16), width: 1 },
+  landHistory: { line: rgba(palette.blue, 0.75), fill: rgba(palette.blue, 0.12), width: 1 },
+  landslideWarning: { line: rgba(palette.red, 0.8), fill: rgba(palette.red, 0.12), width: 1 },
+  multistageFlood: { line: rgba(palette.transmission, 0.8), fill: rgba(palette.transmission, 0.12), width: 1 },
+  publishedLandPrice: { line: rgba(palette.amber, 0.9), fill: rgba(palette.amber, 0.35), width: 1 },
+  embankmentRegulation: { line: rgba(palette.comms, 0.85), fill: rgba(palette.comms, 0.12), width: 1 },
+  railway: { line: rgba(palette.ink, 0.7), fill: rgba(palette.ink, 0.1), width: 1.5 },
+  landUseMesh: { line: rgba(palette.green, 0.5), fill: rgba(palette.green, 0.1), width: 0.5 },
+  prefecturalLandPrice: { line: rgba(palette.amber, 0.9), fill: rgba(palette.amber, 0.2), width: 1 },
+  osmSapporoUndergroundAccess: { line: rgba(palette.forest, 0.85), fill: rgba(palette.forest, 0.14), width: 1.5 },
+};
 
 /** Buildings drawn as context under other analytical layers. */
 export const BUILDING_OVERLAYS = {

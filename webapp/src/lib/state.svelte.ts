@@ -36,6 +36,9 @@ let auditRecord = $state<AuditRecord | null>(null);
 let queueSelection = $state.raw<{ feature: Feature; tick: number } | null>(null);
 
 let underground = $state.raw<UndergroundState>({ status: "unknown", manifest: null, auditIndex: null });
+// Foundation overlay visibility is explicit application state: it survives
+// module, view, region and language switches, deliberately.
+let foundationLayers = $state<string[]>([]);
 let sceneBundle = $state.raw<SceneBundle | null>(null);
 
 export type { UndergroundState } from "./underground";
@@ -68,6 +71,9 @@ export const app = {
   get sceneBundle() {
     return sceneBundle;
   },
+  get foundationLayers() {
+    return foundationLayers;
+  },
 
   selectModule(next: ModuleName) {
     module = next;
@@ -85,6 +91,11 @@ export const app = {
   },
   selectBasemap(next: BasemapKey) {
     basemap = next;
+  },
+  toggleFoundationLayer(key: string) {
+    foundationLayers = foundationLayers.includes(key)
+      ? foundationLayers.filter((item) => item !== key)
+      : [...foundationLayers, key];
   },
   selectLanguage(lang: typeof i18n.lang) {
     if (lang === i18n.lang) return;

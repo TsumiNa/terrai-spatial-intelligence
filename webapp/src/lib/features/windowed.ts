@@ -58,21 +58,6 @@ interface ApiLike {
   GET(path: "/api/v1/features/{key}", init: unknown): Promise<{ data?: unknown; error?: unknown }>;
 }
 
-/** The proving consumer: `landHistory`, chosen for difficulty — 23 MB across
- *  seventeen and twelve source layers per archive. Its coverage is the two
- *  MLIT acquisition-context windows; the numbers come from the pipeline
- *  study-area registry (`terrai_spatial/pipeline/regions.py`) and the layer
- *  registry planned for the overlay stage will own them properly. */
-export const PROVING_LAYER: { key: string; extents: Bounds[] } = {
-  key: "landHistory",
-  extents: [
-    [139.54, 35.39, 139.66, 35.515],
-    [140.22, 35.38, 140.35, 35.51],
-  ],
-};
-
-export const IDLE_STATE: WindowedState = { status: "idle", features: [], matched: 0 };
-
 export function quantizeWindow(bounds: Bounds, grid: number = WINDOW_GRID_DEGREES): Bounds {
   const [west, south, east, north] = bounds;
   return [
@@ -125,9 +110,12 @@ export function createWindowedFeatureClient(options: {
   datasetKey: string;
   extents: Bounds[];
   onState: (state: WindowedState) => void;
+  /** Per-layer floor from the registry; the default is the measured bound. */
+  minZoom?: number;
   debounceMs?: number;
 }): WindowedFeatureClient {
   const debounceMs = options.debounceMs ?? WINDOW_DEBOUNCE_MS;
+  const minZoom = options.minZoom ?? WINDOWED_MIN_ZOOM;
   const cache = new Map<string, WindowResult>();
   let timer: ReturnType<typeof setTimeout> | null = null;
   let inflight: AbortController | null = null;
@@ -174,7 +162,7 @@ export function createWindowedFeatureClient(options: {
   return {
     viewChanged(view) {
       if (destroyed) return;
-      if (view.zoom < WINDOWED_MIN_ZOOM) {
+      if (view.zoom < minZoom) {
         cancelPending();
         options.onState({ status: "belowZoom", features: [], matched: 0 });
         return;

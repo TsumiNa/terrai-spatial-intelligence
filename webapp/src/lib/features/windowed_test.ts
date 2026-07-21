@@ -1,8 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-  IDLE_STATE,
-  PROVING_LAYER,
   WINDOWED_MIN_ZOOM,
   WINDOW_LIMIT,
   createWindowedFeatureClient,
@@ -12,6 +10,9 @@ import {
   type Bounds,
   type WindowedState,
 } from "./windowed";
+import { foundationLayer } from "./registry";
+
+const LAND_HISTORY = foundationLayer("landHistory")!;
 
 const YOKOHAMA_VIEW: Bounds = [139.585, 35.443, 139.595, 35.451];
 const OCEAN_VIEW: Bounds = [150.0, 20.0, 150.1, 20.1];
@@ -54,8 +55,8 @@ function harness(api: ReturnType<typeof fakeApi>) {
   const states: WindowedState[] = [];
   const client = createWindowedFeatureClient({
     api,
-    datasetKey: PROVING_LAYER.key,
-    extents: PROVING_LAYER.extents,
+    datasetKey: LAND_HISTORY.key,
+    extents: LAND_HISTORY.extents,
     onState: (state) => states.push(state),
   });
   return { client, states, last: () => states[states.length - 1] };
@@ -192,12 +193,8 @@ describe("window helpers", () => {
   });
 
   it("treats an edge-touching window as inside the extent", () => {
-    expect(intersectsAny([139.66, 35.3, 139.7, 35.39], PROVING_LAYER.extents)).toBe(true);
-    expect(intersectsAny([139.67, 35.3, 139.7, 35.3899], PROVING_LAYER.extents)).toBe(false);
-  });
-
-  it("exposes an idle state constant for consumers to reset with", () => {
-    expect(IDLE_STATE.status).toBe("idle");
+    expect(intersectsAny([139.66, 35.3, 139.7, 35.39], LAND_HISTORY.extents)).toBe(true);
+    expect(intersectsAny([139.67, 35.3, 139.7, 35.3899], LAND_HISTORY.extents)).toBe(false);
   });
 });
 

@@ -27,9 +27,10 @@ import {
   OVERLAY_OPACITY,
   RISK_BANDS,
   ROAD_OPACITY,
+  FOUNDATION_DEFAULT_STYLE,
+  FOUNDATION_OVERLAY_STYLES,
   ROAD_THRESHOLDS,
   SOLAR_STATUS,
-  WINDOWED_STYLE,
   ZONE_STYLE,
   rgba,
 } from "./style-rules";
@@ -61,23 +62,36 @@ export function assetUrl(path: string, assetBase: string): string {
 }
 
 /**
- * The windowed foundation layer, rendered minimally: geometry only, palette
- * colours, drawn beneath the analytical layers and never picked. Styling is
- * the overlay stage's scope; this proves the delivery path.
+ * One windowed foundation overlay, rendered as context: registry-keyed
+ * palette colours, drawn beneath the analytical layers. Pickable when a
+ * handler is given, but always under the analysis — deck picks the topmost
+ * layer, so an analytical feature wins any contested click.
  */
-export function buildWindowedFeatureLayer(key: string, features: Feature[]): Layer {
+export function buildWindowedFeatureLayer(
+  key: string,
+  features: Feature[],
+  handlers?: { onFeature(feature: Feature, coordinate: [number, number]): void },
+): Layer {
+  const style = FOUNDATION_OVERLAY_STYLES[key] ?? FOUNDATION_DEFAULT_STYLE;
   return new GeoJsonLayer({
     id: `windowed-${key}`,
     data: features as unknown as GeoJSON.Feature[],
     stroked: true,
     filled: true,
-    pickable: false,
+    pickable: Boolean(handlers),
     lineWidthUnits: "pixels",
-    getLineWidth: WINDOWED_STYLE.width,
-    getLineColor: WINDOWED_STYLE.line,
-    getFillColor: WINDOWED_STYLE.fill,
+    getLineWidth: style.width,
+    getLineColor: style.line,
+    getFillColor: style.fill,
     pointRadiusUnits: "pixels",
     getPointRadius: 4,
+    onClick: handlers
+      ? (info: { object?: Feature; coordinate?: number[] }) => {
+          if (!info.object || !info.coordinate) return;
+          handlers.onFeature(info.object, [info.coordinate[0], info.coordinate[1]]);
+          return true;
+        }
+      : undefined,
   } as never);
 }
 

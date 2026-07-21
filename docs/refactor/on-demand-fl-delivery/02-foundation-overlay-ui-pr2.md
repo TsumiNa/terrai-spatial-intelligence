@@ -1,8 +1,29 @@
 # PR2 Plan: Foundation Layers as Auditable Overlays
 
-- Status: Planned
+- Status: Completed
 - Refactor: `on-demand-fl-delivery`
 - Depends on: PR1 merged
+- PR: #48
+
+## Completion record
+
+- Eleven layers registered (10 MLIT + the OSM Sapporo access graph), each with a
+  compile-checked trilingual name, per-layer zoom floor, coverage extents, source-stated
+  attribution, verbatim licence, the source's own timestamp, and stated limitations. The
+  registry test pins the key set to exactly the on-demand feature collections, so an
+  analytical dataset cannot drift into the overlay registry.
+- The seventeen-source-layer question resolved as one toggle per dataset key: the archive's
+  internal layers surface per feature (`terrai_source_layer`) in the popup and audit record,
+  matching how MLIT itself packages them.
+- Attribution renders as a persistent on-screen strip while any layer is visible;
+  `renderableFoundationLayers` drops an entry without attribution and a test proves it.
+- Foundation clicks open raw-kind audit records with the source's own timestamp shown
+  verbatim beside the per-feature retrieval stamp; overlays draw beneath the analysis and
+  deck's topmost-first picking gives analytical features every contested click.
+- PR1's proving toggle is superseded by the registry control. The pan/cache e2e drives
+  `railway`: the mechanics are layer-agnostic, and `landHistory`'s tessellation cost — the
+  client-side limit PR1 recorded — makes it the wrong vehicle for timing-sensitive
+  assertions while it still loads real windows in the attribution and below-zoom tests.
 
 ## Goal
 
