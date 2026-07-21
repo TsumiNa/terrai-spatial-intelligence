@@ -14,6 +14,8 @@ Hand-written CSS lets each change invent a class name, a colour and a spacing va
 
 The goal is therefore not tidier CSS. **The goal is that a human can review UI changes they did not write**, by reading rule violations and rendered-output diffs instead of class strings.
 
+The current applications are exploratory. They will be substantially rewritten once the requirements are settled, and the UI will grow well beyond today's ten components. That is the premise this refactor rests on, and it inverts the obvious objection: the guardrails are worth building *before* the rewrite, not after, because the rewrite is when the most code is produced and when reviewing it matters most. Establishing them afterwards means paying to retrofit exactly the code that was written without them.
+
 Three properties deliver that, and none of them is "install Tailwind":
 
 1. Values outside the design system are **impossible to write silently** — they fail a check rather than rendering a slightly-off green.
@@ -25,6 +27,10 @@ Three properties deliver that, and none of them is "install Tailwind":
 Adopt **Tailwind CSS v4** with a theme locked to the existing TerrAI tokens, and **shadcn-svelte** for behaviour-hard overlay primitives only.
 
 Tailwind is chosen for the reason above: with a locked `@theme` and the default palette removed, an off-system value has to be written as an arbitrary value (`bg-[#1f7a58]`, `p-[13px]`), which is greppable and therefore enforceable. Plain CSS gives no such signal. Svelte's scoped styles already solve collisions and naming, so that is not what Tailwind is buying here.
+
+Two properties decide it, and both depend on the growth premise. Model output converges on convention, and Tailwind is the convention — an AI writing bespoke CSS invents a class, a scale and a near-miss colour every time, while an AI writing Tailwind produces something a reviewer has seen before. And a violation is *visible* rather than merely *detectable*: `bg-[#1f7a58]` reads as an escape hatch at a glance, where a raw hex in a stylesheet looks like ordinary code and its detection depends entirely on the linter's coverage.
+
+Stylelint against plain CSS could enforce the same tokens, and at today's size that would be lighter. It was the better answer while the UI was ten components and stable. It stops being the better answer once most of the UI is yet to be written.
 
 shadcn-svelte components are copy-in, so they become this repository's code on arrival. That cuts both ways and shapes how they are used:
 
@@ -67,10 +73,15 @@ Ordered so that the safety net exists before anything it protects is touched.
 
 Each stage is its own pull request, states its own acceptance commands, and leaves the suite and validation passing when it merges. Stage 01 must merge before 02 begins: without a baseline, "the UI did not change" is an opinion.
 
+**All five stages run to completion before the applications are redesigned.** They are short, and running them alongside a redesign mixes two kinds of diff — "the styling system moved" and "the design changed" — in the same review, where neither can be read. The guardrails are cheapest to install against a UI that is holding still.
+
 ## Consequences accepted
 
-- **Screenshot tests need a stable environment.** They fail on font and rendering differences between machines. Pin the Playwright browser version and generate baselines in one place; expect to regenerate them deliberately, and never regenerate them to make a red build green without looking at the diff.
-- **The twelve tokens become a hard boundary.** Adding a colour becomes a deliberate act with a review, which is the point, and will feel obstructive the first time it blocks something legitimate.
+- **Screenshot tests need a stable environment.** They fail on font and rendering differences between machines. Pin the Playwright browser version and generate baselines in one place.
+- **Baselines are migration scaffolding with a known expiry.** They exist to prove stages 02–05 changed nothing they did not intend to. They are not a permanent regression suite for these particular screens, which are exploratory and will be replaced. Two cases, and conflating them makes the rule either violated or obstructive:
+  - **During this refactor**, a screenshot diff is a defect. Do not regenerate to go green.
+  - **During a deliberate redesign**, baselines are regenerated wholesale as part of reviewing that design. That is normal, and the diff is the artefact under review rather than a failure.
+- **The twelve tokens become a hard boundary, not a fixed set.** They are extracted from the design that exists today. The redesign will need more, and the site scene may need a subsurface scale. Extending the theme is a normal reviewed act; the boundary exists so that extension is *deliberate*, not so that the count stays at twelve. If adding a token feels like fighting the system, the system is being read wrong — the failure mode to prevent is a component reaching past the theme, not the theme growing.
 - **Copied shadcn components are owned code.** They do not update themselves, and each one must be reviewed on arrival like any other source file.
 - **Class strings get longer.** Utility-first markup is harder to skim than a semantic class name. That cost is accepted because the reviewer's job moves from reading markup to reading violations and image diffs.
 
@@ -82,6 +93,6 @@ Each stage is its own pull request, states its own acceptance commands, and leav
 
 ## Open questions
 
-1. Whether the twelve tokens are sufficient once the site scene lands, or whether a subsurface palette is needed as a separate scale.
+1. What the redesign needs from the theme. The twelve tokens describe today's exploratory applications; the site scene in particular may want a subsurface scale that does not exist yet.
 2. Whether screenshot baselines are generated in CI or committed from a developer machine. There is no CI workflow in this repository yet, which stage 01 has to resolve one way or the other.
 3. Whether the enforcement check lives in the JavaScript toolchain or in `terrai validate` alongside the other repository contracts.

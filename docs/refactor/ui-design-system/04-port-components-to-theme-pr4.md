@@ -22,7 +22,7 @@ No visual change. No markup restructuring beyond what styling requires. No acces
 ## Implementation notes
 
 - Port one component per commit. A single commit touching all ten makes the screenshot diff unreadable, which defeats the reason the baseline exists.
-- Any screenshot diff is a defect in this stage, not an improvement. If a diff looks better, it still fails: this stage is defined as visually neutral, and a better version belongs to a design change that is reviewed as one.
+- Any screenshot diff is a defect in this stage, not an improvement. If a diff looks better, it still fails: this stage is defined as visually neutral, and a better version belongs to the redesign, which is reviewed as its own change with its own regenerated baselines.
 - `MapCard` is the largest at 133 lines and interacts with the map canvas; port it last, once the pattern is settled.
 
 ## Acceptance
