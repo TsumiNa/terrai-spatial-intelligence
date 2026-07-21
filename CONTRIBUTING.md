@@ -37,6 +37,17 @@ Project documentation belongs in the five `docs/` categories: `architecture`, `r
 
 Run `uv run python -m terrai_spatial validate` after adding or changing documentation. The validator discovers documents under the three multilingual directories automatically and checks their language partners and navigation. It also enforces directory boundaries, refactor naming, and required data-card sections.
 
+## Visual baselines
+
+`webapp/e2e/visual_test.ts` compares the exhibition chrome against committed screenshots. They are platform specific — fonts and rasterisation differ between macOS and the Linux runner — so both suffixes are committed and Playwright picks the right one.
+
+Regenerate deliberately, never to turn a red build green:
+
+- **Locally**, for the platform you are on: `cd webapp && npx playwright test visual_test.ts --update-snapshots`
+- **For Linux**, run the `Visual baselines` workflow from the Actions tab, download the `visual-baselines-linux` artifact, review every changed image, and commit the ones you intend to keep.
+
+A diff during a refactor is a defect. A diff during an intended redesign is the thing being reviewed.
+
 ## Branches and PRs
 
 Follow [branch-and-pr-workflow.instructions.md](.github/instructions/branch-and-pr-workflow.instructions.md): use one branch/PR per objective; continue on an existing branch when its PR has the same objective; and record reviewable stages in the relevant `docs/refactor/<refactor>/` plan.

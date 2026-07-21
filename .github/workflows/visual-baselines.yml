@@ -5,8 +5,7 @@ name: Visual baselines
 # generated here, in the one environment that also checks them.
 #
 # Run this deliberately — after an intended redesign, or when adding a screen.
-# Nothing runs automatically, and the job is inert until e2e/visual_test.ts
-# exists; it lands with stage 01 of the ui-design-system refactor.
+# Nothing runs automatically.
 # It uploads the images rather than committing them, so a person looks at what
 # changed before it becomes the thing future runs are compared against.
 on:
