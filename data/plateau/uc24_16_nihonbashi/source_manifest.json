@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "dataset_id": "plateau_uc24_16_nihonbashi",
+  "package_id": "plateau-uc24-16",
+  "package_api": "https://www.geospatial.jp/ckan/api/3/action/package_show?id=plateau-uc24-16",
+  "package_page": "https://www.geospatial.jp/ckan/dataset/plateau-uc24-16",
+  "license_url": "https://www.mlit.go.jp/plateau/site-policy/",
+  "selection_rule": "All nine resources published for the UC24-16-01 Nihonbashi demonstration scene; resource IDs are frozen so catalog drift fails visibly.",
+  "resources": [
+    {
+      "resource_id": "bbd1e7cc-4b9e-4438-8127-95a31c7779e2",
+      "slug": "sewer-pipe",
+      "utility_class": "sewer_pipe"
+    },
+    {
+      "resource_id": "03bcc8f6-a3dd-4ccc-b32d-98acf6c327a2",
+      "slug": "power-manhole",
+      "utility_class": "power_manhole"
+    },
+    {
+      "resource_id": "120e705e-36b6-41a2-8bd2-e931afcb1d5d",
+      "slug": "communications-manhole",
+      "utility_class": "communications_manhole"
+    },
+    {
+      "resource_id": "5f9d5be6-309c-4e82-a31d-14a4bed84308",
+      "slug": "communications-cable",
+      "utility_class": "communications_cable"
+    },
+    {
+      "resource_id": "c4744db5-15e8-4268-acae-31e53883b9f7",
+      "slug": "sewer-manhole",
+      "utility_class": "sewer_manhole"
+    },
+    {
+      "resource_id": "3b304996-7c30-46e2-a945-3d6c88bb92d7",
+      "slug": "power-cable",
+      "utility_class": "power_cable"
+    },
+    {
+      "resource_id": "6ee65d70-6e9e-4a78-ab3f-722c2ecb422b",
+      "slug": "water-pipe",
+      "utility_class": "water_pipe"
+    },
+    {
+      "resource_id": "af968ad3-6d48-445c-bc4f-ea324f264db6",
+      "slug": "gas-pipe",
+      "utility_class": "gas_pipe"
+    },
+    {
+      "resource_id": "939c73eb-0414-44d6-bbd3-aaa2f11ecad8",
+      "slug": "communications-handhole",
+      "utility_class": "communications_handhole"
+    }
+  ]
+}

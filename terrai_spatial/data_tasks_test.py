@@ -125,6 +125,35 @@ def test_offline_start_accepts_committed_grid_summary_without_local_cache(tmp_pa
     assert "local cache missing" in states[-1].reason
 
 
+def test_underground_scene_requires_every_manifest_cache_file(tmp_path: Path) -> None:
+    source_manifest = tmp_path / "data/plateau/uc24_16_nihonbashi/source_manifest.json"
+    retrieval_manifest = tmp_path / "data/plateau/uc24_16_nihonbashi/manifest.json"
+    audit_index = tmp_path / "data/plateau/uc24_16_nihonbashi/audit_index.json"
+    cache_file = tmp_path / "data/external/plateau_uc24_16/assets/water-pipe/tileset.json"
+    write_json(source_manifest)
+    retrieval_manifest.parent.mkdir(parents=True, exist_ok=True)
+    retrieval_manifest.write_text(
+        json.dumps({"files": [str(cache_file.relative_to(tmp_path))]}), encoding="utf-8"
+    )
+    write_json(audit_index)
+
+    state = task_state("underground_utilities", tmp_path)
+    assert state.status == "missing"
+    assert "water-pipe/tileset.json" in state.reason
+
+    write_json(cache_file)
+    assert task_state("underground_utilities", tmp_path).status == "ready"
+
+
+def test_offline_incomplete_underground_scene_is_not_reported_ready(tmp_path: Path) -> None:
+    write_json(tmp_path / "data/plateau/uc24_16_nihonbashi/source_manifest.json")
+    write_json(tmp_path / "data/plateau/uc24_16_nihonbashi/manifest.json")
+    write_json(tmp_path / "data/plateau/uc24_16_nihonbashi/audit_index.json")
+
+    with pytest.raises(RuntimeError, match="requires network access"):
+        ensure_data(root=tmp_path, selected=["underground_utilities"], allow_network=False)
+
+
 def test_integrated_fl_sources_require_retrieval_and_source_time_metadata(tmp_path: Path) -> None:
     registry = tmp_path / "data/external/source_registry.json"
     registry.parent.mkdir(parents=True)

@@ -1,6 +1,6 @@
 # PR1 Plan: UC24-16 Underground Utility Foundation Data
 
-- Status: Planned
+- Status: Completed
 - Refactor: `underground-observation-foundation`
 - Downstream consumer: `maplibre-migration/06-underground-networks-pr6`
 

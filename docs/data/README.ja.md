@@ -11,6 +11,7 @@
 | GSI 指定避難データ | 接続済み・全国 base | [指定避難所と災害種別指定緊急避難場所](gsi-designated-evacuation/README.ja.md) |
 | Google Satellite Embedding V1 | 接続済み | [年次遥感表現](google-satellite-embedding/README.ja.md) |
 | OpenStreetMap | 接続済み | [建物、道路、context](openstreetmap/README.ja.md) |
+| PLATEAU UC24-16 日本橋 | 接続済み・オンデマンド sample | [観測地下埋設物](plateau-uc24-16-nihonbashi/README.ja.md) |
 | 横浜市地域防災拠点 | 接続済み・地方検証/補足 | [公式公共施設](yokohama-disaster-bases/README.ja.md) |
 | NASA POWER | 接続済み | [日射気候背景](nasa-power/README.ja.md) |
 | TEPCO 公開系統情報 | 接続済み・再配布制限 | [地域系統容量 screening](tepco-grid/README.ja.md) |

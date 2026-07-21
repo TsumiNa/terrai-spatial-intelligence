@@ -1,21 +1,64 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
-from terrai_spatial.data_service import DATASETS, FOUNDATION_DATASETS, DatasetNotFoundError, service
+from terrai_spatial.data_service import (
+    ASSET_MANIFEST_DATASETS,
+    DATASETS,
+    FOUNDATION_DATASETS,
+    DataService,
+    DatasetNotFoundError,
+    service,
+)
 
 
 def test_health_reports_all_file_backed_datasets_ready() -> None:
     health = service.health()
     assert health["status"] == "ready"
-    assert health["datasets_ready"] == len(DATASETS) + len(FOUNDATION_DATASETS)
-    assert health["datasets_total"] == len(DATASETS) + len(FOUNDATION_DATASETS)
+    expected = len(DATASETS) + len(FOUNDATION_DATASETS) - len(ASSET_MANIFEST_DATASETS)
+    assert health["datasets_total"] == expected
+    assert health["datasets_ready"] == expected
 
 
 def test_foundation_datasets_are_on_demand_not_bootstrapped() -> None:
     catalog = {row["key"]: row for row in service.catalog()}
     assert catalog["landslideWarning"]["delivery"] == "on_demand"
     assert "landslideWarning" not in service.bootstrap()
+    assert catalog["uc24_16_nihonbashi"]["delivery"] == "on_demand"
+    assert "uc24_16_nihonbashi" not in service.bootstrap()
+    assert service.bootstrap()["meta"]["datasets_total"] == (
+        len(DATASETS) + len(FOUNDATION_DATASETS) - len(ASSET_MANIFEST_DATASETS)
+    )
+
+
+def test_asset_manifest_readiness_requires_every_local_cache_file(tmp_path: Path) -> None:
+    manifest = tmp_path / "data/plateau/uc24_16_nihonbashi/manifest.json"
+    asset = tmp_path / "data/external/plateau_uc24_16/assets/water-pipe/tileset.json"
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text(
+        '{"feature_count": 1, "files": ["data/external/plateau_uc24_16/assets/water-pipe/tileset.json"], '
+        '"resources": [{"tileset_url": "/api/v1/assets/external/plateau_uc24_16/assets/water-pipe/tileset.json"}]}',
+        encoding="utf-8",
+    )
+    local_service = DataService(tmp_path)
+
+    row = next(item for item in local_service.catalog() if item["key"] == "uc24_16_nihonbashi")
+    assert row["ready"] is False
+    assert row["feature_count"] == 1
+
+    asset.parent.mkdir(parents=True)
+    asset.write_text("{", encoding="utf-8")
+    row = next(item for item in local_service.catalog() if item["key"] == "uc24_16_nihonbashi")
+    assert row["ready"] is False
+
+    asset.write_text("{}", encoding="utf-8")
+    row = next(item for item in local_service.catalog() if item["key"] == "uc24_16_nihonbashi")
+    assert row["ready"] is True
+    assert row["asset_roots"] == [
+        "/api/v1/assets/external/plateau_uc24_16/assets/water-pipe/tileset.json"
+    ]
 
 
 def test_bootstrap_contains_ranked_server_side_recommendations() -> None:

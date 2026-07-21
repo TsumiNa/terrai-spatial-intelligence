@@ -47,6 +47,27 @@
       "rights_limit": "Attribution required; public derivative databases may trigger share-alike; completeness is not guaranteed"
     },
     {
+      "id": "plateau_uc24_16_nihonbashi",
+      "theme": "observed_underground_utility_sample",
+      "status": "integrated",
+      "source_updated_at": "2025-06-04",
+      "sample_creation_date": "2025-01-31",
+      "retrieved_at": "2026-07-21",
+      "format": "3D Tiles 1.1 with glTF 2.0 EXT_structural_metadata",
+      "access_cost": "free direct public download; no account or API key",
+      "license": "PLATEAU Site Policy, section 3",
+      "official_page": "https://www.geospatial.jp/ckan/dataset/plateau-uc24-16",
+      "package_api": "https://www.geospatial.jp/ckan/api/3/action/package_show?id=plateau-uc24-16",
+      "local_cache": "data/external/plateau_uc24_16/ (Git-ignored source ZIPs and expanded 3D Tiles)",
+      "local_output": [
+        "data/plateau/uc24_16_nihonbashi/source_manifest.json",
+        "data/plateau/uc24_16_nihonbashi/manifest.json",
+        "data/plateau/uc24_16_nihonbashi/audit_index.json"
+      ],
+      "spatial_limit": "Nine-resource Nihonbashi demonstration sample only; not a current or complete utility ledger",
+      "rights_limit": "Attribution and third-party-rights checks are required; not suitable for excavation, engineering or emergency use"
+    },
+    {
       "id": "yokohama_official_disaster_bases",
       "theme": "official_facility_resilience",
       "status": "integrated",
