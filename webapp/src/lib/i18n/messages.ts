@@ -66,6 +66,18 @@ export const en = {
 
   // Basemap switcher
   "basemap.aria": "Basemap",
+
+  // Windowed foundation proving layer
+  "windowed.aria": "On-demand foundation layer",
+  "windowed.toggle": "Land history",
+  "windowed.title": "Load MLIT land-history features for the current viewport, on demand",
+  "windowed.loading": "Loading land history…",
+  "windowed.ready": "{n} land-history features in view",
+  "windowed.belowZoom": "Zoom in to load land history",
+  "windowed.outside": "Outside land-history coverage",
+  "windowed.empty": "No land-history features in this window",
+  "windowed.oversized": "Window too large — zoom in",
+  "windowed.error": "Land-history request failed",
   "basemap.standard": "Standard",
   "basemap.standardTitle": "GSI standard map",
   "basemap.photo": "Imagery",
@@ -506,6 +518,18 @@ export const zh: Record<MessageKey, string> = {
   "chip.aefChangeDetail": "独立核查，不计分",
 
   "basemap.aria": "背景地图",
+
+  // 按需基础图层（验证用）
+  "windowed.aria": "按需基础图层",
+  "windowed.toggle": "土地履历",
+  "windowed.title": "按当前视口按需加载 MLIT 土地履历要素",
+  "windowed.loading": "土地履历加载中…",
+  "windowed.ready": "视口内 {n} 个土地履历要素",
+  "windowed.belowZoom": "放大后才会加载土地履历",
+  "windowed.outside": "当前视口在土地履历覆盖范围之外",
+  "windowed.empty": "此窗口内没有土地履历要素",
+  "windowed.oversized": "窗口过大——请放大",
+  "windowed.error": "土地履历请求失败",
   "basemap.standard": "标准",
   "basemap.standardTitle": "GSI 标准地图",
   "basemap.photo": "影像",
@@ -905,6 +929,18 @@ export const ja: Record<MessageKey, string> = {
   "chip.aefChangeDetail": "独立確認、スコア未使用",
 
   "basemap.aria": "背景地図",
+
+  // オンデマンド基盤レイヤ（実証用）
+  "windowed.aria": "オンデマンド基盤レイヤ",
+  "windowed.toggle": "土地履歴",
+  "windowed.title": "現在のビューポートに応じて MLIT 土地履歴図の地物を読み込みます",
+  "windowed.loading": "土地履歴を読み込み中…",
+  "windowed.ready": "表示範囲内の土地履歴地物 {n} 件",
+  "windowed.belowZoom": "ズームインすると土地履歴を読み込みます",
+  "windowed.outside": "土地履歴の整備範囲外です",
+  "windowed.empty": "このウィンドウに土地履歴の地物はありません",
+  "windowed.oversized": "ウィンドウが大きすぎます——ズームインしてください",
+  "windowed.error": "土地履歴のリクエストに失敗しました",
   "basemap.standard": "標準",
   "basemap.standardTitle": "GSI標準地図",
   "basemap.photo": "画像",

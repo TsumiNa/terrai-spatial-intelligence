@@ -1,6 +1,6 @@
 # PR1 Plan: Viewport-driven Feature Client
 
-- Status: Planned
+- Status: In progress
 - Refactor: `on-demand-fl-delivery`
 
 ## Goal

@@ -21,6 +21,10 @@ export function rgba(hex: string, alpha = 1): RGBA {
   ];
 }
 
+/** The windowed foundation proving layer: context under the analysis, never
+ *  competing with it — low-opacity fill, thin stroke, no picking. */
+export const WINDOWED_STYLE = { line: rgba(palette.blue, 0.75), fill: rgba(palette.blue, 0.12), width: 1 } as const;
+
 /** Buildings drawn as context under other analytical layers. */
 export const BUILDING_OVERLAYS = {
   overview: { line: rgba(palette.exposureOutline), width: 0.4, fill: rgba(colors.red, 0.2) },

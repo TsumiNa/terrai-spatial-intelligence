@@ -56,6 +56,13 @@ export interface ExhibitionMap {
   closePopup(): void;
   /** Frame a feature the way the queue always has: fit its bounds, capped. */
   frame(bounds: [number, number, number, number]): void;
+  /**
+   * Report settled viewports — bounds and zoom, plain data only. Fetch
+   * decisions belong to the caller; the map only says where it is looking.
+   * Fires once for the initial view and on every `moveend`; returns an
+   * unsubscribe function.
+   */
+  onViewChange(listener: (view: { bounds: [number, number, number, number]; zoom: number }) => void): () => void;
   destroy(): void;
 }
 
@@ -212,6 +219,18 @@ export async function createExhibitionMap(
     },
     closePopup() {
       popup.remove();
+    },
+    onViewChange(listener) {
+      const report = () => {
+        const bounds = map.getBounds();
+        listener({
+          bounds: [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()],
+          zoom: map.getZoom(),
+        });
+      };
+      map.on("moveend", report);
+      void loaded.then(report);
+      return () => map.off("moveend", report);
     },
     frame([west, south, east, north]) {
       if (west === east && south === north) {

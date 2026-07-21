@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
-from typing import Annotated, AsyncIterator
+from typing import Annotated, Any, AsyncIterator
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .data_service import DatasetNotFoundError, ROOT, service
@@ -26,6 +27,30 @@ app = FastAPI(
     description="Read-only APIs for the TerrAI commercial exhibition prototype, served from the spatial store derived from the committed datasets.",
     lifespan=lifespan,
 )
+
+RASTER_SUFFIXES = (".png", ".jpg")
+
+
+class SkipRasterCompression:
+    """Strip Accept-Encoding for raster tiles so the gzip layer passes them
+    through untouched: PNG and JPEG are already compressed, and wrapping them
+    again spends cycles for negative gain. Everything else on the asset mount
+    (GeoJSON, glTF, audit indexes) compresses like the JSON routes."""
+
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if scope["type"] == "http" and scope["path"].lower().endswith(RASTER_SUFFIXES):
+            scope = {**scope, "headers": [item for item in scope["headers"] if item[0] != b"accept-encoding"]}
+        await self.app(scope, receive, send)
+
+
+# Compression wraps the whole application, the static asset mount included.
+# Middleware added later runs earlier, so the raster exclusion above sees the
+# request before gzip negotiates.
+app.add_middleware(GZipMiddleware, minimum_size=1024)
+app.add_middleware(SkipRasterCompression)
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,6 +1,6 @@
 # On-demand FL Delivery
 
-- Status: Planned
+- Status: In progress
 
 ## Context
 
