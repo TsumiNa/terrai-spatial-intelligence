@@ -18,7 +18,7 @@ Install Tailwind v4 and express the existing design tokens as the only values it
 
 ## Non-goals
 
-No component is restyled. No rule is deleted from `app.css`. No enforcement yet — that is stage 03. No shadcn.
+No component is restyled. No rule is deleted from `app.css`. No enforcement yet — that is stage 03. No component library.
 
 ## Implementation notes
 
