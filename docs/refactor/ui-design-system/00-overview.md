@@ -18,7 +18,7 @@ The current applications are exploratory. They will be substantially rewritten o
 
 Three properties deliver that, and none of them is "install Tailwind":
 
-1. Values outside the design system are **impossible to write silently** — they fail a check rather than rendering a slightly-off green.
+1. Values outside the design system are **impossible to write silently** — they fail a check rather than rendering a slightly-off green. This applies to the **palette only**; see below.
 2. Visual change is **visible as an image diff**, because no reviewer can diff CSS in their head.
 3. Interaction correctness is **asserted**, because accessible markup and plausible markup look identical in a diff.
 
@@ -84,7 +84,7 @@ Each stage is its own pull request, states its own acceptance commands, and leav
 - **Baselines are migration scaffolding with a known expiry.** They exist to prove stages 02–05 changed nothing they did not intend to. They are not a permanent regression suite for these particular screens, which are exploratory and will be replaced. Two cases, and conflating them makes the rule either violated or obstructive:
   - **During this refactor**, a screenshot diff is a defect. Do not regenerate to go green.
   - **During a deliberate redesign**, baselines are regenerated wholesale as part of reviewing that design. That is normal, and the diff is the artefact under review rather than a failure.
-- **The twelve tokens become a hard boundary, not a fixed set.** They are extracted from the design that exists today. The redesign will need more, and the site scene may need a subsurface scale. Extending the theme is a normal reviewed act; the boundary exists so that extension is *deliberate*, not so that the count stays at twelve. If adding a token feels like fighting the system, the system is being read wrong — the failure mode to prevent is a component reaching past the theme, not the theme growing.
+- **The twelve colours become a hard boundary, not a fixed set.** They are extracted from the design that exists today. The redesign will need more, and the site scene may need a subsurface scale. Extending the theme is a normal reviewed act; the boundary exists so that extension is *deliberate*, not so that the count stays at twelve. If adding a token feels like fighting the system, the system is being read wrong — the failure mode to prevent is a component reaching past the theme, not the theme growing.
 - **Bits UI becomes a runtime dependency.** An upstream change can move behaviour, which is the cost of receiving upstream accessibility fixes. Pin it and read its changelog on upgrade.
 - **Class strings get longer.** Utility-first markup is harder to skim than a semantic class name. That cost is accepted because the reviewer's job moves from reading markup to reading violations and image diffs.
 

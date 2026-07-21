@@ -10,9 +10,11 @@ Make an off-system value fail a check rather than merge. Without this stage, the
 
 ## Scope
 
-1. A check that scans every `.svelte` file and rejects:
-   - **arbitrary utility values** — `bg-[#1f7a58]`, `p-[13px]`, `w-[238px]`, `text-[14px]`;
-   - raw colour literals in `<style>` blocks and inline styles, where a token exists.
+1. A check that scans every `.svelte` file and rejects **off-palette colours**:
+   - arbitrary colour utilities — `bg-[#1f7a58]`, `text-[rgb(20,30,40)]`, `border-[hsl(...)]`;
+   - raw colour literals in `<style>` blocks and inline styles.
+
+   It must **not** reject arbitrary geometry — `p-[13px]`, `rounded-[7px]`, `w-[238px]`, `gap-[5px]`. Those are judgements, not defects, and rejecting them would both flatten the design and be impossible to satisfy: 63% of the pixel values in `app.css` are not multiples of four, so the existing design cannot be expressed on any regular scale.
 
    It must **not** reject **arbitrary variants** — `data-[state=open]:`, `aria-[expanded=true]:`, `supports-[...]:`. These carry no design value; they select a state. The dialog and popover primitives adopted in stage 05 require them, so a rule written as "reject anything containing `-[`" would block the exact components this refactor is adding.
 
@@ -34,6 +36,7 @@ No styling change. No opinion on class ordering or formatting — this is about 
 ## Acceptance
 
 - Injecting `bg-[#ff0000]` into any component fails the check with a message naming the file and the value.
+- `p-[13px]` and `rounded-[7px]` pass, proving the rule distinguishes palette from geometry.
 - `data-[state=open]:bg-forest` passes, and `data-[state=open]:bg-[#ff0000]` fails, proving the rule reads the utility rather than the whole class.
 - Injecting a raw hex into a component `<style>` block fails likewise.
 - The current tree passes with no exceptions needed, or with exceptions that are individually justified in review.
