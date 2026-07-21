@@ -11,16 +11,27 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
-/* The design system, and the whole of it.
+/* The design system.
  *
- * Tailwind's default palette, spacing scale and radii are cleared below, so a
- * value that is not declared here does not exist as a utility. Writing an
- * off-system colour then requires arbitrary-value syntax — `bg-[#1f7a58]` —
- * which is visible in review and rejected by the check that stage 03 adds.
+ * The lock is on the palette, not on the geometry, because the two kinds of
+ * deviation are not the same thing:
  *
- * These are a boundary, not a fixed set. The redesign will need more, and
- * extending this block is a normal reviewed act. What must not happen is a
- * component reaching past it.
+ *   A colour outside the palette is a defect. It fragments the brand, it is
+ *   where a model most plausibly invents a near miss, and it carries a contrast
+ *   risk this project already has fourteen instances of. So `--color-*` is
+ *   cleared: `bg-blue-500` does not exist, and an off-palette colour has to be
+ *   written as `bg-[#1f7a58]`, which is visible in review and rejected by the
+ *   check stage 03 adds.
+ *
+ *   A radius, a shadow or a spacing step outside the named set is a judgement.
+ *   Whether a card corner is 6px or 9px has no correctness dimension, and
+ *   forcing every surface through four named roles is how a product ends up
+ *   looking uniform and lifeless. Tailwind's own scales stay available, and the
+ *   role names below are shorthand for the common cases rather than a fence.
+ *
+ * The palette is a boundary, not a fixed set. The redesign will need more
+ * colours, and extending this block is a normal reviewed act. What must not
+ * happen is a component reaching past it.
  */
 @theme {
   --color-*: initial;
@@ -38,17 +49,17 @@
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  /* Radii the existing design actually uses, named by role rather than size so
-   * a component asks for "a card corner" instead of picking 9px by eye. */
-  --radius-*: initial;
+  /* Shorthand for the corners this design reaches for most often. Tailwind's
+   * own radius scale is left in place alongside them, and an arbitrary radius
+   * is legitimate: this is the layer a designer is meant to play in. */
   --radius-control: 6px;
   --radius-card: 9px;
   --radius-panel: 12px;
   --radius-pill: 999px;
 
-  --shadow-*: initial;
   --shadow-card: 0 14px 34px rgba(26, 55, 45, 0.09);
 
+  /* Typeface is identity rather than detail, so this one is a replacement. */
   --font-*: initial;
   --font-sans: Inter, "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }

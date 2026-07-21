@@ -17,18 +17,19 @@ Restyle all ten components through the theme and delete the rules they replace, 
 
 ## Non-goals
 
-No visual change. No markup restructuring beyond what styling requires. No accessibility work — stage 05. No new components.
+No redesign. No markup restructuring beyond what styling requires. No accessibility work — stage 05. No new components.
 
 ## Implementation notes
 
 - Port one component per commit. A single commit touching all ten makes the screenshot diff unreadable, which defeats the reason the baseline exists.
-- Any screenshot diff is a defect in this stage, not an improvement. If a diff looks better, it still fails: this stage is defined as visually neutral, and a better version belongs to the redesign, which is reviewed as its own change with its own regenerated baselines.
+- **Small visual diffs are acceptable here, and are reviewed rather than forbidden.** The earlier rule demanded pixel neutrality; that was dropped deliberately. The applications are exploratory and about to be rewritten, so preserving spacing that was set by eye costs more than it is worth. What must not happen is a diff nobody looked at: regenerate baselines as part of the review, with the images in the pull request, not to turn a red build green.
+- The screenshots still earn their place — they turn "did anything move" from an opinion into an artefact. Their purpose in this stage is disclosure, not prohibition.
 - `MapCard` is the largest at 133 lines and interacts with the map canvas; port it last, once the pattern is settled.
 
 ## Acceptance
 
-- Stage 01 screenshots pass unchanged across all three languages and both viewports.
+- Any screenshot diff is small, deliberate, and shown in the pull request with regenerated baselines.
 - `app.css` contains only global concerns; every component-specific rule is gone.
 - The theme enforcement check from stage 03 passes without new exceptions.
-- The dashed audit affordance renders identically.
+- The dashed audit affordance renders identically. This one is not negotiable: it is the product's signal that a value is auditable.
 - `uv run pytest` and `uv run python -m terrai_spatial validate` pass.
