@@ -13,6 +13,7 @@ This directory documents datasets already integrated into the TerrAI Foundation 
 | OpenStreetMap | Integrated | [Buildings, roads, and context](openstreetmap/README.md) |
 | PLATEAU UC24-13 Sapporo | Integrated, on-demand sample | [Observed underground structures](plateau-uc24-13-sapporo/README.md) |
 | PLATEAU UC24-16 Nihonbashi | Integrated, on-demand sample | [Observed underground utilities](plateau-uc24-16-nihonbashi/README.md) |
+| KuniJiban boreholes | Integrated, on-demand regional extract | [Boreholes, strata, and SPT](kunijiban-boreholes/README.md) |
 | Yokohama regional disaster bases | Integrated, local validation/supplement | [Official public facilities](yokohama-disaster-bases/README.md) |
 | NASA POWER | Integrated | [Solar climate context](nasa-power/README.md) |
 | TEPCO public system information | Integrated, redistribution restricted | [Regional grid-capacity screen](tepco-grid/README.md) |

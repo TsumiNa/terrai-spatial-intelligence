@@ -13,6 +13,7 @@
 | OpenStreetMap | 已接入 | [建筑、道路与场景对象](openstreetmap/README.zh.md) |
 | PLATEAU UC24-13 札幌 | 已接入，按需样例 | [观测地下结构](plateau-uc24-13-sapporo/README.zh.md) |
 | PLATEAU UC24-16 日本桥 | 已接入，按需样例 | [观测地下管线](plateau-uc24-16-nihonbashi/README.zh.md) |
+| KuniJiban 钻孔 | 已接入，按需区域数据 | [钻孔、地层与 SPT](kunijiban-boreholes/README.zh.md) |
 | 横滨市地域防灾拠点 | 已接入，地方校验/补充 | [官方公共设施](yokohama-disaster-bases/README.zh.md) |
 | NASA POWER | 已接入 | [太阳辐照气候背景](nasa-power/README.zh.md) |
 | TEPCO 公开系統信息 | 已接入但再分发受限 | [区域并网容量筛查](tepco-grid/README.zh.md) |

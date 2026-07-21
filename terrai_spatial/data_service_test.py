@@ -34,9 +34,32 @@ def test_foundation_datasets_are_on_demand_not_bootstrapped() -> None:
     assert "uc24_13_sapporo" not in service.bootstrap()
     assert catalog["osmSapporoUndergroundAccess"]["delivery"] == "on_demand"
     assert "osmSapporoUndergroundAccess" not in service.bootstrap()
+    assert catalog["kunijibanBoreholes"]["delivery"] == "on_demand"
+    assert catalog["kunijibanBoreholes"]["kind"] == "asset_manifest"
+    assert catalog["kunijibanBoreholes"]["feature_count"] == 12_067
+    assert "kunijibanBoreholes" not in service.bootstrap()
     assert service.bootstrap()["meta"]["datasets_total"] == (
         len(DATASETS) + len(FOUNDATION_DATASETS) - len(HEALTH_EXCLUDED_DATASETS)
     )
+
+
+def test_kunijiban_manifest_preserves_mixed_provenance_and_local_assets() -> None:
+    manifest = service.load("kunijibanBoreholes")
+
+    assert manifest["retrieved_at"] == "2026-06-27T13:04:00+09:00"
+    assert manifest["source_updated_at"] is None
+    assert manifest["evidence_status"] == "mixed_observed_and_model_extracted"
+    assert manifest["provenance_counts"] == {
+        "raw_xml": 6_462,
+        "pdf_vlm": 5_241,
+        "pdf_vlm_empty": 364,
+    }
+    assert {asset["role"] for asset in manifest["assets"]} == {
+        "boreholes_nested",
+        "stratigraphic_layers_flat",
+        "spt_tests_flat",
+    }
+    assert all((service.root / relative).is_file() for relative in manifest["files"])
 
 
 def test_scene_handoffs_resolve_through_existing_foundation_dataset_keys() -> None:
