@@ -1,8 +1,14 @@
 <script lang="ts">
   import AuditTrigger from "./AuditTrigger.svelte";
-  import type { ModuleVM } from "../modules";
+  import { app } from "../state.svelte";
+  import type { ModuleVM, QueueItemVM } from "../modules";
 
   let { vm }: { vm: ModuleVM } = $props();
+
+  function open(item: QueueItemVM, event: Event) {
+    if ((event.target as HTMLElement).closest(".audit-trigger")) return;
+    app.selectQueueItem(item.feature);
+  }
 </script>
 
 <aside class="insight-panel">
@@ -16,7 +22,18 @@
   </div>
   <div class="queue">
     {#each vm.queueItems as item, index (index)}
-      <div class="queue-item">
+      <div
+        class="queue-item"
+        role="button"
+        tabindex="0"
+        onclick={(event) => open(item, event)}
+        onkeydown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            open(item, event);
+          }
+        }}
+      >
         <span class="rank" style={`--rank-color:${item.color}`}>{index + 1}</span>
         <span class="queue-main">
           <strong>{item.title}</strong>

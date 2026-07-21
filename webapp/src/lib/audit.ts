@@ -360,6 +360,24 @@ export type FieldKey =
   | "field.distTransmission"
   | "field.distWater"
   | "field.length"
+  | "field.highRiskBuildings"
+  | "field.serviceDemand"
+  | "field.officialStatus"
+  | "field.highRiskLinks"
+  | "field.roadDistance"
+  | "field.roofMatch"
+  | "field.exposedBuildings"
+  | "field.evidenceStatus"
+  | "field.year"
+  | "field.support"
+  | "field.validPixels"
+  | "field.semanticClass"
+  | "field.notScored"
+  | "field.context"
+  | "field.kind"
+  | "field.class"
+  | "field.reasons"
+  | "field.meanBuildingRisk"
   | "field.property";
 
 export const FIELD_LABELS: Record<FieldKey, Localized> = {
@@ -389,8 +407,44 @@ export const FIELD_LABELS: Record<FieldKey, Localized> = {
   "field.distTransmission": ml("距输电线", "送電線距離", "Distance to line"),
   "field.distWater": ml("距水体", "水域距離", "Distance to water"),
   "field.length": ml("长度", "延長", "Length"),
+  "field.highRiskBuildings": ml("高风险建筑", "高リスク建物", "High-risk buildings"),
+  "field.serviceDemand": ml("服务需求", "サービス需要", "Service demand"),
+  "field.officialStatus": ml("官方状态", "公式状態", "Official status"),
+  "field.highRiskLinks": ml("高风险关联", "高リスク関連", "High-risk links"),
+  "field.roadDistance": ml("道路距离", "道路距離", "Road distance"),
+  "field.roofMatch": ml("屋顶匹配", "屋根マッチング", "Roof match"),
+  "field.exposedBuildings": ml("暴露建筑", "曝露建物", "Exposed buildings"),
+  "field.evidenceStatus": ml("证据状态", "証拠状態", "Evidence status"),
+  "field.year": ml("年度", "年度", "Year"),
+  "field.support": ml("支持率", "支持率", "Support"),
+  "field.validPixels": ml("有效像素", "有効画素", "Valid pixels"),
+  "field.semanticClass": ml("语义类别", "意味クラス", "Semantic class"),
+  "field.notScored": ml("未计入评分", "スコア未使用", "Not scored"),
+  "field.context": ml("上下文", "コンテキスト", "Context"),
+  "field.kind": ml("类型", "種類", "Type"),
+  "field.class": ml("等级", "区分", "Class"),
+  "field.reasons": ml("原因", "理由", "Reasons"),
+  "field.meanBuildingRisk": ml("平均建筑风险", "平均建物リスク", "Mean building risk"),
   "field.property": ml("属性值", "属性値", "Property value"),
 };
+
+/** Fields audit.js routed to the "cached GeoJSON property" record, whose
+ * meaning varies by object type and whose licensing lives in docs/data. */
+const PROPERTY_FIELDS: FieldKey[] = [
+  "field.evidenceStatus",
+  "field.year",
+  "field.kind",
+  "field.class",
+  "field.support",
+  "field.notScored",
+  "field.validPixels",
+  "field.semanticClass",
+  "field.reasons",
+  "field.highRiskBuildings",
+  "field.exposedBuildings",
+  "field.serviceDemand",
+  "field.meanBuildingRisk",
+];
 
 const GEOSPATIAL_FIELDS: FieldKey[] = [
   "field.slope",
@@ -633,6 +687,22 @@ export function field(key: FieldKey, value: string | number, props: FeaturePrope
         "PoC采用局部平面距离近似；生产版应使用适当投影并记录误差。",
         "PoCは局所平面距離近似を使用。製品版では適切な投影と誤差記録が必要です。",
         "The PoC uses a local planar approximation; production should use a suitable projection and record error.",
+      ),
+    );
+  }
+
+  if (PROPERTY_FIELDS.includes(key)) {
+    return raw(
+      title,
+      value,
+      "Local cached GeoJSON property",
+      text(title, "en"),
+      "current Demo snapshot",
+      "data/**/*.geojson",
+      ml(
+        "字段含义和来源随对象类型而异；完整许可见 docs/data/README.zh.md。",
+        "フィールドの意味と出典は対象種別で異なります。ライセンス詳細は docs/data/README.ja.md を参照してください。",
+        "Field meaning and lineage vary by object type; see docs/data/README.md for licensing.",
       ),
     );
   }

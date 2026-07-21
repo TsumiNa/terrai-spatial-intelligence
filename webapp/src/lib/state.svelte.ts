@@ -1,5 +1,5 @@
 import type { AuditRecord, ModuleName } from "./audit";
-import type { Bootstrap } from "./api/types";
+import type { Bootstrap, Feature } from "./api/types";
 import { MODULES, normalizeView } from "./modules";
 import { i18n } from "./i18n/i18n.svelte";
 
@@ -31,6 +31,7 @@ let basemap = $state<BasemapKey>(initial.basemap);
 let data = $state<Bootstrap | null>(null);
 let loadError = $state<string | null>(null);
 let auditRecord = $state<AuditRecord | null>(null);
+let queueSelection = $state.raw<{ feature: Feature; tick: number } | null>(null);
 
 export const app = {
   get module() {
@@ -51,15 +52,23 @@ export const app = {
   get auditRecord() {
     return auditRecord;
   },
+  get queueSelection() {
+    return queueSelection;
+  },
 
   selectModule(next: ModuleName) {
     module = next;
     view = null; // the module decides its default view, as the old shell did
+    queueSelection = null;
     this.closeAudit();
   },
   selectView(next: string) {
     view = normalizeView(module, next);
+    queueSelection = null;
     this.closeAudit();
+  },
+  selectQueueItem(feature: Feature) {
+    queueSelection = { feature, tick: (queueSelection?.tick ?? 0) + 1 };
   },
   selectBasemap(next: BasemapKey) {
     basemap = next;
