@@ -146,7 +146,15 @@ class DataService:
             return False
         path = (self.root / relative).resolve()
         root = self.root.resolve()
-        return root in path.parents and path.is_file() and path.stat().st_size > 0
+        if root not in path.parents or not path.is_file() or path.stat().st_size == 0:
+            return False
+        if path.suffix not in {".json", ".geojson"}:
+            return True
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return False
+        return path.suffix != ".geojson" or value.get("type") == "FeatureCollection"
 
     def health(self) -> dict[str, Any]:
         catalog = [row for row in self.catalog() if row["key"] not in ASSET_MANIFEST_DATASETS]

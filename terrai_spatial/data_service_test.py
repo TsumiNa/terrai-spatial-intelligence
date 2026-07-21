@@ -49,6 +49,10 @@ def test_asset_manifest_readiness_requires_every_local_cache_file(tmp_path: Path
     assert row["feature_count"] == 1
 
     asset.parent.mkdir(parents=True)
+    asset.write_text("{", encoding="utf-8")
+    row = next(item for item in local_service.catalog() if item["key"] == "uc24_16_nihonbashi")
+    assert row["ready"] is False
+
     asset.write_text("{}", encoding="utf-8")
     row = next(item for item in local_service.catalog() if item["key"] == "uc24_16_nihonbashi")
     assert row["ready"] is True

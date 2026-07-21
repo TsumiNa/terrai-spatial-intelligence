@@ -493,11 +493,6 @@ def fetch_uc24_16(
             retrieval = "existing local cache"
             resource_retrieved_at = prior.get("retrieved_at", retrieved_at)
 
-        inspection = inspect_tileset(
-            asset_directory,
-            resource_id=resource_id,
-            utility_class=selection["utility_class"],
-        )
         archive_relative = _relative(root, archive_path)
         tileset_path = asset_directory / inspection["tileset_relative"]
         tileset_relative = _relative(root, tileset_path)
