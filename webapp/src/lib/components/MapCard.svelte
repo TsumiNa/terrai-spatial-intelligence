@@ -5,7 +5,7 @@
   import { field, text, FIELD_LABELS } from "../audit";
   import FeaturePopup from "./FeaturePopup.svelte";
   import { i18n } from "../i18n/i18n.svelte";
-  import { buildAnalyticalLayers, geometryBounds, queuePopup, type PopupSpec } from "../map/layers";
+  import { buildAnalyticalLayers, drawsOwnBuildings, geometryBounds, queuePopup, type PopupSpec } from "../map/layers";
   import { createExhibitionMap, type ExhibitionMap } from "../map/map";
   import { normalizeView } from "../modules";
   import { app, BASEMAP_KEYS } from "../state.svelte";
@@ -78,6 +78,7 @@
     if (!mapApi || !data) return;
     mapApi.closePopup();
     mapApi.setAnalyticalLayers(buildAnalyticalLayers(module, view, data, assetBase, { onFeature: openFeaturePopup }));
+    mapApi.setVectorBuildingsVisible(!drawsOwnBuildings(module, view));
   });
 
   // Parity with the old shell: a language switch closes any open popup.
