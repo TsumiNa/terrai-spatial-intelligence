@@ -4,7 +4,7 @@
 
 面向客户展示的空间决策 Demo：用地图和优先队列直接回答“哪里值得先行动、为什么、证据是否可信”。当前覆盖横滨城市韧性与茂原光伏开发；每个指标、队列结果和地图字段都能追溯来源、公式与适用限制。
 
-项目采用独立静态前端和 FastAPI 后端。前端只负责数据加载、地图和审计交互；Python 后端负责文件数据读取、健康检查、条件/空间查询、汇总及推荐队列排序。基础数据暂时保留为独立 JSON/GeoJSON，数据库与 SQLite 留到后续开发。
+项目采用构建后的 Svelte 前端（`webapp/`，由 `webapp/dist` 提供服务）和 FastAPI 后端。前端只负责数据加载、地图和审计交互；Python 后端负责文件数据读取、健康检查、条件/空间查询、汇总及推荐队列排序。基础数据暂时保留为独立 JSON/GeoJSON，数据库与 SQLite 留到后续开发。
 
 ## 运行
 
@@ -305,7 +305,7 @@ terrai-spatial-intelligence/
 │   ├── api.py                  # health / catalog / data / query / recommendations API
 │   ├── data_service.py         # JSON/GeoJSON 读取、缓存、查询、汇总与服务端排序
 │   └── data_tasks.py           # 启动与手动命令共享的数据任务注册表
-├── frontend/                   # 独立静态客户展示前端
+├── webapp/                     # Svelte + MapLibre/deck.gl 客户展示前端（npm 构建）
 │   ├── index.html              # 展览型信息架构
 │   ├── app.js                  # API 加载、地图与交互展示
 │   ├── audit.js                # 原始/模型/计算三类审计契约

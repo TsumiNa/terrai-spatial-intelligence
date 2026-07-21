@@ -1,8 +1,8 @@
 # PR5 Plan: Retire the Leaflet Runtime
 
-- Status: Planned
+- Status: Completed
 - Refactor: `maplibre-migration`
-- PR: #5
+- PR: #17
 
 ## Goal
 

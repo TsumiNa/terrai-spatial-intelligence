@@ -120,21 +120,17 @@ def test_concept_document_defines_layers_and_development_non_goals() -> None:
 
 
 def test_customer_ui_keeps_internal_architecture_out_of_primary_navigation() -> None:
-    html = read("frontend/index.html")
-    app = read("frontend/app.js")
-    assert 'data-module="architecture"' not in html
-    assert 'id="architecture-board"' not in html
-    assert "function renderArchitecture()" not in app
-    assert 'data-module="overview"' in html
-    assert 'data-module="evidence"' in html
-    assert "证据与可靠性" in html
+    registry = read("webapp/src/lib/modules.ts")
+    assert '"architecture"' not in registry
+    assert '"overview"' in registry
+    assert '"evidence"' in registry
 
 
 def test_evidence_module_label_is_translated_to_japanese_and_english() -> None:
-    translations = read("frontend/i18n.js")
-    assert translations.count('"证据与可靠性"') >= 2
-    assert '"Evidence & reliability"' in translations
-    assert '"証拠と信頼性"' in translations
+    catalogs = read("webapp/src/lib/i18n/messages.ts")
+    assert '"nav.evidence": "证据与可靠性"' in catalogs
+    assert '"nav.evidence": "証拠と信頼性"' in catalogs
+    assert '"nav.evidence": "Evidence & reliability"' in catalogs
 
 
 @pytest.mark.parametrize(

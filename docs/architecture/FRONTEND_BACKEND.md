@@ -6,14 +6,14 @@ Status: current Demo implementation
 
 Updated: 2026-07-21
 
-This document describes the runtime call structure of the customer-facing TerrAI Demo: how the browser, static frontend, FastAPI service, Python data service, and file-backed data interact. See `docs/architecture/FL_SL_AL_CONCEPT.md` for the internal FL → SL → AL product concept.
+This document describes the runtime call structure of the customer-facing TerrAI Demo: how the browser, the built Svelte frontend, FastAPI service, Python data service, and file-backed data interact. See `docs/architecture/FL_SL_AL_CONCEPT.md` for the internal FL → SL → AL product concept.
 
 ## 1. Components and responsibilities
 
 | Component | Current implementation | Responsibility |
 |---|---|---|
 | Customer browser | Chrome, Safari, etc. | Load the page and trigger module, view, language, and audit interactions |
-| Static frontend | `frontend/index.html`, `app.js`, `audit.js`, `i18n.js` | Request the exhibition payload and render maps, metrics, queues, and the trilingual UI; never read local data files or calculate/sort business results |
+| Svelte frontend | `webapp/` (Svelte 5 + Vite; `terrai serve` serves the built `webapp/dist`) | Request the exhibition payload and render the MapLibre + deck.gl map, metrics, queues, audit drawer, and the compile-checked trilingual UI; never read local data files or calculate/sort business results |
 | FastAPI | `terrai_spatial/api.py` | Provide the `/api/v1` HTTP boundary, validation, error mapping, CORS, OpenAPI, and read-only assets |
 | Python DataService | `terrai_spatial/data_service.py` | Resolve stable keys to files, cache by mtime, query/filter, aggregate, and rank recommendation queues |
 | Data tasks | `terrai_spatial/data_tasks.py` and `scripts/` | Check, download, parse, and rebuild data before startup; never run expensive jobs inside normal API requests |
@@ -33,7 +33,7 @@ http://127.0.0.1:4176/?api=http://127.0.0.1:9000
 
 ## 2. Startup call sequence
 
-`terrai_spatial serve` coordinates the data check and two independent HTTP listeners. The task registry invokes the relevant Python script when data is missing or stale; the frontend and API start only after data is ready.
+`terrai_spatial serve` refuses to start until `webapp/dist` exists (`cd webapp && npm run build`), then coordinates the data check and two independent HTTP listeners. The task registry invokes the relevant Python script when data is missing or stale; the frontend and API start only after data is ready.
 
 ```mermaid
 sequenceDiagram
@@ -44,7 +44,7 @@ sequenceDiagram
     participant Files as data/ FL Files
     participant Scripts as Download/Parse/Build Scripts
     participant API as FastAPI :8000
-    participant Web as Static Frontend :4176
+    participant Web as Built Frontend webapp/dist :4176
 
     Operator->>CLI: uv run python -m terrai_spatial serve
     CLI->>Tasks: ensure_data(allow_network)
@@ -74,7 +74,7 @@ sequenceDiagram
     autonumber
     actor Customer
     participant Browser
-    participant Frontend as frontend/app.js
+    participant Frontend as webapp Svelte app
     participant API as FastAPI /api/v1
     participant Service as Python DataService
     participant FL as JSON / GeoJSON
@@ -84,7 +84,7 @@ sequenceDiagram
     Browser->>Frontend: Load HTML/CSS/JS
     Frontend->>API: GET /bootstrap
     API->>Service: bootstrap()
-    loop 18 stable dataset keys
+    loop every stable bootstrap dataset key
         Service->>FL: stat mtime
         alt Cache missing or file changed
             Service->>FL: read + json.load
@@ -115,7 +115,7 @@ sequenceDiagram
     Note over Frontend,API: No additional API request today
 
     Customer->>Frontend: Click a dashed value
-    Frontend->>Frontend: audit.js opens source/formula/limits
+    Frontend->>Frontend: The audit drawer opens source/formula/limits
     Note over Frontend,API: Audit metadata is already loaded
 ```
 
@@ -153,7 +153,7 @@ sequenceDiagram
 |---|---:|---|
 | `GET /api/v1/bootstrap` | Yes, once at startup | All exhibition data, server-ranked queues, facility aggregates, and health metadata |
 | `GET /api/v1/assets/*` | Yes, by viewport | Local map tiles, Satellite Embedding visualizations, and other binary evidence |
-| `GET /api/v1/health` | No; embedded in bootstrap metadata | Independently monitor the service and 18 datasets |
+| `GET /api/v1/health` | No; embedded in bootstrap metadata | Independently monitor the service and every dataset |
 | `GET /api/v1/catalog` | No | Inspect stable keys, file types, record counts, and update times |
 | `GET /api/v1/datasets/{key}` | No | Retrieve a complete JSON/GeoJSON dataset by key |
 | `GET /api/v1/features/{key}` | No | Query GeoJSON by field, range, bbox, sort, and limit |
@@ -169,7 +169,9 @@ sequenceDiagram
 
 ## 7. Code map
 
-- Frontend API origin and startup request: `frontend/app.js`
+- Frontend API origin and typed startup request: `webapp/src/lib/api/client.ts`, `webapp/src/App.svelte`
+- Map instance, basemaps and deck.gl layers: `webapp/src/lib/map/`
+- Audit records and message catalogs: `webapp/src/lib/audit.ts`, `webapp/src/lib/i18n/messages.ts`
 - HTTP routes and error mapping: `terrai_spatial/api.py`
 - File cache, queries, aggregates, and queues: `terrai_spatial/data_service.py`
 - Dual-service startup and automatic data checks: `terrai_spatial/cli.py`

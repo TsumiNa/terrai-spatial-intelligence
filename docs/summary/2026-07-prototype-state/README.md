@@ -4,7 +4,7 @@
 
 A customer-facing spatial-decision Demo that answers “where should we act first, why, and can the evidence be trusted?” with maps and priority queues. It currently covers Yokohama urban resilience and Mobara solar development. Every metric, queue result, and map field traces to a source, formula, and limitation.
 
-The project separates a static frontend from a FastAPI backend. The frontend loads and presents data; Python reads file data, checks health, queries fields/space, aggregates, and ranks recommendations. Foundation data remains independent JSON/GeoJSON for now; database/SQLite design is deferred.
+The project separates a built Svelte frontend (`webapp/`, served from `webapp/dist`) from a FastAPI backend. The frontend loads and presents data; Python reads file data, checks health, queries fields/space, aggregates, and ranks recommendations. Foundation data remains independent JSON/GeoJSON for now; database/SQLite design is deferred.
 
 ## Run
 
@@ -250,7 +250,7 @@ terrai-spatial-intelligence/
 │   ├── api.py                  # health/catalog/data/query/recommendations
 │   ├── data_service.py         # file cache, query, aggregation, ranking
 │   └── data_tasks.py           # shared startup/manual task registry
-├── frontend/                   # independent static customer frontend
+├── webapp/                     # Svelte + MapLibre/deck.gl customer frontend (build with npm)
 │   ├── index.html              # exhibition information architecture
 │   ├── app.js                  # API loading, map, interactions
 │   ├── audit.js                # observed/model/calculation audit
