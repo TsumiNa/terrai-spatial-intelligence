@@ -154,6 +154,35 @@ def test_offline_incomplete_underground_scene_is_not_reported_ready(tmp_path: Pa
         ensure_data(root=tmp_path, selected=["underground_utilities"], allow_network=False)
 
 
+def test_sapporo_structure_scene_requires_every_manifest_cache_file(tmp_path: Path) -> None:
+    source_manifest = tmp_path / "data/plateau/uc24_13_sapporo/source_manifest.json"
+    retrieval_manifest = tmp_path / "data/plateau/uc24_13_sapporo/manifest.json"
+    cache_file = tmp_path / "data/external/plateau_uc24_13/assets/sapporo-underground-mall/tileset.json"
+    write_json(source_manifest)
+    retrieval_manifest.parent.mkdir(parents=True, exist_ok=True)
+    retrieval_manifest.write_text(
+        json.dumps({"files": [str(cache_file.relative_to(tmp_path))]}), encoding="utf-8"
+    )
+
+    state = task_state("underground_structures", tmp_path)
+    assert state.status == "missing"
+    assert "sapporo-underground-mall/tileset.json" in state.reason
+
+    write_json(cache_file)
+    assert task_state("underground_structures", tmp_path).status == "ready"
+
+
+def test_osm_underground_snapshot_is_explicit_refresh_not_startup_download() -> None:
+    task = TASKS["underground_access_osm"]
+
+    assert task.network is True
+    assert task.automatic is False
+    assert task.outputs == (
+        "data/osm/sapporo_underground_access/features.geojson",
+        "data/osm/sapporo_underground_access/metadata.json",
+    )
+
+
 def test_integrated_fl_sources_require_retrieval_and_source_time_metadata(tmp_path: Path) -> None:
     registry = tmp_path / "data/external/source_registry.json"
     registry.parent.mkdir(parents=True)

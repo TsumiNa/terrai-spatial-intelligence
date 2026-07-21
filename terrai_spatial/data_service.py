@@ -52,9 +52,14 @@ FOUNDATION_DATASETS: dict[str, str] = {
     "landUseMesh": "data/mlit/land_use_mesh.geojson",
     "prefecturalLandPrice": "data/mlit/prefectural_land_price.geojson",
     "uc24_16_nihonbashi": "data/plateau/uc24_16_nihonbashi/manifest.json",
+    "uc24_13_sapporo": "data/plateau/uc24_13_sapporo/manifest.json",
+    "osmSapporoUndergroundAccess": "data/osm/sapporo_underground_access/features.geojson",
 }
 ALL_DATASETS = {**DATASETS, **FOUNDATION_DATASETS}
-ASSET_MANIFEST_DATASETS = {"uc24_16_nihonbashi"}
+ASSET_MANIFEST_DATASETS = {"uc24_16_nihonbashi", "uc24_13_sapporo"}
+# Optional site-scene inputs remain queryable in the catalog but do not change
+# the existing exhibition bootstrap's health denominator or visual chrome.
+HEALTH_EXCLUDED_DATASETS = ASSET_MANIFEST_DATASETS | {"osmSapporoUndergroundAccess"}
 
 SOURCE_GROUPS = (
     {"name": "GSI", "role": "terrain, designated evacuation and visual basemaps", "access": "public"},
@@ -157,7 +162,7 @@ class DataService:
         return path.suffix != ".geojson" or value.get("type") == "FeatureCollection"
 
     def health(self) -> dict[str, Any]:
-        catalog = [row for row in self.catalog() if row["key"] not in ASSET_MANIFEST_DATASETS]
+        catalog = [row for row in self.catalog() if row["key"] not in HEALTH_EXCLUDED_DATASETS]
         ready = sum(1 for row in catalog if row["ready"])
         return {
             "status": "ready" if ready == len(catalog) else "degraded",

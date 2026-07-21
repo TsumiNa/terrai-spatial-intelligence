@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "dataset_id": "plateau_uc24_13_sapporo",
+  "scene_id": "sapporo-station-underground",
+  "package_id": "plateau-uc24-13",
+  "package_api": "https://www.geospatial.jp/ckan/api/3/action/package_show?id=plateau-uc24-13",
+  "package_page": "https://www.geospatial.jp/ckan/dataset/plateau-uc24-13",
+  "license_url": "https://www.mlit.go.jp/plateau/site-policy/",
+  "selection_rule": "The two Sapporo structural resources selected for the canonical Sapporo Station scene; resource IDs are frozen so catalog drift fails visibly.",
+  "resources": [
+    {
+      "resource_id": "b0d1e3b0-4137-47c0-b975-9410a92801fe",
+      "slug": "sapporo-underground-mall",
+      "structure_class": "underground_mall"
+    },
+    {
+      "resource_id": "c1127937-6a66-4440-a242-25d814d9368a",
+      "slug": "sapporo-municipal-subway-station",
+      "structure_class": "subway_station"
+    }
+  ],
+  "reference_resources": [
+    {
+      "package_id": "plateau-uc24-13",
+      "resource_id": "3714b3e9-4243-4ba4-8d73-86256f0573dd",
+      "label": "North Ichijo parking"
+    },
+    {
+      "package_id": "plateau-uc24-13",
+      "resource_id": "8e5c37d1-4749-416d-988a-4d15f0fb926c",
+      "label": "Shibuya Station west-exit underground passage"
+    },
+    {
+      "package_id": "plateau-uc24-13",
+      "resource_id": "643064e2-e18f-4f59-b67b-2225a2a4b847",
+      "label": "Sunport Takamatsu underground parking"
+    },
+    {
+      "package_id": "plateau-uc23-05",
+      "package_page": "https://www.geospatial.jp/ckan/dataset/plateau-uc23-05",
+      "label": "Tokyo Station underground mall CityGML"
+    }
+  ]
+}

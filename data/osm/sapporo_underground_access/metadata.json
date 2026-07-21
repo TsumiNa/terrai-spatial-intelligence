@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "dataset_id": "osm_sapporo_underground_access",
+  "scene_id": "sapporo-station-underground",
+  "retrieved_at": "2026-07-21T10:53:05Z",
+  "osm_base_timestamp": "2026-07-21T10:51:01Z",
+  "overpass_endpoint": "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+  "overpass_generator": "Overpass API 0.7.62.4 2390de5a",
+  "query_path": "data/osm/sapporo_underground_access/query.overpassql",
+  "query_sha256": "b937a5aa054757e296596c79e6ec3e65ccad7d04aee29ba69eb364eab0ef9887",
+  "query_bbox": [
+    141.349592632,
+    43.054916388,
+    141.356913521,
+    43.070980841
+  ],
+  "bbox_semantics": "The bbox selects intersecting OSM objects; complete source geometry is retained rather than clipped.",
+  "crs": "EPSG:4326",
+  "raw_element_count": 201,
+  "feature_count": 195,
+  "feature_counts": {
+    "subway_entrance": 97,
+    "subway_station": 6,
+    "subway_track": 8,
+    "underground_walkway": 84
+  },
+  "omitted_explicitly_restricted_walkways": 0,
+  "omitted_non_underground_walkways": 6,
+  "license": "Open Database License (ODbL) 1.0",
+  "attribution": "© OpenStreetMap contributors",
+  "identity_note": "OSM type, ID, version, changeset and element timestamp are preserved independently from PLATEAU identities.",
+  "missing_value_semantics": "Absent tags remain absent; unknown level, depth, accessibility and current opening status are not inferred.",
+  "limitations": [
+    "Community completeness, geometry accuracy and freshness are not guaranteed",
+    "An absent access restriction is not proof of legal public access or current opening",
+    "This snapshot is access context, not a routable or authoritative station graph"
+  ]
+}
