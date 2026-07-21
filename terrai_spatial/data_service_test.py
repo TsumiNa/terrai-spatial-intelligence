@@ -6,9 +6,9 @@ from pathlib import Path
 import pytest
 
 from terrai_spatial.data_service import (
-    ASSET_MANIFEST_DATASETS,
     DATASETS,
     FOUNDATION_DATASETS,
+    HEALTH_EXCLUDED_DATASETS,
     DataService,
     DatasetNotFoundError,
     service,
@@ -18,7 +18,7 @@ from terrai_spatial.data_service import (
 def test_health_reports_all_file_backed_datasets_ready() -> None:
     health = service.health()
     assert health["status"] == "ready"
-    expected = len(DATASETS) + len(FOUNDATION_DATASETS) - len(ASSET_MANIFEST_DATASETS)
+    expected = len(DATASETS) + len(FOUNDATION_DATASETS) - len(HEALTH_EXCLUDED_DATASETS)
     assert health["datasets_total"] == expected
     assert health["datasets_ready"] == expected
 
@@ -34,7 +34,7 @@ def test_foundation_datasets_are_on_demand_not_bootstrapped() -> None:
     assert catalog["osmSapporoUndergroundAccess"]["delivery"] == "on_demand"
     assert "osmSapporoUndergroundAccess" not in service.bootstrap()
     assert service.bootstrap()["meta"]["datasets_total"] == (
-        len(DATASETS) + len(FOUNDATION_DATASETS) - len(ASSET_MANIFEST_DATASETS)
+        len(DATASETS) + len(FOUNDATION_DATASETS) - len(HEALTH_EXCLUDED_DATASETS)
     )
 
 
