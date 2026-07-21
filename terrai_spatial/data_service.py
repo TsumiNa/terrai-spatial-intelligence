@@ -79,11 +79,6 @@ SOURCE_GROUPS = (
     {"name": "NASA POWER", "role": "solar climate baseline", "access": "public"},
     {"name": "TEPCO public system data", "role": "regional grid screen", "access": "restricted redistribution"},
     {"name": "Google Satellite Embedding", "role": "annual change and similarity evidence", "access": "CC BY 4.0"},
-    {
-        "name": "KuniJiban",
-        "role": "boreholes, stratigraphy and SPT subsurface evidence",
-        "access": "public; attribution and source-quality conditions",
-    },
 )
 
 
