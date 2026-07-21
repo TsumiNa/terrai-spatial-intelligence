@@ -1,6 +1,6 @@
 # Frontend Migration: Svelte + Vite, MapLibre + deck.gl
 
-- Status: In progress — stages 01-05 completed and the Leaflet runtime retired; 06-07 remain blocked on data
+- Status: In progress — stages 01-05 completed and the Leaflet runtime retired; 06-07 unblocked by the `underground-observation-foundation` data refactor and now in implementation
 - Date: 2026-07-20
 - Baseline: `main` / `d68bd1e`
 - Type: frontend platform migration; the FastAPI backend and the data pipelines stay
@@ -38,13 +38,13 @@ Svelte was chosen over React because the framework's job here is panels, queues,
 
 ## Non-goals
 
-Backend rewrite; database or schema work; authentication or tenancy; the Flutter or Capacitor field client; SL model serving. Underground network rendering and the site scene are planned here but blocked on data that does not exist yet — see stages 06 and 07.
+Backend rewrite; database or schema work; authentication or tenancy; the Flutter or Capacitor field client; SL model serving. Underground network rendering and the site scene were blocked on data when this plan was written; the [underground-observation-foundation](../underground-observation-foundation/00-overview.md) refactor has since integrated the Nihonbashi and Sapporo observed scenes, and stages 06–07 consume them.
 
-A design-system adoption (Tailwind + shadcn-svelte) is agreed follow-up work **after** stage 05, deliberately excluded here: stages 02–05 are verified against pixel-level parity with the current exhibition, and restyling mid-migration would destroy that baseline.
+The design-system adoption agreed as follow-up work after stage 05 has landed as the [ui-design-system](../ui-design-system/00-overview.md) refactor (Tailwind v4 + Bits UI, superseding the earlier shadcn-svelte intention). Stages 06–07 are written against its rules: colours only through the palette's two declarations, overlay behaviour from the dialog primitives, and visual changes reviewed against the screenshot baselines.
 
 ## Stage map
 
-Stages 01–05 reach parity with today's exhibition and retire Leaflet. Stages 06–07 add capability and cannot start until their data exists.
+Stages 01–05 reach parity with today's exhibition and retire Leaflet. Stages 06–07 add capability; their data dependency is satisfied by the `underground-observation-foundation` refactor, and each plan records how it was adjusted to the data actually integrated.
 
 | Stage | Plan                                                               | Purpose                                                                             |
 | ----- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
@@ -69,4 +69,4 @@ Each stage ships as its own pull request, states its own acceptance commands, an
 
 1. ~~Whether the UI source language stays Simplified Chinese or moves to English.~~ **Settled in stage 02:** the message key set is defined by the English catalog (`webapp/src/lib/i18n/messages.ts`), aligning the UI source language with the documentation policy; the Chinese and Japanese catalogs are compile-checked against it, and the default *display* language remains Simplified Chinese for exhibition parity.
 2. Whether MapLibre terrain from GSI elevation works outside the throwaway spike. Not required by any stage here, but wanted for surface context.
-3. The output shape of `geo_pfn` subsurface prediction, which decides whether stage 07 needs volumetric ray marching or only discrete surfaces and boreholes.
+3. ~~The output shape of `geo_pfn` subsurface prediction.~~ No longer gates stage 07: the site scene renders observed structures only, and predicted fields remain explicitly `unresolved` in the scene handoffs until a later SL contract defines them.

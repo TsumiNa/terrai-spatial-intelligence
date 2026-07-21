@@ -31,6 +31,9 @@ The `underground-observation-foundation` refactor now publishes two renderer-neu
 - Keep heavy geometry imperative even if a declarative Three wrapper is used for lights, camera and controls.
 - Preserve source separation inside Sapporo: OSM access context supplements but never validates, snaps or overwrites PLATEAU geometry.
 - Defer volumetric rendering decisions until a later plan defines an actual predicted-field payload and uncertainty semantics.
+- The bundle endpoint is the first HTTP surface over `DataService.scene_catalog()` / `scene_handoff()`, which stage 3 of the data refactor deliberately left service-level: `GET /api/v1/scenes` returns the catalog and `GET /api/v1/scenes/{scene_id}` returns the filtered bundle. Both enter the committed OpenAPI schema through the normal regeneration, so the typed client covers them.
+- Tiles-in-Three rendering uses the maintained NASA-AMMOS `3d-tiles-renderer` package rather than a hand-written tileset walker; b3dm batch tables (Sapporo) and glTF structural metadata (Nihonbashi) are its supported paths for picking identity, with the same granularity ladder as stage 06 where support falls short.
+- The scene opens as a full-viewport overlay on the dialog primitive already in use, so focus trapping, Escape-to-leave and restoration of the map state come from the primitive, not hand-rolled code.
 
 ## Acceptance
 
