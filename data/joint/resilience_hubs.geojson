@@ -461,7 +461,7 @@
         "hub_score": 90,
         "hub_band": "priority",
         "pv_kwp_proxy": 78.6,
-        "served_high_risk_buildings": 18,
+        "served_high_risk_buildings": 19,
         "nearest_road_m": 21,
         "nearest_road_name": "Road 158515028",
         "nearest_road_priority": 77,
@@ -1241,7 +1241,7 @@
         "hub_score": 89,
         "hub_band": "priority",
         "pv_kwp_proxy": 87.6,
-        "served_high_risk_buildings": 24,
+        "served_high_risk_buildings": 25,
         "nearest_road_m": 10,
         "nearest_road_name": "Road 125735204",
         "nearest_road_priority": 50,
@@ -1350,7 +1350,7 @@
         "hub_score": 88,
         "hub_band": "priority",
         "pv_kwp_proxy": 177.2,
-        "served_high_risk_buildings": 42,
+        "served_high_risk_buildings": 43,
         "nearest_road_m": 17,
         "nearest_road_name": "Road 362367600",
         "nearest_road_priority": 41,
@@ -1953,7 +1953,7 @@
         "hub_score": 85,
         "hub_band": "priority",
         "pv_kwp_proxy": 38.6,
-        "served_high_risk_buildings": 63,
+        "served_high_risk_buildings": 64,
         "nearest_road_m": 10,
         "nearest_road_name": "Road 158516312",
         "nearest_road_priority": 60,
@@ -2104,7 +2104,7 @@
         "nearest_road_name": "国道1号",
         "nearest_road_priority": 27,
         "pv_component": 95,
-        "access_component": 45,
+        "access_component": 46,
         "community_need_component": 100,
         "site_safety_component": 92,
         "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
@@ -2289,7 +2289,7 @@
         "hub_score": 83,
         "hub_band": "priority",
         "pv_kwp_proxy": 93.5,
-        "served_high_risk_buildings": 19,
+        "served_high_risk_buildings": 20,
         "nearest_road_m": 20,
         "nearest_road_name": "Road 470459964",
         "nearest_road_priority": 12,
@@ -2574,71 +2574,6 @@
     },
     {
       "type": "Feature",
-      "id": 304924075,
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              139.5853298,
-              35.4455928
-            ],
-            [
-              139.5853508,
-              35.4457219
-            ],
-            [
-              139.5855518,
-              35.4457002
-            ],
-            [
-              139.5855308,
-              35.4455711
-            ],
-            [
-              139.5853298,
-              35.4455928
-            ]
-          ]
-        ]
-      },
-      "properties": {
-        "osm_id": 304924075,
-        "building": "yes",
-        "name": "Building 304924075",
-        "levels": null,
-        "footprint_m2": 266,
-        "centroid": [
-          139.585441,
-          35.445647
-        ],
-        "elevation_m": 12.7,
-        "slope_deg": 0.4,
-        "local_relief_m": 6.0,
-        "low_point_m": 0.5,
-        "dem_source": "DEM5A",
-        "risk_score": 10,
-        "risk_band": "low",
-        "slope_component": 2,
-        "relief_component": 25,
-        "low_point_component": 8,
-        "hub_score": 81,
-        "hub_band": "priority",
-        "pv_kwp_proxy": 31.9,
-        "served_high_risk_buildings": 34,
-        "nearest_road_m": 13,
-        "nearest_road_name": "旧東海道",
-        "nearest_road_priority": 49,
-        "pv_component": 71,
-        "access_component": 64,
-        "community_need_component": 100,
-        "site_safety_component": 90,
-        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
-        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
-      }
-    },
-    {
-      "type": "Feature",
       "id": 469395234,
       "geometry": {
         "type": "Polygon",
@@ -2703,17 +2638,82 @@
         "slope_component": 8,
         "relief_component": 32,
         "low_point_component": 27,
-        "hub_score": 79,
+        "hub_score": 81,
         "hub_band": "priority",
         "pv_kwp_proxy": 86.5,
-        "served_high_risk_buildings": 15,
+        "served_high_risk_buildings": 16,
         "nearest_road_m": 29,
         "nearest_road_name": "国道1号",
         "nearest_road_priority": 27,
         "pv_component": 100,
         "access_component": 46,
-        "community_need_component": 83,
+        "community_need_component": 89,
         "site_safety_component": 82,
+        "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
+        "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 304924075,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.5853298,
+              35.4455928
+            ],
+            [
+              139.5853508,
+              35.4457219
+            ],
+            [
+              139.5855518,
+              35.4457002
+            ],
+            [
+              139.5855308,
+              35.4455711
+            ],
+            [
+              139.5853298,
+              35.4455928
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 304924075,
+        "building": "yes",
+        "name": "Building 304924075",
+        "levels": null,
+        "footprint_m2": 266,
+        "centroid": [
+          139.585441,
+          35.445647
+        ],
+        "elevation_m": 12.7,
+        "slope_deg": 0.4,
+        "local_relief_m": 6.0,
+        "low_point_m": 0.5,
+        "dem_source": "DEM5A",
+        "risk_score": 10,
+        "risk_band": "low",
+        "slope_component": 2,
+        "relief_component": 25,
+        "low_point_component": 8,
+        "hub_score": 81,
+        "hub_band": "priority",
+        "pv_kwp_proxy": 31.9,
+        "served_high_risk_buildings": 34,
+        "nearest_road_m": 13,
+        "nearest_road_name": "旧東海道",
+        "nearest_road_priority": 49,
+        "pv_component": 71,
+        "access_component": 64,
+        "community_need_component": 100,
+        "site_safety_component": 90,
         "joint_action": "屋顶光伏＋储能＋社区应急服务节点候选",
         "assumption": "可用屋顶面积60%，组件功率密度0.20 kWp/m²"
       }

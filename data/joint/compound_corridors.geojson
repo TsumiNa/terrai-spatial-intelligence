@@ -781,7 +781,7 @@
         "action": "边坡、挡土墙与路基巡检",
         "compound_score": 87,
         "joint_band": "priority",
-        "joint_nearby_buildings": 61,
+        "joint_nearby_buildings": 62,
         "joint_high_risk_buildings": 16,
         "joint_average_building_risk": 69.0,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
@@ -1109,9 +1109,9 @@
         "action": "边坡、挡土墙与路基巡检",
         "compound_score": 87,
         "joint_band": "priority",
-        "joint_nearby_buildings": 55,
-        "joint_high_risk_buildings": 33,
-        "joint_average_building_risk": 78.2,
+        "joint_nearby_buildings": 56,
+        "joint_high_risk_buildings": 34,
+        "joint_average_building_risk": 78.6,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -1164,9 +1164,9 @@
         "action": "边坡、挡土墙与路基巡检",
         "compound_score": 87,
         "joint_band": "priority",
-        "joint_nearby_buildings": 52,
+        "joint_nearby_buildings": 51,
         "joint_high_risk_buildings": 26,
-        "joint_average_building_risk": 81.3,
+        "joint_average_building_risk": 81.4,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -1263,9 +1263,9 @@
         "action": "边坡、挡土墙与路基巡检",
         "compound_score": 86,
         "joint_band": "priority",
-        "joint_nearby_buildings": 134,
+        "joint_nearby_buildings": 135,
         "joint_high_risk_buildings": 29,
-        "joint_average_building_risk": 57.8,
+        "joint_average_building_risk": 57.5,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -1523,9 +1523,9 @@
         "action": "边坡、挡土墙与路基巡检",
         "compound_score": 86,
         "joint_band": "priority",
-        "joint_nearby_buildings": 80,
-        "joint_high_risk_buildings": 38,
-        "joint_average_building_risk": 75.6,
+        "joint_nearby_buildings": 79,
+        "joint_high_risk_buildings": 37,
+        "joint_average_building_risk": 75.5,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -1630,9 +1630,9 @@
         "action": "边坡、挡土墙与路基巡检",
         "compound_score": 85,
         "joint_band": "priority",
-        "joint_nearby_buildings": 194,
+        "joint_nearby_buildings": 193,
         "joint_high_risk_buildings": 54,
-        "joint_average_building_risk": 57.4,
+        "joint_average_building_risk": 57.3,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -2334,9 +2334,9 @@
         "action": "边坡、挡土墙与路基巡检",
         "compound_score": 84,
         "joint_band": "priority",
-        "joint_nearby_buildings": 87,
+        "joint_nearby_buildings": 88,
         "joint_high_risk_buildings": 24,
-        "joint_average_building_risk": 52.9,
+        "joint_average_building_risk": 52.6,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -2500,9 +2500,9 @@
         "action": "边坡、挡土墙与路基巡检",
         "compound_score": 84,
         "joint_band": "priority",
-        "joint_nearby_buildings": 85,
-        "joint_high_risk_buildings": 35,
-        "joint_average_building_risk": 63.4,
+        "joint_nearby_buildings": 84,
+        "joint_high_risk_buildings": 34,
+        "joint_average_building_risk": 63.2,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -2752,8 +2752,8 @@
         "action": "边坡、挡土墙与路基巡检",
         "compound_score": 83,
         "joint_band": "priority",
-        "joint_nearby_buildings": 97,
-        "joint_high_risk_buildings": 26,
+        "joint_nearby_buildings": 99,
+        "joint_high_risk_buildings": 27,
         "joint_average_building_risk": 64.1,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
@@ -3388,9 +3388,9 @@
         "action": "边坡、挡土墙与路基巡检",
         "compound_score": 82,
         "joint_band": "priority",
-        "joint_nearby_buildings": 52,
+        "joint_nearby_buildings": 53,
         "joint_high_risk_buildings": 18,
-        "joint_average_building_risk": 65.4,
+        "joint_average_building_risk": 65.5,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -4018,9 +4018,9 @@
         "action": "边坡、挡土墙与路基巡检",
         "compound_score": 80,
         "joint_band": "priority",
-        "joint_nearby_buildings": 90,
+        "joint_nearby_buildings": 91,
         "joint_high_risk_buildings": 18,
-        "joint_average_building_risk": 60.8,
+        "joint_average_building_risk": 60.5,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -4077,7 +4077,7 @@
         "action": "边坡、挡土墙与路基巡检",
         "compound_score": 80,
         "joint_band": "priority",
-        "joint_nearby_buildings": 71,
+        "joint_nearby_buildings": 72,
         "joint_high_risk_buildings": 20,
         "joint_average_building_risk": 69.3,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
@@ -4285,9 +4285,9 @@
         "action": "排水能力与积水点巡检",
         "compound_score": 80,
         "joint_band": "priority",
-        "joint_nearby_buildings": 32,
-        "joint_high_risk_buildings": 17,
-        "joint_average_building_risk": 79.2,
+        "joint_nearby_buildings": 33,
+        "joint_high_risk_buildings": 18,
+        "joint_average_building_risk": 79.9,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -5233,9 +5233,9 @@
         "action": "排水能力与积水点巡检",
         "compound_score": 77,
         "joint_band": "priority",
-        "joint_nearby_buildings": 30,
+        "joint_nearby_buildings": 31,
         "joint_high_risk_buildings": 13,
-        "joint_average_building_risk": 62.9,
+        "joint_average_building_risk": 63.0,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -5576,9 +5576,9 @@
         "action": "沿线建筑与道路联合巡检",
         "compound_score": 75,
         "joint_band": "priority",
-        "joint_nearby_buildings": 67,
+        "joint_nearby_buildings": 68,
         "joint_high_risk_buildings": 15,
-        "joint_average_building_risk": 63.8,
+        "joint_average_building_risk": 63.9,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -6103,9 +6103,9 @@
         "action": "排水能力与积水点巡检",
         "compound_score": 74,
         "joint_band": "watch",
-        "joint_nearby_buildings": 30,
-        "joint_high_risk_buildings": 17,
-        "joint_average_building_risk": 81.0,
+        "joint_nearby_buildings": 31,
+        "joint_high_risk_buildings": 18,
+        "joint_average_building_risk": 81.6,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -6241,9 +6241,9 @@
         "action": "排水能力与积水点巡检",
         "compound_score": 73,
         "joint_band": "watch",
-        "joint_nearby_buildings": 76,
-        "joint_high_risk_buildings": 10,
-        "joint_average_building_risk": 49.0,
+        "joint_nearby_buildings": 77,
+        "joint_high_risk_buildings": 11,
+        "joint_average_building_risk": 49.7,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -7043,9 +7043,76 @@
         "action": "沿线建筑与道路联合巡检",
         "compound_score": 72,
         "joint_band": "watch",
-        "joint_nearby_buildings": 51,
+        "joint_nearby_buildings": 50,
         "joint_high_risk_buildings": 19,
-        "joint_average_building_risk": 64.9,
+        "joint_average_building_risk": 65.4,
+        "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 158904220,
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            139.5863454,
+            35.4469681
+          ],
+          [
+            139.5863212,
+            35.4469849
+          ],
+          [
+            139.586289,
+            35.4470144
+          ],
+          [
+            139.5862052,
+            35.4471444
+          ],
+          [
+            139.5861254,
+            35.4472013
+          ],
+          [
+            139.5860214,
+            35.4472515
+          ],
+          [
+            139.5858827,
+            35.4472865
+          ],
+          [
+            139.5856942,
+            35.4473225
+          ],
+          [
+            139.585582,
+            35.4473358
+          ]
+        ]
+      },
+      "properties": {
+        "osm_id": 158904220,
+        "name": "Road 158904220",
+        "highway": "service",
+        "length_m": 85,
+        "max_slope_deg": 8.7,
+        "low_point_m": 4.1,
+        "nearby_exposed_buildings": 44,
+        "nearby_high_buildings": 7,
+        "terrain_component": 54,
+        "exposure_component": 100,
+        "criticality_component": 25,
+        "lowpoint_component": 81,
+        "priority_score": 63,
+        "action": "排水能力与积水点巡检",
+        "compound_score": 71,
+        "joint_band": "watch",
+        "joint_nearby_buildings": 54,
+        "joint_high_risk_buildings": 7,
+        "joint_average_building_risk": 61.1,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -7735,9 +7802,9 @@
         "action": "沿线建筑与道路联合巡检",
         "compound_score": 69,
         "joint_band": "watch",
-        "joint_nearby_buildings": 57,
+        "joint_nearby_buildings": 58,
         "joint_high_risk_buildings": 13,
-        "joint_average_building_risk": 61.5,
+        "joint_average_building_risk": 61.2,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -8124,73 +8191,6 @@
     },
     {
       "type": "Feature",
-      "id": 158904220,
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            139.5863454,
-            35.4469681
-          ],
-          [
-            139.5863212,
-            35.4469849
-          ],
-          [
-            139.586289,
-            35.4470144
-          ],
-          [
-            139.5862052,
-            35.4471444
-          ],
-          [
-            139.5861254,
-            35.4472013
-          ],
-          [
-            139.5860214,
-            35.4472515
-          ],
-          [
-            139.5858827,
-            35.4472865
-          ],
-          [
-            139.5856942,
-            35.4473225
-          ],
-          [
-            139.585582,
-            35.4473358
-          ]
-        ]
-      },
-      "properties": {
-        "osm_id": 158904220,
-        "name": "Road 158904220",
-        "highway": "service",
-        "length_m": 85,
-        "max_slope_deg": 8.7,
-        "low_point_m": 4.1,
-        "nearby_exposed_buildings": 44,
-        "nearby_high_buildings": 7,
-        "terrain_component": 54,
-        "exposure_component": 100,
-        "criticality_component": 25,
-        "lowpoint_component": 81,
-        "priority_score": 63,
-        "action": "排水能力与积水点巡检",
-        "compound_score": 67,
-        "joint_band": "watch",
-        "joint_nearby_buildings": 53,
-        "joint_high_risk_buildings": 6,
-        "joint_average_building_risk": 60.7,
-        "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
-      }
-    },
-    {
-      "type": "Feature",
       "id": 159041725,
       "geometry": {
         "type": "LineString",
@@ -8226,9 +8226,9 @@
         "action": "沿线建筑与道路联合巡检",
         "compound_score": 67,
         "joint_band": "watch",
-        "joint_nearby_buildings": 52,
+        "joint_nearby_buildings": 53,
         "joint_high_risk_buildings": 7,
-        "joint_average_building_risk": 57.4,
+        "joint_average_building_risk": 57.5,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -8320,9 +8320,9 @@
         "action": "沿线建筑与道路联合巡检",
         "compound_score": 67,
         "joint_band": "watch",
-        "joint_nearby_buildings": 64,
+        "joint_nearby_buildings": 65,
         "joint_high_risk_buildings": 11,
-        "joint_average_building_risk": 57.8,
+        "joint_average_building_risk": 57.5,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -8795,9 +8795,9 @@
         "action": "沿线建筑与道路联合巡检",
         "compound_score": 65,
         "joint_band": "watch",
-        "joint_nearby_buildings": 55,
+        "joint_nearby_buildings": 56,
         "joint_high_risk_buildings": 9,
-        "joint_average_building_risk": 58.1,
+        "joint_average_building_risk": 57.8,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -9414,9 +9414,9 @@
         "action": "排水能力与积水点巡检",
         "compound_score": 63,
         "joint_band": "watch",
-        "joint_nearby_buildings": 81,
+        "joint_nearby_buildings": 80,
         "joint_high_risk_buildings": 8,
-        "joint_average_building_risk": 39.1,
+        "joint_average_building_risk": 39.5,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },
@@ -9622,9 +9622,9 @@
         "action": "边坡、挡土墙与路基巡检",
         "compound_score": 62,
         "joint_band": "watch",
-        "joint_nearby_buildings": 51,
+        "joint_nearby_buildings": 52,
         "joint_high_risk_buildings": 5,
-        "joint_average_building_risk": 54.0,
+        "joint_average_building_risk": 54.1,
         "joint_action": "边坡排水、道路通行与邻近建筑联合巡检"
       }
     },

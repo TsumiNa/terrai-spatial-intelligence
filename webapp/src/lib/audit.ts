@@ -718,9 +718,9 @@ export function field(key: FieldKey, value: string | number, props: FeaturePrope
       `${text(title, "en")} = ${value}`,
       "GSI DEM5A and/or OpenStreetMap geometry",
       ml(
-        "PoC采用局部平面距离近似；生产版应使用适当投影并记录误差。",
-        "PoCは局所平面距離近似を使用。製品版では適切な投影と誤差記録が必要です。",
-        "The PoC uses a local planar approximation; production should use a suitable projection and record error.",
+        "本项目管线的距离在投影坐标系 EPSG:6677（JGD2011 平面直角坐标系 IX 系）中计算，存储保持 EPSG:4326；该字段取自打包源快照，沿用其源管线的量测方法。",
+        "本プロジェクトのパイプラインは距離を投影座標系 EPSG:6677（JGD2011 平面直角座標系IX系）で計測し、保存は EPSG:4326 のままです。この値はパッケージ済みソーススナップショット由来で、その計測方法を引き継ぎます。",
+        "Pipeline distances are measured in the projected CRS EPSG:6677 (JGD2011 / Japan Plane Rectangular CS IX), with storage kept in EPSG:4326; this value comes from the packaged source snapshot and carries its source pipeline's measurement.",
       ),
     );
   }

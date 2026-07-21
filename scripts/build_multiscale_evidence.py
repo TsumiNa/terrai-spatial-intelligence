@@ -6,7 +6,6 @@ from __future__ import annotations
 import csv
 import io
 import json
-import math
 import re
 import sys
 import unicodedata
@@ -17,12 +16,15 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from terrai_spatial.pipeline.io import write_json_atomic  # noqa: E402
+from terrai_spatial.pipeline.measurement import (  # noqa: E402
+    distance_m,
+    point_line_distance_m,
+    project_line,
+    project_point,
+)
 from terrai_spatial.pipeline.regions import STUDY_BOUNDS  # noqa: E402
 
 DATA = ROOT / "data"
-LAT0 = math.radians(35.446)
-M_PER_DEG_LAT = 111_320.0
-M_PER_DEG_LON = M_PER_DEG_LAT * math.cos(LAT0)
 
 LOCAL_SOURCE_UPDATED_AT = "2026-04-01"
 LOCAL_RETRIEVED_AT = "2026-07-20"
@@ -67,31 +69,6 @@ def data_as_of(*timestamps: str | None) -> str:
 
 def feature_collection(features: list[dict]) -> dict:
     return {"type": "FeatureCollection", "features": features}
-
-
-def xy(point: tuple[float, float] | list[float]) -> tuple[float, float]:
-    return point[0] * M_PER_DEG_LON, point[1] * M_PER_DEG_LAT
-
-
-def distance(a: tuple[float, float] | list[float], b: tuple[float, float] | list[float]) -> float:
-    ax, ay = xy(a)
-    bx, by = xy(b)
-    return math.hypot(ax - bx, ay - by)
-
-
-def point_segment_distance(point: list[float], a: list[float], b: list[float]) -> float:
-    px, py = xy(point)
-    ax, ay = xy(a)
-    bx, by = xy(b)
-    dx, dy = bx - ax, by - ay
-    if dx == 0 and dy == 0:
-        return math.hypot(px - ax, py - ay)
-    t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)))
-    return math.hypot(px - (ax + t * dx), py - (ay + t * dy))
-
-
-def point_line_distance(point: list[float], coordinates: list[list[float]]) -> float:
-    return min(point_segment_distance(point, coordinates[index], coordinates[index + 1]) for index in range(len(coordinates) - 1))
 
 
 def centroid(feature: dict) -> list[float]:
@@ -247,19 +224,21 @@ def reconcile_facility_sources(gsi_features: list[dict], local_rows: list[dict[s
 
 
 def official_facilities(buildings: list[dict], roads: list[dict]) -> list[dict]:
-    high_points = [centroid(item) for item in buildings if item["properties"]["risk_band"] == "high"]
+    building_points = [(item, project_point(centroid(item))) for item in buildings]
+    high_points = [point for item, point in building_points if item["properties"]["risk_band"] == "high"]
+    road_lines = [(item, project_line(item["geometry"]["coordinates"])) for item in roads]
     local_source = DATA / "external" / "yokohama" / "hinanjo_20260401.csv"
     gsi_source = load(DATA / "external" / "gsi_evacuation" / "yokohama_evacuation.geojson")
     source_records = reconcile_facility_sources(gsi_source["features"], local_facility_rows(local_source))
     results = []
     for record in source_records:
-        point = record["geometry"]["coordinates"]
-        nearest_building = min(buildings, key=lambda item: distance(point, centroid(item)))
-        building_distance = distance(point, centroid(nearest_building))
+        point = project_point(record["geometry"]["coordinates"])
+        nearest_building, building_point = min(building_points, key=lambda pair: distance_m(point, pair[1]))
+        building_distance = distance_m(point, building_point)
         building_props = nearest_building["properties"]
-        nearest_road = min(roads, key=lambda item: point_line_distance(point, item["geometry"]["coordinates"]))
-        road_distance = point_line_distance(point, nearest_road["geometry"]["coordinates"])
-        served_high = sum(distance(point, high_point) <= 250 for high_point in high_points)
+        nearest_road, road_line = min(road_lines, key=lambda pair: point_line_distance_m(point, pair[1]))
+        road_distance = point_line_distance_m(point, road_line)
+        served_high = sum(distance_m(point, high_point) <= 250 for high_point in high_points)
         roof_area = building_props.get("footprint_m2", 0) if building_distance <= 90 else 0
         pv_proxy = round(roof_area * 0.12, 1)
         site_safety = clamp(100 - building_props.get("risk_score", 50))
