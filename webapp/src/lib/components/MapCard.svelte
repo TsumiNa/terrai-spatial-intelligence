@@ -1,10 +1,13 @@
 <script lang="ts">
   import { mount, onMount, unmount } from "svelte";
 
+  import { Popover } from "bits-ui";
+
   import { apiOrigin } from "../api/client";
-  import { field, text, undergroundField, FIELD_LABELS, type AuditRecord, type FieldKey } from "../audit";
+  import { field, foundationField, localized, text, undergroundField, FIELD_LABELS, type AuditRecord, type FieldKey } from "../audit";
   import FeaturePopup from "./FeaturePopup.svelte";
-  import { createWindowedFeatureClient, IDLE_STATE, PROVING_LAYER, type WindowedState } from "../features/windowed";
+  import { foundationLayer, renderableFoundationLayers } from "../features/registry";
+  import { createWindowedFeatureClient, type WindowedState } from "../features/windowed";
   import { i18n } from "../i18n/i18n.svelte";
   import { buildAnalyticalLayers, buildWindowedFeatureLayer, drawsOwnBuildings, geometryBounds, queuePopup, type PopupSpec } from "../map/layers";
   import { buildUndergroundLayers } from "../map/underground-layers";
@@ -39,27 +42,73 @@
   let boxArmed = $state(false);
   let sceneMessage = $state<string | null>(null);
 
-  // --- windowed foundation proving layer ---------------------------------
-  // The client owns every fetch decision; this component only relays the
-  // map's settled viewports in and plain state snapshots out.
-  let windowedOn = $state(false);
-  let windowedState = $state.raw<WindowedState>(IDLE_STATE);
+  // --- foundation overlays -----------------------------------------------
+  // One windowed client per visible registry layer; the clients own every
+  // fetch decision and this component only relays the map's settled
+  // viewports in and plain state snapshots out. Visibility itself lives in
+  // app state, so it survives module, view, region and language switches.
+  const renderableLayers = renderableFoundationLayers();
+  let foundationStates = $state.raw<Record<string, WindowedState>>({});
 
   $effect(() => {
-    if (!mapApi || !windowedOn) return;
-    const client = createWindowedFeatureClient({
-      api: createApiClient(),
-      datasetKey: PROVING_LAYER.key,
-      extents: PROVING_LAYER.extents,
-      onState: (state) => (windowedState = state),
+    const active = app.foundationLayers
+      .map((key) => renderableLayers.find((entry) => entry.key === key))
+      .filter((entry) => entry !== undefined);
+    if (!mapApi || !active.length) return;
+    const clients = active.map((entry) =>
+      createWindowedFeatureClient({
+        api: createApiClient(),
+        datasetKey: entry.key,
+        extents: entry.extents,
+        minZoom: entry.minZoom,
+        onState: (state) => (foundationStates = { ...foundationStates, [entry.key]: state }),
+      }),
+    );
+    const unsubscribe = mapApi.onViewChange((view) => {
+      for (const client of clients) client.viewChanged(view);
     });
-    const unsubscribe = mapApi.onViewChange((view) => client.viewChanged(view));
     return () => {
       unsubscribe();
-      client.destroy();
-      windowedState = IDLE_STATE;
+      for (const client of clients) client.destroy();
+      foundationStates = {};
     };
   });
+
+  const activeAttributions = $derived(
+    app.foundationLayers
+      .map((key) => foundationLayer(key))
+      .filter((entry) => entry !== undefined)
+      .map((entry) => `${i18n.t(entry.name)} — ${entry.attribution} · ${entry.license}`),
+  );
+
+  function openFoundationPopup(key: string, feature: Feature, coordinate: [number, number]) {
+    const entry = foundationLayer(key);
+    if (!entry) return;
+    const props = feature.properties as Record<string, unknown>;
+    const retrievedAt = String(props.terrai_retrieved_at ?? props.osm_timestamp ?? "—");
+    const sourceUpdated = String(props.terrai_source_updated_at ?? entry.sourceUpdatedAt);
+    const sourceLayer = String(props.terrai_source_layer ?? props.feature_class ?? "—");
+    const rawUrl = props.terrai_source_url ?? props.source_url;
+    const sourceUrl = typeof rawUrl === "string" ? rawUrl : undefined;
+    const context = (sourceField: string) => ({
+      attribution: entry.attribution,
+      license: entry.license,
+      sourceUpdatedAt: sourceUpdated,
+      retrievedAt,
+      sourceField,
+      datasetKey: key,
+      sourceUrl,
+      limitations: entry.limitations,
+    });
+    const t = i18n.t.bind(i18n);
+    const fields = [
+      { label: t("fl.sourceLayer"), text: sourceLayer, record: foundationField(localized("fl.sourceLayer"), sourceLayer, context("terrai_source_layer")) },
+      { label: t("fl.sourceUpdatedAt"), text: sourceUpdated, record: foundationField(localized("fl.sourceUpdatedAt"), sourceUpdated, context("terrai_source_updated_at")) },
+      { label: t("fl.retrievedAt"), text: retrievedAt, record: foundationField(localized("fl.retrievedAt"), retrievedAt, context("terrai_retrieved_at")) },
+      { label: t("fl.license"), text: entry.license, record: foundationField(localized("fl.license"), entry.license, context("registry")) },
+    ];
+    showPopup(coordinate, { eyebrow: t("fl.eyebrow"), title: t(entry.name), fields });
+  }
 
   $effect(() => {
     if (app.module !== "underground" || sceneCatalog) return;
@@ -204,13 +253,19 @@
           : [];
       mapApi.setAnalyticalLayers(buildUndergroundLayers(resources, assetBase, { onAsset: openUndergroundAssetPopup }));
     } else {
-      // The windowed layer is context: it renders beneath the analysis.
-      const windowed =
-        windowedOn && windowedState.status === "ready"
-          ? [buildWindowedFeatureLayer(PROVING_LAYER.key, windowedState.features)]
-          : [];
+      // Foundation overlays are context: they render beneath the analysis,
+      // and deck's topmost-first picking means an analytical feature wins
+      // any contested click.
+      const overlays = app.foundationLayers
+        .map((key) => ({ key, state: foundationStates[key] }))
+        .filter((item) => item.state?.status === "ready")
+        .map(({ key, state }) =>
+          buildWindowedFeatureLayer(key, state.features, {
+            onFeature: (feature, coordinate) => openFoundationPopup(key, feature, coordinate),
+          }),
+        );
       mapApi.setAnalyticalLayers([
-        ...windowed,
+        ...overlays,
         ...buildAnalyticalLayers(module, view, data, assetBase, { onFeature: openFeaturePopup }),
       ]);
     }
@@ -262,36 +317,55 @@
         {/each}
       </div>
       {#if app.module !== "underground"}
-        <div class="basemap-switcher" aria-label={i18n.t("windowed.aria")}>
-          <button
-            class="basemap-button windowed-toggle"
-            class:active={windowedOn}
-            aria-pressed={windowedOn}
-            title={i18n.t("windowed.title")}
-            onclick={() => (windowedOn = !windowedOn)}
+        <Popover.Root>
+          <Popover.Trigger
+            class="basemap-button foundation-toggle"
+            aria-pressed={app.foundationLayers.length > 0}
+            title={i18n.t("layers.title")}
           >
-            {i18n.t("windowed.toggle")}
-          </button>
-        </div>
-        {#if windowedOn && windowedState.status !== "idle"}
-          <span class="windowed-chip text-xs text-muted" data-status={windowedState.status} role="status">
-            {#if windowedState.status === "ready"}
-              {i18n.t("windowed.ready", { n: windowedState.matched })}
-            {:else if windowedState.status === "loading"}
-              {i18n.t("windowed.loading")}
-            {:else if windowedState.status === "belowZoom"}
-              {i18n.t("windowed.belowZoom")}
-            {:else if windowedState.status === "outside"}
-              {i18n.t("windowed.outside")}
-            {:else if windowedState.status === "empty"}
-              {i18n.t("windowed.empty")}
-            {:else if windowedState.status === "oversized"}
-              {i18n.t("windowed.oversized")}
-            {:else}
-              {i18n.t("windowed.error")}
-            {/if}
-          </span>
-        {/if}
+            {i18n.t("layers.toggle")}{app.foundationLayers.length ? ` · ${app.foundationLayers.length}` : ""}
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Content
+              class="foundation-panel z-30 flex min-w-64 flex-col gap-1 rounded-card border border-line bg-paper p-2 shadow-card"
+              sideOffset={6}
+              aria-label={i18n.t("layers.aria")}
+            >
+              {#each renderableLayers as entry (entry.key)}
+                {@const on = app.foundationLayers.includes(entry.key)}
+                {@const status = on ? (foundationStates[entry.key]?.status ?? "loading") : "off"}
+                <button
+                  class="foundation-item flex items-center justify-between gap-3 rounded-card px-2 py-1 text-left text-xs text-ink hover:bg-line/40"
+                  class:active={on}
+                  aria-pressed={on}
+                  data-layer={entry.key}
+                  onclick={() => app.toggleFoundationLayer(entry.key)}
+                >
+                  <span>{i18n.t(entry.name)}</span>
+                  <span class="foundation-status text-[10px] text-muted" data-layer-status={status}>
+                    {#if status === "off"}
+                      —
+                    {:else if status === "ready"}
+                      {i18n.t("windowed.ready", { n: foundationStates[entry.key]?.matched ?? 0 })}
+                    {:else if status === "loading" || status === "idle"}
+                      {i18n.t("windowed.loading")}
+                    {:else if status === "belowZoom"}
+                      {i18n.t("windowed.belowZoom")}
+                    {:else if status === "outside"}
+                      {i18n.t("windowed.outside")}
+                    {:else if status === "empty"}
+                      {i18n.t("windowed.empty")}
+                    {:else if status === "oversized"}
+                      {i18n.t("windowed.oversized")}
+                    {:else}
+                      {i18n.t("windowed.error")}
+                    {/if}
+                  </span>
+                </button>
+              {/each}
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
       {/if}
       {#if app.module === "underground" && sceneCatalog}
         <div class="basemap-switcher" aria-label={i18n.t("scene.catalogScenes")}>
@@ -318,6 +392,18 @@
     </div>
   </div>
   <div id="map" bind:this={container} aria-label={i18n.t("map.aria")}></div>
+  {#if activeAttributions.length}
+    <!-- Attribution is registry-driven and not optional: it stays on screen
+         for as long as any foundation overlay is visible. -->
+    <div
+      class="map-attribution pointer-events-none absolute bottom-8 left-2 z-10 max-w-2xl rounded-card border border-line bg-paper/90 px-2 py-1 text-[10px] leading-snug text-muted"
+      role="note"
+    >
+      {#each activeAttributions as line (line)}
+        <span class="block">{line}</span>
+      {/each}
+    </div>
+  {/if}
   {#if sceneMessage}
     <div class="absolute left-1/2 top-16 z-20 -translate-x-1/2 rounded-card border border-line bg-paper/95 px-4 py-2 text-xs text-ink shadow-card" role="status">
       {sceneMessage}

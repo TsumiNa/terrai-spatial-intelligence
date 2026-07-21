@@ -1,6 +1,6 @@
 # PR2 Plan: Foundation Layers as Auditable Overlays
 
-- Status: Planned
+- Status: In progress
 - Refactor: `on-demand-fl-delivery`
 - Depends on: PR1 merged
 

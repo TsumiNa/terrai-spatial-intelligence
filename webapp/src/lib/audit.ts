@@ -821,6 +821,44 @@ export function undergroundField(
   };
 }
 
+/** Provenance of one clicked foundation-overlay feature: what the source is,
+ * when it was retrieved, what the source's own timestamp says, and what it is
+ * not suitable for. Foundation layers are evidence shown, never scored. */
+export interface FoundationAuditContext {
+  attribution: string;
+  license: string;
+  /** The source's own timestamp, verbatim. */
+  sourceUpdatedAt: string;
+  retrievedAt: string;
+  sourceField: string;
+  datasetKey: string;
+  sourceUrl?: string;
+  limitations: Localized;
+}
+
+export function foundationField(title: Localized, value: AuditValue, context: FoundationAuditContext): AuditRecord {
+  return {
+    kind: "raw",
+    title,
+    value,
+    sections: [
+      section(ml("数据来源", "データソース", "Data source"), context.attribution, context.sourceUrl ?? ""),
+      section(ml("来源字段", "元フィールド", "Source field"), context.sourceField),
+      section(
+        ml("时间/版本", "時点・バージョン", "Date / version"),
+        ml(
+          `来源时点 ${context.sourceUpdatedAt} · 获取于 ${context.retrievedAt}`,
+          `ソース時点 ${context.sourceUpdatedAt} · 取得 ${context.retrievedAt}`,
+          `source ${context.sourceUpdatedAt} · retrieved ${context.retrievedAt}`,
+        ),
+      ),
+      section(ml("许可", "ライセンス", "License"), context.license),
+      section(ml("本地证据", "ローカル証拠", "Local evidence"), `/api/v1/features/${context.datasetKey} (on demand)`),
+    ],
+    caveat: context.limitations,
+  };
+}
+
 /** Provenance of one element picked inside the standalone site scene. */
 export interface SceneAuditContext {
   datasetId: string;
