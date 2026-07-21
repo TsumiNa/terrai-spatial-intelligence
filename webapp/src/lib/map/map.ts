@@ -33,7 +33,7 @@ export interface ExhibitionMap {
   setRegion(region: RegionKey): void;
   setBasemap(basemap: BasemapKey): void;
   setAnalyticalLayers(layers: Layer[]): void;
-  /** Hide the basemap's own buildings while an analysis colours buildings. */
+  /** Hide the basemap's own buildings while an analysis colors buildings. */
   setVectorBuildingsVisible(visible: boolean): void;
   openPopup(lngLat: [number, number], content: HTMLElement, onClose?: () => void): void;
   closePopup(): void;

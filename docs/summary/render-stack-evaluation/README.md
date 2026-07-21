@@ -16,15 +16,15 @@ This document records what was measured, and the decision those measurements led
 
 Probed directly against the two demo bounding boxes.
 
-| Layer | Deepest level served | Note |
-|---|---|---|
-| `slopemap` | z15 | z16 returns 404 |
-| `hillshademap` | z16 | z17 returns 404 |
-| `seamlessphoto` | z18 | z19 returns 404 |
-| `ort` | z18 | ~57 KB per tile against seamlessphoto's ~17 KB at the same level |
-| `dem5a_png` | z15 | numeric elevation, available for both regions |
-| `dem_png` | z14 | DEM10B fallback |
-| `experimental_bvmap` | z16 | vector tiles; an official style with 774 layers is published |
+| Layer                | Deepest level served | Note                                                             |
+| -------------------- | -------------------- | ---------------------------------------------------------------- |
+| `slopemap`           | z15                  | z16 returns 404                                                  |
+| `hillshademap`       | z16                  | z17 returns 404                                                  |
+| `seamlessphoto`      | z18                  | z19 returns 404                                                  |
+| `ort`                | z18                  | ~57 KB per tile against seamlessphoto's ~17 KB at the same level |
+| `dem5a_png`          | z15                  | numeric elevation, available for both regions                    |
+| `dem_png`            | z14                  | DEM10B fallback                                                  |
+| `experimental_bvmap` | z16                  | vector tiles; an official style with 774 layers is published     |
 
 All GSI tiles respond with `access-control-allow-origin: *`, so decoding their pixels in the browser is possible.
 
@@ -33,11 +33,11 @@ All GSI tiles respond with `access-control-allow-origin: *`, so decoding their p
 At 35.45°N:
 
 | Level | Resolution |
-|---|---|
-| z15 | 3.89 m/px |
-| z16 | 1.95 m/px |
-| z17 | 0.97 m/px |
-| z18 | 0.49 m/px |
+| ----- | ---------- |
+| z15   | 3.89 m/px  |
+| z16   | 1.95 m/px  |
+| z17   | 0.97 m/px  |
+| z18   | 0.49 m/px  |
 
 DEM5A is a 5 m grid, so z15 already slightly oversamples the elevation data that `slopemap` and `hillshademap` are derived from. GSI stopping `slopemap` at z15 is an information limit, not an arbitrary cap.
 
@@ -51,12 +51,12 @@ One Yokohama z15 tile decodes to min/median/max of 3.6 / 36.8 / 72.4 m, with 186
 
 ## Library weight, measured
 
-| | Raw | gzip | brotli |
-|---|---|---|---|
-| CesiumJS 1.143 `Cesium.js` | 5.64 MB | 1.64 MB | 1.31 MB |
-| MapLibre GL 5 | 1.0 MB | 269 KB | — |
-| deck.gl 9 (UMD, all layers) | 1.6 MB | 459 KB | — |
-| MapLibre CSS | 72 KB | 10 KB | — |
+|                             | Raw     | gzip    | brotli  |
+| --------------------------- | ------- | ------- | ------- |
+| CesiumJS 1.143 `Cesium.js`  | 5.64 MB | 1.64 MB | 1.31 MB |
+| MapLibre GL 5               | 1.0 MB  | 269 KB  | —       |
+| deck.gl 9 (UMD, all layers) | 1.6 MB  | 459 KB  | —       |
+| MapLibre CSS                | 72 KB   | 10 KB   | —       |
 
 Cesium's full `Build/Cesium` directory is 22 MB on disk, but `Assets` (4.6 MB), `Workers` (1.3 MB) and `ThirdParty` (1.1 MB) load on demand rather than on first paint.
 
@@ -76,7 +76,7 @@ Stack totals over the wire, gzip: **Cesium 1.64 MB, MapLibre + deck.gl 738 KB.**
 - **Frame rate is markedly better than Cesium** on the same machine, region and data.
 - **The vector basemap stays sharp past its source ceiling.** `experimental_bvmap` serves to z16; beyond that the geometry scales rather than the pixels, so lines and labels stay crisp where raster imagery blurs.
 - **GPU aggregation is available and Cesium has no equivalent.** `HexagonLayer` aggregates the building set by `risk_score` on the GPU.
-- **Terrain from GSI elevation is unresolved in the spike.** Three defects were found and fixed in the spike's own code: a shared decode canvas racing across concurrent tile requests; a missing `colorSpaceConversion: "none"`, which let the browser alter RGB values that are data rather than colour; and an encoding mismatch, where the handler emitted terrarium while the source declared MapLibre's default `mapbox` encoding. Terrain still rendered incorrectly after all three. The cause is not established. **This is a limitation of the spike, not a demonstrated limitation of MapLibre.**
+- **Terrain from GSI elevation is unresolved in the spike.** Three defects were found and fixed in the spike's own code: a shared decode canvas racing across concurrent tile requests; a missing `colorSpaceConversion: "none"`, which let the browser alter RGB values that are data rather than color; and an encoding mismatch, where the handler emitted terrarium while the source declared MapLibre's default `mapbox` encoding. Terrain still rendered incorrectly after all three. The cause is not established. **This is a limitation of the spike, not a demonstrated limitation of MapLibre.**
 - **deck.gl extrusions do not follow terrain automatically.** Extruded polygons start at elevation 0, so with terrain enabled buildings sink into or float above slopes. Cesium's absolute heights aligned without extra work. Correcting this is real additional effort.
 
 ## Underground viewing, as originally framed

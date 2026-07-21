@@ -46,15 +46,15 @@ A design-system adoption (Tailwind + shadcn-svelte) is agreed follow-up work **a
 
 Stages 01–05 reach parity with today's exhibition and retire Leaflet. Stages 06–07 add capability and cannot start until their data exists.
 
-| Stage | Plan | Purpose |
-|---|---|---|
-| 01 | [toolchain and typed client](01-toolchain-and-typed-client-pr1.md) | Vite, Svelte, TypeScript, OpenAPI codegen. No visible change. |
-| 02 | [app shell and i18n](02-app-shell-and-i18n-pr2.md) | Panels, queues, audit drawer, compile-time translations. Map area is a placeholder. |
-| 03 | [MapLibre basemaps](03-maplibre-basemap-pr3.md) | Vector and raster basemaps, region switching, camera. |
-| 04 | [deck.gl analytical layers](04-deck-analytical-layers-pr4.md) | Every current module's layers and their audit wiring. Parity reached. |
-| 05 | [retire the Leaflet runtime](05-retire-leaflet-runtime-pr5.md) | Delete the old frontend; replace grep contracts with types and Playwright. |
-| 06 | [underground utility networks](06-underground-networks-pr6.md) | Lowered camera, translucent surface, depth-controlled network layer. |
-| 07 | [site scene](07-site-scene-three-pr7.md) | Box-select into a standalone Three.js local scene. |
+| Stage | Plan                                                               | Purpose                                                                             |
+| ----- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| 01    | [toolchain and typed client](01-toolchain-and-typed-client-pr1.md) | Vite, Svelte, TypeScript, OpenAPI codegen. No visible change.                       |
+| 02    | [app shell and i18n](02-app-shell-and-i18n-pr2.md)                 | Panels, queues, audit drawer, compile-time translations. Map area is a placeholder. |
+| 03    | [MapLibre basemaps](03-maplibre-basemap-pr3.md)                    | Vector and raster basemaps, region switching, camera.                               |
+| 04    | [deck.gl analytical layers](04-deck-analytical-layers-pr4.md)      | Every current module's layers and their audit wiring. Parity reached.               |
+| 05    | [retire the Leaflet runtime](05-retire-leaflet-runtime-pr5.md)     | Delete the old frontend; replace grep contracts with types and Playwright.          |
+| 06    | [underground utility networks](06-underground-networks-pr6.md)     | Lowered camera, translucent surface, depth-controlled network layer.                |
+| 07    | [site scene](07-site-scene-three-pr7.md)                           | Box-select into a standalone Three.js local scene.                                  |
 
 Each stage ships as its own pull request, states its own acceptance commands, and leaves the test suite and validation passing when it merges. A stage that only turns green after a later one is wrongly ordered — see `.github/instructions/branch-and-pr-workflow.instructions.md`.
 

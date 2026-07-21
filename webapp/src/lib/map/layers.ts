@@ -3,7 +3,7 @@
  *
  * Ported from the Leaflet layer halves of the `render*` functions in
  * `frontend/app.js`: layer order (bottom→top), styling and the popup each
- * feature class binds. Colours and thresholds come from ./style-rules.ts as
+ * feature class binds. Colors and thresholds come from ./style-rules.ts as
  * data. Layers are rebuilt only when (module, view, data) change — never on
  * a language switch or unrelated state.
  */
@@ -223,8 +223,8 @@ export const POPUPS: Record<string, PopupSpec> = {
   },
 };
 
-/** Views that colour building footprints themselves; the basemap's own
- * building layer hides underneath so the analysis colour is the only one. */
+/** Views that color building footprints themselves; the basemap's own
+ * building layer hides underneath so the analysis color is the only one. */
 export function drawsOwnBuildings(module: ModuleName, view: string): boolean {
   if (module === "slope" || module === "facilities") return true;
   if (module === "overview") return view === "urban";

@@ -10,7 +10,7 @@
 
 Most code in this repository is now written by AI. That changes what a styling system is for.
 
-Hand-written CSS lets each change invent a class name, a colour and a spacing value. All of them render plausibly, so a reviewer has to hold the intended design in their head and diff against it by eye. At the current size — ten components (nine under `webapp/src/lib/components/` plus `App.svelte`), 186 lines of CSS, 129 selectors — that is still possible. It stops being possible well before the site scene and the field client exist.
+Hand-written CSS lets each change invent a class name, a color and a spacing value. All of them render plausibly, so a reviewer has to hold the intended design in their head and diff against it by eye. At the current size — ten components (nine under `webapp/src/lib/components/` plus `App.svelte`), 186 lines of CSS, 129 selectors — that is still possible. It stops being possible well before the site scene and the field client exist.
 
 The goal is therefore not tidier CSS. **The goal is that a human can review UI changes they did not write**, by reading rule violations and rendered-output diffs instead of class strings.
 
@@ -28,7 +28,7 @@ Adopt **Tailwind CSS v4** with a theme locked to the existing TerrAI tokens, and
 
 Tailwind is chosen for the reason above: with a locked `@theme` and the default palette removed, an off-system value has to be written as an arbitrary value (`bg-[#1f7a58]`, `p-[13px]`), which is greppable and therefore enforceable. Plain CSS gives no such signal. Svelte's scoped styles already solve collisions and naming, so that is not what Tailwind is buying here.
 
-Two properties decide it, and both depend on the growth premise. Model output converges on convention, and Tailwind is the convention — an AI writing bespoke CSS invents a class, a scale and a near-miss colour every time, while an AI writing Tailwind produces something a reviewer has seen before. And a violation is *visible* rather than merely *detectable*: `bg-[#1f7a58]` reads as an escape hatch at a glance, where a raw hex in a stylesheet looks like ordinary code and its detection depends entirely on the linter's coverage.
+Two properties decide it, and both depend on the growth premise. Model output converges on convention, and Tailwind is the convention — an AI writing bespoke CSS invents a class, a scale and a near-miss color every time, while an AI writing Tailwind produces something a reviewer has seen before. And a violation is *visible* rather than merely *detectable*: `bg-[#1f7a58]` reads as an escape hatch at a glance, where a raw hex in a stylesheet looks like ordinary code and its detection depends entirely on the linter's coverage.
 
 Stylelint against plain CSS could enforce the same tokens, and at today's size that would be lighter. It was the better answer while the UI was ten components and stable. It stops being the better answer once most of the UI is yet to be written.
 
@@ -70,8 +70,8 @@ Ordered so that the safety net exists before anything it protects is touched.
 |---|---|---|
 | 01 | [visual and a11y baseline](01-visual-and-a11y-baseline-pr1.md) | Playwright screenshots and axe assertions against today's UI. No production change. |
 | 02 | [Tailwind with a locked theme](02-tailwind-locked-theme-pr2.md) | Install v4, express the twelve tokens as `@theme`, remove the default palette. Nothing restyled. |
-| 03 | [theme enforcement](03-theme-enforcement-pr3.md) | A check that fails on arbitrary values and off-theme colours. |
-| 04 | [close the colour gap](04-close-the-colour-gap-pr4.md) | Extend the check to stylesheets, collapse the duplicated tokens, inventory the inherited colour. |
+| 03 | [theme enforcement](03-theme-enforcement-pr3.md) | A check that fails on arbitrary values and off-theme colors. |
+| 04 | [close the color gap](04-close-the-color-gap-pr4.md) | Extend the check to stylesheets, collapse the duplicated tokens, inventory the inherited color. |
 | 05 | [overlay primitives](05-overlay-primitives-pr5.md) | Bits UI Dialog for the audit drawer; the four defects above are fixed and asserted. |
 
 Each stage is its own pull request, states its own acceptance commands, and leaves the suite and validation passing when it merges. Stage 01 must merge before 02 begins: without a baseline, "the UI did not change" is an opinion.
@@ -84,7 +84,7 @@ Each stage is its own pull request, states its own acceptance commands, and leav
 - **Baselines are migration scaffolding with a known expiry.** They exist to prove stages 02–05 changed nothing they did not intend to. They are not a permanent regression suite for these particular screens, which are exploratory and will be replaced. Two cases, and conflating them makes the rule either violated or obstructive:
   - **During this refactor**, a screenshot diff is a defect. Do not regenerate to go green.
   - **During a deliberate redesign**, baselines are regenerated wholesale as part of reviewing that design. That is normal, and the diff is the artefact under review rather than a failure.
-- **The twelve colours become a hard boundary, not a fixed set.** They are extracted from the design that exists today. The redesign will need more, and the site scene may need a subsurface scale. Extending the theme is a normal reviewed act; the boundary exists so that extension is *deliberate*, not so that the count stays at twelve. If adding a token feels like fighting the system, the system is being read wrong — the failure mode to prevent is a component reaching past the theme, not the theme growing.
+- **The twelve colors become a hard boundary, not a fixed set.** They are extracted from the design that exists today. The redesign will need more, and the site scene may need a subsurface scale. Extending the theme is a normal reviewed act; the boundary exists so that extension is *deliberate*, not so that the count stays at twelve. If adding a token feels like fighting the system, the system is being read wrong — the failure mode to prevent is a component reaching past the theme, not the theme growing.
 - **Bits UI becomes a runtime dependency.** An upstream change can move behaviour, which is the cost of receiving upstream accessibility fixes. Pin it and read its changelog on upgrade.
 - **Class strings get longer.** Utility-first markup is harder to skim than a semantic class name. That cost is accepted because the reviewer's job moves from reading markup to reading violations and image diffs.
 

@@ -50,8 +50,8 @@ export function rasterId(region: RegionKey, kind: RasterKind): string {
 /**
  * The vector style's own building layers. Analytical scores live in the
  * exhibition's GeoJSON, not in the vector tiles, so a building-level analysis
- * cannot recolour these — it hides them and draws the analysis colour as the
- * only building colour instead.
+ * cannot recolor these — it hides them and draws the analysis color as the
+ * only building color instead.
  */
 export function vectorBuildingLayerIds(style: StyleSpecification): string[] {
   return style.layers
