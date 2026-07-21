@@ -15,7 +15,9 @@ async function undergroundReady(page: Page): Promise<boolean> {
 
 async function openUnderground(page: Page) {
   await page.goto("/?module=underground");
-  await expect(page.locator(".metrics, .analysis-grid").first()).toBeVisible({ timeout: 15000 });
+  // Not `.metrics`: the unavailable state renders it empty, and an empty grid
+  // has zero height, which Playwright reads as invisible.
+  await expect(page.locator(".map-card")).toBeVisible({ timeout: 15000 });
   await expect(page.locator("#map .maplibregl-canvas")).toBeVisible({ timeout: 20000 });
 }
 
