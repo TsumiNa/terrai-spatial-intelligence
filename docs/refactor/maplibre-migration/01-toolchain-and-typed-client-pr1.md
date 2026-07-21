@@ -1,8 +1,8 @@
 # PR1 Plan: Toolchain and Typed API Client
 
-- Status: Planned
+- Status: Completed
 - Refactor: `maplibre-migration`
-- PR: #1
+- PR: #12
 
 ## Goal
 

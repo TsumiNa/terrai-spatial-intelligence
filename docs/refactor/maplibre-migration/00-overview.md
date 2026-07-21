@@ -1,6 +1,6 @@
 # Frontend Migration: Svelte + Vite, MapLibre + deck.gl
 
-- Status: Planned — stages 01-05 reach parity, 06-07 are blocked on data
+- Status: In progress — stages 01-05 reach parity, 06-07 are blocked on data
 - Date: 2026-07-20
 - Baseline: `main` / `d68bd1e`
 - Type: frontend platform migration; the FastAPI backend and the data pipelines stay

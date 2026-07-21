@@ -11,6 +11,25 @@ uv run python -m terrai_spatial serve --port 4176
 
 The frontend lives in `frontend/`; FastAPI and data services in `terrai_spatial/`; directly executable data tasks in `scripts/`; and file-backed foundation data and caches in `data/`.
 
+## Frontend toolchain (`webapp/`)
+
+The next frontend is a Svelte 5 + Vite + TypeScript application in `webapp/`. It is not yet the served exhibition — `frontend/` stays the default until the [MapLibre migration](docs/refactor/maplibre-migration/00-overview.md) reaches parity.
+
+Requires Node.js >= 22 alongside `uv`.
+
+```bash
+cd webapp
+npm install                  # once
+npm run dev                  # dev server on http://127.0.0.1:4300
+npm run build                # static output in webapp/dist/
+npm run check                # svelte-check over the TypeScript sources
+npm test                     # Vitest unit tests (colocated *_test.ts)
+npm run test:e2e             # Playwright smoke test (npx playwright install chromium once)
+npm run generate:api         # regenerate webapp/openapi.json and src/lib/api/schema.d.ts
+```
+
+`webapp/openapi.json` and `webapp/src/lib/api/schema.d.ts` are generated from the FastAPI application and committed. Never hand-edit them: after any API route or response change, run `npm run generate:api` — `terrai_spatial/api_test.py` fails while the committed schema drifts from the live application.
+
 ## Documentation convention
 
 Project documentation belongs in the five `docs/` categories: `architecture`, `refactor`, `data`, `summary`, and `others`. Documents in `architecture`, `data`, and `summary` require an English `.md`, Japanese `.ja.md`, and Chinese `.zh.md` version. English is always the unsuffixed default. Every data or summary group lives in its own subfolder with `README.*` filenames. All other locations use English-only `.md` documents by default. See [repository-doc-boundaries.instructions.md](.github/instructions/repository-doc-boundaries.instructions.md) for detailed boundaries and naming.
