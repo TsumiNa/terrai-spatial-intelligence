@@ -22,6 +22,7 @@ Current instruction files (may be incomplete — always verify against the direc
 | `minimal-implementation-and-tests.instructions.md` | `**`                                     | Minimal abstraction/scope, required test coverage for new logic             |
 | `repository-doc-boundaries.instructions.md`        | `**/{README,CONTRIBUTING}.md`, `docs/**` | Root entrypoints, `docs/` structure, language policy                        |
 | `docs-data-cards.instructions.md`                  | `docs/data/**`                           | Dataset card sections, including `## Data description`                      |
+| `colour-palette.instructions.md`                   | `webapp/**`                              | Where colour may be declared, and what to do when adding or changing one    |
 
 ## 2. Python environment: this project uses `uv`
 
@@ -74,13 +75,40 @@ The exhibition frontend in `webapp/` (Svelte 5 + Vite + TypeScript, MapLibre GL 
 
 ## 4. Colour is locked to the palette
 
-Every colour in the web app comes from one place. `webapp/src/lib/theme.ts` is the only file that may write a colour literal in TypeScript, and each of its entries also exists as a `--color-*` token in `webapp/src/app.css`. A test asserts both, so the two cannot drift — which they already had, `lime` meaning one green in the stylesheet and another on the map.
+`colour-palette.instructions.md` holds the rules. This section is the concrete form they take today.
 
-`--color-*` is cleared before the palette is declared, so `bg-blue-500` does not exist. Writing an off-palette colour requires `bg-[#1f7a58]`, which `webapp/src/lib/palette_guard.ts` rejects.
+**The two declarations.** `webapp/src/lib/theme.ts` is the only TypeScript file that may write a colour literal; the `@theme` block in `webapp/src/app.css` declares the same set as `--color-*` tokens. Names correspond as kebab ↔ camelCase: `--color-exposure-outline` ↔ `exposureOutline`. A test compares them by name *and* value, so they cannot drift — which they already had, `lime` meaning `#a9d96e` in the stylesheet and `#8fc85a` on the map.
 
-**The lock is on colour, not geometry.** `p-[13px]`, `rounded-[7px]` and `w-[238px]` are legitimate: a radius is a judgement, not a defect, and forcing every surface through named roles is how a product ends up looking uniform. Arbitrary variants such as `data-[state=open]:` are also allowed — they select a state rather than carry a value.
+**How it is enforced.** `--color-*: initial` clears the default palette, so `bg-blue-500` is not generated at all. `webapp/src/lib/palette_guard.ts` then rejects colour literals in `.svelte`, `.ts` and `.css` files, and arbitrary colour utilities in class attributes. Failures name the file and the value:
 
-Adding a colour means adding it to both files. That is a normal reviewed act, not something to route around.
+```
+{ "file": "src/lib/components/Hero.svelte",
+  "reason": "arbitrary colour utility",
+  "value": "bg-[#ff6600]" }
+```
+
+**Changing a value** — edit both declarations in the same commit, then regenerate the screenshot baselines and show the images in the pull request:
+
+```bash
+cd webapp && npx playwright test e2e/visual_test.ts --update-snapshots
+```
+
+**Adding a colour** — add to both, with corresponding names. This is normal; do not use an arbitrary value to avoid it.
+
+```css
+/* webapp/src/app.css, inside @theme */
+--color-flood-risk: #2f6f9f;
+```
+```ts
+// webapp/src/lib/theme.ts
+floodRisk: "#2f6f9f",
+```
+
+**Using a colour** — `class="bg-forest text-paper"`, `var(--color-forest)` in a stylesheet, or `palette.transmission` in TypeScript.
+
+**The lock is on colour, not geometry.** `p-[13px]`, `rounded-[7px]` and `w-[238px]` are legitimate, and so are arbitrary variants such as `data-[state=open]:`. A check that rejects those is broken.
+
+**Two known items.** `lime` (`#a9d96e`, interface accent) and `hub` (`#8fc85a`, map fill) are deliberately separate; merging them changes what the map renders and belongs to the redesign. `app.css` also carries 59 colours picked by eye before this rule, asserted as an exact set in `palette_guard_test.ts` — adding one fails, and so does removing one without updating the list.
 
 ## 5. Architecture
 
