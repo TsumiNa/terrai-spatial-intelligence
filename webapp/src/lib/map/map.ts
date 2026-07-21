@@ -221,7 +221,9 @@ export async function createExhibitionMap(
       popup.remove();
     },
     onViewChange(listener) {
+      let active = true;
       const report = () => {
+        if (!active) return; // the initial loaded-report can outlive unsubscribe
         const bounds = map.getBounds();
         listener({
           bounds: [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()],
@@ -230,7 +232,10 @@ export async function createExhibitionMap(
       };
       map.on("moveend", report);
       void loaded.then(report);
-      return () => map.off("moveend", report);
+      return () => {
+        active = false;
+        map.off("moveend", report);
+      };
     },
     frame([west, south, east, north]) {
       if (west === east && south === north) {

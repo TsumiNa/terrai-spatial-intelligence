@@ -266,6 +266,7 @@
           <button
             class="basemap-button windowed-toggle"
             class:active={windowedOn}
+            aria-pressed={windowedOn}
             title={i18n.t("windowed.title")}
             onclick={() => (windowedOn = !windowedOn)}
           >
