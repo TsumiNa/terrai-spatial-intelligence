@@ -2,7 +2,7 @@
 
 - Status: Completed
 - Refactor: `maplibre-migration`
-- PR: #1
+- PR: #12
 
 ## Goal
 
