@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 .DS_Store
 
+# Svelte webapp toolchain
+node_modules/
+webapp/dist/
+webapp/playwright-report/
+webapp/test-results/
+
 # TEPCO source files are publicly readable but marked redistribution-prohibited.
 # Keep them only in the local working copy; commit the documented screening result.
 data/external/tepco/*.zip
