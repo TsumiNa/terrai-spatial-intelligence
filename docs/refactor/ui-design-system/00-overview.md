@@ -1,6 +1,6 @@
 # UI Design System and Review Guardrails
 
-- Status: In progress — stages 01-04 complete
+- Status: Completed
 - Date: 2026-07-21
 - Baseline: `main` / `b8fcfc3`
 - Type: frontend styling platform; no change to analytical behaviour, data, or the API

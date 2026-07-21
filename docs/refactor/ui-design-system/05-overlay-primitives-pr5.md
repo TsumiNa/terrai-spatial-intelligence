@@ -1,6 +1,6 @@
 # PR5 Plan: Overlay Primitives
 
-- Status: Planned
+- Status: Completed
 - Refactor: `ui-design-system`
 - PR: #5
 
@@ -31,6 +31,12 @@ No primitive beyond Dialog, and no decorative components. Cards, badges, separat
 - Pin the version. Receiving upstream accessibility fixes is the reason for the dependency, but an upgrade can also move behaviour, so it should be a deliberate act with the baselines rerun.
 - Escape-to-close, click-outside-to-close and focus return already work; the primitive must preserve them, not merely replace them.
 - The drawer holds long trilingual prose. Check scrolling and focus order with the longest Japanese and English content, not the shortest.
+
+## Findings
+
+- **The primitive confines assistive technology with `aria-modal="true"`, not by marking the background.** The stage-01 test demanded `aria-hidden` or `inert` on the app shell, which encoded a technique rather than an outcome — marking siblings is the fallback for assistive technology that does not support `aria-modal`. The assertion now checks the outcome: modal semantics, a focus trap, and a covering overlay. axe reports no violations in the open state.
+- **`Dialog.Title` renders a `div` with `role="heading"` by default**, which `.audit-head h2` does not match, so the title silently dropped from 20px to 16px. Caught by the screenshot baseline, not by review. It renders a real `<h2>` through the `child` snippet now.
+- **Two pre-existing tests asserted the old mechanism** — that `.audit-drawer` loses its `open` class. The primitive unmounts instead, so they assert absence now, which is the stronger claim.
 
 ## Acceptance
 
