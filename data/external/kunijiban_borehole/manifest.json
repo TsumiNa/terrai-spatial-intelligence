@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "dataset_id": "kunijiban_borehole",
+  "title": "KuniJiban integrated borehole, layer, and SPT tables",
+  "evidence_status": "mixed_observed_and_model_extracted",
+  "source_system": "KuniJiban",
+  "source_url": "https://www.kunijiban.pwri.go.jp/",
+  "terms_url": "https://www.kunijiban.pwri.go.jp/jp/terms.html",
+  "attention_url": "https://www.kunijiban.pwri.go.jp/jp/attention.html",
+  "retrieved_at": "2026-06-27T13:04:00+09:00",
+  "source_updated_at": null,
+  "source_updated_at_note": "The supplied regional extract has no single publisher snapshot timestamp; individual survey dates may differ by borehole.",
+  "horizontal_crs": "WGS 84 longitude/latitude (EPSG:4326)",
+  "vertical_datum": "source-dependent and not normalized",
+  "feature_count": 11703,
+  "record_counts": {
+    "boreholes": 11703,
+    "layers": 122693,
+    "spt_tests": 239137
+  },
+  "provenance_counts": {
+    "raw_xml": 6462,
+    "pdf_vlm": 5241
+  },
+  "filters_applied": {
+    "excluded_data_source": "pdf_vlm_empty",
+    "excluded_boreholes": 364,
+    "reason": "Records contain no usable stratigraphy and no related layer or SPT rows."
+  },
+  "files": [
+    "data/external/kunijiban_borehole/integrated_boreholes.parquet",
+    "data/external/kunijiban_borehole/integrated_borehole_layers.parquet",
+    "data/external/kunijiban_borehole/integrated_borehole_spt.parquet",
+    "data/external/kunijiban_borehole/Full_Pipeline_Run_Report.md"
+  ],
+  "assets": [
+    {
+      "role": "boreholes_nested",
+      "path": "data/external/kunijiban_borehole/integrated_boreholes.parquet",
+      "asset_url": "/api/v1/assets/external/kunijiban_borehole/integrated_boreholes.parquet",
+      "format": "Apache Parquet",
+      "rows": 11703,
+      "bytes": 9160661,
+      "sha256": "3db962c27eeb1ee09a5f3ba478cafd4622889982c91eeccbda6c28ebd4fec068"
+    },
+    {
+      "role": "stratigraphic_layers_flat",
+      "path": "data/external/kunijiban_borehole/integrated_borehole_layers.parquet",
+      "asset_url": "/api/v1/assets/external/kunijiban_borehole/integrated_borehole_layers.parquet",
+      "format": "Apache Parquet",
+      "rows": 122693,
+      "bytes": 1917668,
+      "sha256": "c47d3abac0b93ebb8a2c2270ca0b42e5c98a8fb0e430f4bfd2016fd88ab48d92"
+    },
+    {
+      "role": "spt_tests_flat",
+      "path": "data/external/kunijiban_borehole/integrated_borehole_spt.parquet",
+      "asset_url": "/api/v1/assets/external/kunijiban_borehole/integrated_borehole_spt.parquet",
+      "format": "Apache Parquet",
+      "rows": 239137,
+      "bytes": 915304,
+      "sha256": "c459f035185e7e4f91b785e928f2631358d2a9c8a9d4506207e84e7e94a33bd2"
+    }
+  ],
+  "quality_notes": [
+    "Keep data_source on every record: raw_xml is source XML, while pdf_vlm is a model-extracted PDF reconstruction.",
+    "Elevation datum is not normalized and may use local harbour or river reference surfaces.",
+    "Groundwater and test values represent survey-time conditions and may not describe current conditions.",
+    "The extract is a user-supplied regional subset, not complete national KuniJiban coverage."
+  ]
+}
