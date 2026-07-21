@@ -101,8 +101,7 @@ button { font: inherit; }
 .legend-item { display: flex; align-items: center; gap: 4px; }
 .legend-dot { width: 7px; height: 7px; border-radius: 2px; }
 #map { flex: 1; min-height: 330px; background: #dce4df; }
-.map-placeholder { display: grid; place-items: center; padding: 24px; }
-.map-placeholder span { max-width: 420px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.7; border: 1px dashed #b7c6bd; border-radius: 11px; padding: 18px 20px; background: rgba(255,255,255,.55); }
+#map .maplibregl-ctrl-attrib { font-size: 10px; }
 .map-note { position: absolute; z-index: 500; left: 12px; bottom: 12px; max-width: 500px; background: rgba(16,35,30,.9); color: #e3ece8; border-radius: 7px; padding: 10px 12px; font-size: 12px; line-height: 1.55; backdrop-filter: blur(5px); }
 .popup-eyebrow { color: var(--green); font-size: 10px; font-weight: 800; letter-spacing: .1em; }
 .popup-title { font-size: 16px; margin: 4px 0 10px; font-weight: 750; }

@@ -1,0 +1,51 @@
+import { expect, test, type Page } from "@playwright/test";
+
+async function waitForMap(page: Page) {
+  await page.goto("/");
+  await expect(page.locator(".metrics .metric").first()).toBeVisible({ timeout: 15000 });
+  await expect(page.locator("#map .maplibregl-canvas")).toBeVisible({ timeout: 20000 });
+}
+
+test("both regions load with GSI attribution", async ({ page }) => {
+  const mobaraTiles: string[] = [];
+  page.on("response", (response) => {
+    if (response.url().includes("/api/v1/assets/tiles/mobara/photo/")) mobaraTiles.push(response.url());
+  });
+
+  await waitForMap(page);
+  await expect(page.locator(".maplibregl-ctrl-attrib")).toContainText("地理院");
+
+  // Mobara via the overview's renewable tab, with the photo basemap active.
+  await page.locator(".basemap-button", { hasText: "影像" }).click();
+  await page.locator(".view-tab", { hasText: "茂原" }).click();
+  await expect(page.locator(".region-pill")).toHaveText("千叶 · 茂原市");
+  await expect.poll(() => mobaraTiles.length, { timeout: 15000 }).toBeGreaterThan(0);
+});
+
+test("basemap switching keeps the single map instance (no camera rebuild)", async ({ page }) => {
+  await waitForMap(page);
+  const canvas = await page.locator("#map .maplibregl-canvas").elementHandle();
+  for (const label of ["影像", "起伏", "坡度", "标准"]) {
+    await page.locator(".basemap-button", { hasText: label }).click();
+    await page.waitForTimeout(250);
+    expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true);
+  }
+});
+
+test("zooming past the raster ceilings produces no failed tile requests", async ({ page }) => {
+  const failures: string[] = [];
+  page.on("response", (response) => {
+    if (response.url().includes("/api/v1/assets/tiles/") && response.status() >= 400) failures.push(response.url());
+  });
+
+  await waitForMap(page);
+  await page.locator(".basemap-button", { hasText: "影像" }).click();
+  // Photo tiles cap at z18; ride the camera to its maximum and let overscale take over.
+  for (let index = 0; index < 4; index += 1) {
+    await page.locator(".maplibregl-ctrl-zoom-in").click();
+    await page.waitForTimeout(400);
+  }
+  await page.locator(".basemap-button", { hasText: "坡度" }).click();
+  await page.waitForTimeout(800);
+  expect(failures).toEqual([]);
+});

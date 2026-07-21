@@ -25,6 +25,7 @@
     "vitest": "^4.1.10"
   },
   "dependencies": {
+    "maplibre-gl": "^5.24.0",
     "openapi-fetch": "^0.17.0"
   }
 }

@@ -1,5 +1,9 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+
+  import { apiOrigin } from "../api/client";
   import { i18n } from "../i18n/i18n.svelte";
+  import { createExhibitionMap, type ExhibitionMap } from "../map/map";
   import { app, BASEMAP_KEYS } from "../state.svelte";
   import type { ModuleVM } from "../modules";
   import type { MessageKey } from "../i18n/i18n.svelte";
@@ -12,6 +16,36 @@
     hillshade: { label: "basemap.hillshade", title: "basemap.hillshadeTitle" },
     slope: { label: "basemap.slope", title: "basemap.slopeTitle" },
   };
+
+  let container: HTMLElement;
+  // $state.raw: the handle is stored for effects, never wrapped reactively.
+  let mapApi = $state.raw<ExhibitionMap | null>(null);
+
+  onMount(() => {
+    let disposed = false;
+    let api: ExhibitionMap | undefined;
+    const assetBase = `${apiOrigin(window.location.search)}/api/v1/assets`;
+    createExhibitionMap(container, assetBase, { region: vm.region, basemap: app.basemap })
+      .then((created) => {
+        if (disposed) created.destroy();
+        else {
+          api = created;
+          mapApi = created;
+        }
+      })
+      .catch((cause) => console.error("map initialisation failed", cause));
+    return () => {
+      disposed = true;
+      api?.destroy();
+    };
+  });
+
+  $effect(() => {
+    mapApi?.setRegion(vm.region);
+  });
+  $effect(() => {
+    mapApi?.setBasemap(app.basemap);
+  });
 </script>
 
 <div class="map-card">
@@ -43,8 +77,6 @@
       </div>
     </div>
   </div>
-  <div id="map" class="map-placeholder" role="img" aria-label={i18n.t("map.aria")}>
-    <span>{i18n.t("map.placeholder")}</span>
-  </div>
+  <div id="map" bind:this={container} aria-label={i18n.t("map.aria")}></div>
   <div class="map-note">{vm.mapNote}</div>
 </div>

@@ -77,7 +77,6 @@ export const en = {
 
   // Map area
   "map.aria": "Spatial analysis map",
-  "map.placeholder": "The map engine arrives in a later migration stage (MapLibre GL + deck.gl). Panels, queues and audit records are fully live.",
   "aria.keyMetrics": "Key metrics",
 
   // Queue explanations
@@ -422,7 +421,6 @@ export const zh: Record<MessageKey, string> = {
   "basemap.slopeTitle": "DEM5/10m 倾斜量图",
 
   "map.aria": "空间分析地图",
-  "map.placeholder": "地图引擎将在后续迁移阶段接入（MapLibre GL + deck.gl）。面板、队列与审计记录已全部可用。",
   "aria.keyMetrics": "关键指标",
 
   "queueExpl.overviewUrban": "优先显示兼顾屋顶能源潜力、道路可达性与周边需求的候选点。",
@@ -734,7 +732,6 @@ export const ja: Record<MessageKey, string> = {
   "basemap.slopeTitle": "DEM5/10m 傾斜量図",
 
   "map.aria": "空間分析地図",
-  "map.placeholder": "地図エンジンは後続の移行段階で接続します（MapLibre GL + deck.gl）。パネル、キュー、監査記録はすべて利用可能です。",
   "aria.keyMetrics": "主要指標",
 
   "queueExpl.overviewUrban": "屋根エネルギー潜在力、道路アクセス、周辺需要を兼ねる候補を優先表示します。",

@@ -1,8 +1,15 @@
 # PR3 Plan: MapLibre Basemaps and Camera
 
-- Status: Planned
+- Status: Completed
 - Refactor: `maplibre-migration`
-- PR: #3
+- PR: #14
+
+## Decisions landed
+
+1. **Cached imagery stays `seamlessphoto`.** Sampled 2026-07-21 over both demo regions: `ort` serves the same ortho mosaic as `seamlessphoto` at z18 with no visible difference, at roughly triple the bytes per tile (58.8 KB vs 17.7 KB). Same content, three times the repository weight — no reason to switch.
+2. **The imagery cache extends from z17 to z18** (the measured GSI ceiling): 220 additional tiles, ≈3.9 MB, in exchange for sharp imagery at the building-inspection zoom the exhibition actually uses.
+
+One consequence to carry: the vector "standard" basemap loads its style, glyphs and tiles from GSI at runtime, so it needs the network; the three cached raster basemaps remain fully offline. Whether the old cached `std` raster (still in `data/tiles/`) is retired or kept as an offline fallback is a stage 05 question.
 
 ## Goal
 

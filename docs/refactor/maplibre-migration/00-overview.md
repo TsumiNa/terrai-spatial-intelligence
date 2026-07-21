@@ -40,6 +40,8 @@ Svelte was chosen over React because the framework's job here is panels, queues,
 
 Backend rewrite; database or schema work; authentication or tenancy; the Flutter or Capacitor field client; SL model serving. Underground network rendering and the site scene are planned here but blocked on data that does not exist yet — see stages 06 and 07.
 
+A design-system adoption (Tailwind + shadcn-svelte) is agreed follow-up work **after** stage 05, deliberately excluded here: stages 02–05 are verified against pixel-level parity with the current exhibition, and restyling mid-migration would destroy that baseline.
+
 ## Stage map
 
 Stages 01–05 reach parity with today's exhibition and retire Leaflet. Stages 06–07 add capability and cannot start until their data exists.
