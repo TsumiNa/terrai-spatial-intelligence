@@ -205,7 +205,7 @@ unplanned until PR3's measurement answers whether a rewrite is still solving a r
 
 ```mermaid
 flowchart LR
-    U["underground-observation-foundation<br/>(in progress)"] --> P1["data-pipeline-and-store<br/>PR1 → PR2 → PR3"]
+    U["underground-observation-foundation<br/>(merged, PRs #31-#33)"] --> P1["data-pipeline-and-store<br/>PR1 → PR2 → PR3"]
     C["projected-crs-measurement<br/>(independent)"] -.shared measurement module.- P1
     P1 --> O["on-demand-fl-delivery<br/>PR1 → PR2 → PR3"]
     P1 --> R["rust-api-backend<br/>(gated on PR3 measurement)"]

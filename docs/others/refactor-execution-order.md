@@ -5,6 +5,12 @@ picked up by a fresh session. It is **not** a plan document: every decision live
 points to. Delete this file in the final PR of the sequence — that deletion is the last step
 below.
 
+Why `docs/others/`: this file fits none of the four primary categories. It is not architecture
+(it decides nothing normative), not a refactor plan (it holds no scope, decisions, or acceptance
+criteria — only the order between plans that do), not a data card, and not a summary (it records
+no evaluation or evidence). It is disposable cross-plan scheduling state, and it is deleted when
+the sequence completes rather than reclassified.
+
 Process: per `.github/instructions/branch-and-pr-workflow.instructions.md`, one PR at a time —
 review, address feedback, squash merge, fetch main, then begin the next. Do not start a later
 step while the current PR is open.
