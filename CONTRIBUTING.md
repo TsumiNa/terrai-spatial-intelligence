@@ -21,7 +21,7 @@ Requires Node.js >= 22 alongside `uv`.
 ```bash
 cd webapp
 npm install                  # once
-npm run dev                  # dev server on http://127.0.0.1:4300
+npm run dev                  # dev server on http://127.0.0.1:4310 (e2e uses the preview build on 4300)
 npm run build                # static output in webapp/dist/
 npm run check                # svelte-check over the TypeScript sources
 npm test                     # Vitest unit tests (colocated *_test.ts)
