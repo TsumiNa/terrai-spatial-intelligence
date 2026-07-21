@@ -10,7 +10,7 @@
 
 Most code in this repository is now written by AI. That changes what a styling system is for.
 
-Hand-written CSS lets each change invent a class name, a colour and a spacing value. All of them render plausibly, so a reviewer has to hold the intended design in their head and diff against it by eye. At the current size — 8 components, 186 lines of CSS, 129 selectors — that is still possible. It stops being possible well before the site scene and the field client exist.
+Hand-written CSS lets each change invent a class name, a colour and a spacing value. All of them render plausibly, so a reviewer has to hold the intended design in their head and diff against it by eye. At the current size — ten components (nine under `webapp/src/lib/components/` plus `App.svelte`), 186 lines of CSS, 129 selectors — that is still possible. It stops being possible well before the site scene and the field client exist.
 
 The goal is therefore not tidier CSS. **The goal is that a human can review UI changes they did not write**, by reading rule violations and rendered-output diffs instead of class strings.
 
@@ -62,7 +62,7 @@ Ordered so that the safety net exists before anything it protects is touched.
 | 01 | [visual and a11y baseline](01-visual-and-a11y-baseline-pr1.md) | Playwright screenshots and axe assertions against today's UI. No production change. |
 | 02 | [Tailwind with a locked theme](02-tailwind-locked-theme-pr2.md) | Install v4, express the twelve tokens as `@theme`, remove the default palette. Nothing restyled. |
 | 03 | [theme enforcement](03-theme-enforcement-pr3.md) | A check that fails on arbitrary values and off-theme colours. |
-| 04 | [port components to the theme](04-port-components-to-theme-pr4.md) | Restyle the eight components; delete the replaced rules from `app.css`. |
+| 04 | [port components to the theme](04-port-components-to-theme-pr4.md) | Restyle all ten components; delete the replaced rules from `app.css`. |
 | 05 | [overlay primitives](05-overlay-primitives-pr5.md) | shadcn-svelte Dialog for the audit drawer; the four defects above are fixed and asserted. |
 
 Each stage is its own pull request, states its own acceptance commands, and leaves the suite and validation passing when it merges. Stage 01 must merge before 02 begins: without a baseline, "the UI did not change" is an opinion.
