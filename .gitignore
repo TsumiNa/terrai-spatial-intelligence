@@ -19,3 +19,4 @@ data/external/tepco/*.local.json
 # caches. Commit the selection, retrieval manifest and lightweight audit index,
 # not the upstream binaries.
 data/external/plateau_uc24_16/
+data/external/plateau_uc24_13/
