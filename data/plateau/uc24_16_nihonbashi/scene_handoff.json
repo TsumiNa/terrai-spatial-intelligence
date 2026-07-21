@@ -1,0 +1,174 @@
+{
+  "schema_version": "1.0",
+  "scene_id": "nihonbashi-utilities",
+  "purpose": "Observed underground utility and access-structure scene",
+  "owner_dataset_key": "uc24_16_nihonbashi",
+  "foundation_layer_only": true,
+  "approved_roots": [
+    "data/external/plateau_uc24_16",
+    "data/plateau/uc24_16_nihonbashi"
+  ],
+  "local_frame": {
+    "source_crs": "EPSG:4979",
+    "source_axis_order": [
+      "longitude_degrees",
+      "latitude_degrees",
+      "ellipsoid_height_metres"
+    ],
+    "world_crs": "EPSG:4978",
+    "world_axis_order": [
+      "ecef_x_metres",
+      "ecef_y_metres",
+      "ecef_z_metres"
+    ],
+    "local_axis_convention": {
+      "x": "east",
+      "y": "north",
+      "z": "up"
+    },
+    "local_unit": "metre",
+    "geographic_extent_degrees_and_metres": [
+      139.76704257767426,
+      35.680906944422816,
+      139.7803025126254,
+      35.69172558142839,
+      2.3851870331777194,
+      15.77873420715332
+    ],
+    "origin_geographic_degrees_and_metres": [
+      139.77367254514985,
+      35.6863162629256,
+      9.08196062016552
+    ],
+    "origin_world_ecef_metres": [
+      -3959803.08579172,
+      3349413.1893692957,
+      3699983.177290261
+    ],
+    "world_to_local_matrix_row_major": [
+      -0.6458085844342196,
+      -0.7634993597057363,
+      0.0,
+      -0.0,
+      0.4453852502116432,
+      -0.37673066036089425,
+      0.8122228686991991,
+      20253.580409292597,
+      -0.620131640190195,
+      0.5245405010797308,
+      0.5833472478396067,
+      -6370877.058622161,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "local_to_world_matrix_row_major": [
+      -0.6458085844342196,
+      0.4453852502116432,
+      -0.620131640190195,
+      -3959803.08579172,
+      -0.7634993597057363,
+      -0.37673066036089425,
+      0.5245405010797308,
+      3349413.1893692957,
+      0.0,
+      0.8122228686991991,
+      0.5833472478396067,
+      3699983.177290261,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "height_reference": "WGS 84 ellipsoid per 3D Tiles boundingVolume.region semantics",
+    "vertical_datum": "WGS 84 ellipsoid (not an orthometric survey datum)",
+    "orthometric_vertical_datum": "unknown",
+    "round_trip_tolerance": {
+      "longitude_latitude_degrees": 1e-08,
+      "height_metres": 0.0001
+    }
+  },
+  "evidence_families": {
+    "terrain_buildings_context": {
+      "availability": "unresolved",
+      "reason": "No co-located terrain or above-ground building context is integrated"
+    },
+    "utility_networks": {
+      "availability": "available",
+      "evidence_class": "observed",
+      "sources": [
+        {
+          "dataset_id": "plateau_uc24_16_nihonbashi",
+          "resource_ids": [
+            "3b304996-7c30-46e2-a945-3d6c88bb92d7",
+            "5f9d5be6-309c-4e82-a31d-14a4bed84308",
+            "6ee65d70-6e9e-4a78-ab3f-722c2ecb422b",
+            "af968ad3-6d48-445c-bc4f-ea324f264db6",
+            "bbd1e7cc-4b9e-4438-8127-95a31c7779e2"
+          ],
+          "retrieved_at": "2026-07-21T10:13:01Z",
+          "source_updated_at": "2025-06-04T02:47:00.570146",
+          "license": {
+            "name": "PLATEAU Site Policy 「３．著作権について」に拠る",
+            "url": "https://www.mlit.go.jp/plateau/site-policy/"
+          },
+          "audit_index_path": "data/plateau/uc24_16_nihonbashi/audit_index.json",
+          "asset_paths": [
+            "data/external/plateau_uc24_16/assets/communications-cable/tileset.json",
+            "data/external/plateau_uc24_16/assets/gas-pipe/tileset.json",
+            "data/external/plateau_uc24_16/assets/power-cable/tileset.json",
+            "data/external/plateau_uc24_16/assets/sewer-pipe/tileset.json",
+            "data/external/plateau_uc24_16/assets/water-pipe/tileset.json"
+          ],
+          "feature_count": 810
+        }
+      ]
+    },
+    "underground_structures": {
+      "availability": "not_applicable",
+      "reason": "Public underground-space structures are outside this utility scene"
+    },
+    "access_topology": {
+      "availability": "available",
+      "evidence_class": "observed",
+      "sources": [
+        {
+          "dataset_id": "plateau_uc24_16_nihonbashi",
+          "resource_ids": [
+            "03bcc8f6-a3dd-4ccc-b32d-98acf6c327a2",
+            "120e705e-36b6-41a2-8bd2-e931afcb1d5d",
+            "939c73eb-0414-44d6-bbd3-aaa2f11ecad8",
+            "c4744db5-15e8-4268-acae-31e53883b9f7"
+          ],
+          "retrieved_at": "2026-07-21T10:13:01Z",
+          "source_updated_at": "2025-06-04T02:47:00.570146",
+          "license": {
+            "name": "PLATEAU Site Policy 「３．著作権について」に拠る",
+            "url": "https://www.mlit.go.jp/plateau/site-policy/"
+          },
+          "audit_index_path": "data/plateau/uc24_16_nihonbashi/audit_index.json",
+          "asset_paths": [
+            "data/external/plateau_uc24_16/assets/communications-handhole/tileset.json",
+            "data/external/plateau_uc24_16/assets/communications-manhole/tileset.json",
+            "data/external/plateau_uc24_16/assets/power-manhole/tileset.json",
+            "data/external/plateau_uc24_16/assets/sewer-manhole/tileset.json"
+          ],
+          "feature_count": 311
+        }
+      ]
+    },
+    "boreholes": {
+      "availability": "unresolved",
+      "reason": "No qualified borehole observations are integrated"
+    },
+    "strata": {
+      "availability": "unresolved",
+      "reason": "No qualified strata observations are integrated"
+    },
+    "predicted_fields": {
+      "availability": "unresolved",
+      "reason": "No qualified SL prediction is integrated"
+    }
+  }
+}

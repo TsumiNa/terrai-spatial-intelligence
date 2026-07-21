@@ -183,6 +183,19 @@ def test_osm_underground_snapshot_is_explicit_refresh_not_startup_download() -> 
     )
 
 
+def test_underground_scene_handoffs_are_offline_derived_on_demand() -> None:
+    task = TASKS["underground_scenes"]
+
+    assert task.network is False
+    assert task.automatic is False
+    assert task.script == "scripts/build_underground_scenes.py"
+    assert task.outputs == (
+        "data/scenes/underground/catalog.json",
+        "data/plateau/uc24_16_nihonbashi/scene_handoff.json",
+        "data/plateau/uc24_13_sapporo/scene_handoff.json",
+    )
+
+
 def test_integrated_fl_sources_require_retrieval_and_source_time_metadata(tmp_path: Path) -> None:
     registry = tmp_path / "data/external/source_registry.json"
     registry.parent.mkdir(parents=True)
