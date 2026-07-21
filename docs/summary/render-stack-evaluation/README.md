@@ -124,7 +124,7 @@ Splitting the site view into a separate Three.js canvas also removes several pro
 ## Still open
 
 1. Whether MapLibre terrain from GSI elevation works once implemented properly, outside the throwaway spike.
-2. Whether `ort` replaces `seamlessphoto` as the cached imagery layer, and whether the cache extends from z17 to z18.
+2. ~~Whether `ort` replaces `seamlessphoto` as the cached imagery layer, and whether the cache extends from z17 to z18.~~ Landed in the migration's stage 03 (`docs/refactor/maplibre-migration/03-maplibre-basemap-pr3.md`): imagery stays `seamlessphoto` — identical content over both regions at a third of `ort`'s bytes — and the cache extends to z18.
 3. The output shape of `geo_pfn` subsurface prediction, which decides whether the site scene needs volumetric ray marching or only discrete surfaces and boreholes.
 
 ## Reproducing

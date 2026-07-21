@@ -28,9 +28,13 @@ REGIONS = {
     "yokohama": {"south": 35.4426, "west": 139.5835, "north": 35.4504, "east": 139.5935},
     "mobara": {"south": 35.4387, "west": 140.2757, "north": 35.4513, "east": 140.2913},
 }
+# Imagery stays `seamlessphoto` and the cache reaches its real z18 ceiling —
+# decision landed in docs/refactor/maplibre-migration/03-maplibre-basemap-pr3.md:
+# in both demo regions `ort` serves the same ortho mosaic at roughly triple the
+# bytes per z18 tile (58.8 KB vs 17.7 KB, sampled 2026-07-21).
 LAYERS = {
     "standard": ("std", "png", range(15, 16)),
-    "photo": ("seamlessphoto", "jpg", range(15, 18)),
+    "photo": ("seamlessphoto", "jpg", range(15, 19)),
     "hillshade": ("hillshademap", "png", range(15, 17)),
     "slope": ("slopemap", "png", range(15, 16)),
 }
