@@ -150,6 +150,20 @@ def test_manifest_detects_source_drift_and_a_corrupted_store(tmp_path: Path) -> 
     assert any("manifest says 4 features, store holds 3" in failure for failure in failures)
 
 
+def test_missing_tables_report_as_corruption_failures_not_exceptions(tmp_path: Path) -> None:
+    sources = write_fixture_root(tmp_path)
+    target = tmp_path / "store.sqlite"
+    store.build_store(tmp_path, target, sources)
+
+    writable = sqlite3.connect(target)
+    writable.execute("DROP TABLE features")
+    writable.commit()
+    writable.close()
+
+    failures = store.verify_store(tmp_path, target)
+    assert any("store is corrupt" in failure for failure in failures)
+
+
 def test_schema_version_mismatch_means_rebuild_not_migrate(tmp_path: Path) -> None:
     sources = write_fixture_root(tmp_path)
     target = tmp_path / "store.sqlite"

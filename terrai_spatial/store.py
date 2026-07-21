@@ -314,7 +314,11 @@ def open_store(path: Path) -> sqlite3.Connection:
     """Read-only connection; a schema version mismatch means rebuild."""
 
     connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
-    version = connection.execute("PRAGMA user_version").fetchone()[0]
+    try:
+        version = connection.execute("PRAGMA user_version").fetchone()[0]
+    except sqlite3.Error:
+        connection.close()
+        raise
     if version != SCHEMA_VERSION:
         connection.close()
         raise StoreVersionError(
@@ -345,12 +349,11 @@ def verify_store(root: Path, path: Path, *, expected_keys: Sequence[str] | None 
     except sqlite3.Error as error:
         return [f"store cannot be opened: {error}"]
     try:
-        try:
-            rows = connection.execute(
-                "SELECT key, kind, source_path, source_sha256, feature_count FROM datasets ORDER BY key"
-            ).fetchall()
-        except sqlite3.Error as error:
-            return [f"store is corrupt: {error}"]
+        # This runs inside `terrai validate`: any corruption must come back
+        # as a readable failure string, never as an exception.
+        rows = connection.execute(
+            "SELECT key, kind, source_path, source_sha256, feature_count FROM datasets ORDER BY key"
+        ).fetchall()
         by_key = {row[0]: row for row in rows}
         for expected in expected_keys or []:
             if expected not in by_key:
@@ -372,6 +375,8 @@ def verify_store(root: Path, path: Path, *, expected_keys: Sequence[str] | None 
         with_bbox = connection.execute("SELECT COUNT(*) FROM features WHERE min_x IS NOT NULL").fetchone()[0]
         if indexed != with_bbox:
             failures.append(f"R-tree indexes {indexed} features; {with_bbox} carry a bounding box")
+    except sqlite3.Error as error:
+        failures.append(f"store is corrupt: {error}")
     finally:
         connection.close()
     return failures
