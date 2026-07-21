@@ -14,8 +14,11 @@
 
 import type { Feature } from "../api/types";
 
-/** Below this zoom no request is issued; the state says so instead. */
-export const WINDOWED_MIN_ZOOM = 15;
+/** Below this zoom no request is issued; the state says so instead. The
+ *  floor is the bound that keeps a window's response tractable: at zoom 15 a
+ *  legitimate landHistory window already returns ~8.6 MB across 141 large
+ *  polygons, enough to stall tessellation on software-GL hardware. */
+export const WINDOWED_MIN_ZOOM = 16;
 /** The viewport snaps outward to this grid (~1 km) before it becomes a cache
  *  key, so panning back into a visited neighbourhood is a hit, not a near
  *  miss, and every pixel of pan is not a distinct window. */
