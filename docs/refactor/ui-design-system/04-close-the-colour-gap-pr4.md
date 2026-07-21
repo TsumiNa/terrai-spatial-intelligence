@@ -1,4 +1,4 @@
-# PR4 Plan: Port Components to the Theme
+# PR4 Plan: Close the Colour Gap
 
 - Status: Completed
 - Refactor: `ui-design-system`
@@ -12,9 +12,13 @@ Close the remaining gap in the colour lock, so that every colour in the web app 
 
 ## Scope
 
-1. Port all ten: the nine under `webapp/src/lib/components/` — `Sidebar`, `Topbar`, `Hero`, `Metrics`, `QueuePanel`, `MapCard`, `AuditTrigger`, `FeaturePopup`, `AuditDrawer` — plus `webapp/src/App.svelte`.
-Deleting each `app.css` rule as its component stops needing it. `app.css` should retain only genuinely global concerns — resets, base typography, and anything the map libraries need.
-These are worth doing when the components are rewritten rather than twice.
+1. **Extend the check to stylesheets**, exempting the `@theme` block, which is where colour is supposed to be written.
+2. **Collapse the duplicate custom properties.** `:root` restated the twelve palette values instead of referring to them — the mechanism by which `lime` came to mean two different greens. It now aliases the theme tokens, so a colour has exactly one value.
+3. **Inventory the stylesheet's inherited colour.** `app.css` holds 59 one-off tints and overlays picked by eye. Turning them into palette entries would make the palette a colour dump rather than a design system, and they disappear with the redesign. They are asserted as an exact set instead: a new one fails, and so does removing one without updating the list.
+
+### Deferred to the redesign, not done here
+
+Porting the ten components to utilities, deleting each `app.css` rule as its component stops needing it, and checking the longest English strings against the sidebar width. Those are worth doing when the components are rewritten rather than twice.
 
 ## Non-goals
 

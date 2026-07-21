@@ -114,8 +114,11 @@ export function stylesheetLiterals(source: string): string[] {
   const body =
     themeStart < 0 ? source : source.slice(0, themeStart) + source.slice(source.indexOf("}", themeStart));
   const found: string[] = [];
-  for (const line of withoutComments(body).split("\n")) {
-    if (line.includes("var(--")) continue;
+  // Strip the var() references rather than skipping the line that holds them.
+  // These rules are written one per line, so a line very often carries both —
+  // `linear-gradient(145deg, var(--lime), #50aa75)` — and skipping it hid every
+  // literal that shared a line with a token reference.
+  for (const line of withoutComments(body).replace(/var\(--[a-z-]+\)/g, "").split("\n")) {
     for (const match of line.matchAll(/#[0-9a-fA-F]{3,8}\b|rgba?\(\s*[\d.][^)]*\)/g)) {
       found.push(match[0].toLowerCase());
     }

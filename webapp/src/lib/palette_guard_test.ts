@@ -115,14 +115,25 @@ describe("the repository conforms", () => {
 
 /** Colours written by eye in `app.css`, inventoried rather than fixed.
  *
- *  Turning 36 one-off tints into palette entries would make the palette a
+ *  Turning these one-off tints into palette entries would make the palette a
  *  colour dump instead of a design system, and they disappear with the
- *  redesign. Asserted as an exact set so a 37th fails — and so does removing
+ *  redesign. Asserted as an exact set so a new one fails — and so does removing
  *  one without updating this list, which keeps the inventory honest.
+ *
+ *  The first version of this list held 36 entries because the scanner skipped
+ *  any line containing a `var()` reference. These rules are written one per
+ *  line, so that hid 23 literals sharing a line with a token — including every
+ *  `rgba()` overlay. Scanning strips the references instead.
  */
 const STYLESHEET_DEBT = [
   "#102b23",
+  "#153e30",
+  "#153f33",
+  "#173b2e",
+  "#1b5944",
   "#275f81",
+  "#315f4a",
+  "#50aa75",
   "#6f5c35",
   "#78978c",
   "#889b94",
@@ -132,6 +143,7 @@ const STYLESHEET_DEBT = [
   "#9fb9af",
   "#a9beb5",
   "#a9d96e",
+  "#b9cac0",
   "#b9cdc5",
   "#d3e2dc",
   "#dce4df",
@@ -140,22 +152,38 @@ const STYLESHEET_DEBT = [
   "#e2a43c",
   "#e3ece8",
   "#e7f0f6",
+  "#e9f2ec",
+  "#eaf0ec",
   "#edf1ee",
+  "#eef3ef",
+  "#eef4f0",
+  "#f2f6f2",
+  "#f4f7f3",
   "#f5f8f5",
   "#f6fbf7",
+  "#f7f9f7",
   "#f8efdc",
+  "#fbf6eb",
   "#fbfcfa",
+  "rgba(0,0,0,.12)",
   "rgba(10,36,27,.18)",
   "rgba(12,36,28,.18)",
   "rgba(16,35,30,.9)",
+  "rgba(16,43,35,.15)",
+  "rgba(16,43,35,.18)",
+  "rgba(169,217,110,.12)",
+  "rgba(25,55,44,.035)",
   "rgba(255,255,255,.018)",
   "rgba(255,255,255,.025)",
   "rgba(255,255,255,.06)",
   "rgba(255,255,255,.07)",
   "rgba(255,255,255,.08)",
   "rgba(255,255,255,.10)",
+  "rgba(255,255,255,.15)",
   "rgba(255,255,255,.16)",
   "rgba(255,255,255,.18)",
+  "rgba(255,255,255,.7)",
+  "rgba(26,55,45,.04)",
   "rgba(9, 27, 21, .28)",
 ];
 

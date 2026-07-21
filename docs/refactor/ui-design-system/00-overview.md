@@ -71,7 +71,7 @@ Ordered so that the safety net exists before anything it protects is touched.
 | 01 | [visual and a11y baseline](01-visual-and-a11y-baseline-pr1.md) | Playwright screenshots and axe assertions against today's UI. No production change. |
 | 02 | [Tailwind with a locked theme](02-tailwind-locked-theme-pr2.md) | Install v4, express the twelve tokens as `@theme`, remove the default palette. Nothing restyled. |
 | 03 | [theme enforcement](03-theme-enforcement-pr3.md) | A check that fails on arbitrary values and off-theme colours. |
-| 04 | [close the colour gap](04-port-components-to-theme-pr4.md) | Extend the check to stylesheets, collapse the duplicated tokens, inventory the inherited colour. |
+| 04 | [close the colour gap](04-close-the-colour-gap-pr4.md) | Extend the check to stylesheets, collapse the duplicated tokens, inventory the inherited colour. |
 | 05 | [overlay primitives](05-overlay-primitives-pr5.md) | Bits UI Dialog for the audit drawer; the four defects above are fixed and asserted. |
 
 Each stage is its own pull request, states its own acceptance commands, and leaves the suite and validation passing when it merges. Stage 01 must merge before 02 begins: without a baseline, "the UI did not change" is an opinion.

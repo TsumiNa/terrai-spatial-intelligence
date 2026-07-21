@@ -81,8 +81,9 @@
    architecture-board styles were dropped; the map placeholder block is new
    for the pre-MapLibre stages.
 
-   These custom properties stay until stage 04 ports the components that read
-   them. They mirror the @theme block above rather than competing with it. */
+   These rules are inherited from the exhibition as built. They will be
+   rewritten with the applications rather than ported twice; what mattered here
+   was that their colour is checked and has one definition. */
 
 /* Aliases, not a second declaration. These names are what the rules below were
  * written against; pointing them at the theme tokens means a colour has exactly
