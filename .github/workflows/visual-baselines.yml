@@ -1,0 +1,60 @@
+name: Visual baselines
+
+# Screenshot baselines are platform specific: fonts and rasterisation differ
+# between a developer machine and the Linux runner CI uses. They are therefore
+# generated here, in the one environment that also checks them.
+#
+# Run this deliberately — after an intended redesign, or when adding a screen.
+# It uploads the images rather than committing them, so a person looks at what
+# changed before it becomes the thing future runs are compared against.
+on:
+  workflow_dispatch:
+
+jobs:
+  regenerate:
+    name: Regenerate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+
+      - name: Install Python environment
+        run: uv sync --locked
+
+      - name: Install web dependencies
+        run: npm ci
+        working-directory: webapp
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+        working-directory: webapp
+
+      - name: Regenerate screenshots
+        run: npx playwright test visual_test.ts --update-snapshots
+        working-directory: webapp
+
+      - name: Upload baselines for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-baselines-linux
+          path: webapp/e2e/visual_test.ts-snapshots/
+          retention-days: 14
+
+      - name: Summarise
+        run: |
+          echo "### Regenerated baselines" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Download the \`visual-baselines-linux\` artifact, review every changed" >> "$GITHUB_STEP_SUMMARY"
+          echo "image, and commit the ones you intend to keep." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          ls -1 webapp/e2e/visual_test.ts-snapshots/ | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"
