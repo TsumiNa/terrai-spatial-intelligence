@@ -277,3 +277,19 @@ def test_fetch_parses_every_downloading_task_and_rejects_others() -> None:
         assert fetch_accepts(name) is downloads, name
     assert not fetch_accepts("tepco")
     assert not fetch_accepts("no-such-task")
+
+
+# --- validate --skip-data-tasks -----------------------------------------------
+# A fresh clone stamps every file with the checkout time, so data-task freshness
+# is undecidable there. CI needs to check repository content without it.
+
+
+def test_validate_skipping_data_tasks_still_checks_repository_content() -> None:
+    parser = build_parser()
+    assert parser.parse_args(["validate", "--skip-data-tasks"]).skip_data_tasks is True
+    assert parser.parse_args(["validate"]).skip_data_tasks is False
+
+
+def test_skipping_data_tasks_does_not_weaken_the_content_contracts() -> None:
+    # The flag must drop only the working-copy check, never a contract.
+    assert contract_failures() == []
