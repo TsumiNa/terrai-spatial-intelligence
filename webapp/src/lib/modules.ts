@@ -79,6 +79,8 @@ export interface QueueItemVM {
   color: string;
   scoreAudit: AuditRecord;
   detailAudit: AuditRecord;
+  /** The underlying server-ranked feature, for queue-to-map framing. */
+  feature: Feature;
 }
 
 export interface ModuleVM {
@@ -130,6 +132,7 @@ function queueItems(
       color: item.color,
       scoreAudit: queueScore(module, view, item.score, props),
       detailAudit: field("field.queueDetail", item.detail, props),
+      feature,
     };
   });
 }

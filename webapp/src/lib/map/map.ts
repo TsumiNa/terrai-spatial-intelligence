@@ -1,13 +1,16 @@
 /**
- * The one module that owns the MapLibre instance.
+ * The one module that owns the MapLibre instance and its deck.gl overlay.
  *
  * Svelte components call the narrow interface returned by
  * `createExhibitionMap` from effects; nothing else touches map internals and
  * no map object enters reactive state. Basemap switches are visibility
- * toggles on prebuilt layers and region switches are camera jumps, so the
- * map is never rebuilt after construction.
+ * toggles on prebuilt layers, region switches are camera jumps and
+ * analytical layers arrive as prebuilt deck.gl layer arrays, so the map is
+ * never rebuilt after construction.
  */
 
+import { MapboxOverlay } from "@deck.gl/mapbox";
+import type { Layer } from "@deck.gl/core";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -28,6 +31,11 @@ import {
 export interface ExhibitionMap {
   setRegion(region: RegionKey): void;
   setBasemap(basemap: BasemapKey): void;
+  setAnalyticalLayers(layers: Layer[]): void;
+  openPopup(lngLat: [number, number], content: HTMLElement, onClose?: () => void): void;
+  closePopup(): void;
+  /** Frame a feature the way the queue always has: fit its bounds, capped. */
+  frame(bounds: [number, number, number, number]): void;
   destroy(): void;
 }
 
@@ -54,6 +62,16 @@ export async function createExhibitionMap(
     attributionControl: { compact: false },
   });
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right");
+
+  const overlay = new MapboxOverlay({ interleaved: false, layers: [], pickingRadius: 8 });
+  map.addControl(overlay);
+
+  const popup = new maplibregl.Popup({ closeButton: true, maxWidth: "300px" });
+  let popupCleanup: (() => void) | null = null;
+  popup.on("close", () => {
+    popupCleanup?.();
+    popupCleanup = null;
+  });
 
   const observer = new ResizeObserver(() => map.resize());
   observer.observe(container);
@@ -82,8 +100,33 @@ export async function createExhibitionMap(
       basemap = next;
       void loaded.then(applyVisibility);
     },
+    setAnalyticalLayers(layers) {
+      overlay.setProps({ layers });
+    },
+    openPopup(lngLat, content, onClose) {
+      popup.remove(); // fires close → previous cleanup
+      popupCleanup = onClose ?? null;
+      popup.setLngLat(lngLat).setDOMContent(content).addTo(map);
+    },
+    closePopup() {
+      popup.remove();
+    },
+    frame([west, south, east, north]) {
+      if (west === east && south === north) {
+        map.easeTo({ center: [west, south], zoom: MAX_ZOOM });
+      } else {
+        map.fitBounds(
+          [
+            [west, south],
+            [east, north],
+          ],
+          { padding: 80, maxZoom: MAX_ZOOM },
+        );
+      }
+    },
     destroy() {
       observer.disconnect();
+      popup.remove();
       map.remove();
     },
   };

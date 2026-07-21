@@ -40,9 +40,14 @@ test("zooming past the raster ceilings produces no failed tile requests", async 
 
   await waitForMap(page);
   await page.locator(".basemap-button", { hasText: "影像" }).click();
-  // Photo tiles cap at z18; ride the camera to its maximum and let overscale take over.
+  // Photo tiles cap at z18; ride the camera to its maximum and let overscale
+  // take over. MapLibre disables the control at maxZoom — stop there.
   for (let index = 0; index < 4; index += 1) {
-    await page.locator(".maplibregl-ctrl-zoom-in").click();
+    try {
+      await page.locator(".maplibregl-ctrl-zoom-in").click({ timeout: 1500 });
+    } catch {
+      break; // the control disables itself at maxZoom
+    }
     await page.waitForTimeout(400);
   }
   await page.locator(".basemap-button", { hasText: "坡度" }).click();

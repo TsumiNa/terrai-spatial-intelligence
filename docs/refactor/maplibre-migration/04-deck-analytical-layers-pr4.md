@@ -1,8 +1,8 @@
 # PR4 Plan: deck.gl Analytical Layers
 
-- Status: Planned
+- Status: Completed
 - Refactor: `maplibre-migration`
-- PR: #4
+- PR: #15
 
 ## Goal
 

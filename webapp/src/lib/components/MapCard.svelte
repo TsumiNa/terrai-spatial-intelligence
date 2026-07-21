@@ -1,10 +1,15 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { mount, onMount, unmount } from "svelte";
 
   import { apiOrigin } from "../api/client";
+  import { field, text, FIELD_LABELS } from "../audit";
+  import FeaturePopup from "./FeaturePopup.svelte";
   import { i18n } from "../i18n/i18n.svelte";
+  import { buildAnalyticalLayers, geometryBounds, queuePopup, type PopupSpec } from "../map/layers";
   import { createExhibitionMap, type ExhibitionMap } from "../map/map";
+  import { normalizeView } from "../modules";
   import { app, BASEMAP_KEYS } from "../state.svelte";
+  import type { Feature } from "../api/types";
   import type { ModuleVM } from "../modules";
   import type { MessageKey } from "../i18n/i18n.svelte";
 
@@ -17,14 +22,31 @@
     slope: { label: "basemap.slope", title: "basemap.slopeTitle" },
   };
 
+  const assetBase = `${apiOrigin(typeof window === "undefined" ? "" : window.location.search)}/api/v1/assets`;
+
   let container: HTMLElement;
   // $state.raw: the handle is stored for effects, never wrapped reactively.
   let mapApi = $state.raw<ExhibitionMap | null>(null);
 
+  function openFeaturePopup(spec: PopupSpec, feature: Feature, coordinate: [number, number]) {
+    if (!mapApi) return;
+    const props = feature.properties;
+    const t = i18n.t.bind(i18n);
+    const fields = spec.fields.map((item) => {
+      const value = item.value(props, t);
+      return { label: text(FIELD_LABELS[item.key], i18n.lang), text: value, record: field(item.key, value, props) };
+    });
+    const host = document.createElement("div");
+    const instance = mount(FeaturePopup, {
+      target: host,
+      props: { eyebrow: t(spec.eyebrow), title: spec.title(props, t), fields },
+    });
+    mapApi.openPopup(coordinate, host, () => void unmount(instance));
+  }
+
   onMount(() => {
     let disposed = false;
     let api: ExhibitionMap | undefined;
-    const assetBase = `${apiOrigin(window.location.search)}/api/v1/assets`;
     createExhibitionMap(container, assetBase, { region: vm.region, basemap: app.basemap })
       .then((created) => {
         if (disposed) created.destroy();
@@ -45,6 +67,34 @@
   });
   $effect(() => {
     mapApi?.setBasemap(app.basemap);
+  });
+
+  // Analytical layers rebuild only when module, view or data change — not on
+  // a language switch; popup content resolves its language at open time.
+  $effect(() => {
+    const module = app.module;
+    const view = normalizeView(module, app.view);
+    const data = app.data;
+    if (!mapApi || !data) return;
+    mapApi.closePopup();
+    mapApi.setAnalyticalLayers(buildAnalyticalLayers(module, view, data, assetBase, { onFeature: openFeaturePopup }));
+  });
+
+  // Parity with the old shell: a language switch closes any open popup.
+  $effect(() => {
+    void i18n.lang;
+    mapApi?.closePopup();
+  });
+
+  // Queue-to-map: frame the selected feature and open its popup.
+  $effect(() => {
+    const selection = app.queueSelection;
+    if (!mapApi || !selection) return;
+    const bounds = geometryBounds(selection.feature.geometry);
+    if (!bounds) return;
+    mapApi.frame(bounds);
+    const center: [number, number] = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2];
+    openFeaturePopup(queuePopup(app.module, normalizeView(app.module, app.view)), selection.feature, center);
   });
 </script>
 
