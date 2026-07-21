@@ -4,12 +4,17 @@
 from __future__ import annotations
 
 import csv
-from email.utils import parsedate_to_datetime
 import json
+import sys
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from terrai_spatial.pipeline.io import write_json_atomic  # noqa: E402
+
 RAW = ROOT / "data" / "external" / "tepco"
 OUTPUT = ROOT / "data" / "mobara" / "tepco_grid_screen.json"
 METADATA = RAW / "download_metadata.local.json"
@@ -146,8 +151,7 @@ def main() -> None:
         },
         "important_note": "公开数值只是选址筛查证据，不是接续検討结果；CSV没有可直接用于宗地空间连接的完整设备几何。",
     }
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_json_atomic(OUTPUT, value)
     print(f"Parsed {len(lines)} line rows and {len(transformers)} transformer rows; Mobara matches: {len(mobara_lines)} lines / {len(mobara_transformers)} transformers")
 
 

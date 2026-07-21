@@ -4,48 +4,40 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import json
+import sys
 from collections import Counter
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
-from urllib.request import Request, urlopen
-
-if __package__:
-    from .fetch_plateau_uc24_16 import _atomic_json
-else:
-    from fetch_plateau_uc24_16 import _atomic_json
-
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from terrai_spatial.pipeline.http import download_json  # noqa: E402
+from terrai_spatial.pipeline.io import write_json_atomic  # noqa: E402
+from terrai_spatial.pipeline.provenance import utc_timestamp  # noqa: E402
+from terrai_spatial.pipeline.regions import SAPPORO_UNDERGROUND_ACCESS_BOUNDS  # noqa: E402
+
 QUERY_PATH = Path("data/osm/sapporo_underground_access/query.overpassql")
 OUTPUT_PATH = Path("data/osm/sapporo_underground_access/features.geojson")
 METADATA_PATH = Path("data/osm/sapporo_underground_access/metadata.json")
 OVERPASS_ENDPOINT = "https://maps.mail.ru/osm/tools/overpass/api/interpreter"
-BBOX = [141.349592632, 43.054916388, 141.356913521, 43.070980841]
+BBOX = list(SAPPORO_UNDERGROUND_ACCESS_BOUNDS)
 WALKWAY_HIGHWAYS = {"footway", "pedestrian", "corridor", "steps"}
 
 
 def _request_overpass(query: str) -> tuple[dict[str, Any], str]:
     payload = urlencode({"data": query}).encode("utf-8")
-    request = Request(
+    value, provenance = download_json(
         OVERPASS_ENDPOINT,
         data=payload,
-        headers={
-            "Content-Type": "application/x-www-form-urlencoded",
-            "User-Agent": "TerrAI-Spatial-Intelligence/0.1",
-        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        timeout=180,
     )
-    with urlopen(request, timeout=180) as response:
-        try:
-            value = json.load(response)
-        except json.JSONDecodeError as error:
-            raise RuntimeError("Overpass response is not JSON") from error
-        resolved_url = response.geturl()
     if not isinstance(value, dict):
         raise RuntimeError("Overpass response root is not an object")
-    return value, resolved_url
+    return value, provenance["resolved_url"]
 
 
 def _has_negative_number(value: Any) -> bool:
@@ -255,15 +247,15 @@ def fetch_osm_snapshot(*, root: Path = ROOT) -> tuple[dict[str, Any], dict[str, 
     query_path = root / QUERY_PATH
     query = query_path.read_text(encoding="utf-8")
     document, endpoint = _request_overpass(query)
-    retrieved_at = datetime.now(tz=UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    retrieved_at = utc_timestamp()
     collection, metadata = normalize_snapshot(
         document,
         query=query,
         retrieved_at=retrieved_at,
         endpoint=endpoint,
     )
-    _atomic_json(root / OUTPUT_PATH, collection)
-    _atomic_json(root / METADATA_PATH, metadata)
+    write_json_atomic(root / OUTPUT_PATH, collection)
+    write_json_atomic(root / METADATA_PATH, metadata)
     print(
         f"OSM Sapporo underground snapshot ready: {metadata['feature_count']} features at "
         f"{metadata['osm_base_timestamp']}"

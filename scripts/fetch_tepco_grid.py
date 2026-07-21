@@ -8,19 +8,21 @@ publish it under an open-data licence. This script only creates a local cache.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
+import sys
 import tempfile
-import time
-import urllib.error
-import urllib.request
 import zipfile
-from datetime import datetime, timezone
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from terrai_spatial.pipeline.http import download_file  # noqa: E402
+from terrai_spatial.pipeline.io import file_sha256, safe_extract_zip, write_json_atomic  # noqa: E402
+from terrai_spatial.pipeline.provenance import utc_timestamp  # noqa: E402
+
 RAW = ROOT / "data" / "external" / "tepco"
 ARCHIVE_NAME = "csv_yosochoryu_chiba.zip"
 METADATA_NAME = "download_metadata.local.json"
@@ -32,50 +34,6 @@ EXPECTED_FILES = (
 )
 MAX_ARCHIVE_BYTES = 50 * 1024 * 1024
 MAX_EXTRACTED_FILE_BYTES = 25 * 1024 * 1024
-USER_AGENT = "TerrAI-Spatial-Intelligence/0.3 (+https://github.com/TsumiNa/terrai-spatial-intelligence)"
-
-
-def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def _atomic_json(path: Path, value: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent, delete=False) as handle:
-        json.dump(value, handle, ensure_ascii=False, indent=2)
-        handle.write("\n")
-        temporary = Path(handle.name)
-    os.replace(temporary, path)
-
-
-def _download(url: str, destination: Path, *, retries: int = 3) -> dict[str, str | None]:
-    last_error: Exception | None = None
-    for attempt in range(retries):
-        request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/zip"})
-        try:
-            with urllib.request.urlopen(request, timeout=30) as response, destination.open("wb") as output:
-                total = 0
-                while chunk := response.read(1024 * 1024):
-                    total += len(chunk)
-                    if total > MAX_ARCHIVE_BYTES:
-                        raise RuntimeError(f"TEPCO archive exceeds {MAX_ARCHIVE_BYTES} bytes")
-                    output.write(chunk)
-                return {
-                    "resolved_url": response.geturl(),
-                    "http_last_modified": response.headers.get("Last-Modified"),
-                    "http_etag": response.headers.get("ETag"),
-                    "http_content_type": response.headers.get("Content-Type"),
-                }
-        except (OSError, RuntimeError, urllib.error.URLError) as error:
-            last_error = error
-            destination.unlink(missing_ok=True)
-            if attempt + 1 < retries:
-                time.sleep(0.5 * (attempt + 1))
-    raise RuntimeError(f"failed to download TEPCO archive from {url}: {last_error}") from last_error
 
 
 def extract_archive(archive: Path, raw_dir: Path) -> dict[str, dict[str, str | int]]:
@@ -84,48 +42,28 @@ def extract_archive(archive: Path, raw_dir: Path) -> dict[str, dict[str, str | i
         raise RuntimeError(f"download is not a valid ZIP archive: {archive}")
     raw_dir.mkdir(parents=True, exist_ok=True)
     extracted: dict[str, dict[str, str | int]] = {}
-    with zipfile.ZipFile(archive) as bundle:
-        members: dict[str, zipfile.ZipInfo] = {}
-        for info in bundle.infolist():
-            basename = Path(info.filename).name
-            if basename not in EXPECTED_FILES:
+    with tempfile.TemporaryDirectory(dir=raw_dir) as temporary_directory:
+        members = safe_extract_zip(archive, Path(temporary_directory), max_member_bytes=MAX_EXTRACTED_FILE_BYTES)
+        by_name: dict[str, Path] = {}
+        for path in members:
+            if path.name not in EXPECTED_FILES:
                 continue
-            if basename in members:
-                raise RuntimeError(f"duplicate expected file in TEPCO archive: {basename}")
-            members[basename] = info
-        missing = [name for name in EXPECTED_FILES if name not in members]
+            if path.name in by_name:
+                raise RuntimeError(f"duplicate expected file in TEPCO archive: {path.name}")
+            by_name[path.name] = path
+        missing = [name for name in EXPECTED_FILES if name not in by_name]
         if missing:
             raise RuntimeError(f"TEPCO archive is missing expected files: {', '.join(missing)}")
-        oversized = [name for name, info in members.items() if info.file_size > MAX_EXTRACTED_FILE_BYTES]
-        if oversized:
-            raise RuntimeError(f"TEPCO archive contains oversized files: {', '.join(oversized)}")
-
-        temporary_paths: list[tuple[Path, Path]] = []
-        try:
-            for name in EXPECTED_FILES:
-                target = raw_dir / name
-                with bundle.open(members[name]) as source, tempfile.NamedTemporaryFile(
-                    "wb", dir=raw_dir, delete=False
-                ) as output:
-                    copied = 0
-                    while chunk := source.read(1024 * 1024):
-                        copied += len(chunk)
-                        if copied > MAX_EXTRACTED_FILE_BYTES:
-                            raise RuntimeError(f"TEPCO archive member exceeds size limit: {name}")
-                        output.write(chunk)
-                    temporary = Path(output.name)
-                if temporary.stat().st_size == 0:
-                    raise RuntimeError(f"TEPCO archive member is empty: {name}")
-                temporary_paths.append((temporary, target))
-            for temporary, target in temporary_paths:
-                os.replace(temporary, target)
-                extracted[target.name] = {
-                    "bytes": target.stat().st_size,
-                    "sha256": sha256(target),
-                }
-        finally:
-            for temporary, _ in temporary_paths:
-                temporary.unlink(missing_ok=True)
+        empty = [name for name in EXPECTED_FILES if by_name[name].stat().st_size == 0]
+        if empty:
+            raise RuntimeError(f"TEPCO archive member is empty: {', '.join(empty)}")
+        for name in EXPECTED_FILES:
+            target = raw_dir / name
+            os.replace(by_name[name], target)
+            extracted[target.name] = {
+                "bytes": target.stat().st_size,
+                "sha256": file_sha256(target),
+            }
     return extracted
 
 
@@ -172,7 +110,13 @@ def fetch_tepco_data(
         with tempfile.NamedTemporaryFile("wb", dir=raw_dir, delete=False) as handle:
             temporary_archive = Path(handle.name)
         try:
-            headers = _download(url, temporary_archive)
+            headers = download_file(
+                url,
+                temporary_archive,
+                timeout=30,
+                max_bytes=MAX_ARCHIVE_BYTES,
+                headers={"Accept": "application/zip"},
+            )
             if not zipfile.is_zipfile(temporary_archive):
                 raise RuntimeError("TEPCO response is not a ZIP archive")
             downloaded_files = extract_archive(temporary_archive, raw_dir)
@@ -187,11 +131,11 @@ def fetch_tepco_data(
         files = extract_archive(archive, raw_dir)
     else:
         files = {
-            name: {"bytes": (raw_dir / name).stat().st_size, "sha256": sha256(raw_dir / name)}
+            name: {"bytes": (raw_dir / name).stat().st_size, "sha256": file_sha256(raw_dir / name)}
             for name in EXPECTED_FILES
         }
 
-    downloaded_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    downloaded_at = utc_timestamp()
     metadata = {
         "schema_version": 1,
         "source": "TEPCO Power Grid - 系統の予想潮流等に関する情報（千葉県CSV）",
@@ -203,14 +147,14 @@ def fetch_tepco_data(
         "http_last_modified": headers.get("http_last_modified"),
         "http_etag": headers.get("http_etag"),
         "archive": (
-            {"path": f"data/external/tepco/{ARCHIVE_NAME}", "bytes": archive.stat().st_size, "sha256": sha256(archive)}
+            {"path": f"data/external/tepco/{ARCHIVE_NAME}", "bytes": archive.stat().st_size, "sha256": file_sha256(archive)}
             if archive.is_file()
             else None
         ),
         "files": files,
         "rights_note": "Local internal cache only; do not commit or redistribute without confirming permission with TEPCO.",
     }
-    _atomic_json(metadata_path, metadata)
+    write_json_atomic(metadata_path, metadata)
     print(
         f"TEPCO cache ready: {len(files)} CSV files; retrieval={source}; "
         f"metadata={metadata_path.relative_to(ROOT) if ROOT in metadata_path.parents else metadata_path}"

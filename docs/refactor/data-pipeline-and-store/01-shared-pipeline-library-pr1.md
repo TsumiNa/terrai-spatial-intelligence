@@ -1,7 +1,26 @@
 # PR1 Plan: Shared Pipeline Library
 
-- Status: Planned
+- Status: Completed
 - Refactor: `data-pipeline-and-store`
+- PR: #42
+
+## Completion record
+
+- All 56 committed JSON/GeoJSON files hash identically before and after the migration; `joint`
+  and `evidence` were rebuilt through the migrated writers to prove it, and no re-fetch was
+  needed.
+- One deviation: `pipeline.provenance` ships the timestamp producer and the three-spelling
+  parser but no source/licence stamp-block helpers — the fetchers' stamp blocks share no
+  structure beyond `retrieved_at`, so a common helper would have been abstraction without a
+  second real caller.
+- The 3D-Tiles domain helpers (`_tile_content_paths`, tileset discovery, `_asset_url`,
+  `_relative`) stay in `fetch_plateau_uc24_16.py` with `fetch_plateau_uc24_13.py` importing
+  them as a sibling: they are format knowledge, not pipeline infrastructure, and moving them
+  would make the library format-aware.
+- Discovered, not fixed: the committed `scene_handoff.json` files were built from a
+  `manifest.json` older than the one #37 committed (`retrieved_at` 10:13:01Z vs 12:39:12Z).
+  Rebuilding `underground_scenes` reproduces that diff exactly; it was reverted here to keep
+  the data diff empty and is left for a later PR in this sequence.
 
 ## Goal
 

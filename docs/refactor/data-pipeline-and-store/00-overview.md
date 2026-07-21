@@ -1,6 +1,6 @@
 # Data Pipeline and Store
 
-- Status: Planned
+- Status: In progress
 
 ## Context
 

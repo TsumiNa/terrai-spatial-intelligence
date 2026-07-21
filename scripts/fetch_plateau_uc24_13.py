@@ -8,40 +8,31 @@ import math
 import os
 import shutil
 import struct
+import sys
 import tempfile
 import zipfile
 from collections import Counter
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-if __package__:
-    from .fetch_plateau_uc24_16 import (
-        _asset_url,
-        _atomic_json,
-        _download,
-        _json,
-        _relative,
-        _request_json,
-        _tile_content_paths,
-        extract_archive,
-        sha256,
-    )
-else:
-    from fetch_plateau_uc24_16 import (
-        _asset_url,
-        _atomic_json,
-        _download,
-        _json,
-        _relative,
-        _request_json,
-        _tile_content_paths,
-        extract_archive,
-        sha256,
-    )
-
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from terrai_spatial.pipeline.http import download_file, download_json  # noqa: E402
+from terrai_spatial.pipeline.io import file_sha256, read_json_object, write_json_atomic  # noqa: E402
+from terrai_spatial.pipeline.provenance import utc_timestamp  # noqa: E402
+
+if __package__:
+    from .fetch_plateau_uc24_16 import _asset_url, _relative, _tile_content_paths, extract_archive
+else:
+    from fetch_plateau_uc24_16 import (  # noqa: E402
+        _asset_url,
+        _relative,
+        _tile_content_paths,
+        extract_archive,
+    )
+
 DEFAULT_SOURCE_MANIFEST = ROOT / "data/plateau/uc24_13_sapporo/source_manifest.json"
 OUTPUT_DIRECTORY = Path("data/plateau/uc24_13_sapporo")
 CACHE_DIRECTORY = Path("data/external/plateau_uc24_13")
@@ -116,7 +107,7 @@ def inspect_tileset(asset_root: Path) -> dict[str, Any]:
     if len(tilesets) != 1:
         raise RuntimeError(f"asset must contain exactly one tileset.json; found {len(tilesets)}")
     tileset_path = tilesets[0]
-    document = _json(tileset_path, label="3D Tiles tileset")
+    document = read_json_object(tileset_path, label="3D Tiles tileset")
     if document.get("asset", {}).get("version") != "1.0":
         raise RuntimeError("UC24-13 3D Tiles asset.version must be 1.0")
     root_tile = document.get("root")
@@ -175,13 +166,13 @@ def inspect_tileset(asset_root: Path) -> dict[str, Any]:
 def _validate_offline(root: Path, manifest_path: Path) -> dict[str, Any]:
     if not manifest_path.is_file():
         raise RuntimeError("offline cache is incomplete: retrieval manifest is missing")
-    manifest = _json(manifest_path, label="UC24-13 retrieval manifest")
+    manifest = read_json_object(manifest_path, label="UC24-13 retrieval manifest")
     missing = [relative for relative in manifest.get("files", []) if not (root / relative).is_file()]
     if missing:
         raise RuntimeError(f"offline cache is incomplete: missing {', '.join(missing[:3])}")
     for resource in manifest.get("resources", []):
         archive = root / resource["archive_path"]
-        if sha256(archive) != resource["archive_sha256"]:
+        if file_sha256(archive) != resource["archive_sha256"]:
             raise RuntimeError(f"offline cache archive hash mismatch: {resource['slug']}")
         inspect_tileset((root / resource["tileset_path"]).parent)
     return manifest
@@ -200,15 +191,15 @@ def fetch_uc24_13(
     if offline:
         return _validate_offline(root, retrieval_manifest_path)
 
-    source_manifest = _json(source_manifest_path, label="UC24-13 source manifest")
-    package, package_headers = _request_json(source_manifest["package_api"])
-    if package.get("success") is not True or not isinstance(package.get("result"), dict):
+    source_manifest = read_json_object(source_manifest_path, label="UC24-13 source manifest")
+    package, package_headers = download_json(source_manifest["package_api"], timeout=120)
+    if not isinstance(package, dict) or package.get("success") is not True or not isinstance(package.get("result"), dict):
         raise RuntimeError("official CKAN package_show request was not successful")
     package_result = package["result"]
     resources_by_id = {item.get("id"): item for item in package_result.get("resources", [])}
-    previous = _json(retrieval_manifest_path, label="UC24-13 retrieval manifest") if retrieval_manifest_path.is_file() else {}
+    previous = read_json_object(retrieval_manifest_path, label="UC24-13 retrieval manifest") if retrieval_manifest_path.is_file() else {}
     previous_by_id = {item["resource_id"]: item for item in previous.get("resources", [])}
-    retrieved_at = datetime.now(tz=UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    retrieved_at = utc_timestamp()
     archive_dir = cache_dir / "archives"
     assets_dir = cache_dir / "assets"
     archive_dir.mkdir(parents=True, exist_ok=True)
@@ -236,14 +227,14 @@ def fetch_uc24_13(
             except RuntimeError:
                 cached_inspection = None
             expected_hash = prior.get("archive_sha256")
-            if expected_hash and sha256(archive_path) != expected_hash:
+            if expected_hash and file_sha256(archive_path) != expected_hash:
                 cached_inspection = None
 
         if cached_inspection is None:
             with tempfile.NamedTemporaryFile("wb", dir=cache_dir, delete=False) as handle:
                 temporary_archive = Path(handle.name)
             try:
-                download_headers = _download(official["url"], temporary_archive)
+                download_headers = download_file(official["url"], temporary_archive, timeout=300)
                 if not zipfile.is_zipfile(temporary_archive):
                     raise RuntimeError(f"UC24-13 resource is not a ZIP archive: {slug}")
                 with tempfile.TemporaryDirectory(dir=cache_dir) as temporary_directory:
@@ -288,7 +279,7 @@ def fetch_uc24_13(
                 "http_etag": download_headers["http_etag"],
                 "archive_path": archive_relative,
                 "archive_bytes": archive_path.stat().st_size,
-                "archive_sha256": sha256(archive_path),
+                "archive_sha256": file_sha256(archive_path),
                 "tileset_path": tileset_relative,
                 "tileset_url": _asset_url(tileset_relative),
                 **inspection,
@@ -352,7 +343,7 @@ def fetch_uc24_13(
             "not suitable for engineering, evacuation or operational decisions without authoritative verification",
         ],
     }
-    _atomic_json(retrieval_manifest_path, manifest)
+    write_json_atomic(retrieval_manifest_path, manifest)
     print(
         f"UC24-13 Sapporo cache ready: {len(manifest_resources)} resources, "
         f"{manifest['content_count']} B3DM contents, {manifest['feature_count']} batched features"

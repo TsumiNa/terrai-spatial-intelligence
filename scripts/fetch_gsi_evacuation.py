@@ -7,12 +7,17 @@ import argparse
 import csv
 import io
 import json
-from datetime import datetime, timezone
+import sys
 from pathlib import Path
-from urllib.request import Request, urlopen
-
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from terrai_spatial.pipeline.http import download_bytes  # noqa: E402
+from terrai_spatial.pipeline.io import write_json_atomic  # noqa: E402
+from terrai_spatial.pipeline.provenance import utc_timestamp  # noqa: E402
+
 OUT_DIR = ROOT / "data" / "external" / "gsi_evacuation"
 OUTPUT = OUT_DIR / "yokohama_evacuation.geojson"
 METADATA = OUT_DIR / "metadata.json"
@@ -34,12 +39,6 @@ HAZARD_FIELDS = {
     "内水氾濫": "inland_flooding",
     "火山現象": "volcanic_phenomena",
 }
-
-
-def download_bytes(url: str) -> bytes:
-    request = Request(url, headers={"User-Agent": "TerrAI-Spatial-Intelligence/0.1"})
-    with urlopen(request, timeout=60) as response:
-        return response.read()
 
 
 def publication_record(payload: bytes, municipality_code: str = MUNICIPALITY_CODE) -> dict[str, str | None]:
@@ -141,18 +140,6 @@ def build_dataset(
     return dataset, metadata
 
 
-def write_json(path: Path, value: dict, *, compact: bool = False) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".tmp")
-    serialized = (
-        json.dumps(value, ensure_ascii=False, separators=(",", ":"))
-        if compact
-        else json.dumps(value, ensure_ascii=False, indent=2)
-    )
-    temporary.write_text(serialized + "\n", encoding="utf-8")
-    temporary.replace(path)
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--force", action="store_true", help="refresh even when both outputs already exist")
@@ -161,15 +148,15 @@ def main() -> None:
         print(f"GSI evacuation data already available: {OUTPUT.relative_to(ROOT)}")
         return
 
-    retrieved_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    retrieved_at = utc_timestamp()
     dataset, metadata = build_dataset(
-        download_bytes(SOURCE_URLS["designated_shelter"]),
-        download_bytes(SOURCE_URLS["designated_emergency_evacuation_place"]),
-        download_bytes(SOURCE_URLS["publication_history"]),
+        download_bytes(SOURCE_URLS["designated_shelter"], timeout=60),
+        download_bytes(SOURCE_URLS["designated_emergency_evacuation_place"], timeout=60),
+        download_bytes(SOURCE_URLS["publication_history"], timeout=60),
         retrieved_at=retrieved_at,
     )
-    write_json(OUTPUT, dataset, compact=True)
-    write_json(METADATA, metadata)
+    write_json_atomic(OUTPUT, dataset, compact=True)
+    write_json_atomic(METADATA, metadata)
     print(
         f"Wrote {metadata['total_features']} GSI features "
         f"(source updated {metadata['source_updated_at']}) to {OUTPUT.relative_to(ROOT)}"

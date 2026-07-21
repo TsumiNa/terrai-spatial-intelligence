@@ -106,6 +106,9 @@ def test_missing_local_grid_cache_runs_download_even_when_summary_exists(
     write_json(tmp_path / "data/mobara/tepco_grid_screen.json")
 
     monkeypatch.setenv("TERRAI_TEPCO_CHIBA_URL", source.as_uri())
+    # The sandbox relocates the scripts but not the shared pipeline library;
+    # resolve it from the real repository, as any checkout does.
+    monkeypatch.setenv("PYTHONPATH", str(PROJECT_ROOT))
     states = ensure_data(root=tmp_path, selected=["grid"], allow_network=True)
 
     assert states[-1].status == "ready"

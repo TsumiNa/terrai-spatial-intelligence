@@ -8,20 +8,21 @@ import io
 import json
 import math
 import re
+import sys
 import unicodedata
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from terrai_spatial.pipeline.io import write_json_atomic  # noqa: E402
+from terrai_spatial.pipeline.regions import STUDY_BOUNDS  # noqa: E402
+
 DATA = ROOT / "data"
 LAT0 = math.radians(35.446)
 M_PER_DEG_LAT = 111_320.0
 M_PER_DEG_LON = M_PER_DEG_LAT * math.cos(LAT0)
-
-BOUNDS = {
-    "yokohama": (139.5835, 35.4426, 139.5935, 35.4504),
-    "mobara": (140.2757, 35.4387, 140.2913, 35.4513),
-}
 
 LOCAL_SOURCE_UPDATED_AT = "2026-04-01"
 LOCAL_RETRIEVED_AT = "2026-07-20"
@@ -30,11 +31,6 @@ LOCAL_RETRIEVED_AT = "2026-07-20"
 def load(path: Path) -> dict:
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)
-
-
-def write(path: Path, value: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def read_csv_text(path: Path) -> str:
@@ -141,7 +137,7 @@ def local_facility_rows(source: Path) -> list[dict[str, str]]:
             for row in csv.DictReader(handle)
             if row["Ward"] == "保土ケ谷区"
             and row["Type"] == "地域防災拠点"
-            and point_in_box([float(row["Lon"]), float(row["Lat"])], BOUNDS["yokohama"])
+            and point_in_box([float(row["Lon"]), float(row["Lat"])], STUDY_BOUNDS["yokohama"])
         ]
 
 
@@ -172,7 +168,7 @@ def reconcile_facility_sources(gsi_features: list[dict], local_rows: list[dict[s
     for feature in gsi_features:
         props = feature["properties"]
         point = feature["geometry"]["coordinates"]
-        if props["designation_type"] != "designated_shelter" or not point_in_box(point, BOUNDS["yokohama"]):
+        if props["designation_type"] != "designated_shelter" or not point_in_box(point, STUDY_BOUNDS["yokohama"]):
             continue
         key = facility_key(props.get("name"))
         local = local_by_key.get(key)
@@ -315,7 +311,7 @@ def build_zones(
     facilities: list[dict],
     embeddings: list[dict],
 ) -> list[dict]:
-    west, south, east, north = BOUNDS[region]
+    west, south, east, north = STUDY_BOUNDS[region]
     dx, dy = (east - west) / columns, (north - south) / rows
     zones = []
     for row in range(rows):
@@ -391,10 +387,10 @@ def main() -> None:
     yoko_zones = build_zones("yokohama", 4, 4, buildings, roads, solar, facilities, embeddings)
     mobara_zones = build_zones("mobara", 5, 4, buildings, roads, solar, facilities, embeddings)
 
-    write(DATA / "yokohama" / "official_facility_resilience.geojson", feature_collection(facilities))
-    write(DATA / "evidence" / "yokohama_zones.geojson", feature_collection(yoko_zones))
-    write(DATA / "evidence" / "mobara_zones.geojson", feature_collection(mobara_zones))
-    write(
+    write_json_atomic(DATA / "yokohama" / "official_facility_resilience.geojson", feature_collection(facilities))
+    write_json_atomic(DATA / "evidence" / "yokohama_zones.geojson", feature_collection(yoko_zones))
+    write_json_atomic(DATA / "evidence" / "mobara_zones.geojson", feature_collection(mobara_zones))
+    write_json_atomic(
         DATA / "evidence" / "multiscale_summary.json",
         {
             "data_as_of": data_as_of(

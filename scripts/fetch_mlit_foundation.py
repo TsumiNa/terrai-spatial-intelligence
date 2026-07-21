@@ -7,27 +7,27 @@ the two TerrAI demonstration contexts, plus provenance on every feature.
 from __future__ import annotations
 
 import argparse
-import hashlib
-import json
+import sys
 import tempfile
-import urllib.request
-import zipfile
 from dataclasses import dataclass
-from datetime import UTC, date, datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Iterable
 
 import fiona
 from fiona.transform import transform, transform_geom
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from terrai_spatial.pipeline.http import download_file  # noqa: E402
+from terrai_spatial.pipeline.io import safe_extract_zip, write_json_atomic  # noqa: E402
+from terrai_spatial.pipeline.provenance import utc_timestamp  # noqa: E402
+from terrai_spatial.pipeline.regions import MLIT_CONTEXT_BOUNDS  # noqa: E402
+
 OUTPUT = ROOT / "data/mlit"
-USER_AGENT = "TerrAI-Spatial-Intelligence/0.3 (+https://github.com/TsumiNa)"
-CONTEXTS = {
-    "yokohama": (139.54, 35.39, 139.66, 35.515),
-    "mobara": (140.22, 35.38, 140.35, 35.51),
-}
+CONTEXTS = MLIT_CONTEXT_BOUNDS
 
 
 @dataclass(frozen=True)
@@ -105,25 +105,6 @@ DATASETS = (
 )
 
 
-def _download(url: str, target: Path) -> dict[str, Any]:
-    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    digest = hashlib.sha256()
-    with urllib.request.urlopen(request, timeout=120) as response, target.open("wb") as handle:
-        while chunk := response.read(1024 * 1024):
-            digest.update(chunk)
-            handle.write(chunk)
-        return {"sha256": digest.hexdigest(), "last_modified": response.headers.get("Last-Modified")}
-
-
-def _extract(archive: Path, target: Path) -> None:
-    with zipfile.ZipFile(archive) as zipped:
-        for member in zipped.infolist():
-            path = Path(member.filename)
-            if path.is_absolute() or ".." in path.parts:
-                raise ValueError(f"unsafe ZIP member: {member.filename}")
-        zipped.extractall(target)
-
-
 def _layers(root: Path, mode: str) -> list[Path]:
     geojson = sorted(root.rglob("*.geojson"))
     shapes = sorted(root.rglob("*.shp"))
@@ -198,7 +179,7 @@ def _read_features(path: Path, dataset: Dataset, archive: Archive, retrieved_at:
 
 def build(*, output: Path = OUTPUT) -> dict[str, Any]:
     output.mkdir(parents=True, exist_ok=True)
-    retrieved_at = datetime.now(UTC).replace(microsecond=0).isoformat()
+    retrieved_at = utc_timestamp()
     manifest: dict[str, Any] = {"retrieved_at": retrieved_at, "datasets": {}}
     with tempfile.TemporaryDirectory(prefix="terrai-mlit-") as temporary:
         temp = Path(temporary)
@@ -207,10 +188,11 @@ def build(*, output: Path = OUTPUT) -> dict[str, Any]:
             downloads = []
             for index, archive in enumerate(dataset.archives):
                 archive_path = temp / f"{dataset.dataset_id}-{index}.zip"
-                details = _download(archive.url, archive_path)
+                result = download_file(archive.url, archive_path, timeout=120)
+                details = {"sha256": result["sha256"], "last_modified": result["http_last_modified"]}
                 extracted = temp / f"{dataset.dataset_id}-{index}"
                 extracted.mkdir()
-                _extract(archive_path, extracted)
+                safe_extract_zip(archive_path, extracted)
                 layers = _layers(extracted, dataset.include)
                 if not layers:
                     raise RuntimeError(f"no supported layers in {archive.url}")
@@ -228,7 +210,7 @@ def build(*, output: Path = OUTPUT) -> dict[str, Any]:
                 },
                 "features": features,
             }
-            (output / dataset.output).write_text(json.dumps(collection, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+            write_json_atomic(output / dataset.output, collection, compact=True, trailing_newline=False)
             manifest["datasets"][dataset.key] = {
                 "dataset_id": dataset.dataset_id,
                 "output": f"data/mlit/{dataset.output}",
@@ -238,7 +220,7 @@ def build(*, output: Path = OUTPUT) -> dict[str, Any]:
                 "feature_count": len(features),
                 "downloads": downloads,
             }
-    (output / "metadata.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_json_atomic(output / "metadata.json", manifest)
     return manifest
 
 

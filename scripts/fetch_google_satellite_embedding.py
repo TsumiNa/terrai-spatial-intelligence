@@ -12,12 +12,11 @@ Runtime (kept outside the static demo):
 
 from __future__ import annotations
 
-import json
 import math
 import re
+import sys
 import tempfile
 import urllib.parse
-import urllib.request
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -28,8 +27,14 @@ from PIL import Image
 from pyproj import Transformer
 from rasterio.windows import from_bounds
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from terrai_spatial.pipeline.http import download_bytes  # noqa: E402
+from terrai_spatial.pipeline.io import write_json_atomic  # noqa: E402
+from terrai_spatial.pipeline.regions import STUDY_BOUNDS  # noqa: E402
+
 OUT = ROOT / "data" / "google" / "satellite_embedding"
 S3_BUCKET = "us-west-2.opendata.source.coop"
 S3_ENDPOINT = "https://s3.us-west-2.amazonaws.com"
@@ -37,29 +42,18 @@ PREFIX = "tge-labs/aef/v1/annual"
 YEARS = (2023, 2024)
 ZONE = "54N"
 NODATA = -128
+DOWNLOAD_TIMEOUT = 45
 
 REGIONS = {
-    "yokohama": {
-        "label": "横滨 · 保土谷区",
-        "bounds": (139.5835, 35.4426, 139.5935, 35.4504),
-    },
-    "mobara": {
-        "label": "千叶 · 茂原市",
-        "bounds": (140.2757, 35.4387, 140.2913, 35.4513),
-    },
+    "yokohama": {"label": "横滨 · 保土谷区", "bounds": STUDY_BOUNDS["yokohama"]},
+    "mobara": {"label": "千叶 · 茂原市", "bounds": STUDY_BOUNDS["mobara"]},
 }
-
-
-def get_bytes(url: str, timeout: int = 45) -> bytes:
-    request = urllib.request.Request(url, headers={"User-Agent": "TerrAI-PoC/1.0"})
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        return response.read()
 
 
 def list_vrts(year: int) -> list[str]:
     prefix = f"{PREFIX}/{year}/{ZONE}/"
     query = urllib.parse.urlencode({"list-type": "2", "prefix": prefix, "max-keys": "1000"})
-    root = ET.fromstring(get_bytes(f"{S3_ENDPOINT}/{S3_BUCKET}?{query}"))
+    root = ET.fromstring(download_bytes(f"{S3_ENDPOINT}/{S3_BUCKET}?{query}", timeout=DOWNLOAD_TIMEOUT))
     namespace = {"s3": "http://s3.amazonaws.com/doc/2006-03-01/"}
     keys = [
         item.find("s3:Key", namespace).text
@@ -92,7 +86,7 @@ def locate_vrts(year: int, points_utm: dict[str, tuple[float, float]]) -> dict[s
     matches: dict[str, tuple[str, bytes]] = {}
 
     def fetch(key: str) -> tuple[str, bytes]:
-        return key, get_bytes(vrt_url(key))
+        return key, download_bytes(vrt_url(key), timeout=DOWNLOAD_TIMEOUT)
 
     with ThreadPoolExecutor(max_workers=18) as executor:
         futures = [executor.submit(fetch, key) for key in keys]
@@ -317,28 +311,23 @@ def main() -> None:
         }
         all_features.extend(block_features(region, change, current, valid, transform))
 
-    (OUT / "embedding_evidence.geojson").write_text(
-        json.dumps({"type": "FeatureCollection", "features": all_features}, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
+    write_json_atomic(
+        OUT / "embedding_evidence.geojson",
+        {"type": "FeatureCollection", "features": all_features},
     )
-    (OUT / "summary.json").write_text(
-        json.dumps(
-            {
-                "generated_at": "2026-07-20",
-                "dataset": "Google Satellite Embedding V1 / AlphaEarth Foundations",
-                "license": "CC BY 4.0",
-                "attribution": "The AlphaEarth Foundations Satellite Embedding dataset is produced by Google and Google DeepMind.",
-                "years": list(YEARS),
-                "role": "Annual change evidence and similarity features; excluded from suitability scores until local validation.",
-                "source": "Source Cooperative public mirror (not officially supported by Google)",
-                "overlays": overlays,
-                "regions": summaries,
-            },
-            ensure_ascii=False,
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
+    write_json_atomic(
+        OUT / "summary.json",
+        {
+            "generated_at": "2026-07-20",
+            "dataset": "Google Satellite Embedding V1 / AlphaEarth Foundations",
+            "license": "CC BY 4.0",
+            "attribution": "The AlphaEarth Foundations Satellite Embedding dataset is produced by Google and Google DeepMind.",
+            "years": list(YEARS),
+            "role": "Annual change evidence and similarity features; excluded from suitability scores until local validation.",
+            "source": "Source Cooperative public mirror (not officially supported by Google)",
+            "overlays": overlays,
+            "regions": summaries,
+        },
     )
     print(f"Wrote {len(all_features)} evidence cells to {OUT}")
 
