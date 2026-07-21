@@ -29,6 +29,7 @@ import {
   ROAD_OPACITY,
   ROAD_THRESHOLDS,
   SOLAR_STATUS,
+  WINDOWED_STYLE,
   ZONE_STYLE,
   rgba,
 } from "./style-rules";
@@ -57,6 +58,27 @@ const byCell = (props: P) => String(props.cell_id);
 /** Repository-relative `data/…` paths resolve on the API asset mount. */
 export function assetUrl(path: string, assetBase: string): string {
   return path.startsWith("data/") ? `${assetBase}/${path.slice(5)}` : path;
+}
+
+/**
+ * The windowed foundation layer, rendered minimally: geometry only, palette
+ * colours, drawn beneath the analytical layers and never picked. Styling is
+ * the overlay stage's scope; this proves the delivery path.
+ */
+export function buildWindowedFeatureLayer(key: string, features: Feature[]): Layer {
+  return new GeoJsonLayer({
+    id: `windowed-${key}`,
+    data: features as unknown as GeoJSON.Feature[],
+    stroked: true,
+    filled: true,
+    pickable: false,
+    lineWidthUnits: "pixels",
+    getLineWidth: WINDOWED_STYLE.width,
+    getLineColor: WINDOWED_STYLE.line,
+    getFillColor: WINDOWED_STYLE.fill,
+    pointRadiusUnits: "pixels",
+    getPointRadius: 4,
+  } as never);
 }
 
 export const POPUPS: Record<string, PopupSpec> = {

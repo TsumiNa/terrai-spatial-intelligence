@@ -4,8 +4,9 @@
   import { apiOrigin } from "../api/client";
   import { field, text, undergroundField, FIELD_LABELS, type AuditRecord, type FieldKey } from "../audit";
   import FeaturePopup from "./FeaturePopup.svelte";
+  import { createWindowedFeatureClient, IDLE_STATE, PROVING_LAYER, type WindowedState } from "../features/windowed";
   import { i18n } from "../i18n/i18n.svelte";
-  import { buildAnalyticalLayers, drawsOwnBuildings, geometryBounds, queuePopup, type PopupSpec } from "../map/layers";
+  import { buildAnalyticalLayers, buildWindowedFeatureLayer, drawsOwnBuildings, geometryBounds, queuePopup, type PopupSpec } from "../map/layers";
   import { buildUndergroundLayers } from "../map/underground-layers";
   import { createExhibitionMap, type ExhibitionMap } from "../map/map";
   import { RASTER_REGIONS } from "../map/config";
@@ -37,6 +38,28 @@
   let sceneCatalog = $state.raw<SceneCatalog | null>(null);
   let boxArmed = $state(false);
   let sceneMessage = $state<string | null>(null);
+
+  // --- windowed foundation proving layer ---------------------------------
+  // The client owns every fetch decision; this component only relays the
+  // map's settled viewports in and plain state snapshots out.
+  let windowedOn = $state(false);
+  let windowedState = $state.raw<WindowedState>(IDLE_STATE);
+
+  $effect(() => {
+    if (!mapApi || !windowedOn) return;
+    const client = createWindowedFeatureClient({
+      api: createApiClient(),
+      datasetKey: PROVING_LAYER.key,
+      extents: PROVING_LAYER.extents,
+      onState: (state) => (windowedState = state),
+    });
+    const unsubscribe = mapApi.onViewChange((view) => client.viewChanged(view));
+    return () => {
+      unsubscribe();
+      client.destroy();
+      windowedState = IDLE_STATE;
+    };
+  });
 
   $effect(() => {
     if (app.module !== "underground" || sceneCatalog) return;
@@ -181,7 +204,15 @@
           : [];
       mapApi.setAnalyticalLayers(buildUndergroundLayers(resources, assetBase, { onAsset: openUndergroundAssetPopup }));
     } else {
-      mapApi.setAnalyticalLayers(buildAnalyticalLayers(module, view, data, assetBase, { onFeature: openFeaturePopup }));
+      // The windowed layer is context: it renders beneath the analysis.
+      const windowed =
+        windowedOn && windowedState.status === "ready"
+          ? [buildWindowedFeatureLayer(PROVING_LAYER.key, windowedState.features)]
+          : [];
+      mapApi.setAnalyticalLayers([
+        ...windowed,
+        ...buildAnalyticalLayers(module, view, data, assetBase, { onFeature: openFeaturePopup }),
+      ]);
     }
     mapApi.setVectorBuildingsVisible(!drawsOwnBuildings(module, view));
   });
@@ -230,6 +261,38 @@
           </button>
         {/each}
       </div>
+      {#if app.module !== "underground"}
+        <div class="basemap-switcher" aria-label={i18n.t("windowed.aria")}>
+          <button
+            class="basemap-button windowed-toggle"
+            class:active={windowedOn}
+            aria-pressed={windowedOn}
+            title={i18n.t("windowed.title")}
+            onclick={() => (windowedOn = !windowedOn)}
+          >
+            {i18n.t("windowed.toggle")}
+          </button>
+        </div>
+        {#if windowedOn && windowedState.status !== "idle"}
+          <span class="windowed-chip text-xs text-muted" data-status={windowedState.status} role="status">
+            {#if windowedState.status === "ready"}
+              {i18n.t("windowed.ready", { n: windowedState.matched })}
+            {:else if windowedState.status === "loading"}
+              {i18n.t("windowed.loading")}
+            {:else if windowedState.status === "belowZoom"}
+              {i18n.t("windowed.belowZoom")}
+            {:else if windowedState.status === "outside"}
+              {i18n.t("windowed.outside")}
+            {:else if windowedState.status === "empty"}
+              {i18n.t("windowed.empty")}
+            {:else if windowedState.status === "oversized"}
+              {i18n.t("windowed.oversized")}
+            {:else}
+              {i18n.t("windowed.error")}
+            {/if}
+          </span>
+        {/if}
+      {/if}
       {#if app.module === "underground" && sceneCatalog}
         <div class="basemap-switcher" aria-label={i18n.t("scene.catalogScenes")}>
           {#each sceneCatalog.scenes as entry (entry.scene_id)}

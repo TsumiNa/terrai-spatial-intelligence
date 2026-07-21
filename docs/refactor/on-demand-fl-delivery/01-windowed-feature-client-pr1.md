@@ -1,7 +1,27 @@
 # PR1 Plan: Viewport-driven Feature Client
 
-- Status: Planned
+- Status: Completed
 - Refactor: `on-demand-fl-delivery`
+- PR: #47
+
+## Completion record
+
+- Bootstrap transfers at 455,968 bytes gzipped against 4,478,021 uncompressed (9.8×).
+  Raster tiles are excluded from compression by a request-scope filter: PNG and JPEG are
+  already compressed, while the JSON routes and every JSON/glTF asset on the mount gzip.
+- The handoff fact PR2 asked for: a legitimate ~0.02° `landHistory` window (zoom 15)
+  returns 141 features at 8.6 MB raw / 3.2 MB gzipped. The endpoint serves it comfortably
+  against the indexed store — the limit it exposed is client-side: tessellating those
+  polygons stalls software-GL hardware for tens of seconds. The zoom floor was raised
+  from 15 to 16 in response; the floor is exactly the bound the plan intended it to be,
+  and PR2's presentation design inherits the number.
+- The proving layer's coverage extents are duplicated into the client config with their
+  source named (`terrai_spatial/pipeline/regions.py`); PR2's registry takes ownership.
+- The truncated-window state deliberately renders nothing: a silently partial subset is
+  the misleading option, and the state chip says why instead.
+- The map gained one narrow hook (`onViewChange`, plain bounds and zoom); every fetch
+  decision — debounce, zoom floor, outward window quantisation, cache, cancellation —
+  lives in `src/lib/features/windowed.ts`, outside the map module.
 
 ## Goal
 
