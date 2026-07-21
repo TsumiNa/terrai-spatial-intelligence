@@ -6,9 +6,10 @@ The current Demo covers slope exposure and road/facility resilience in Yokohama,
 
 ## Quick start
 
-Install [uv](https://docs.astral.sh/uv/). No database or paid data service is required.
+Install [uv](https://docs.astral.sh/uv/) and Node.js >= 22. No database or paid data service is required.
 
 ```bash
+cd webapp && npm install && npm run build && cd ..   # build the exhibition frontend once
 uv run python -m terrai_spatial serve --port 4176
 ```
 

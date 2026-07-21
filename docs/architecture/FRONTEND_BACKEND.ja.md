@@ -6,14 +6,14 @@
 
 更新日：2026-07-21
 
-本書は、顧客向け TerrAI Demo におけるブラウザ、静的フロントエンド、FastAPI、Python データサービス、ファイルベースデータ間の実行時呼び出し構造を説明します。内部の FL → SL → AL 製品概念は `docs/architecture/FL_SL_AL_CONCEPT.ja.md` を参照してください。
+本書は、顧客向け TerrAI Demo におけるブラウザ、ビルド済み Svelte フロントエンド、FastAPI、Python データサービス、ファイルベースデータ間の実行時呼び出し構造を説明します。内部の FL → SL → AL 製品概念は `docs/architecture/FL_SL_AL_CONCEPT.ja.md` を参照してください。
 
 ## 1. コンポーネントと責務
 
 | コンポーネント | 現在の実装 | 責務 |
 |---|---|---|
 | 顧客ブラウザ | Chrome、Safari など | ページ読込、モジュール・表示・言語・監査操作 |
-| 静的フロントエンド | `frontend/index.html`、`app.js`、`audit.js`、`i18n.js` | 展示 payload を取得し、地図・指標・キュー・三言語 UI を描画。ローカルデータの直接読込、業務結果の計算・並べ替えは行わない |
+| Svelte フロントエンド | `webapp/`（Svelte 5 + Vite。`terrai serve` はビルド済み `webapp/dist` を配信） | 展示 payload を取得し、MapLibre + deck.gl の地図・指標・キュー・監査ドロワー・コンパイル時検証済み三言語 UI を描画。ローカルデータの直接読込、業務結果の計算・並べ替えは行わない |
 | FastAPI | `terrai_spatial/api.py` | `/api/v1` HTTP 境界、検証、エラー変換、CORS、OpenAPI、読取専用アセット |
 | Python DataService | `terrai_spatial/data_service.py` | 安定 key からファイルを解決し、mtime キャッシュ、検索、地域抽出、集計、推薦キュー順位付けを実施 |
 | データタスク | `terrai_spatial/data_tasks.py` と `scripts/` | 起動前に確認・取得・解析・再構築。通常 API リクエスト内では高コスト処理を行わない |
@@ -33,7 +33,7 @@ http://127.0.0.1:4176/?api=http://127.0.0.1:9000
 
 ## 2. 起動時の呼び出し順序
 
-`terrai_spatial serve` はデータ確認と二つの独立 HTTP リスナーを管理します。データが不足・期限切れの場合、タスク登録表が対応する Python スクリプトを実行し、準備完了後にのみフロントエンドと API を起動します。
+`terrai_spatial serve` は `webapp/dist` が存在しない場合は起動を拒否し（先に `cd webapp && npm run build`）、その後データ確認と二つの独立 HTTP リスナーを管理します。データが不足・期限切れの場合、タスク登録表が対応する Python スクリプトを実行し、準備完了後にのみフロントエンドと API を起動します。
 
 ```mermaid
 sequenceDiagram
@@ -44,7 +44,7 @@ sequenceDiagram
     participant Files as data/ FL ファイル
     participant Scripts as 取得/解析/構築スクリプト
     participant API as FastAPI :8000
-    participant Web as Static Frontend :4176
+    participant Web as Built Frontend webapp/dist :4176
 
     Operator->>CLI: uv run python -m terrai_spatial serve
     CLI->>Tasks: ensure_data(allow_network)
@@ -74,7 +74,7 @@ sequenceDiagram
     autonumber
     actor Customer as 顧客
     participant Browser as ブラウザ
-    participant Frontend as frontend/app.js
+    participant Frontend as webapp Svelte app
     participant API as FastAPI /api/v1
     participant Service as Python DataService
     participant FL as JSON / GeoJSON
@@ -84,7 +84,7 @@ sequenceDiagram
     Browser->>Frontend: HTML/CSS/JS を読み込む
     Frontend->>API: GET /bootstrap
     API->>Service: bootstrap()
-    loop 18 個の安定 dataset key
+    loop 各安定 bootstrap dataset key
         Service->>FL: mtime を確認
         alt キャッシュなし、またはファイル更新
             Service->>FL: read + json.load
@@ -115,7 +115,7 @@ sequenceDiagram
     Note over Frontend,API: 現在は追加 API リクエストなし
 
     Customer->>Frontend: 破線付き数値をクリック
-    Frontend->>Frontend: audit.js が出典/式/制約を表示
+    Frontend->>Frontend: 監査ドロワーが出典/式/制約を表示
     Note over Frontend,API: 監査 metadata は読込済み
 ```
 
@@ -153,7 +153,7 @@ sequenceDiagram
 |---|---:|---|
 | `GET /api/v1/bootstrap` | はい、起動時に一度 | 全展示データ、サーバー順位付け済みキュー、施設集計、health metadata |
 | `GET /api/v1/assets/*` | はい、表示範囲に応じて | ローカル地図タイル、Satellite Embedding 可視化など |
-| `GET /api/v1/health` | いいえ、bootstrap metadata に含む | サービスと 18 データセットの独立監視 |
+| `GET /api/v1/health` | いいえ、bootstrap metadata に含む | サービスと全データセットの独立監視 |
 | `GET /api/v1/catalog` | いいえ | 安定 key、ファイル型、件数、更新時刻の確認 |
 | `GET /api/v1/datasets/{key}` | いいえ | key で完全な JSON/GeoJSON を取得 |
 | `GET /api/v1/features/{key}` | いいえ | フィールド、範囲、bbox、並替、limit による GeoJSON 検索 |
@@ -169,7 +169,9 @@ sequenceDiagram
 
 ## 7. コード位置
 
-- フロントエンド API origin と初期要求：`frontend/app.js`
+- フロントエンド API origin と型付き初期要求：`webapp/src/lib/api/client.ts`、`webapp/src/App.svelte`
+- 地図インスタンス・ベースマップ・deck.gl レイヤ：`webapp/src/lib/map/`
+- 監査レコードとメッセージカタログ：`webapp/src/lib/audit.ts`、`webapp/src/lib/i18n/messages.ts`
 - HTTP ルートとエラー変換：`terrai_spatial/api.py`
 - ファイルキャッシュ、検索、集計、キュー：`terrai_spatial/data_service.py`
 - 二サービス起動と自動データ確認：`terrai_spatial/cli.py`

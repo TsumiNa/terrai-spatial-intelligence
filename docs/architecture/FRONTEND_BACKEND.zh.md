@@ -6,14 +6,14 @@
 
 更新日期：2026-07-21
 
-本文描述客户展示版 TerrAI 的**运行时调用结构**。它关注浏览器、静态前端、FastAPI、Python 数据服务和文件数据之间如何交互；内部 FL → SL → AL 产品概念见 `docs/architecture/FL_SL_AL_CONCEPT.md`。
+本文描述客户展示版 TerrAI 的**运行时调用结构**。它关注浏览器、构建后的 Svelte 前端、FastAPI、Python 数据服务和文件数据之间如何交互；内部 FL → SL → AL 产品概念见 `docs/architecture/FL_SL_AL_CONCEPT.md`。
 
 ## 1. 组件与职责
 
 | 组件 | 当前实现 | 职责 |
 |---|---|---|
 | 客户浏览器 | Chrome / Safari 等 | 加载页面、触发模块切换和审计交互 |
-| 静态前端 | `frontend/index.html`、`app.js`、`audit.js`、`i18n.js` | 请求展示数据，渲染地图、指标、队列和中/日/英界面；不读取本地数据文件，不计算或排序业务结果 |
+| Svelte 前端 | `webapp/`（Svelte 5 + Vite；`terrai serve` 提供构建后的 `webapp/dist`） | 请求展示数据，渲染 MapLibre + deck.gl 地图、指标、队列、审计抽屉和编译期校验的三语界面；不读取本地数据文件，不计算或排序业务结果 |
 | FastAPI | `terrai_spatial/api.py` | 提供 `/api/v1` HTTP 边界、参数校验、错误码、CORS、OpenAPI 和只读资产服务 |
 | Python 数据服务 | `terrai_spatial/data_service.py` | 用稳定 key 定位文件，按修改时间缓存，执行查询、区域筛选、汇总与推荐队列排序 |
 | 数据任务 | `terrai_spatial/data_tasks.py` 与 `scripts/` | 启动前检查、下载、解析和重建数据；不在普通 API 请求中执行昂贵任务 |
@@ -33,7 +33,7 @@ http://127.0.0.1:4176/?api=http://127.0.0.1:9000
 
 ## 2. 启动调用顺序
 
-`terrai_spatial serve` 在一个开发命令中管理数据检查和两个独立 HTTP 服务。数据缺失或过期时，统一任务注册表调用对应 Python 脚本；数据可用后才启动前端和 API。
+`terrai_spatial serve` 会在 `webapp/dist` 不存在时拒绝启动（先执行 `cd webapp && npm run build`），然后在一个开发命令中管理数据检查和两个独立 HTTP 服务。数据缺失或过期时，统一任务注册表调用对应 Python 脚本；数据可用后才启动前端和 API。
 
 ```mermaid
 sequenceDiagram
@@ -44,7 +44,7 @@ sequenceDiagram
     participant Files as data/ FL 文件
     participant Scripts as 下载/解析/构建脚本
     participant API as FastAPI :8000
-    participant Web as Static Frontend :4176
+    participant Web as Built Frontend webapp/dist :4176
 
     Operator->>CLI: uv run python -m terrai_spatial serve
     CLI->>Tasks: ensure_data(allow_network)
@@ -74,7 +74,7 @@ sequenceDiagram
     autonumber
     actor Customer as 客户
     participant Browser as 浏览器
-    participant Frontend as frontend/app.js
+    participant Frontend as webapp Svelte app
     participant API as FastAPI /api/v1
     participant Service as Python DataService
     participant FL as JSON / GeoJSON
@@ -84,7 +84,7 @@ sequenceDiagram
     Browser->>Frontend: 加载 HTML/CSS/JS
     Frontend->>API: GET /bootstrap
     API->>Service: bootstrap()
-    loop 18 个稳定 dataset key
+    loop 每个稳定 bootstrap dataset key
         Service->>FL: stat 修改时间
         alt 缓存不存在或文件已更新
             Service->>FL: read + json.load
@@ -115,7 +115,7 @@ sequenceDiagram
     Note over Frontend,API: 当前不会再次请求 API
 
     Customer->>Frontend: 点击虚线数值
-    Frontend->>Frontend: audit.js 打开来源/公式/限制抽屉
+    Frontend->>Frontend: 审计抽屉打开来源/公式/限制
     Note over Frontend,API: 审计内容随展示包加载，不产生网络请求
 ```
 
@@ -153,7 +153,7 @@ sequenceDiagram
 |---|---:|---|
 | `GET /api/v1/bootstrap` | 是，首次加载一次 | 返回全部展示数据、服务端推荐队列、设施汇总和健康元数据 |
 | `GET /api/v1/assets/*` | 是，按地图视窗调用 | 返回本地地图瓦片、Satellite Embedding 可视化等二进制资源 |
-| `GET /api/v1/health` | 否，包含在 bootstrap metadata | 独立监控服务和 18 个数据集的就绪状态 |
+| `GET /api/v1/health` | 否，包含在 bootstrap metadata | 独立监控服务和全部数据集的就绪状态 |
 | `GET /api/v1/catalog` | 否 | 审查稳定 key、文件类型、记录数和更新时间 |
 | `GET /api/v1/datasets/{key}` | 否 | 按 key 获取完整 JSON/GeoJSON |
 | `GET /api/v1/features/{key}` | 否 | 按字段、范围、bbox、排序与 limit 查询 GeoJSON |
@@ -169,7 +169,9 @@ sequenceDiagram
 
 ## 7. 代码定位
 
-- 前端 API origin 与启动请求：`frontend/app.js`
+- 前端 API origin 与带类型的启动请求：`webapp/src/lib/api/client.ts`、`webapp/src/App.svelte`
+- 地图实例、底图与 deck.gl 图层：`webapp/src/lib/map/`
+- 审计记录与消息目录：`webapp/src/lib/audit.ts`、`webapp/src/lib/i18n/messages.ts`
 - HTTP 路由与错误映射：`terrai_spatial/api.py`
 - 文件缓存、查询、汇总与队列：`terrai_spatial/data_service.py`
 - 启动双服务与自动数据检查：`terrai_spatial/cli.py`

@@ -245,7 +245,7 @@ terrai-spatial-intelligence/
 │   ├── api.py                  # health/catalog/data/query/recommendations
 │   ├── data_service.py         # file cache/query/aggregate/ranking
 │   └── data_tasks.py           # startup/manual task registry
-├── frontend/                   # static customer frontend
+├── webapp/                     # Svelte + MapLibre/deck.gl 顧客向けフロントエンド（npm でビルド）
 │   ├── index.html
 │   ├── app.js
 │   ├── audit.js

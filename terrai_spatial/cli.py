@@ -17,7 +17,8 @@ from .data_tasks import TASKS, ensure_data, status_rows, validate_json_outputs
 
 
 ROOT = Path(__file__).resolve().parents[1]
-FRONTEND_ROOT = ROOT / "frontend"
+FRONTEND_ROOT = ROOT / "webapp" / "dist"
+FRONTEND_BUILD_HINT = "frontend build missing; run: cd webapp && npm install && npm run build"
 DEFAULT_PIPELINES = ("joint", "evidence")
 
 DOCS_TOP_LEVEL_DIRECTORIES = {"architecture", "refactor", "data", "summary", "others"}
@@ -44,15 +45,15 @@ def multilingual_documents() -> list[Path]:
     return documents
 
 REQUIRED_FILES = [
-    "frontend/index.html",
-    "frontend/styles.css",
-    "frontend/i18n.js",
-    "frontend/audit.js",
-    "frontend/app.js",
+    "webapp/index.html",
+    "webapp/package.json",
+    "webapp/openapi.json",
+    "webapp/src/main.ts",
+    "webapp/src/App.svelte",
+    "webapp/src/lib/audit.ts",
+    "webapp/src/lib/i18n/messages.ts",
     "terrai_spatial/api.py",
     "terrai_spatial/data_service.py",
-    "frontend/vendor/leaflet.js",
-    "frontend/vendor/leaflet.css",
     "terrai_spatial/data_tasks.py",
     "scripts/ensure_data.py",
     "scripts/bootstrap_packaged_data.py",
@@ -103,6 +104,8 @@ def command_data(args: argparse.Namespace) -> None:
 
 
 def command_serve(args: argparse.Namespace) -> None:
+    if not (FRONTEND_ROOT / "index.html").is_file():
+        raise SystemExit(FRONTEND_BUILD_HINT)
     if not args.no_ensure_data:
         print("[TerrAI data] checking startup data", flush=True)
         ensure_data(allow_network=not args.offline)
@@ -147,6 +150,8 @@ def command_api(args: argparse.Namespace) -> None:
 
 
 def command_frontend(args: argparse.Namespace) -> None:
+    if not (FRONTEND_ROOT / "index.html").is_file():
+        raise SystemExit(FRONTEND_BUILD_HINT)
     handler = partial(SimpleHTTPRequestHandler, directory=FRONTEND_ROOT)
     server = ThreadingHTTPServer((args.host, args.port), handler)
     print(f"TerrAI frontend: http://{args.host}:{args.port}/", flush=True)
@@ -231,18 +236,19 @@ def contract_failures() -> list[str]:
         if not ok:
             failures.append(f"invalid {path.relative_to(ROOT)}: {message}")
 
-    runtime_files = [
-        ROOT / "frontend/index.html",
-        ROOT / "frontend/app.js",
-        ROOT / "frontend/audit.js",
-        ROOT / "frontend/styles.css",
-    ]
+    runtime_sources = sorted(
+        path
+        for pattern in ("*.ts", "*.svelte", "*.html", "*.css")
+        for path in (ROOT / "webapp" / "src").rglob(pattern)
+    ) + [ROOT / "webapp" / "index.html"]
     forbidden = ("dynamic_world", "fetch_dynamic_world", "Dynamic World ·")
-    for path in runtime_files:
+    for path in runtime_sources:
         content = path.read_text(encoding="utf-8")
         for token in forbidden:
             if token in content:
-                failures.append(f"removed runtime dependency still referenced: {path.name}: {token}")
+                failures.append(
+                    f"removed runtime dependency still referenced: {path.relative_to(ROOT)}: {token}"
+                )
 
     concept_contract = {
         "docs/architecture/FL_SL_AL_CONCEPT.md": (
@@ -262,18 +268,12 @@ def contract_failures() -> list[str]:
             if token not in content:
                 failures.append(f"concept contract missing: {relative}: {token}")
 
+    # The old literal-string frontend checks are gone with the Leaflet runtime:
+    # module navigation and audit flows are covered by Playwright under
+    # webapp/e2e, dataset keys and payload fields by the typed client, and
+    # translation completeness by the compile-checked message catalogs. What
+    # remains below still describes something no type system sees.
     exhibition_contract = {
-        "frontend/index.html": (
-            'data-module="overview"',
-            'data-module="evidence"',
-            "证据与可靠性",
-            "点击任意虚线数值查看来源、公式与限制",
-        ),
-        "frontend/app.js": (
-            'fetchJson(`${API_BASE}/bootstrap`)',
-            "state.data.recommendations.slope.features",
-            "state.data.facilitySummary",
-        ),
         "terrai_spatial/api.py": (
             '/api/v1/health',
             '/api/v1/bootstrap',
@@ -407,8 +407,10 @@ def contract_failures() -> list[str]:
             for heading in data_headings[language]:
                 if heading not in content:
                     failures.append(f"data card missing section: {document}: {heading}")
-    client_html = (ROOT / "frontend/index.html").read_text(encoding="utf-8")
-    if 'data-module="architecture"' in client_html:
+    # The internal architecture module must not reach customer navigation:
+    # modules.ts is the single module registry the sidebar renders from.
+    module_registry = (ROOT / "webapp/src/lib/modules.ts").read_text(encoding="utf-8")
+    if '"architecture"' in module_registry:
         failures.append("internal architecture module leaked into the customer navigation")
     return failures
 

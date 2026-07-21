@@ -4,16 +4,17 @@
 
 ```bash
 uv sync
+cd webapp && npm install && npm run build && cd ..
 uv run python -m terrai_spatial validate
 uv run pytest
 uv run python -m terrai_spatial serve --port 4176
 ```
 
-The frontend lives in `frontend/`; FastAPI and data services in `terrai_spatial/`; directly executable data tasks in `scripts/`; and file-backed foundation data and caches in `data/`.
+The exhibition frontend lives in `webapp/`; FastAPI and data services in `terrai_spatial/`; directly executable data tasks in `scripts/`; and file-backed foundation data and caches in `data/`.
 
 ## Frontend toolchain (`webapp/`)
 
-The next frontend is a Svelte 5 + Vite + TypeScript application in `webapp/`. It is not yet the served exhibition — `frontend/` stays the default until the [MapLibre migration](docs/refactor/maplibre-migration/00-overview.md) reaches parity.
+The exhibition frontend is a Svelte 5 + Vite + TypeScript application in `webapp/`, rendering the map with MapLibre GL and deck.gl. `terrai serve` and `terrai frontend` serve the built output from `webapp/dist` and refuse to start until it exists (see the [MapLibre migration](docs/refactor/maplibre-migration/00-overview.md)).
 
 Requires Node.js >= 22 alongside `uv`.
 
