@@ -14,3 +14,8 @@ webapp/test-results/
 data/external/tepco/*.zip
 data/external/tepco/*.csv
 data/external/tepco/*.local.json
+
+# PLATEAU source archives and expanded 3D Tiles are reproducible on-demand
+# caches. Commit the selection, retrieval manifest and lightweight audit index,
+# not the upstream binaries.
+data/external/plateau_uc24_16/
