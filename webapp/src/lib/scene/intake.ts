@@ -22,7 +22,10 @@ import type { SceneBundle, SceneCatalog } from "./catalog";
 export class SceneIntakeError extends Error {}
 
 interface ApiLike {
-  GET(path: string, init?: unknown): Promise<{ data?: unknown; error?: unknown }>;
+  GET(
+    path: "/api/v1/scenes" | "/api/v1/scenes/{scene_id}",
+    init?: unknown,
+  ): Promise<{ data?: unknown; error?: unknown }>;
 }
 
 /** Path markers that identify each canonical scene's data roots. The two
@@ -34,12 +37,24 @@ const OWNER_ROOT_MARKERS: Record<string, string[]> = {
 };
 
 function insideRoots(path: string, roots: string[]): boolean {
+  // A non-canonical path (absolute, traversal or empty segments) could pass
+  // a prefix check while resolving outside the root; reject it outright.
+  const segments = path.split("/");
+  if (path.startsWith("/") || segments.some((segment) => segment === ".." || segment === "." || segment === "")) {
+    return false;
+  }
   return roots.some((root) => path === root || path.startsWith(`${root}/`));
 }
 
 /** Refuse a bundle that violates its own isolation or honesty invariants. */
 export function assertSingleSceneBundle(bundle: SceneBundle): SceneBundle {
   const owner = bundle.handoff.owner_dataset_key;
+  if (bundle.scene.owner_dataset_key !== owner || bundle.scene.scene_id !== bundle.handoff.scene_id) {
+    throw new SceneIntakeError(
+      `bundle identity mismatch: catalog says ${bundle.scene.scene_id}/${bundle.scene.owner_dataset_key}, ` +
+        `handoff says ${bundle.handoff.scene_id}/${owner}`,
+    );
+  }
   const ownMarkers = OWNER_ROOT_MARKERS[owner];
   if (!ownMarkers) throw new SceneIntakeError(`unknown scene owner: ${owner}`);
   const foreignMarkers = Object.entries(OWNER_ROOT_MARKERS)
@@ -51,6 +66,9 @@ export function assertSingleSceneBundle(bundle: SceneBundle): SceneBundle {
   for (const root of roots) {
     if (foreignMarkers.some((marker) => root.includes(marker))) {
       throw new SceneIntakeError(`${bundle.scene.scene_id} carries another scene's root: ${root}`);
+    }
+    if (!ownMarkers.some((marker) => root.includes(marker))) {
+      throw new SceneIntakeError(`${bundle.scene.scene_id} carries a root outside its owner's data: ${root}`);
     }
   }
 

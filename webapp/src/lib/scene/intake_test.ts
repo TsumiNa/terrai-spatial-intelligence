@@ -67,6 +67,24 @@ describe("assertSingleSceneBundle", () => {
     expect(() => assertSingleSceneBundle(osm)).toThrow("another scene's root");
   });
 
+  it("refuses a traversal path that would escape the roots after normalization", () => {
+    const tampered = bundle();
+    tampered.handoff.evidence_families.utility_networks.sources![0].asset_paths = [
+      "data/plateau/uc24_16_nihonbashi/../uc24_13_sapporo/tileset.json",
+    ];
+    expect(() => assertSingleSceneBundle(tampered)).toThrow("escapes the scene's approved roots");
+  });
+
+  it("refuses a root that belongs to neither scene and a mismatched identity", () => {
+    const stray = bundle();
+    stray.handoff.approved_roots = [...stray.handoff.approved_roots, "data/elsewhere"];
+    expect(() => assertSingleSceneBundle(stray)).toThrow("outside its owner's data");
+
+    const mismatched = bundle();
+    mismatched.scene.owner_dataset_key = "uc24_13_sapporo";
+    expect(() => assertSingleSceneBundle(mismatched)).toThrow("identity mismatch");
+  });
+
   it("refuses unavailable evidence that carries fabricated metadata", () => {
     const counts = bundle();
     (counts.handoff.evidence_families.boreholes as unknown as Record<string, unknown>).sources = [];
