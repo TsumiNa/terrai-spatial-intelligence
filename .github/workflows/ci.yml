@@ -38,7 +38,7 @@ jobs:
       # store is a derived artifact every clone rebuilds from committed
       # files — exactly what this does, with no network.
       - name: Build derived data
-        run: uv run python -m terrai_spatial data ensure --offline
+        run: uv run python -m terrai_spatial data ensure --only store --offline
 
       - name: Test
         run: uv run pytest -q

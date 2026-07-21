@@ -211,32 +211,40 @@ class DataService:
             raise DatasetNotFoundError(key) from error
         return self.root / relative
 
+    def _missing_from_store(self, key: str) -> RuntimeError:
+        return RuntimeError(
+            f"{key} is missing from the spatial store; "
+            "rebuild it with: uv run python -m terrai_spatial data ensure --only store"
+        )
+
+    def _document(self, key: str) -> Any:
+        value = read_document(self._connection(), key)
+        if value is None:
+            raise self._missing_from_store(key)
+        return value
+
     def load(self, key: str) -> Any:
         if key not in ALL_DATASETS:
             raise DatasetNotFoundError(key)
         connection = self._connection()
-        kind = dataset_kind(connection, key)
-        if kind == "document":
-            return read_document(connection, key)
+        if dataset_kind(connection, key) == "document":
+            return self._document(key)
         value = read_collection(connection, key)
         if value is None:
-            raise RuntimeError(
-                f"dataset {key} is missing from the spatial store; "
-                "rebuild it with: uv run python -m terrai_spatial data ensure --only store"
-            )
+            raise self._missing_from_store(key)
         return value
 
     def scene_catalog(self) -> dict[str, Any]:
         """Return renderer-neutral scene discovery without adding a dataset key."""
 
-        return read_document(self._connection(), "sceneCatalog")
+        return self._document("sceneCatalog")
 
     def scene_handoff(self, owner_dataset_key: str) -> dict[str, Any]:
         """Resolve scene metadata through its existing Foundation dataset key."""
 
         if owner_dataset_key not in SCENE_HANDOFFS:
             raise DatasetNotFoundError(owner_dataset_key)
-        return read_document(self._connection(), f"sceneHandoff:{owner_dataset_key}")
+        return self._document(f"sceneHandoff:{owner_dataset_key}")
 
     def scene_bundle(self, scene_id: str) -> dict[str, Any]:
         """One catalogued scene with its full handoff, resolved by scene id.

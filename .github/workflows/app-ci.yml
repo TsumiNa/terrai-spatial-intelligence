@@ -97,7 +97,7 @@ jobs:
       # The API refuses to start without the derived store; build it from
       # the committed files before the suite launches the server.
       - name: Build derived data
-        run: uv run python -m terrai_spatial data ensure --offline
+        run: uv run python -m terrai_spatial data ensure --only store --offline
 
       - name: End-to-end test
         run: npm run test:e2e

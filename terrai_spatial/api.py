@@ -23,7 +23,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(
     title="TerrAI Spatial Intelligence API",
     version="1.0.0",
-    description="Read-only file-backed APIs for the TerrAI commercial exhibition prototype.",
+    description="Read-only APIs for the TerrAI commercial exhibition prototype, served from the spatial store derived from the committed datasets.",
     lifespan=lifespan,
 )
 

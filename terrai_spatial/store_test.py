@@ -14,12 +14,21 @@ from terrai_spatial.data_service import ALL_DATASETS, store_sources
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
+def _oracle_pairs(value):  # the retired scan's coordinate walk, verbatim
+    if isinstance(value, list) and len(value) >= 2 and all(isinstance(item, (int, float)) for item in value[:2]):
+        yield float(value[0]), float(value[1])
+        return
+    if isinstance(value, list):
+        for item in value:
+            yield from _oracle_pairs(item)
+
+
 def scan_intersects(geometry: dict | None, bbox: tuple[float, float, float, float]) -> bool:
     """Independent oracle replicating the retired per-query bbox scan."""
 
     if not geometry:
         return False
-    pairs = list(store._coordinate_pairs(geometry.get("coordinates")))
+    pairs = list(_oracle_pairs(geometry.get("coordinates")))
     if not pairs:
         return False
     min_x, min_y, max_x, max_y = bbox
