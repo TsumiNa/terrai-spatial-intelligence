@@ -1,6 +1,6 @@
 # PR3 Plan: Store-backed Data Service
 
-- Status: Planned
+- Status: In progress
 - Refactor: `data-pipeline-and-store`
 - Depends on: PR2 merged
 

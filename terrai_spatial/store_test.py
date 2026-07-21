@@ -8,10 +8,27 @@ from pathlib import Path
 import pytest
 
 from terrai_spatial import store
-from terrai_spatial.data_service import ALL_DATASETS, DataService, store_sources
+from terrai_spatial.data_service import ALL_DATASETS, store_sources
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def scan_intersects(geometry: dict | None, bbox: tuple[float, float, float, float]) -> bool:
+    """Independent oracle replicating the retired per-query bbox scan."""
+
+    if not geometry:
+        return False
+    pairs = list(store._coordinate_pairs(geometry.get("coordinates")))
+    if not pairs:
+        return False
+    min_x, min_y, max_x, max_y = bbox
+    return not (
+        max(x for x, _ in pairs) < min_x
+        or min(x for x, _ in pairs) > max_x
+        or max(y for _, y in pairs) < min_y
+        or min(y for _, y in pairs) > max_y
+    )
 
 # Edge-case fixture: a feature straddling the window edge, a multi-part
 # geometry, a diagonal line whose bbox intersects while its geometry does not,
@@ -85,7 +102,7 @@ def test_window_query_matches_the_serving_scan_on_the_fixture(tmp_path: Path) ->
             expected = [
                 index
                 for index, feature in enumerate(EDGE_FEATURES)
-                if DataService._intersects_bbox(feature.get("geometry"), window)
+                if scan_intersects(feature.get("geometry"), window)
             ]
             got = [ordinal for ordinal, _ in store.window_features(connection, "edge", window)]
             assert got == expected, window
@@ -99,7 +116,7 @@ def test_window_query_matches_the_serving_scan_on_the_fixture(tmp_path: Path) ->
     assert [
         index
         for index, feature in enumerate(EDGE_FEATURES)
-        if DataService._intersects_bbox(feature.get("geometry"), (4.0, 4.0, 5.0, 5.0))
+        if scan_intersects(feature.get("geometry"), (4.0, 4.0, 5.0, 5.0))
     ] == [1, 2]
 
 
@@ -122,7 +139,7 @@ def test_window_query_matches_the_serving_scan_on_a_real_mlit_dataset(tmp_path: 
             expected = [
                 index
                 for index, feature in enumerate(features)
-                if DataService._intersects_bbox(feature.get("geometry"), window)
+                if scan_intersects(feature.get("geometry"), window)
             ]
             got = [ordinal for ordinal, _ in store.window_features(connection, "railway", window)]
             assert got == expected, window

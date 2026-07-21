@@ -76,12 +76,23 @@ Not in this direction at all: replacing the pipelines, changing the FL → SL �
 
 ## Stage map
 
-**None planned.** No numbered plan files exist because no stage can be written honestly yet: there is no performance measurement to size the problem, and the storage-layer alternatives above have not been tried.
+**None planned.** No numbered plan files exist because no stage can be written honestly yet: the storage-layer alternative above has now been tried and measured, and it resolved the latency question rather than exposing a language problem.
+
+The `data-pipeline-and-store` refactor produced the measurement this folder demanded (its PR3; same machine, same data, median of five warm runs after one cold run, peak RSS via `ru_maxrss` in a fresh process per scenario):
+
+| Scenario | File-scan service | Store-backed service |
+| --- | --- | --- |
+| `landHistory` window query (23 MB, 141 matched) | 981 ms, 427 MiB peak | 88 ms, 124 MiB peak |
+| `landUseMesh` window query (20 MB / 31,132 features, 425 matched) | 788 ms, 267 MiB peak | 11 ms, 30 MiB peak |
+| `landUseMesh` attribute filter (14,647 matched) | 719 ms, 270 MiB peak | 154 ms, 176 MiB peak |
+| bootstrap assembly | 386 ms, 90 MiB peak | 331 ms, 131 MiB peak |
+
+Windowed queries no longer scale with the size of collections not being queried. Entry condition 2 below is therefore **not currently met**: no measured latency remains that the storage and query layer failed to resolve, so a rewrite today would be solving a problem that no longer exists.
 
 The entry condition for planning stages is all three of:
 
 1. the business scope is settled, so the query patterns that must be fast are known;
-2. a measurement exists showing the latency, and showing that the storage and query layer alone does not resolve it;
+2. a measurement exists showing the latency, and showing that the storage and query layer alone does not resolve it — the table above is the current state, and it shows the opposite;
 3. the embedded-versus-separated question above has an answer.
 
 When those hold, this folder gains `NN-topic-prN.md` files like any other refactor.

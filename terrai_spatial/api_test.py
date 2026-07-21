@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import asyncio
 import json
+from pathlib import Path
 
 import pytest
 
 from terrai_spatial.api import app
-from terrai_spatial.data_service import ROOT
+from terrai_spatial.data_service import ROOT, service
 
 
 @pytest.mark.parametrize(
@@ -28,6 +30,26 @@ def test_fastapi_exposes_health_data_query_and_analysis_routes(path: str) -> Non
 def test_packaged_data_is_mounted_where_the_frontend_expects_tiles() -> None:
     mounts = {getattr(route, "path", None) for route in app.routes if hasattr(route, "app")}
     assert "/api/v1/assets" in mounts
+
+
+def run_lifespan() -> None:
+    async def boot() -> None:
+        async with app.router.lifespan_context(app):
+            pass
+
+    asyncio.run(boot())
+
+
+def test_startup_refuses_to_serve_without_the_store(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(service, "root", tmp_path)
+    with pytest.raises(RuntimeError, match="spatial store is missing"):
+        run_lifespan()
+
+
+def test_startup_verifies_the_store_against_its_sources() -> None:
+    run_lifespan()
 
 
 def test_committed_openapi_schema_matches_the_live_application() -> None:

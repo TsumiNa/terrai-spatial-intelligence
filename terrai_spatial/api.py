@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Annotated
+from contextlib import asynccontextmanager
+from typing import Annotated, AsyncIterator
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,10 +12,19 @@ from fastapi.staticfiles import StaticFiles
 from .data_service import DatasetNotFoundError, ROOT, service
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    # Refuse to serve from a missing or drifted store: a broken pipeline must
+    # surface as a startup failure naming the fix, never as stale responses.
+    service.require_store()
+    yield
+
+
 app = FastAPI(
     title="TerrAI Spatial Intelligence API",
     version="1.0.0",
     description="Read-only file-backed APIs for the TerrAI commercial exhibition prototype.",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
