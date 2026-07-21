@@ -172,7 +172,9 @@ class DataService:
                     "asset_roots": asset_roots,
                     "scene_handoff_path": SCENE_HANDOFFS.get(key),
                     "scene_handoff_ready": (
-                        (self.root / SCENE_HANDOFFS[key]).is_file() if key in SCENE_HANDOFFS else None
+                        self._safe_manifest_file_exists(SCENE_HANDOFFS[key])
+                        if key in SCENE_HANDOFFS
+                        else None
                     ),
                     "modified_at": (
                         datetime.fromtimestamp(path.stat().st_mtime, tz=UTC).isoformat() if exists else None

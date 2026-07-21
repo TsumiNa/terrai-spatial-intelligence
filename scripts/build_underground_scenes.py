@@ -230,7 +230,7 @@ def validate_handoff(handoff: dict[str, Any]) -> None:
             raise RuntimeError(f"{handoff['scene_id']} coordinate round trip exceeds its tolerance")
 
 
-def _osm_source(metadata: dict[str, Any]) -> dict[str, Any]:
+def _osm_source(metadata: dict[str, Any], feature_count: int) -> dict[str, Any]:
     return {
         "dataset_id": metadata["dataset_id"],
         "resource_ids": [metadata["query_sha256"]],
@@ -242,7 +242,7 @@ def _osm_source(metadata: dict[str, Any]) -> dict[str, Any]:
         },
         "audit_index_path": "data/osm/sapporo_underground_access/features.geojson",
         "asset_paths": ["data/osm/sapporo_underground_access/features.geojson"],
-        "feature_count": metadata["feature_count"],
+        "feature_count": feature_count,
     }
 
 
@@ -250,6 +250,14 @@ def build_scene_handoffs(root: Path = ROOT) -> dict[str, Any]:
     utilities = _read_json(root, "data/plateau/uc24_16_nihonbashi/manifest.json")
     structures = _read_json(root, "data/plateau/uc24_13_sapporo/manifest.json")
     osm = _read_json(root, "data/osm/sapporo_underground_access/metadata.json")
+    osm_features = _read_json(root, "data/osm/sapporo_underground_access/features.geojson")
+    features = osm_features.get("features")
+    if osm_features.get("type") != "FeatureCollection" or not isinstance(features, list):
+        raise RuntimeError("OSM access snapshot must be a GeoJSON FeatureCollection")
+    if osm.get("feature_count") != len(features):
+        raise RuntimeError(
+            f"OSM feature_count metadata is {osm.get('feature_count')}; snapshot contains {len(features)}"
+        )
     if (
         utilities.get("scene_id") != "nihonbashi-utilities"
         or structures.get("scene_id") != "sapporo-station-underground"
@@ -356,7 +364,7 @@ def build_scene_handoffs(root: Path = ROOT) -> dict[str, Any]:
                     audit_index_path="data/plateau/uc24_13_sapporo/manifest.json",
                 )
             ),
-            "access_topology": _available(_osm_source(osm)),
+            "access_topology": _available(_osm_source(osm, len(features))),
             "boreholes": _unavailable("unresolved", "No qualified borehole observations are integrated"),
             "strata": _unavailable("unresolved", "No qualified strata observations are integrated"),
             "predicted_fields": _unavailable("unresolved", "No qualified SL prediction is integrated"),

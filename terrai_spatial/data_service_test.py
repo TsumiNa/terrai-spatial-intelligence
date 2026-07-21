@@ -62,6 +62,24 @@ def test_scene_handoffs_resolve_through_existing_foundation_dataset_keys() -> No
         service.scene_handoff("osmSapporoUndergroundAccess")
 
 
+def test_catalog_rejects_empty_or_corrupt_scene_handoff(tmp_path: Path) -> None:
+    handoff = tmp_path / SCENE_HANDOFFS["uc24_16_nihonbashi"]
+    handoff.parent.mkdir(parents=True)
+    local_service = DataService(tmp_path)
+
+    handoff.write_text("", encoding="utf-8")
+    rows = {item["key"]: item for item in local_service.catalog()}
+    assert rows["uc24_16_nihonbashi"]["scene_handoff_ready"] is False
+
+    handoff.write_text("{", encoding="utf-8")
+    rows = {item["key"]: item for item in local_service.catalog()}
+    assert rows["uc24_16_nihonbashi"]["scene_handoff_ready"] is False
+
+    handoff.write_text("{}", encoding="utf-8")
+    rows = {item["key"]: item for item in local_service.catalog()}
+    assert rows["uc24_16_nihonbashi"]["scene_handoff_ready"] is True
+
+
 def test_asset_manifest_readiness_requires_every_local_cache_file(tmp_path: Path) -> None:
     manifest = tmp_path / "data/plateau/uc24_16_nihonbashi/manifest.json"
     asset = tmp_path / "data/external/plateau_uc24_16/assets/water-pipe/tileset.json"

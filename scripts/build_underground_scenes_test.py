@@ -113,3 +113,14 @@ def test_mismatched_source_scene_id_stops_cross_scene_join(tmp_path: Path) -> No
 
     with pytest.raises(RuntimeError, match="preserve Nihonbashi/Sapporo isolation"):
         build_scene_handoffs(tmp_path)
+
+
+def test_osm_metadata_feature_count_must_match_snapshot(tmp_path: Path) -> None:
+    copy_inputs(tmp_path)
+    metadata_path = tmp_path / "data/osm/sapporo_underground_access/metadata.json"
+    metadata = json.loads(metadata_path.read_text())
+    metadata["feature_count"] += 1
+    metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+
+    with pytest.raises(RuntimeError, match="OSM feature_count metadata is 196; snapshot contains 195"):
+        build_scene_handoffs(tmp_path)
