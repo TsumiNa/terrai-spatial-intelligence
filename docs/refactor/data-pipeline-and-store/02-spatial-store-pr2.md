@@ -1,6 +1,6 @@
 # PR2 Plan: Spatially Indexed Store
 
-- Status: Planned
+- Status: In progress
 - Refactor: `data-pipeline-and-store`
 - Depends on: PR1 merged
 

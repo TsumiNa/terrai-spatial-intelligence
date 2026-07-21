@@ -13,7 +13,9 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+from .data_service import store_sources
 from .data_tasks import TASKS, ensure_data, status_rows, validate_json_outputs
+from .store import STORE_PATH, verify_store
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -183,11 +185,18 @@ def data_task_failures() -> list[str]:
     Keep it out of `contract_failures` for that reason.
     """
 
-    return [
+    failures = [
         f"data task {state.name}: {state.status}: {state.reason}"
         for state in status_rows()
         if state.status != "ready"
     ]
+    store_path = ROOT / STORE_PATH
+    if store_path.is_file():
+        expected = [source.key for source in store_sources()]
+        failures.extend(
+            f"store: {failure}" for failure in verify_store(ROOT, store_path, expected_keys=expected)
+        )
+    return failures
 
 
 def refactor_status_failures(path: Path) -> list[str]:

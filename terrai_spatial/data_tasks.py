@@ -8,10 +8,14 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+from .data_service import store_sources
 from .pipeline.io import json_file_failure, valid_data_file
+from .store import STORE_PATH
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+STORE_INPUTS = tuple(sorted({source.path for source in store_sources()}))
 
 
 @dataclass(frozen=True)
@@ -231,6 +235,15 @@ TASKS = {
             "data/evidence/multiscale_summary.json",
         ),
         dependencies=("bootstrap", "embedding", "gsi_evacuation"),
+    ),
+    "store": DataTask(
+        "store",
+        "build the spatially indexed SQLite store from every committed dataset",
+        "scripts/build_spatial_store.py",
+        inputs=STORE_INPUTS,
+        outputs=(STORE_PATH,),
+        dependencies=("bootstrap", "joint", "evidence"),
+        force_argument=True,
     ),
 }
 

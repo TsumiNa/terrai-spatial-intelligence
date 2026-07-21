@@ -20,3 +20,8 @@ data/external/tepco/*.local.json
 # not the upstream binaries.
 data/external/plateau_uc24_16/
 data/external/plateau_uc24_13/
+
+# The spatially indexed store is derived from the committed datasets and
+# rebuilt by ensure_data; a binary that diffs as a full rewrite on every
+# refresh must never enter git.
+var/
