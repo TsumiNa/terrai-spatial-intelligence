@@ -16,10 +16,10 @@
  * The lock is on the palette, not on the geometry, because the two kinds of
  * deviation are not the same thing:
  *
- *   A colour outside the palette is a defect. It fragments the brand, it is
+ *   A color outside the palette is a defect. It fragments the brand, it is
  *   where a model most plausibly invents a near miss, and it carries a contrast
  *   risk this project already has fourteen instances of. So `--color-*` is
- *   cleared: `bg-blue-500` does not exist, and an off-palette colour has to be
+ *   cleared: `bg-blue-500` does not exist, and an off-palette color has to be
  *   written as `bg-[#1f7a58]`, which is visible in review and rejected by the
  *   check stage 03 adds.
  *
@@ -30,7 +30,7 @@
  *   role names below are shorthand for the common cases rather than a fence.
  *
  * The palette is a boundary, not a fixed set. The redesign will need more
- * colours, and extending this block is a normal reviewed act. What must not
+ * colors, and extending this block is a normal reviewed act. What must not
  * happen is a component reaching past it.
  */
 @theme {
@@ -48,7 +48,7 @@
   --color-blue: #397ca3;
   /* Map fills and strokes. These live in TypeScript too, because deck.gl needs
    * numeric values; src/lib/theme.ts mirrors them and is the only file allowed
-   * to write a colour literal. */
+   * to write a color literal. */
   --color-hub: #8fc85a;
   --color-gray: #a9b5af;
   --color-transmission: #8e5eaa;
@@ -83,10 +83,10 @@
 
    These rules are inherited from the exhibition as built. They will be
    rewritten with the applications rather than ported twice; what mattered here
-   was that their colour is checked and has one definition. */
+   was that their color is checked and has one definition. */
 
 /* Aliases, not a second declaration. These names are what the rules below were
- * written against; pointing them at the theme tokens means a colour has exactly
+ * written against; pointing them at the theme tokens means a color has exactly
  * one value, which is how `lime` came to mean two different greens before. */
 :root {
   --ink: var(--color-ink);

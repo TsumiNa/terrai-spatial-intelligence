@@ -1,5 +1,5 @@
 /**
- * Colour and threshold definitions for every analytical layer, expressed as
+ * Color and threshold definitions for every analytical layer, expressed as
  * data. Ported one-to-one from the Leaflet style callbacks in
  * `frontend/app.js`; an analytical threshold change is an edit here, not in
  * layer code.

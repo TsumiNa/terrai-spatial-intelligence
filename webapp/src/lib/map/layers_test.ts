@@ -143,7 +143,7 @@ it("formats popup values from feature properties", () => {
   expect(spec.fields[1].value(props, t as never)).toBe("坡度、水体");
 });
 
-it("hides the basemap's buildings exactly where an analysis colours them", () => {
+it("hides the basemap's buildings exactly where an analysis colors them", () => {
   expect(drawsOwnBuildings("slope", "all")).toBe(true);
   expect(drawsOwnBuildings("slope", "high")).toBe(true);
   expect(drawsOwnBuildings("facilities", "official")).toBe(true);
@@ -157,7 +157,7 @@ it("hides the basemap's buildings exactly where an analysis colours them", () =>
   expect(drawsOwnBuildings("development", "delivery")).toBe(false);
 });
 
-it("converts hex colours with opacity into RGBA data", () => {
+it("converts hex colors with opacity into RGBA data", () => {
   expect(rgba("#d75b4c")).toEqual([215, 91, 76, 255]);
   expect(rgba("#fff", 0.5)).toEqual([255, 255, 255, 128]);
 });

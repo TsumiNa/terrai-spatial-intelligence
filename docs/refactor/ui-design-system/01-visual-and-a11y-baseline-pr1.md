@@ -28,6 +28,6 @@ No styling change. No accessibility fix. No Tailwind. Existing violations are re
 ## Acceptance
 
 - `npx playwright test` passes on a clean checkout and regenerates identical images.
-- Deliberately changing a colour in `app.css` produces a failing screenshot diff, confirming the net has holes in it nowhere it matters.
+- Deliberately changing a color in `app.css` produces a failing screenshot diff, confirming the net has holes in it nowhere it matters.
 - The axe baseline lists the four audit-drawer defects, so stage 05 has something to prove against.
 - `uv run pytest` and `uv run python -m terrai_spatial validate` pass.

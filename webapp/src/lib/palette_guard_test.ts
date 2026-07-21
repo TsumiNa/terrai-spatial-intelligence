@@ -1,7 +1,13 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
-import { inspect, PALETTE_SOURCE, stylesheetLiterals, type Violation } from "./palette_guard";
+import {
+  INVENTORIED_STYLESHEET,
+  inspect,
+  PALETTE_SOURCE,
+  stylesheetLiterals,
+  type Violation,
+} from "./palette_guard";
 import { palette } from "./theme";
 
 const ROOT = new URL("../..", import.meta.url).pathname;
@@ -22,25 +28,30 @@ function check(file: string, source: string): Violation[] {
 }
 
 describe("what it rejects", () => {
-  it("rejects an arbitrary colour utility", () => {
+  it("rejects an arbitrary color utility", () => {
     const found = check("Card.svelte", `<div class="bg-[#1f7a58] p-2"></div>`);
     expect(found).toHaveLength(1);
-    expect(found[0]?.reason).toBe("arbitrary colour utility");
+    expect(found[0]?.reason).toBe("arbitrary color utility");
   });
 
-  it("rejects arbitrary colour in any colour-carrying utility", () => {
+  it("rejects arbitrary color in any color-carrying utility", () => {
     for (const utility of ["bg", "text", "border", "ring", "fill", "stroke", "from"]) {
       const found = check("C.svelte", `<div class="${utility}-[rgb(1,2,3)]"></div>`);
       expect(found, utility).toHaveLength(1);
     }
   });
 
-  it("rejects a colour literal in a style block", () => {
+  it("rejects a color literal in a style block", () => {
     const found = check("C.svelte", `<style>.a { color: #ff0000; }</style>`);
-    expect(found[0]?.reason).toBe("colour literal in a style block");
+    expect(found[0]?.reason).toBe("color literal in a style block");
   });
 
-  it("rejects a colour literal in TypeScript outside the palette", () => {
+  it("rejects a color literal in a stylesheet other than the inventoried one", () => {
+    const found = check("src/lib/map/overlay.css", `.a { color: #ff0000; }`);
+    expect(found[0]?.reason).toBe("color literal outside the theme block");
+  });
+
+  it("rejects a color literal in TypeScript outside the palette", () => {
     const found = check("src/lib/map/layers.ts", `const c = "#8e5eaa";`);
     expect(found[0]?.reason).toContain(PALETTE_SOURCE);
   });
@@ -57,12 +68,12 @@ describe("what it must not reject", () => {
     expect(check("C.svelte", source)).toEqual([]);
   });
 
-  it("still rejects an arbitrary colour behind an arbitrary variant", () => {
+  it("still rejects an arbitrary color behind an arbitrary variant", () => {
     const found = check("C.svelte", `<div class="data-[state=open]:bg-[#ff0000]"></div>`);
     expect(found).toHaveLength(1);
   });
 
-  it("allows an interpolated colour, which came from the palette through data", () => {
+  it("allows an interpolated color, which came from the palette through data", () => {
     const source = "<span style={`background:${item.color}`}></span>";
     expect(check("C.svelte", source)).toEqual([]);
   });
@@ -71,13 +82,22 @@ describe("what it must not reject", () => {
     expect(check("C.svelte", `<style>.a { color: var(--color-ink); }</style>`)).toEqual([]);
   });
 
+  it("leaves the inventoried stylesheet to its exact-set assertion", () => {
+    // Scanning it here as well would report its 59 known literals twice.
+    expect(check(INVENTORIED_STYLESHEET, `.a { color: #78978c; }`)).toEqual([]);
+  });
+
+  it("allows a theme block to declare color in a new stylesheet", () => {
+    expect(check("src/other.css", `@theme { --color-x: #ff0000; }`)).toEqual([]);
+  });
+
   it("allows the palette source to declare literals", () => {
     expect(check(PALETTE_SOURCE, `export const palette = { ink: "#10231e" };`)).toEqual([]);
   });
 });
 
 describe("the repository conforms", () => {
-  it("has no colour written outside the palette", () => {
+  it("has no color written outside the palette", () => {
     // Test files are skipped: this one necessarily contains the violations it
     // asserts are caught, and a fixture is not a use.
     const files = sourceFiles().filter((file) => !file.endsWith("_test.ts"));
@@ -113,10 +133,10 @@ describe("the repository conforms", () => {
 });
 
 
-/** Colours written by eye in `app.css`, inventoried rather than fixed.
+/** Colors written by eye in `app.css`, inventoried rather than fixed.
  *
  *  Turning these one-off tints into palette entries would make the palette a
- *  colour dump instead of a design system, and they disappear with the
+ *  color dump instead of a design system, and they disappear with the
  *  redesign. Asserted as an exact set so a new one fails — and so does removing
  *  one without updating this list, which keeps the inventory honest.
  *
@@ -187,13 +207,13 @@ const STYLESHEET_DEBT = [
   "rgba(9, 27, 21, .28)",
 ];
 
-describe("the stylesheet's inherited colour", () => {
+describe("the stylesheet's inherited color", () => {
   it("has not grown", () => {
     const css = readFileSync(join(ROOT, "src/app.css"), "utf8");
     expect([...new Set(stylesheetLiterals(css))].sort()).toEqual(STYLESHEET_DEBT);
   });
 
-  it("exempts the theme block, which is where colour is supposed to be", () => {
+  it("exempts the theme block, which is where color is supposed to be", () => {
     const source = `@theme { --color-ink: #10231e; }\n.a { color: var(--color-ink); }`;
     expect(stylesheetLiterals(source)).toEqual([]);
   });

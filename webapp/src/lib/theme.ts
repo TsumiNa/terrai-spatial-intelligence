@@ -1,13 +1,13 @@
-/** The only place a colour literal may be written in TypeScript.
+/** The only place a color literal may be written in TypeScript.
  *
- *  Most of this product's colour is not in CSS: the map layers need numeric
+ *  Most of this product's color is not in CSS: the map layers need numeric
  *  values, so they were scattered as hex literals across `modules.ts` and
  *  `style-rules.ts`. That is how `lime` came to mean `#a9d96e` in the stylesheet
  *  and `#8fc85a` on the map without anyone deciding it should.
  *
  *  Every entry here also exists as a `--color-*` token in `app.css`, so the two
- *  cannot drift again. The enforcement check rejects colour literals anywhere
- *  else; adding a colour means adding it in both places, deliberately.
+ *  cannot drift again. The enforcement check rejects color literals anywhere
+ *  else; adding a color means adding it in both places, deliberately.
  *
  *  The two limes are kept apart rather than reconciled. They serve different
  *  roles and merging them would change what the map renders, which is a design
