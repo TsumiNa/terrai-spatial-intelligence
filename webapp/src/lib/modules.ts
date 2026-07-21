@@ -8,18 +8,19 @@
  * pure function of (module, view, data, language).
  */
 
+import { palette } from "./theme";
 import { field, metric, queueScore, type AuditRecord, type ModuleName } from "./audit";
 import { i18n } from "./i18n/i18n.svelte";
 import type { Bootstrap, Feature } from "./api/types";
 
 export const colors = {
-  red: "#d75b4c",
-  amber: "#e2a43c",
-  green: "#1f7a58",
-  lime: "#8fc85a",
-  blue: "#397ca3",
-  forest: "#164d3b",
-  gray: "#a9b5af",
+  red: palette.red,
+  amber: palette.amber,
+  green: palette.green,
+  lime: palette.hub,
+  blue: palette.blue,
+  forest: palette.forest,
+  gray: palette.gray,
 } as const;
 
 export type RegionKey = "yokohama" | "mobara";
@@ -211,7 +212,7 @@ export function buildModuleVM(module: ModuleName, requestedView: string | null, 
         legend: [
           { label: t("legend.hubs"), color: colors.lime },
           { label: t("legend.corridors"), color: colors.red },
-          { label: t("legend.highExposureBuildings"), color: "#7b342b" },
+          { label: t("legend.highExposureBuildings"), color: palette.exposureOutline },
         ],
         queueEyebrow: "YOKOHAMA URBAN RESILIENCE",
         queueTitle: t("queueTitle.overviewUrban"),
@@ -234,7 +235,7 @@ export function buildModuleVM(module: ModuleName, requestedView: string | null, 
       legend: [
         { label: t("legend.highDelivery"), color: colors.blue },
         { label: t("legend.candidate"), color: colors.green },
-        { label: t("legend.transmission"), color: "#8e5eaa" },
+        { label: t("legend.transmission"), color: palette.transmission },
       ],
       queueEyebrow: "MOBARA SOLAR DEVELOPMENT",
       queueTitle: t("queueTitle.overviewRenewable"),
@@ -826,7 +827,7 @@ export function buildModuleVM(module: ModuleName, requestedView: string | null, 
       legend: [
         { label: t("legend.highDelivery"), color: colors.blue },
         { label: t("legend.candidate"), color: colors.green },
-        { label: t("legend.transmission"), color: "#8e5eaa" },
+        { label: t("legend.transmission"), color: palette.transmission },
       ],
       queueEyebrow: "DELIVERY-READY SOLAR",
       queueTitle: t("queueTitle.developmentDelivery"),

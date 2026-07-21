@@ -5,6 +5,7 @@
  * layer code.
  */
 
+import { palette } from "../theme";
 import { colors } from "../modules";
 
 export type RGBA = [number, number, number, number];
@@ -22,7 +23,7 @@ export function rgba(hex: string, alpha = 1): RGBA {
 
 /** Buildings drawn as context under other analytical layers. */
 export const BUILDING_OVERLAYS = {
-  overview: { line: rgba("#7b342b"), width: 0.4, fill: rgba(colors.red, 0.2) },
+  overview: { line: rgba(palette.exposureOutline), width: 0.4, fill: rgba(colors.red, 0.2) },
   facilities: { line: rgba(colors.red), width: 0.25, fill: rgba(colors.red, 0.12) },
   joint: { line: rgba(colors.red), width: 0.35, fill: rgba(colors.red, 0.18) },
 } as const;
@@ -53,9 +54,9 @@ export const CORRIDOR_STYLES = {
 
 /** Resilience hubs in their three visual contexts. */
 export const HUB_STYLES = {
-  overview: { line: rgba("#0c4e34"), width: 1.2, fill: () => rgba(colors.lime, 0.9) },
+  overview: { line: rgba(palette.corridorOutline), width: 1.2, fill: () => rgba(colors.lime, 0.9) },
   banded: {
-    line: rgba("#104b35"),
+    line: rgba(palette.zoneOutline),
     width: 1.1,
     fill: (band: unknown) => rgba(band === "priority" ? colors.lime : colors.green, 0.9),
   },
@@ -64,7 +65,7 @@ export const HUB_STYLES = {
 
 /** Delivery-ready solar cells (overview renewable + development delivery). */
 export const DELIVERY_STYLE = {
-  line: rgba("#ffffff"),
+  line: rgba(palette.white),
   width: 1,
   colors: { priority: colors.blue, other: colors.green },
   fillOpacity: { overview: 0.76, development: 0.78 },
@@ -72,7 +73,7 @@ export const DELIVERY_STYLE = {
 
 /** Solar siting status bands (solar module). */
 export const SOLAR_STATUS = {
-  line: rgba("#ffffff"),
+  line: rgba(palette.white),
   width: 0.65,
   colors: { preferred: colors.green, conditional: colors.amber, reject: colors.gray } as Record<string, string>,
   fillOpacity: { reject: 0.34, other: 0.72 },
@@ -81,22 +82,22 @@ export const SOLAR_STATUS = {
 /** Site-context linework (power / water / building / other), per module. */
 export const CONTEXT_STYLES = {
   overviewRenewable: {
-    power: { color: "#8e5eaa", width: 3.5, opacity: 1, dash: [5, 5] as [number, number] },
+    power: { color: palette.transmission, width: 3.5, opacity: 1, dash: [5, 5] as [number, number] },
     water: { color: colors.blue, width: 1.4, opacity: 1 },
-    building: { color: "#687b74", width: 0.8, opacity: 1 },
-    other: { color: "#687b74", width: 0.8, opacity: 1 },
+    building: { color: palette.buildingOutline, width: 0.8, opacity: 1 },
+    other: { color: palette.buildingOutline, width: 0.8, opacity: 1 },
   },
   solar: {
-    power: { color: "#8e5eaa", width: 3.5, opacity: 0.8, dash: [5, 5] as [number, number] },
+    power: { color: palette.transmission, width: 3.5, opacity: 0.8, dash: [5, 5] as [number, number] },
     water: { color: colors.blue, width: 2, opacity: 0.75 },
-    building: { color: "#6e7e78", width: 0.5, opacity: 1, fill: rgba("#8b9994", 0.45) },
-    other: { color: "#687b74", width: 1.2, opacity: 0.7 },
+    building: { color: palette.buildingOutlineSoft, width: 0.5, opacity: 1, fill: rgba(palette.buildingFill, 0.45) },
+    other: { color: palette.buildingOutline, width: 1.2, opacity: 0.7 },
   },
   development: {
-    power: { color: "#8e5eaa", width: 3.5, opacity: 0.85, dash: [5, 5] as [number, number] },
+    power: { color: palette.transmission, width: 3.5, opacity: 0.85, dash: [5, 5] as [number, number] },
     water: { color: colors.blue, width: 1.5, opacity: 0.75 },
-    building: { color: "#687b74", width: 1, opacity: 0.55 },
-    other: { color: "#687b74", width: 1, opacity: 0.55 },
+    building: { color: palette.buildingOutline, width: 1, opacity: 0.55 },
+    other: { color: palette.buildingOutline, width: 1, opacity: 0.55 },
   },
 } as const;
 
@@ -112,7 +113,7 @@ export const EVIDENCE_CHANGE = {
 
 /** Multi-scale decision zones (evidence module). */
 export const ZONE_STYLE = {
-  line: rgba("#ffffff"),
+  line: rgba(palette.white),
   width: 1.1,
   dash: [4, 4] as [number, number],
   fill: rgba(colors.forest, 0.04),
@@ -120,13 +121,13 @@ export const ZONE_STYLE = {
 
 /** Official facility markers. */
 export const FACILITY_MARKERS = {
-  official: { radius: 9, stroke: rgba("#ffffff"), strokeWidth: 2.2, highScore: 80, high: colors.green, other: colors.blue, fillOpacity: 0.95 },
-  joint: { radius: 8, stroke: rgba("#ffffff"), strokeWidth: 2, fill: colors.blue, fillOpacity: 0.95 },
+  official: { radius: 9, stroke: rgba(palette.white), strokeWidth: 2.2, highScore: 80, high: colors.green, other: colors.blue, fillOpacity: 0.95 },
+  joint: { radius: 8, stroke: rgba(palette.white), strokeWidth: 2, fill: colors.blue, fillOpacity: 0.95 },
 } as const;
 
 /** Rule-exclusion cells (development constraints). */
 export const CONSTRAINT_STYLE = {
-  line: rgba("#ffffff"),
+  line: rgba(palette.white),
   width: 0.7,
   multiple: colors.red,
   single: colors.amber,
