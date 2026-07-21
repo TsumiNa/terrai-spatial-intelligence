@@ -22,12 +22,17 @@ import {
   MIN_ZOOM,
   RASTER_KINDS,
   REGION_CAMERAS,
-  REGION_KEYS,
+  RASTER_REGIONS,
   VECTOR_STYLE_URL,
   composeStyle,
   rasterId,
   vectorBuildingLayerIds,
 } from "./config";
+
+/** Camera pitch of the lowered underground view, within the raised MAX_PITCH. */
+export const UNDERGROUND_PITCH = 70;
+/** Basemap canvas opacity while the surface is read through. */
+export const UNDERGROUND_SURFACE_OPACITY = 0.45;
 
 export interface ExhibitionMap {
   setRegion(region: RegionKey): void;
@@ -35,6 +40,12 @@ export interface ExhibitionMap {
   setAnalyticalLayers(layers: Layer[]): void;
   /** Hide the basemap's own buildings while an analysis colors buildings. */
   setVectorBuildingsVisible(visible: boolean): void;
+  /**
+   * Lower the camera and make the surface translucent so content drawn by the
+   * deck overlay reads through it. The camera never goes below ground; the
+   * translucency is the MapLibre canvas's, so the overlay stays opaque.
+   */
+  setUndergroundMode(on: boolean): void;
   openPopup(lngLat: [number, number], content: HTMLElement, onClose?: () => void): void;
   closePopup(): void;
   /** Frame a feature the way the queue always has: fit its bounds, capped. */
@@ -55,6 +66,7 @@ export async function createExhibitionMap(
   let region = initial.region;
   let basemap = initial.basemap;
   let vectorBuildingsVisible = true;
+  let undergroundMode = false;
 
   const map = new maplibregl.Map({
     container,
@@ -84,7 +96,7 @@ export async function createExhibitionMap(
   const loaded = new Promise<void>((resolve) => map.once("load", () => resolve()));
 
   const applyVisibility = () => {
-    for (const r of REGION_KEYS) {
+    for (const r of RASTER_REGIONS) {
       for (const kind of RASTER_KINDS) {
         const visible = r === region && kind === basemap;
         map.setLayoutProperty(rasterId(r, kind), "visibility", visible ? "visible" : "none");
@@ -115,6 +127,12 @@ export async function createExhibitionMap(
       if (visible === vectorBuildingsVisible) return;
       vectorBuildingsVisible = visible;
       void loaded.then(applyVisibility);
+    },
+    setUndergroundMode(on) {
+      if (on === undergroundMode) return;
+      undergroundMode = on;
+      map.getCanvas().style.opacity = on ? String(UNDERGROUND_SURFACE_OPACITY) : "";
+      map.easeTo({ pitch: on ? UNDERGROUND_PITCH : 0 });
     },
     openPopup(lngLat, content, onClose) {
       popup.remove(); // fires close → previous cleanup

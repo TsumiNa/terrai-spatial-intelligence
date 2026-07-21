@@ -136,3 +136,4 @@ export const CONSTRAINT_STYLE = {
 
 /** Image overlay opacities (evidence module). */
 export const OVERLAY_OPACITY = { change: 0.82, latent: 0.74 } as const;
+

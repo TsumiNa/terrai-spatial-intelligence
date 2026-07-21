@@ -52,6 +52,7 @@
   --color-hub: #8fc85a;
   --color-gray: #a9b5af;
   --color-transmission: #8e5eaa;
+  --color-comms: #d97a35;
   --color-exposure-outline: #7b342b;
   --color-building-outline: #687b74;
   --color-building-outline-soft: #6e7e78;
@@ -182,6 +183,7 @@ button { font: inherit; }
 .basemap-switcher { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 7px; padding: 2px; background: #f7f9f7; }
 .basemap-button { border: 0; background: transparent; color: var(--muted); padding: 6px 8px; border-radius: 5px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .basemap-button:hover { color: var(--forest); }
+.basemap-button:disabled { opacity: .45; cursor: default; }
 .basemap-button.active { color: white; background: var(--forest); box-shadow: 0 2px 5px rgba(16,43,35,.15); }
 .map-legend { display: flex; align-items: center; gap: 11px; color: var(--muted); font-size: 12px; white-space: nowrap; }
 .legend-item { display: flex; align-items: center; gap: 4px; }

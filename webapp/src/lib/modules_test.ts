@@ -146,3 +146,57 @@ it("switches evidence hero and notes between change and latent views", () => {
   expect(change.mapNote).not.toBe(latent.mapNote);
   expect(change.queueItems[0].scoreLabel).toBe("CHANGE");
 });
+
+it("renders the underground module honestly while its cache is absent", () => {
+  const unavailable = buildModuleVM("underground", null, fixtureBootstrap(), {
+    status: "unavailable",
+    manifest: null,
+    auditIndex: null,
+  });
+  expect(unavailable.region).toBe("nihonbashi");
+  expect(unavailable.metrics).toEqual([]);
+  expect(unavailable.queueItems).toEqual([]);
+  expect(unavailable.notice?.title).toBe("尚未下载 3D 资产缓存");
+  expect(unavailable.notice?.body).toContain("terrai_spatial fetch underground_utilities");
+});
+
+function undergroundManifestFixture() {
+  return {
+    dataset_id: "plateau_uc24_16_nihonbashi",
+    scene_id: "nihonbashi-utilities",
+    package_page: "https://www.geospatial.jp/ckan/dataset/plateau-uc24-16",
+    retrieved_at: "2026-07-21T12:39:12Z",
+    license: "PLATEAU Site Policy",
+    license_url: "https://www.mlit.go.jp/plateau/site-policy/",
+    vertical_datum: "WGS 84 ellipsoid (not an orthometric survey datum)",
+    extent_degrees_and_metres: [139.767, 35.6809, 139.7803, 35.6917, 2.4, 15.8],
+    feature_count: 1121,
+    resource_count: 3,
+    resources: [
+      { resource_id: "a", slug: "water-pipe", utility_class: "water_pipe", name: "上水道", feature_count: 162, gltf_count: 9, tileset_url: "/api/v1/assets/external/plateau_uc24_16/assets/water-pipe/tileset.json", bounding_region: [2.4394, 0.6227, 2.4396, 0.6229, 2.4, 15.8] },
+      { resource_id: "b", slug: "gas-pipe", utility_class: "gas_pipe", name: "ガス", feature_count: 162, gltf_count: 9, tileset_url: "/api/v1/assets/external/plateau_uc24_16/assets/gas-pipe/tileset.json", bounding_region: [2.4394, 0.6227, 2.4396, 0.6229, 2.4, 15.8] },
+      { resource_id: "c", slug: "sewer-manhole", utility_class: "sewer_manhole", name: "下水道マンホール", feature_count: 92, gltf_count: 9, tileset_url: "/api/v1/assets/external/plateau_uc24_16/assets/sewer-manhole/tileset.json", bounding_region: [2.4394, 0.6227, 2.4396, 0.6229, 2.4, 15.8] },
+    ],
+    limitations: [],
+  };
+}
+
+it("builds underground metrics and the asset inventory from the manifest", () => {
+  const vm = buildModuleVM("underground", "networks", fixtureBootstrap(), {
+    status: "ready",
+    manifest: undergroundManifestFixture() as never,
+    auditIndex: { dataset_id: "x", feature_count: 416, attribute_units: {}, features: [] },
+  });
+  expect(vm.notice).toBeUndefined();
+  expect(vm.metrics.map((m) => m.value)).toEqual(["3", "324", "92", "2026-07-21"]);
+  // Networks view lists only network resources, in published order.
+  expect(vm.queueItems.map((item) => item.score)).toEqual([162, 162]);
+  expect(vm.queueItems[0].scoreLabel).toBe("FEATURES");
+  expect(vm.queueItems[0].feature.geometry).toMatchObject({ type: "Polygon" });
+  const access = buildModuleVM("underground", "access", fixtureBootstrap(), {
+    status: "ready",
+    manifest: undergroundManifestFixture() as never,
+    auditIndex: { dataset_id: "x", feature_count: 416, attribute_units: {}, features: [] },
+  });
+  expect(access.queueItems.map((item) => item.score)).toEqual([92]);
+});

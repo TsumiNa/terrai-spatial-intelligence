@@ -32,6 +32,7 @@
         { module: "roads", icon: "⌁", labelKey: "nav.roads", badge: { kind: "em", text: "272" } },
         { module: "facilities", icon: "⌘", labelKey: "nav.facilities", badge: { kind: "em", text: "2" } },
         { module: "solar", icon: "☼", labelKey: "nav.solar", badge: { kind: "em", text: "70" } },
+        { module: "underground", icon: "⏚", labelKey: "nav.underground", badge: { kind: "b", text: "3D" } },
       ],
     },
     {

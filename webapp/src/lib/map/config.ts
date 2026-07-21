@@ -17,13 +17,20 @@ import type { BasemapKey } from "../state.svelte";
 export const VECTOR_STYLE_URL = "https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/std.json";
 
 /** MapLibre zooms are 512px-tile zooms: one less than the Leaflet values the
- * old exhibition used with 256px GSI tiles. */
+ * old exhibition used with 256px GSI tiles. Nihonbashi's camera frames the
+ * UC24-16 manifest extent. */
 export const REGION_CAMERAS: Record<RegionKey, { center: [number, number]; zoom: number; bounds: [number, number, number, number] }> = {
   yokohama: { center: [139.5885, 35.4465], zoom: 16, bounds: [139.5835, 35.4426, 139.5935, 35.4504] },
   mobara: { center: [140.2835, 35.445], zoom: 15, bounds: [140.2757, 35.4387, 140.2913, 35.4513] },
+  nihonbashi: { center: [139.7737, 35.6863], zoom: 14.4, bounds: [139.767, 35.6809, 139.7803, 35.6917] },
 };
 
 export const REGION_KEYS = Object.keys(REGION_CAMERAS) as RegionKey[];
+
+/** Regions with a committed raster basemap cache. Nihonbashi has none: the
+ * vector style covers it nationwide, and no raster source is declared for it
+ * so no request can 404. */
+export const RASTER_REGIONS: RegionKey[] = ["yokohama", "mobara"];
 
 export type RasterKind = Exclude<BasemapKey, "standard">;
 
@@ -72,7 +79,7 @@ export function rasterTileUrl(assetBase: string, region: RegionKey, kind: Raster
 export function composeStyle(vectorStyle: StyleSpecification, assetBase: string): StyleSpecification {
   const sources: Record<string, SourceSpecification> = { ...vectorStyle.sources };
   const layers: LayerSpecification[] = [...vectorStyle.layers];
-  for (const region of REGION_KEYS) {
+  for (const region of RASTER_REGIONS) {
     for (const kind of RASTER_KINDS) {
       const id = rasterId(region, kind);
       sources[id] = {

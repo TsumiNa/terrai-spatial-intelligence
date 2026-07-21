@@ -14,6 +14,9 @@ import { mask, NARROW, open, openAudit, WIDE } from "./support/ui";
  *  maintain than they catch.
  */
 
+// `underground` is deliberately absent: its chrome reflects the on-demand
+// PLATEAU cache (ready on a fetched dev machine, unavailable on CI), so a
+// screenshot of it is environment-dependent rather than a baseline.
 const MODULES = [
   "overview",
   "evidence",

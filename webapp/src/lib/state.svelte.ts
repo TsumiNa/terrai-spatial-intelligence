@@ -1,5 +1,6 @@
 import type { AuditRecord, ModuleName } from "./audit";
 import type { Bootstrap, Feature } from "./api/types";
+import type { UndergroundAuditIndex, UndergroundManifest, UndergroundState } from "./underground";
 import { MODULES, normalizeView } from "./modules";
 import { i18n } from "./i18n/i18n.svelte";
 
@@ -33,6 +34,10 @@ let loadError = $state<string | null>(null);
 let auditRecord = $state<AuditRecord | null>(null);
 let queueSelection = $state.raw<{ feature: Feature; tick: number } | null>(null);
 
+let underground = $state.raw<UndergroundState>({ status: "unknown", manifest: null, auditIndex: null });
+
+export type { UndergroundState } from "./underground";
+
 export const app = {
   get module() {
     return module;
@@ -54,6 +59,9 @@ export const app = {
   },
   get queueSelection() {
     return queueSelection;
+  },
+  get underground() {
+    return underground;
   },
 
   selectModule(next: ModuleName) {
@@ -86,6 +94,15 @@ export const app = {
   },
   setLoadError(message: string) {
     loadError = message;
+  },
+  setUndergroundLoading() {
+    underground = { status: "loading", manifest: null, auditIndex: null };
+  },
+  setUndergroundReady(manifest: UndergroundManifest, auditIndex: UndergroundAuditIndex) {
+    underground = { status: "ready", manifest, auditIndex };
+  },
+  setUndergroundUnavailable(status: "unavailable" | "error" = "unavailable") {
+    underground = { status, manifest: null, auditIndex: null };
   },
   openAudit(record: AuditRecord) {
     auditRecord = record;

@@ -318,6 +318,26 @@ export function metric(
     );
   }
 
+  if (
+    labelKey === "metric.undergroundResources" ||
+    labelKey === "metric.undergroundNetworkFeatures" ||
+    labelKey === "metric.undergroundAccessFeatures" ||
+    labelKey === "metric.undergroundSnapshot"
+  ) {
+    return raw(
+      title,
+      shown,
+      "Project PLATEAU UC24-16 地下埋設物モデル（示范样本 / demonstration sample）",
+      `${note} → ${shown}`,
+      context.snapshot
+        ? ml(`获取于 ${context.snapshot}`, `取得 ${context.snapshot}`, `retrieved ${context.snapshot}`)
+        : ml("获取日期不可用", "取得日不明", "retrieval date unavailable"),
+      "data/plateau/uc24_16_nihonbashi/manifest.json",
+      UNDERGROUND_CAVEAT,
+      "https://www.geospatial.jp/ckan/dataset/plateau-uc24-16",
+    );
+  }
+
   return calculation(
     title,
     shown,
@@ -378,6 +398,12 @@ export type FieldKey =
   | "field.class"
   | "field.reasons"
   | "field.meanBuildingRisk"
+  | "field.featureCount"
+  | "field.depthRange"
+  | "field.materials"
+  | "field.mesureType"
+  | "field.diameter"
+  | "field.assetPath"
   | "field.property";
 
 export const FIELD_LABELS: Record<FieldKey, Localized> = {
@@ -425,6 +451,12 @@ export const FIELD_LABELS: Record<FieldKey, Localized> = {
   "field.class": ml("等级", "区分", "Class"),
   "field.reasons": ml("原因", "理由", "Reasons"),
   "field.meanBuildingRisk": ml("平均建筑风险", "平均建物リスク", "Mean building risk"),
+  "field.featureCount": ml("要素数", "要素数", "Features"),
+  "field.depthRange": ml("深度范围", "深さ範囲", "Depth range"),
+  "field.materials": ml("材质", "材質", "Material"),
+  "field.mesureType": ml("计测区分", "計測区分", "Measurement class"),
+  "field.diameter": ml("外径", "外径", "Outer diameter"),
+  "field.assetPath": ml("资产文件", "資産ファイル", "Asset file"),
   "field.property": ml("属性值", "属性値", "Property value"),
 };
 
@@ -730,7 +762,62 @@ export type ModuleName =
   | "facilities"
   | "solar"
   | "joint"
-  | "development";
+  | "development"
+  | "underground";
+
+/** Provenance context shared by every field of one picked underground asset. */
+export interface UndergroundAuditContext {
+  sourceTitle: string;
+  sourceUrl: string;
+  assetPath: string;
+  featureIds: string[];
+  creationDates: string[];
+  retrievedAt: string;
+}
+
+const UNDERGROUND_CAVEAT = ml(
+  "PLATEAU 采样示范数据：定位精度为米级而非厘米级；竖向参照为 WGS84 椭球语义、正高基准未知；不可用于开挖、工程设计或应急决策。",
+  "PLATEAUの実証サンプルデータです。位置精度はセンチメートルではなくメートル級で、鉛直参照はWGS84楕円体セマンティクス（正標高基準は不明）。掘削・設計・災害対応の判断には使用できません。",
+  "PLATEAU demonstration sample data: positional accuracy is metres, not centimetres; the vertical reference follows WGS 84 ellipsoid semantics with an unknown orthometric datum. Not for excavation, engineering design or emergency operations.",
+);
+
+/** One field of a picked underground asset, all resolving to the same
+ * source/asset/date provenance with the buried-utility accuracy caveat. */
+export function undergroundField(
+  key: FieldKey,
+  value: AuditValue,
+  context: UndergroundAuditContext,
+): AuditRecord {
+  const shownIds =
+    context.featureIds.length <= 3
+      ? context.featureIds.join(", ")
+      : `${context.featureIds.slice(0, 3).join(", ")} … (${context.featureIds.length})`;
+  return {
+    kind: "raw",
+    title: FIELD_LABELS[key],
+    value,
+    sections: [
+      section(ml("数据来源", "データソース", "Data source"), context.sourceTitle, context.sourceUrl),
+      section(
+        ml("来源资产 / 要素", "元資産・要素", "Source asset / features"),
+        `${context.assetPath}${shownIds ? ` · ${shownIds}` : ""}`,
+      ),
+      section(
+        ml("时间/版本", "時点・バージョン", "Date / version"),
+        ml(
+          `${context.creationDates.join(", ") || "—"}（获取于 ${context.retrievedAt}）`,
+          `${context.creationDates.join(", ") || "—"}（取得 ${context.retrievedAt}）`,
+          `${context.creationDates.join(", ") || "—"} · retrieved ${context.retrievedAt}`,
+        ),
+      ),
+      section(
+        ml("本地证据", "ローカル証拠", "Local evidence"),
+        "data/plateau/uc24_16_nihonbashi/audit_index.json",
+      ),
+    ],
+    caveat: UNDERGROUND_CAVEAT,
+  };
+}
 
 export function queueScore(
   moduleName: ModuleName,
