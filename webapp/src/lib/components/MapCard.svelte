@@ -261,11 +261,12 @@
     </div>
   {/if}
   {#if vm.notice}
-    <!-- pointer-events pass through the full-bleed wrapper: the toolbar stays
-         usable while the notice is up — box selection works from the committed
-         catalog even when the tile cache is absent. -->
+    <!-- The notice is a pure status display and the whole overlay is
+         click-through: box selection works from the committed catalog even
+         when the tile cache is absent, and the card sits centred exactly
+         where a box would be dragged. -->
     <div class="pointer-events-none absolute inset-0 z-10 grid place-items-center p-6" role="status">
-      <div class="pointer-events-auto max-w-md rounded-panel border border-line bg-paper/95 p-6 text-center shadow-card">
+      <div class="max-w-md rounded-panel border border-line bg-paper/95 p-6 text-center shadow-card">
         <strong class="text-ink">{vm.notice.title}</strong>
         <p class="mt-2 text-sm leading-relaxed text-muted">{vm.notice.body}</p>
       </div>
