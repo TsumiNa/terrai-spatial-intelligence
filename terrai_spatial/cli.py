@@ -306,10 +306,13 @@ def contract_failures() -> list[str]:
     actual_directories = {
         path.name for path in docs_root.iterdir() if path.is_dir() and any(path.iterdir())
     }
-    if actual_directories != DOCS_TOP_LEVEL_DIRECTORIES:
+    # `others` holds disposable cross-plan state and may be empty — git cannot
+    # track an empty directory, so a fresh clone legitimately lacks it.
+    required_directories = DOCS_TOP_LEVEL_DIRECTORIES - {"others"}
+    if not (required_directories <= actual_directories <= DOCS_TOP_LEVEL_DIRECTORIES):
         failures.append(
-            "docs top-level directories must be exactly "
-            f"{sorted(DOCS_TOP_LEVEL_DIRECTORIES)}; found {sorted(actual_directories)}"
+            "docs top-level directories must be "
+            f"{sorted(required_directories)} (plus optionally 'others'); found {sorted(actual_directories)}"
         )
     allowed_root_docs = {"README.md"}
     loose_docs = {path.name for path in docs_root.glob("*.md")} - allowed_root_docs

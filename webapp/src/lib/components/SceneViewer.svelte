@@ -91,6 +91,12 @@
           <canvas bind:this={canvas} class="absolute inset-0 block h-full w-full"></canvas>
           <div class="absolute left-3 top-3 rounded-card bg-ink/80 px-3 py-2 text-xs text-paper">
             {bundle.handoff.local_frame.local_unit} · ENU · {bundle.handoff.local_frame.vertical_datum}
+            · {i18n.t("scene.orthometric")}: {bundle.handoff.local_frame.orthometric_vertical_datum}
+          </div>
+          <!-- Demonstration-grade provenance stays at the point of use, not
+               buried in a drawer the user may never open. -->
+          <div class="absolute bottom-3 left-3 right-3 rounded-card bg-ink/80 px-3 py-2 text-[11px] leading-snug text-paper" role="note">
+            {i18n.t("scene.demoNotice")}
           </div>
         </div>
         <aside class="flex min-h-0 min-w-0 flex-col gap-4 overflow-y-auto border-l border-line p-5">
@@ -114,9 +120,9 @@
                         · {i18n.t(`sceneStatus.${familyStatus[name]}` as MessageKey)}
                       {/if}
                     {:else if family?.availability === "not_applicable"}
-                      {i18n.t("availability.not_applicable")}
+                      <span title={family.reason}>{i18n.t("availability.not_applicable")}</span>
                     {:else}
-                      {i18n.t("availability.unresolved")}
+                      <span title={family?.reason}>{i18n.t("availability.unresolved")}</span>
                     {/if}
                   </span>
                 </li>

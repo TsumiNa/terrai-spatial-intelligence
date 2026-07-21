@@ -32,6 +32,11 @@ test("box selection opens the catalogued scene with truthful evidence states", a
   await expect(dialog).toContainText("不适用"); // underground_structures in Nihonbashi
   await expect(dialog).toContainText("未解决 · 留空"); // boreholes / strata / predicted fields
   await expect(dialog.locator("canvas")).toBeVisible();
+  // Demonstration-grade provenance sits at the point of use, and the frame
+  // facts pass through verbatim: the orthometric datum surfaces as unknown
+  // rather than being defaulted away.
+  await expect(dialog).toContainText("示范级样本数据");
+  await expect(dialog).toContainText("正高基准: unknown");
 });
 
 test("leaving the scene returns to the map with its state intact", async ({ page }) => {

@@ -15,7 +15,8 @@
   import { RASTER_REGIONS } from "../map/config";
   import { normalizeView, undergroundAuditContext, undergroundClassKey } from "../modules";
   import { familyResources, materialLabel, summarizeAsset, type UndergroundFamily, type UndergroundResource } from "../underground";
-  import { matchScene, sceneExtent, type SceneBundle, type SceneCatalog } from "../scene/catalog";
+  import { matchScene, sceneExtent, type SceneCatalog } from "../scene/catalog";
+  import { loadSceneBundle, loadSceneCatalog } from "../scene/intake";
   import { createApiClient } from "../api/client";
   import { app, BASEMAP_KEYS } from "../state.svelte";
   import type { Feature } from "../api/types";
@@ -144,12 +145,13 @@
 
   $effect(() => {
     if (app.module !== "underground" || sceneCatalog) return;
-    void createApiClient()
-      .GET("/api/v1/scenes")
-      .then(({ data }) => {
-        if (data) sceneCatalog = data as unknown as SceneCatalog;
-      })
-      .catch(() => {});
+    loadSceneCatalog()
+      .then((catalog) => (sceneCatalog = catalog))
+      .catch(() => {
+        // A failed catalog is a visible state, not a silently missing control.
+        sceneMessage = i18n.t("underground.errorBody");
+        window.setTimeout(() => (sceneMessage = null), 4000);
+      });
   });
 
   // Leaving the module disarms a pending box selection.
@@ -177,11 +179,8 @@
         window.setTimeout(() => (sceneMessage = null), 4000);
         return;
       }
-      void createApiClient()
-        .GET("/api/v1/scenes/{scene_id}", { params: { path: { scene_id: match.scene_id } } })
-        .then(({ data }) => {
-          if (data) app.openScene(data as unknown as SceneBundle);
-        })
+      loadSceneBundle(match.scene_id)
+        .then((validated) => app.openScene(validated))
         .catch(() => {
           sceneMessage = i18n.t("underground.errorBody");
           window.setTimeout(() => (sceneMessage = null), 4000);
