@@ -105,6 +105,12 @@ def test_safe_extract_zip_rejects_traversal_absolute_and_symlink_members(tmp_pat
     with pytest.raises(RuntimeError, match="unsafe ZIP member"):
         io.safe_extract_zip(absolute, tmp_path / "out2")
 
+    dot = tmp_path / "dot.zip"
+    with zipfile.ZipFile(dot, "w") as archive:
+        archive.writestr("./", b"")
+    with pytest.raises(RuntimeError, match="unsafe ZIP member"):
+        io.safe_extract_zip(dot, tmp_path / "out-dot")
+
     symlink = tmp_path / "symlink.zip"
     with zipfile.ZipFile(symlink, "w") as archive:
         info = zipfile.ZipInfo("link")

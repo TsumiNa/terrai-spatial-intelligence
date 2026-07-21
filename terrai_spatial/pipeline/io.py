@@ -112,7 +112,9 @@ def safe_relative_path(value: str, *, label: str) -> PurePosixPath:
     if not value or "\\" in value or "\x00" in value:
         raise RuntimeError(f"unsafe {label}: {value!r}")
     path = PurePosixPath(unquote(value))
-    if path.is_absolute() or ".." in path.parts:
+    # PurePosixPath drops inner "." segments; a value that collapses to no
+    # parts at all (".", "./") would resolve to the root itself.
+    if path.is_absolute() or ".." in path.parts or not path.parts:
         raise RuntimeError(f"unsafe {label}: {value!r}")
     return path
 

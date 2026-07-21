@@ -64,6 +64,29 @@ def test_download_bytes_retries_transient_failures_then_succeeds(monkeypatch: py
     assert all(request.get_header("User-agent") == http.USER_AGENT for request in requests)
 
 
+def test_caller_headers_cannot_override_the_shared_user_agent(monkeypatch: pytest.MonkeyPatch) -> None:
+    requests = install(monkeypatch, [FakeResponse(b"payload")])
+
+    http.download_bytes("https://example.test/data", headers={"User-Agent": "Rogue/1.0", "Accept": "application/zip"})
+
+    assert requests[0].get_header("User-agent") == http.USER_AGENT
+    assert requests[0].get_header("Accept") == "application/zip"
+
+
+def test_http_client_errors_are_not_retried_but_server_errors_are(monkeypatch: pytest.MonkeyPatch) -> None:
+    def http_error(code: int) -> urllib.error.HTTPError:
+        return urllib.error.HTTPError("https://example.test/data", code, "status", hdrs=None, fp=None)
+
+    requests = install(monkeypatch, [http_error(404)] * http.RETRIES)
+    with pytest.raises(http.ResponseRejectedError, match="HTTP 404"):
+        http.download_bytes("https://example.test/data")
+    assert len(requests) == 1
+
+    requests = install(monkeypatch, [http_error(503), http_error(503), FakeResponse(b"recovered")])
+    assert http.download_bytes("https://example.test/data") == b"recovered"
+    assert len(requests) == 3
+
+
 def test_download_bytes_gives_up_after_the_last_retry(monkeypatch: pytest.MonkeyPatch) -> None:
     requests = install(monkeypatch, [urllib.error.URLError("down")] * http.RETRIES)
 

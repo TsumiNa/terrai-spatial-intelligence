@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -28,7 +29,9 @@ class ResponseRejectedError(RuntimeError):
 
 
 def _request(url: str, *, headers: dict[str, str] | None = None, data: bytes | None = None) -> urllib.request.Request:
-    return urllib.request.Request(url, data=data, headers={"User-Agent": USER_AGENT, **(headers or {})})
+    # The shared User-Agent is a contract, not a default: it wins over any
+    # caller-supplied headers so scripts cannot reintroduce divergent strings.
+    return urllib.request.Request(url, data=data, headers={**(headers or {}), "User-Agent": USER_AGENT})
 
 
 def _with_retries(url: str, operation: Any) -> Any:
@@ -38,6 +41,13 @@ def _with_retries(url: str, operation: Any) -> Any:
             return operation()
         except ResponseRejectedError:
             raise
+        except urllib.error.HTTPError as error:
+            # A definitive client-error status will not change on retry.
+            if error.code < 500:
+                raise ResponseRejectedError(f"{url} returned HTTP {error.code}: {error.reason}") from error
+            last_error = error
+            if attempt < RETRIES:
+                time.sleep(BACKOFF_SECONDS * attempt)
         except (OSError, TimeoutError) as error:
             last_error = error
             if attempt < RETRIES:
