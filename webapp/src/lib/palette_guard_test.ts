@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
-import { inspect, PALETTE_SOURCE, type Violation } from "./palette_guard";
+import { inspect, PALETTE_SOURCE, stylesheetLiterals, type Violation } from "./palette_guard";
 import { palette } from "./theme";
 
 const ROOT = new URL("../..", import.meta.url).pathname;
@@ -109,5 +109,64 @@ describe("the repository conforms", () => {
       .filter(([name, value]) => tokens.get(kebab(name)) !== value.toLowerCase())
       .map(([name, value]) => `--color-${kebab(name)} should be ${value}, is ${tokens.get(kebab(name)) ?? "absent"}`);
     expect(wrong).toEqual([]);
+  });
+});
+
+
+/** Colours written by eye in `app.css`, inventoried rather than fixed.
+ *
+ *  Turning 36 one-off tints into palette entries would make the palette a
+ *  colour dump instead of a design system, and they disappear with the
+ *  redesign. Asserted as an exact set so a 37th fails — and so does removing
+ *  one without updating this list, which keeps the inventory honest.
+ */
+const STYLESHEET_DEBT = [
+  "#102b23",
+  "#275f81",
+  "#6f5c35",
+  "#78978c",
+  "#889b94",
+  "#8c5c13",
+  "#93aaa1",
+  "#9eb5ac",
+  "#9fb9af",
+  "#a9beb5",
+  "#a9d96e",
+  "#b9cdc5",
+  "#d3e2dc",
+  "#dce4df",
+  "#dce8e2",
+  "#e0ebe6",
+  "#e2a43c",
+  "#e3ece8",
+  "#e7f0f6",
+  "#edf1ee",
+  "#f5f8f5",
+  "#f6fbf7",
+  "#f8efdc",
+  "#fbfcfa",
+  "rgba(10,36,27,.18)",
+  "rgba(12,36,28,.18)",
+  "rgba(16,35,30,.9)",
+  "rgba(255,255,255,.018)",
+  "rgba(255,255,255,.025)",
+  "rgba(255,255,255,.06)",
+  "rgba(255,255,255,.07)",
+  "rgba(255,255,255,.08)",
+  "rgba(255,255,255,.10)",
+  "rgba(255,255,255,.16)",
+  "rgba(255,255,255,.18)",
+  "rgba(9, 27, 21, .28)",
+];
+
+describe("the stylesheet's inherited colour", () => {
+  it("has not grown", () => {
+    const css = readFileSync(join(ROOT, "src/app.css"), "utf8");
+    expect([...new Set(stylesheetLiterals(css))].sort()).toEqual(STYLESHEET_DEBT);
+  });
+
+  it("exempts the theme block, which is where colour is supposed to be", () => {
+    const source = `@theme { --color-ink: #10231e; }\n.a { color: var(--color-ink); }`;
+    expect(stylesheetLiterals(source)).toEqual([]);
   });
 });

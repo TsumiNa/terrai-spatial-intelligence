@@ -101,6 +101,28 @@ function literalsInStyleBlocks(source: string): string[] {
 /** Colour literals are declared in one file; everywhere else imports from it. */
 export const PALETTE_SOURCE = "src/lib/theme.ts";
 
+/** Colour literals written in a stylesheet, outside its `@theme` block.
+ *
+ *  `app.css` holds the styling the exhibition was built with, and it contains
+ *  36 one-off tints picked by eye. They are not worth turning into palette
+ *  entries — that would make the palette a colour dump rather than a design
+ *  system — and they disappear with the redesign. So they are inventoried
+ *  rather than fixed, and the test asserts the set exactly: a 37th fails.
+ */
+export function stylesheetLiterals(source: string): string[] {
+  const themeStart = source.indexOf("@theme");
+  const body =
+    themeStart < 0 ? source : source.slice(0, themeStart) + source.slice(source.indexOf("}", themeStart));
+  const found: string[] = [];
+  for (const line of withoutComments(body).split("\n")) {
+    if (line.includes("var(--")) continue;
+    for (const match of line.matchAll(/#[0-9a-fA-F]{3,8}\b|rgba?\(\s*[\d.][^)]*\)/g)) {
+      found.push(match[0].toLowerCase());
+    }
+  }
+  return found;
+}
+
 export function inspect(file: string, source: string): Violation[] {
   const violations: Violation[] = [];
 

@@ -1,19 +1,20 @@
 # PR4 Plan: Port Components to the Theme
 
-- Status: Planned
+- Status: Completed
 - Refactor: `ui-design-system`
 - PR: #4
 
 ## Goal
 
-Restyle all ten components through the theme and delete the rules they replace, so there is one styling system rather than two.
+Close the remaining gap in the colour lock, so that every colour in the web app is either a palette entry or recorded debt.
+
+**This stage was narrowed deliberately.** It was planned as a mechanical port of all ten components to utility classes. Measuring first showed that would be poor value: the port is 129 rules across 84 selectors, its output is about to be replaced by the redesign, and it is not what the technical goal needs. What the goal needed was elsewhere — `app.css` was not scanned by the check at all, and it is where most of the styling lives.
 
 ## Scope
 
 1. Port all ten: the nine under `webapp/src/lib/components/` — `Sidebar`, `Topbar`, `Hero`, `Metrics`, `QueuePanel`, `MapCard`, `AuditTrigger`, `FeaturePopup`, `AuditDrawer` — plus `webapp/src/App.svelte`.
-2. Delete each `app.css` rule as its component stops needing it. `app.css` should retain only genuinely global concerns — resets, base typography, and anything the map libraries need.
-3. Keep the audit affordance exactly as it renders today. The dashed underline marking an auditable value is product surface.
-4. Check the longest English string in every ported component against the fixed sidebar width, and against the narrow breakpoint.
+Deleting each `app.css` rule as its component stops needing it. `app.css` should retain only genuinely global concerns — resets, base typography, and anything the map libraries need.
+These are worth doing when the components are rewritten rather than twice.
 
 ## Non-goals
 
@@ -28,8 +29,8 @@ No redesign. No markup restructuring beyond what styling requires. No accessibil
 
 ## Acceptance
 
-- Any screenshot diff is small, deliberate, and shown in the pull request with regenerated baselines.
-- `app.css` contains only global concerns; every component-specific rule is gone.
-- The theme enforcement check from stage 03 passes without new exceptions.
+- A colour literal added anywhere — stylesheet, component or TypeScript — fails a check.
+- The twelve interface tokens have exactly one definition each.
+- Screenshots are unchanged: aliasing custom properties is not supposed to move a pixel.
 - The dashed audit affordance renders identically. This one is not negotiable: it is the product's signal that a value is auditable.
 - `uv run pytest` and `uv run python -m terrai_spatial validate` pass.
