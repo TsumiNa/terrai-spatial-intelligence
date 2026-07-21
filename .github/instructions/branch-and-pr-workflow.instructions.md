@@ -64,6 +64,26 @@ Order the sequence so the repository stays green at every step. Prefer **introdu
 
 Per `in-branch-api-compat.instructions.md`, do not add compatibility shims, aliases, or adapter layers merely to keep an intermediate PR green. If a step cannot be made green without a shim, the sequence is ordered wrong — reorder it.
 
+### Sequential review and squash-merge gate
+
+For every ordered multi-PR plan, process one PR at a time using this fixed sequence:
+
+**review → address feedback → squash merge → begin the next PR**
+
+The current PR is a hard gate for every later PR in the plan. Do not create the next implementation branch, start its changes in another worktree or session, or otherwise develop later stages in parallel while the current PR is open.
+
+Before the gate may advance:
+
+1. Finish the current PR's stated scope and run its acceptance checks.
+2. Push the complete change and wait for required CI and configured human or automated review. Passing CI alone does not complete the review gate.
+3. Inspect every review surface: submitted reviews, inline review threads, and general PR comments.
+4. Address every actionable comment with a code or documentation change and regression coverage where appropriate. If a suggestion should not be implemented, reply with a concrete technical reason instead of silently ignoring it.
+5. Push the follow-up commits, wait for the checks on the latest head commit, reply to each handled thread, and resolve it. Recheck that no new or unresolved review thread remains.
+6. Squash-merge the PR. Confirm the remote PR state is `MERGED` and record the resulting merge commit; a local worktree warning is not evidence that the remote merge failed.
+7. Fetch the merged default branch, then create the next PR's branch or worktree from that updated default branch. Never base the next stage on the unmerged predecessor branch.
+
+Keep every later plan item pending until the preceding PR has passed this complete gate. If review requests changes or the latest checks fail, remain on the current PR and fix it; do not advance the sequence. A separately submitted refactor-plan PR is subject to the same gate before PR1 starts.
+
 ## Anti-patterns
 
 - Creating a new branch when the user is already on a branch with an open PR for the same piece of work.
@@ -74,3 +94,7 @@ Per `in-branch-api-compat.instructions.md`, do not add compatibility shims, alia
 - Landing a rename in one PR and its reference updates in another, leaving the default branch red in between.
 - Bundling a mechanical move with a behavior change so a reviewer cannot tell which lines actually changed meaning.
 - Splitting by file or by commit count rather than by verifiable outcome, producing PRs that individually mean nothing.
+- Starting, branching or implementing a later planned PR before its predecessor is remotely confirmed as merged.
+- Treating green CI as a substitute for waiting for and auditing review feedback.
+- Merging while actionable comments or unresolved review threads remain.
+- Advancing from a local branch state without confirming the remote squash merge and updating from the default branch.
