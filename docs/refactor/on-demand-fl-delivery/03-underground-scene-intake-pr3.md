@@ -1,10 +1,36 @@
 # PR3 Plan: Underground Scene Intake
 
-- Status: Blocked — PR1 and PR2 of this refactor are not merged, and `maplibre-migration` 06/07,
-  which own the endpoint shape and renderer this stage feeds, have not landed
+- Status: Completed
 - Refactor: `on-demand-fl-delivery`
 - Depends on: PR1 and PR2 merged, and the outcome of `maplibre-migration` 06/07
 - Related: `docs/refactor/maplibre-migration/06-underground-networks-pr6.md`
+- PR: #49
+
+## Completion record
+
+Finalised against what `maplibre-migration` 06/07 actually built (#38/#39): the bundle
+endpoint (`GET /api/v1/scenes`, `GET /api/v1/scenes/{scene_id}`) and the renderers already
+existed and already consumed the handoff verbatim. What this stage added, against that
+merged reality:
+
+- **One loading path** — `scene/intake.ts` is now the only way scene documents enter the
+  app: both component-level fetches (one of which swallowed failures silently) are gone,
+  catalog failure is a visible state, and every bundle is validated before it becomes
+  application state. The plan's original words said "through the windowed client"; the
+  windowed client's contract is bbox windows over feature collections, and PR7's bundle
+  endpoint serves whole documents, so "no second loading path" landed as one intake module
+  over the same shared typed client — consuming PR7's route, not inventing a parallel one,
+  exactly as this plan's confirmed-findings section required.
+- **Isolation enforced by test** — the intake refuses a bundle whose assets escape its
+  approved roots, whose roots carry the other canonical scene's markers, or whose
+  unavailable families carry fabricated metadata; `matchScene` resolves exactly one scene
+  even for a box covering both extents. Scene identity remains a single application-state
+  slot.
+- **Honest absence and passthrough** — unavailable families render as labelled absences
+  with the handoff's own reason; the viewer's frame strip now shows the orthometric datum
+  verbatim (`unknown` reads as unknown); nothing restates or defaults a coordinate fact.
+- **Provenance at the point of use** — a demonstration-grade notice sits on the scene
+  canvas itself in all three languages, not only in the audit drawer.
 
 ## Goal
 

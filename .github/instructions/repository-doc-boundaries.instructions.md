@@ -26,13 +26,15 @@ Every other documentation location uses one English `.md` file by default. This 
 
 ## Fixed `docs/` structure
 
-Only the English `docs/README.md` index may be placed directly under `docs/`. `docs/` contains exactly these five top-level directories; do not create another category:
+Only the English `docs/README.md` index may be placed directly under `docs/`. `docs/` uses exactly these five top-level categories; do not create another one:
 
 1. `architecture/`
 2. `refactor/`
 3. `data/`
 4. `summary/`
 5. `others/`
+
+The first four must exist and be non-empty. `others/` holds disposable working documents and may be empty or absent — version control cannot track an empty directory, so a checkout with no `others/` content legitimately has no `others/` directory.
 
 ### `docs/architecture/`
 

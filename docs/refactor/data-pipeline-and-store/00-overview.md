@@ -1,6 +1,6 @@
 # Data Pipeline and Store
 
-- Status: In progress
+- Status: Completed — PR1–PR3 delivered; PR4 and PR5 stay gated on their recorded triggers and were deliberately not part of the executed sequence
 
 ## Context
 
