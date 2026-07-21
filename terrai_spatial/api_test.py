@@ -17,6 +17,8 @@ from terrai_spatial.data_service import ROOT
         "/api/v1/datasets/{key}",
         "/api/v1/features/{key}",
         "/api/v1/recommendations/{analysis}",
+        "/api/v1/scenes",
+        "/api/v1/scenes/{scene_id}",
     ],
 )
 def test_fastapi_exposes_health_data_query_and_analysis_routes(path: str) -> None:

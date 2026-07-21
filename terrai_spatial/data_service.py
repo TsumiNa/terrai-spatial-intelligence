@@ -132,6 +132,21 @@ class DataService:
             raise DatasetNotFoundError(owner_dataset_key) from error
         return self._load_scene_file(relative)
 
+    def scene_bundle(self, scene_id: str) -> dict[str, Any]:
+        """One catalogued scene with its full handoff, resolved by scene id.
+
+        The scene id maps through the catalog to its `owner_dataset_key` — the
+        only resolution path — so an unknown id fails here rather than growing
+        a second lookup. The handoff passes through verbatim: `unresolved` and
+        `not_applicable` evidence families, approved roots, timestamps,
+        licences and audit indexes all stay exactly as published.
+        """
+
+        for entry in self.scene_catalog().get("scenes", []):
+            if entry.get("scene_id") == scene_id:
+                return {"scene": entry, "handoff": self.scene_handoff(entry["owner_dataset_key"])}
+        raise DatasetNotFoundError(scene_id)
+
     def catalog(self) -> list[dict[str, Any]]:
         rows = []
         for key, relative in ALL_DATASETS.items():

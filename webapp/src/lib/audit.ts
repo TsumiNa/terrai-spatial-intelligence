@@ -404,6 +404,7 @@ export type FieldKey =
   | "field.mesureType"
   | "field.diameter"
   | "field.assetPath"
+  | "field.sceneElement"
   | "field.property";
 
 export const FIELD_LABELS: Record<FieldKey, Localized> = {
@@ -457,6 +458,7 @@ export const FIELD_LABELS: Record<FieldKey, Localized> = {
   "field.mesureType": ml("计测区分", "計測区分", "Measurement class"),
   "field.diameter": ml("外径", "外径", "Outer diameter"),
   "field.assetPath": ml("资产文件", "資産ファイル", "Asset file"),
+  "field.sceneElement": ml("场景要素", "シーン要素", "Scene element"),
   "field.property": ml("属性值", "属性値", "Property value"),
 };
 
@@ -816,6 +818,57 @@ export function undergroundField(
       ),
     ],
     caveat: UNDERGROUND_CAVEAT,
+  };
+}
+
+/** Provenance of one element picked inside the standalone site scene. */
+export interface SceneAuditContext {
+  datasetId: string;
+  licenseName: string;
+  licenseUrl: string;
+  elementLabel: string;
+  /** [longitude°, latitude°, ellipsoid height m] via the handoff inverse. */
+  coordinates: [number, number, number];
+  sourceUpdatedAt: string | null;
+  retrievedAt: string;
+  auditIndexPath: string;
+}
+
+const SCENE_CAVEAT = ml(
+  "PLATEAU/OSM 采样示范数据：坐标经场景 handoff 的逆变换解算，为 WGS84 椭球语义、正高基准未知；OSM 通行要素仅作补充，未标注深度时置于场景原点参考面。不可用于开挖、工程设计或应急决策。",
+  "PLATEAU/OSMの実証サンプルデータです。座標はシーンhandoffの逆変換で解決され、WGS84楕円体セマンティクス（正標高基準は不明）。OSMアクセス要素は補助情報で、深さ未記載の場合はシーン原点参照面に配置されます。掘削・設計・災害対応には使用できません。",
+  "PLATEAU/OSM demonstration sample data. Coordinates resolve through the scene handoff's inverse transform under WGS 84 ellipsoid semantics with an unknown orthometric datum; OSM access features are supplementary and sit at the scene-origin reference plane when no level is stated. Not for excavation, engineering design or emergency operations.",
+);
+
+/** One element picked in the 3D scene: source, identity, real coordinates. */
+export function sceneElement(context: SceneAuditContext): AuditRecord {
+  const [longitude, latitude, height] = context.coordinates;
+  const coordinates = `${longitude.toFixed(8)}°, ${latitude.toFixed(8)}°, ${height.toFixed(2)} m`;
+  return {
+    kind: "raw",
+    title: FIELD_LABELS["field.sceneElement"],
+    value: context.elementLabel,
+    sections: [
+      section(
+        ml("数据来源", "データソース", "Data source"),
+        `${context.datasetId} · ${context.licenseName}`,
+        context.licenseUrl,
+      ),
+      section(
+        ml("坐标（经逆变换解算）", "座標（逆変換で解決）", "Coordinates (via inverse transform)"),
+        ml(`${coordinates}（WGS84 椭球高）`, `${coordinates}（WGS84 楕円体高）`, `${coordinates} (WGS 84 ellipsoid height)`),
+      ),
+      section(
+        ml("时间/版本", "時点・バージョン", "Date / version"),
+        ml(
+          `${context.sourceUpdatedAt ?? "—"}（获取于 ${context.retrievedAt}）`,
+          `${context.sourceUpdatedAt ?? "—"}（取得 ${context.retrievedAt}）`,
+          `${context.sourceUpdatedAt ?? "—"} · retrieved ${context.retrievedAt}`,
+        ),
+      ),
+      section(ml("本地证据", "ローカル証拠", "Local evidence"), context.auditIndexPath),
+    ],
+    caveat: SCENE_CAVEAT,
   };
 }
 

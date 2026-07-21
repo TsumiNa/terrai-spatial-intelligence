@@ -5,6 +5,7 @@
   import type { Bootstrap } from "./lib/api/types";
   import type { UndergroundAuditIndex, UndergroundManifest } from "./lib/underground";
   import AuditDrawer from "./lib/components/AuditDrawer.svelte";
+  import SceneViewer from "./lib/components/SceneViewer.svelte";
   import Hero from "./lib/components/Hero.svelte";
   import MapCard from "./lib/components/MapCard.svelte";
   import Metrics from "./lib/components/Metrics.svelte";
@@ -90,6 +91,7 @@
 </div>
 
 <AuditDrawer />
+<SceneViewer />
 
 <div class="loading" class:done={app.data !== null}>
   {#if app.loadError}

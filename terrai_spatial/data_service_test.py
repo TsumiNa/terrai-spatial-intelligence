@@ -178,3 +178,27 @@ def test_unknown_dataset_key_is_rejected() -> None:
 def test_feature_query_rejects_a_dataset_that_is_not_a_feature_collection() -> None:
     with pytest.raises(ValueError, match="not a GeoJSON FeatureCollection"):
         service.query_features("jointSummary")
+
+
+def test_scene_bundle_resolves_by_scene_id_through_the_catalog() -> None:
+    bundle = service.scene_bundle("nihonbashi-utilities")
+    assert bundle["scene"]["owner_dataset_key"] == "uc24_16_nihonbashi"
+    assert bundle["handoff"]["scene_id"] == "nihonbashi-utilities"
+    # The handoff passes through verbatim: unresolved families keep their
+    # states and reasons, and nothing invents geometry or counts for them.
+    families = bundle["handoff"]["evidence_families"]
+    assert families["predicted_fields"]["availability"] == "unresolved"
+    assert families["underground_structures"]["availability"] == "not_applicable"
+    assert bundle["handoff"]["approved_roots"]
+
+    sapporo = service.scene_bundle("sapporo-station-underground")
+    assert sapporo["scene"]["owner_dataset_key"] == "uc24_13_sapporo"
+    assert sapporo["handoff"]["evidence_families"]["utility_networks"]["availability"] == "not_applicable"
+
+
+def test_scene_bundle_rejects_an_unknown_scene_id() -> None:
+    with pytest.raises(DatasetNotFoundError):
+        service.scene_bundle("no-such-scene")
+    with pytest.raises(DatasetNotFoundError):
+        # Owner dataset keys are not scene ids; the catalog is the only path.
+        service.scene_bundle("uc24_16_nihonbashi")

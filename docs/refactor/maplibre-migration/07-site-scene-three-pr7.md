@@ -1,8 +1,18 @@
 # PR7 Plan: Standalone Site Scene
 
-- Status: Planned
+- Status: Completed
 - Refactor: `maplibre-migration`
-- PR: #7
+- PR: #39
+
+## Completion record
+
+- **Shipped picking granularity**: Sapporo reaches **feature level** — the `_BATCHID` vertex attribute at the picked face resolves through the b3dm batch table to the source identity (e.g. a `bdry_…` boundary id); Nihonbashi glTF content picks per asset, feature-level when the asset holds a single feature, matching stage 06's map-side ladder. Every pick resolves through the handoff's inverse transform to WGS 84 ellipsoid coordinates in its audit record.
+- **The bundle endpoint** landed as planned: `GET /api/v1/scenes` (catalog) and `GET /api/v1/scenes/{scene_id}` (scene + verbatim handoff, resolved through the catalog's `owner_dataset_key`; unknown ids and owner keys are 404). Both are in the committed OpenAPI schema.
+- **Renderer adaptations**, each tested: the stage-06 plural-`contents` normalization reused as a TilesRenderer `fetchData` plugin; PLATEAU b3dm requires `CESIUM_RTC` and Draco, wired through `GLTFExtensionsPlugin` with the Draco decoder vendored under `webapp/public/draco/` so the scene stays offline-capable; the library's accelerated raycast consults internal ECEF bounds that an external local-frame matrix does not update, so plain per-tile raycasting is used.
+- **Box selection** listens for `pointerdown` on the map container and `pointermove`/`pointerup` on the window — MapLibre suppresses synthetic mouse events and pointer capture can strand a container-scoped `pointerup`.
+- OSM access features without a stated level render at the scene-origin reference plane, stated in the viewer copy; OSM stays an independent overlay and never snaps to PLATEAU geometry.
+- A few Sapporo tiles fail Draco decoding upstream; individual tile failures log to the console without flipping a family that has rendered models, and a family reports `error` only when nothing loaded (the CI cache-absent path).
+- The visual-baseline suite excludes the scene dialog for the same reason as the stage-06 map: its content depends on the on-demand cache and differs between environments.
 
 ## Goal
 

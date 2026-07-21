@@ -271,3 +271,6 @@ button { font: inherit; }
   .metrics { grid-template-columns: repeat(2, 1fr); }
   .metric-note { min-height: 0; }
 }
+
+/* One-shot box selection for opening a catalogued underground scene. */
+.map-box-select { position: absolute; z-index: 15; border: 2px dashed var(--forest); background: rgba(255,255,255,.18); pointer-events: none; }
