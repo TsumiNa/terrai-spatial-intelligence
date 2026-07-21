@@ -94,6 +94,11 @@ jobs:
 
       # playwright.config.ts starts both the built web app and the FastAPI
       # service itself, so nothing needs to be launched here.
+      # The API refuses to start without the derived store; build it from
+      # the committed files before the suite launches the server.
+      - name: Build derived data
+        run: uv run python -m terrai_spatial data ensure --offline
+
       - name: End-to-end test
         run: npm run test:e2e
         working-directory: webapp
