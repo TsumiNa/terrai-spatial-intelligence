@@ -59,12 +59,12 @@ test("below the minimum zoom no request is issued and the state says so", async 
   await settledStatus(page);
 
   // Region zoom is 16; the floor is 15 and the map's own minimum is 14.
-  // force: the control sits at the map's bottom edge, where CI font metrics
-  // can leave it under the map note's hit area even though it renders fine.
-  const zoomOut = page.locator(".maplibregl-ctrl-zoom-out");
-  await zoomOut.click({ force: true });
-  await page.waitForTimeout(500);
-  await zoomOut.click({ force: true });
+  // Shift+double-click is MapLibre's built-in zoom-out gesture on the canvas
+  // itself — the navigation control's button can hang a CI click mid-easing.
+  const canvas = page.locator("#map .maplibregl-canvas");
+  await canvas.dblclick({ position: { x: 300, y: 200 }, modifiers: ["Shift"] });
+  await page.waitForTimeout(700);
+  await canvas.dblclick({ position: { x: 300, y: 200 }, modifiers: ["Shift"] });
 
   await expect(chip(page)).toHaveAttribute("data-status", "belowZoom", { timeout: 10000 });
 });
