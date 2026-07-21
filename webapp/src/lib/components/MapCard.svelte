@@ -11,6 +11,8 @@
   import { RASTER_REGIONS } from "../map/config";
   import { normalizeView, undergroundAuditContext, undergroundClassKey } from "../modules";
   import { familyResources, materialLabel, summarizeAsset, type UndergroundFamily, type UndergroundResource } from "../underground";
+  import { matchScene, sceneExtent, type SceneBundle, type SceneCatalog } from "../scene/catalog";
+  import { createApiClient } from "../api/client";
   import { app, BASEMAP_KEYS } from "../state.svelte";
   import type { Feature } from "../api/types";
   import type { ModuleVM } from "../modules";
@@ -30,6 +32,58 @@
   let container: HTMLElement;
   // $state.raw: the handle is stored for effects, never wrapped reactively.
   let mapApi = $state.raw<ExhibitionMap | null>(null);
+
+  // --- catalogued 3D scenes (underground module) -------------------------
+  let sceneCatalog = $state.raw<SceneCatalog | null>(null);
+  let boxArmed = $state(false);
+  let sceneMessage = $state<string | null>(null);
+
+  $effect(() => {
+    if (app.module !== "underground" || sceneCatalog) return;
+    void createApiClient()
+      .GET("/api/v1/scenes")
+      .then(({ data }) => {
+        if (data) sceneCatalog = data as unknown as SceneCatalog;
+      })
+      .catch(() => {});
+  });
+
+  // Leaving the module disarms a pending box selection.
+  $effect(() => {
+    if (app.module !== "underground" && boxArmed) {
+      boxArmed = false;
+      mapApi?.setBoxSelect(null);
+    }
+  });
+
+  function armBoxSelect() {
+    if (!mapApi || !sceneCatalog) return;
+    if (boxArmed) {
+      boxArmed = false;
+      mapApi.setBoxSelect(null);
+      return;
+    }
+    boxArmed = true;
+    sceneMessage = null;
+    mapApi.setBoxSelect((bounds) => {
+      boxArmed = false;
+      const match = matchScene(bounds, sceneCatalog?.scenes ?? []);
+      if (!match) {
+        sceneMessage = i18n.t("scene.noSceneHere");
+        window.setTimeout(() => (sceneMessage = null), 4000);
+        return;
+      }
+      void createApiClient()
+        .GET("/api/v1/scenes/{scene_id}", { params: { path: { scene_id: match.scene_id } } })
+        .then(({ data }) => {
+          if (data) app.openScene(data as unknown as SceneBundle);
+        })
+        .catch(() => {
+          sceneMessage = i18n.t("underground.errorBody");
+          window.setTimeout(() => (sceneMessage = null), 4000);
+        });
+    });
+  }
 
   function showPopup(coordinate: [number, number], props: { eyebrow: string; title: string; fields: { label: string; text: string | number; record: AuditRecord }[] }) {
     if (!mapApi) return;
@@ -176,6 +230,23 @@
           </button>
         {/each}
       </div>
+      {#if app.module === "underground" && sceneCatalog}
+        <div class="basemap-switcher" aria-label={i18n.t("scene.catalogScenes")}>
+          {#each sceneCatalog.scenes as entry (entry.scene_id)}
+            <button class="basemap-button" title={entry.purpose} onclick={() => mapApi?.frame(sceneExtent(entry))}>
+              {entry.scene_id === "nihonbashi-utilities" ? i18n.t("region.nihonbashi") : entry.scene_id}
+            </button>
+          {/each}
+          <button
+            class="basemap-button"
+            class:active={boxArmed}
+            title={i18n.t("scene.boxSelectHint")}
+            onclick={armBoxSelect}
+          >
+            {i18n.t("scene.boxSelect")}
+          </button>
+        </div>
+      {/if}
       <div class="map-legend">
         {#each vm.legend as item, index (index)}
           <span class="legend-item"><i class="legend-dot" style={`background:${item.color}`}></i>{item.label}</span>
@@ -184,8 +255,17 @@
     </div>
   </div>
   <div id="map" bind:this={container} aria-label={i18n.t("map.aria")}></div>
+  {#if sceneMessage}
+    <div class="absolute left-1/2 top-16 z-20 -translate-x-1/2 rounded-card border border-line bg-paper/95 px-4 py-2 text-xs text-ink shadow-card" role="status">
+      {sceneMessage}
+    </div>
+  {/if}
   {#if vm.notice}
-    <div class="absolute inset-0 z-10 grid place-items-center p-6" role="status">
+    <!-- The notice is a pure status display and the whole overlay is
+         click-through: box selection works from the committed catalog even
+         when the tile cache is absent, and the card sits centred exactly
+         where a box would be dragged. -->
+    <div class="pointer-events-none absolute inset-0 z-10 grid place-items-center p-6" role="status">
       <div class="max-w-md rounded-panel border border-line bg-paper/95 p-6 text-center shadow-card">
         <strong class="text-ink">{vm.notice.title}</strong>
         <p class="mt-2 text-sm leading-relaxed text-muted">{vm.notice.body}</p>

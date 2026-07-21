@@ -335,6 +335,75 @@
           }
         }
       }
+    },
+    "/api/v1/scenes": {
+      "get": {
+        "tags": [
+          "scenes"
+        ],
+        "summary": "Scenes",
+        "description": "Return the renderer-neutral underground scene catalog.",
+        "operationId": "scenes_api_v1_scenes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Scenes Api V1 Scenes Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/scenes/{scene_id}": {
+      "get": {
+        "tags": [
+          "scenes"
+        ],
+        "summary": "Scene Bundle",
+        "description": "Return one catalogued scene with its local-frame handoff.",
+        "operationId": "scene_bundle_api_v1_scenes__scene_id__get",
+        "parameters": [
+          {
+            "name": "scene_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Scene Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Scene Bundle Api V1 Scenes  Scene Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

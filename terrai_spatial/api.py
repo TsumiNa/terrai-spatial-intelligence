@@ -103,4 +103,21 @@ def recommendations(analysis: str) -> dict:
         raise HTTPException(status_code=404, detail=f"unknown analysis: {analysis}") from error
 
 
+@app.get("/api/v1/scenes", tags=["scenes"])
+def scenes() -> dict:
+    """Return the renderer-neutral underground scene catalog."""
+
+    return service.scene_catalog()
+
+
+@app.get("/api/v1/scenes/{scene_id}", tags=["scenes"])
+def scene_bundle(scene_id: str) -> dict:
+    """Return one catalogued scene with its local-frame handoff."""
+
+    try:
+        return service.scene_bundle(scene_id)
+    except DatasetNotFoundError as error:
+        raise HTTPException(status_code=404, detail=f"unknown scene: {scene_id}") from error
+
+
 app.mount("/api/v1/assets", StaticFiles(directory=ROOT / "data"), name="data-assets")

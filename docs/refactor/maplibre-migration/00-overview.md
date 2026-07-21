@@ -1,6 +1,6 @@
 # Frontend Migration: Svelte + Vite, MapLibre + deck.gl
 
-- Status: In progress — stages 01-05 completed and the Leaflet runtime retired; 06-07 unblocked by the `underground-observation-foundation` data refactor and now in implementation
+- Status: Completed — stages 01-05 reached parity and retired Leaflet; stages 06-07 render the underground observation scenes integrated by `underground-observation-foundation`
 - Date: 2026-07-20
 - Baseline: `main` / `d68bd1e`
 - Type: frontend platform migration; the FastAPI backend and the data pipelines stay
