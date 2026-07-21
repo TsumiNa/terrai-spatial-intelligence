@@ -92,6 +92,10 @@ it("builds underground fields with shared source, date and asset provenance", ()
   expect(text(record.sections[1].value, "zh")).toContain("WaterPipe_coordinates_-14_-115.gltf");
   expect(text(record.sections[1].value, "zh")).toContain("(4)"); // long id lists truncate honestly
   expect(text(record.sections[2].value, "zh")).toContain("2025-01-31");
+  // Trilingual date sections: no English "retrieved" leaking into zh/ja.
+  expect(text(record.sections[2].value, "zh")).toContain("获取于");
+  expect(text(record.sections[2].value, "ja")).toContain("取得");
+  expect(text(record.sections[2].value, "en")).toContain("retrieved");
   expect(text(record.caveat, "en")).toContain("metres, not centimetres");
 });
 
@@ -99,5 +103,8 @@ it("routes underground metrics to a PLATEAU raw record", () => {
   const record = metric("metric.undergroundNetworkFeatures", 810, "项", "全部携带 uro:mesureType 代码 2", { snapshot: "2026-07-21" });
   expect(record.kind).toBe("raw");
   expect(record.sections[0].url).toContain("geospatial.jp");
-  expect(text(record.sections[2].value, "zh")).toContain("2026-07-21");
+  expect(text(record.sections[2].value, "zh")).toBe("获取于 2026-07-21");
+  expect(text(record.sections[2].value, "ja")).toBe("取得 2026-07-21");
+  const undated = metric("metric.undergroundSnapshot", "—", "", "note", {});
+  expect(text(undated.sections[2].value, "zh")).toBe("获取日期不可用");
 });

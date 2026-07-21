@@ -179,14 +179,15 @@ export function indexByAsset(index: UndergroundAuditIndex): Map<string, Undergro
 export function summarizeAsset(features: UndergroundFeature[]): AssetSummary {
   const distinct = (key: string) =>
     [...new Set(features.map((f) => f.attributes[key]).filter((v): v is string => v !== undefined))].sort();
-  const minDepths = features
-    .map((f) => f.attributes["uro:minDepth"])
-    .filter((v): v is string => v !== undefined)
-    .map(Number);
-  const maxDepths = features
-    .map((f) => f.attributes["uro:maxDepth"])
-    .filter((v): v is string => v !== undefined)
-    .map(Number);
+  const finite = (key: string) =>
+    features
+      .map((f) => f.attributes[key])
+      // Number("") is 0, so an empty string must count as missing, not zero.
+      .filter((v): v is string => v !== undefined && v.trim() !== "")
+      .map(Number)
+      .filter((v) => Number.isFinite(v));
+  const minDepths = finite("uro:minDepth");
+  const maxDepths = finite("uro:maxDepth");
   return {
     assetPath: features[0]?.source_asset ?? "",
     utilityClass: features[0]?.utility_class ?? "",

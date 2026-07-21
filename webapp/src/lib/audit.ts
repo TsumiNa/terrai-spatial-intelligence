@@ -329,7 +329,9 @@ export function metric(
       shown,
       "Project PLATEAU UC24-16 地下埋設物モデル（示范样本 / demonstration sample）",
       `${note} → ${shown}`,
-      context.snapshot ? `retrieved ${context.snapshot}` : "retrieval date unavailable",
+      context.snapshot
+        ? ml(`获取于 ${context.snapshot}`, `取得 ${context.snapshot}`, `retrieved ${context.snapshot}`)
+        : ml("获取日期不可用", "取得日不明", "retrieval date unavailable"),
       "data/plateau/uc24_16_nihonbashi/manifest.json",
       UNDERGROUND_CAVEAT,
       "https://www.geospatial.jp/ckan/dataset/plateau-uc24-16",
@@ -802,7 +804,11 @@ export function undergroundField(
       ),
       section(
         ml("时间/版本", "時点・バージョン", "Date / version"),
-        `${context.creationDates.join(", ") || "—"} · retrieved ${context.retrievedAt}`,
+        ml(
+          `${context.creationDates.join(", ") || "—"}（获取于 ${context.retrievedAt}）`,
+          `${context.creationDates.join(", ") || "—"}（取得 ${context.retrievedAt}）`,
+          `${context.creationDates.join(", ") || "—"} · retrieved ${context.retrievedAt}`,
+        ),
       ),
       section(
         ml("本地证据", "ローカル証拠", "Local evidence"),

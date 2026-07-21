@@ -35,7 +35,10 @@
       try {
         const client = createApiClient();
         const catalog = await client.GET("/api/v1/catalog");
-        const rows = (catalog.data as { datasets?: { key: string; ready: boolean }[] } | undefined)?.datasets ?? [];
+        // An unreachable or failing API is an error, not "cache absent".
+        if (catalog.error || !catalog.data) throw new Error("catalog request failed");
+        const rows = (catalog.data as { datasets?: { key: string; ready: boolean }[] }).datasets ?? [];
+        if (!rows.length) throw new Error("catalog returned no datasets");
         if (!rows.find((row) => row.key === "uc24_16_nihonbashi")?.ready) {
           app.setUndergroundUnavailable();
           return;

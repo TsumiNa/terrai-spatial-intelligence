@@ -63,6 +63,19 @@ it("summarizes an asset without inventing missing attributes", () => {
   expect(summary.names).toEqual(["マンホール", "上水道管"]);
 });
 
+it("ignores non-numeric depth strings instead of producing NaN", () => {
+  const summary = summarizeAsset([
+    feature({ attributes: { "uro:minDepth": "not-a-number", "uro:maxDepth": "" } }),
+    feature({ attributes: { "uro:minDepth": "1.5", "uro:maxDepth": "2.5" } }),
+  ]);
+  expect(summary.depthRange).toEqual([1.5, 2.5]);
+  // An empty string is missing, not zero — it must not drag the range to 0.
+  const withEmpty = summarizeAsset([feature({ attributes: { "uro:minDepth": "", "uro:maxDepth": "2.0" } }), feature({ attributes: { "uro:minDepth": "1.0", "uro:maxDepth": "1.5" } })]);
+  expect(withEmpty.depthRange).toEqual([1.0, 2.0]);
+  const allBad = summarizeAsset([feature({ attributes: { "uro:minDepth": "x", "uro:maxDepth": "y" } })]);
+  expect(allBad.depthRange).toBeNull();
+});
+
 it("summarizes an all-unknown asset as empty, not zero", () => {
   const summary = summarizeAsset([feature({ attributes: {} })]);
   expect(summary.depthRange).toBeNull();
