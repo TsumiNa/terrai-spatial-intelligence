@@ -24,6 +24,8 @@ export function rgba(hex: string, alpha = 1): RGBA {
 /** Foundation overlays: context under the analysis, never competing with
  *  it — low-opacity fills, thin strokes. One entry per registry key; colours
  *  reuse the locked palette rather than growing it. */
+export const FOUNDATION_DEFAULT_STYLE = { line: rgba(palette.gray, 0.8), fill: rgba(palette.gray, 0.12), width: 1 } as const;
+
 export const FOUNDATION_OVERLAY_STYLES: Record<string, { line: RGBA; fill: RGBA; width: number }> = {
   landClassification50k: { line: rgba(palette.hub, 0.8), fill: rgba(palette.hub, 0.14), width: 1 },
   floodHistory: { line: rgba(palette.blue, 0.85), fill: rgba(palette.blue, 0.16), width: 1 },

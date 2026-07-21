@@ -27,6 +27,7 @@ import {
   OVERLAY_OPACITY,
   RISK_BANDS,
   ROAD_OPACITY,
+  FOUNDATION_DEFAULT_STYLE,
   FOUNDATION_OVERLAY_STYLES,
   ROAD_THRESHOLDS,
   SOLAR_STATUS,
@@ -71,7 +72,7 @@ export function buildWindowedFeatureLayer(
   features: Feature[],
   handlers?: { onFeature(feature: Feature, coordinate: [number, number]): void },
 ): Layer {
-  const style = FOUNDATION_OVERLAY_STYLES[key] ?? Object.values(FOUNDATION_OVERLAY_STYLES)[0];
+  const style = FOUNDATION_OVERLAY_STYLES[key] ?? FOUNDATION_DEFAULT_STYLE;
   return new GeoJsonLayer({
     id: `windowed-${key}`,
     data: features as unknown as GeoJSON.Feature[],

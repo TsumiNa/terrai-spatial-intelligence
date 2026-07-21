@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { mount, onMount, unmount } from "svelte";
+  import { mount, onDestroy, onMount, unmount, untrack } from "svelte";
 
   import { Popover } from "bits-ui";
 
@@ -49,29 +49,53 @@
   // app state, so it survives module, view, region and language switches.
   const renderableLayers = renderableFoundationLayers();
   let foundationStates = $state.raw<Record<string, WindowedState>>({});
+  // Non-reactive by design: clients are synced incrementally, so toggling
+  // one layer never recreates the others or drops their window caches.
+  const foundationClients = new Map<string, ReturnType<typeof createWindowedFeatureClient>>();
+  let lastView: { bounds: [number, number, number, number]; zoom: number } | null = null;
 
   $effect(() => {
-    const active = app.foundationLayers
-      .map((key) => renderableLayers.find((entry) => entry.key === key))
-      .filter((entry) => entry !== undefined);
-    if (!mapApi || !active.length) return;
-    const clients = active.map((entry) =>
-      createWindowedFeatureClient({
-        api: createApiClient(),
-        datasetKey: entry.key,
-        extents: entry.extents,
-        minZoom: entry.minZoom,
-        onState: (state) => (foundationStates = { ...foundationStates, [entry.key]: state }),
-      }),
-    );
+    if (!mapApi) return;
     const unsubscribe = mapApi.onViewChange((view) => {
-      for (const client of clients) client.viewChanged(view);
+      lastView = view;
+      for (const client of foundationClients.values()) client.viewChanged(view);
     });
-    return () => {
-      unsubscribe();
-      for (const client of clients) client.destroy();
-      foundationStates = {};
-    };
+    return unsubscribe;
+  });
+
+  $effect(() => {
+    const wanted = new Set(
+      app.foundationLayers.filter((key) => renderableLayers.some((entry) => entry.key === key)),
+    );
+    untrack(() => {
+      for (const [key, client] of [...foundationClients]) {
+        if (wanted.has(key)) continue;
+        client.destroy();
+        foundationClients.delete(key);
+        const next = { ...foundationStates };
+        delete next[key];
+        foundationStates = next;
+      }
+      for (const key of wanted) {
+        if (foundationClients.has(key)) continue;
+        const entry = renderableLayers.find((item) => item.key === key);
+        if (!entry) continue;
+        const client = createWindowedFeatureClient({
+          api: createApiClient(),
+          datasetKey: entry.key,
+          extents: entry.extents,
+          minZoom: entry.minZoom,
+          onState: (state) => (foundationStates = { ...foundationStates, [entry.key]: state }),
+        });
+        foundationClients.set(key, client);
+        if (lastView) client.viewChanged(lastView);
+      }
+    });
+  });
+
+  onDestroy(() => {
+    for (const client of foundationClients.values()) client.destroy();
+    foundationClients.clear();
   });
 
   const activeAttributions = $derived(
@@ -85,16 +109,24 @@
     const entry = foundationLayer(key);
     if (!entry) return;
     const props = feature.properties as Record<string, unknown>;
-    const retrievedAt = String(props.terrai_retrieved_at ?? props.osm_timestamp ?? "—");
-    const sourceUpdated = String(props.terrai_source_updated_at ?? entry.sourceUpdatedAt);
-    const sourceLayer = String(props.terrai_source_layer ?? props.feature_class ?? "—");
+    // The audit "source field" names where the shown value actually came
+    // from — the feature property that supplied it, or the registry.
+    const pick = (candidates: string[], fallback: string): { value: string; field: string } => {
+      for (const name of candidates) {
+        if (props[name] != null) return { value: String(props[name]), field: name };
+      }
+      return { value: fallback, field: "registry" };
+    };
+    const retrieved = pick(["terrai_retrieved_at", "osm_timestamp"], "—");
+    const sourceUpdated = pick(["terrai_source_updated_at"], entry.sourceUpdatedAt);
+    const sourceLayer = pick(["terrai_source_layer", "feature_class"], "—");
     const rawUrl = props.terrai_source_url ?? props.source_url;
     const sourceUrl = typeof rawUrl === "string" ? rawUrl : undefined;
     const context = (sourceField: string) => ({
       attribution: entry.attribution,
       license: entry.license,
-      sourceUpdatedAt: sourceUpdated,
-      retrievedAt,
+      sourceUpdatedAt: sourceUpdated.value,
+      retrievedAt: retrieved.value,
       sourceField,
       datasetKey: key,
       sourceUrl,
@@ -102,9 +134,9 @@
     });
     const t = i18n.t.bind(i18n);
     const fields = [
-      { label: t("fl.sourceLayer"), text: sourceLayer, record: foundationField(localized("fl.sourceLayer"), sourceLayer, context("terrai_source_layer")) },
-      { label: t("fl.sourceUpdatedAt"), text: sourceUpdated, record: foundationField(localized("fl.sourceUpdatedAt"), sourceUpdated, context("terrai_source_updated_at")) },
-      { label: t("fl.retrievedAt"), text: retrievedAt, record: foundationField(localized("fl.retrievedAt"), retrievedAt, context("terrai_retrieved_at")) },
+      { label: t("fl.sourceLayer"), text: sourceLayer.value, record: foundationField(localized("fl.sourceLayer"), sourceLayer.value, context(sourceLayer.field)) },
+      { label: t("fl.sourceUpdatedAt"), text: sourceUpdated.value, record: foundationField(localized("fl.sourceUpdatedAt"), sourceUpdated.value, context(sourceUpdated.field)) },
+      { label: t("fl.retrievedAt"), text: retrieved.value, record: foundationField(localized("fl.retrievedAt"), retrieved.value, context(retrieved.field)) },
       { label: t("fl.license"), text: entry.license, record: foundationField(localized("fl.license"), entry.license, context("registry")) },
     ];
     showPopup(coordinate, { eyebrow: t("fl.eyebrow"), title: t(entry.name), fields });

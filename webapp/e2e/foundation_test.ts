@@ -74,16 +74,19 @@ test("panning loads windowed features and returning to a window hits the cache",
 });
 
 test("below the minimum zoom no request is issued and the state says so", async ({ page }) => {
+  // Point features: zero tessellation cost, so the gestures never queue
+  // behind deck on software-GL hardware. The layer's floor is 15 and the
+  // map's own minimum is 14, so two zoom-outs cross it.
   await open(page, { module: "slope" });
-  await toggleLayer(page, "landHistory");
-  await expectStatus(page, "landHistory", /ready|empty/);
+  await toggleLayer(page, "publishedLandPrice");
+  await expectStatus(page, "publishedLandPrice", /ready|empty/);
 
-  // Region zoom equals the layer's floor (16); one zoom-out crosses it
-  // without ever loading an intermediate window.
   const canvas = page.locator("#map .maplibregl-canvas");
   await canvas.dblclick({ position: { x: 300, y: 200 }, modifiers: ["Shift"] });
+  await expectStatus(page, "publishedLandPrice", /ready|empty/);
+  await canvas.dblclick({ position: { x: 300, y: 200 }, modifiers: ["Shift"] });
 
-  await expectStatus(page, "landHistory", /belowZoom/);
+  await expectStatus(page, "publishedLandPrice", /belowZoom/);
 });
 
 test("clicking a foundation feature opens its raw audit record", async ({ page }) => {
