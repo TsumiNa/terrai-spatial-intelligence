@@ -9,6 +9,7 @@ from terrai_spatial.data_service import (
     DATASETS,
     FOUNDATION_DATASETS,
     HEALTH_EXCLUDED_DATASETS,
+    SCENE_HANDOFFS,
     DataService,
     DatasetNotFoundError,
     service,
@@ -36,6 +37,29 @@ def test_foundation_datasets_are_on_demand_not_bootstrapped() -> None:
     assert service.bootstrap()["meta"]["datasets_total"] == (
         len(DATASETS) + len(FOUNDATION_DATASETS) - len(HEALTH_EXCLUDED_DATASETS)
     )
+
+
+def test_scene_handoffs_resolve_through_existing_foundation_dataset_keys() -> None:
+    assert set(SCENE_HANDOFFS) == {"uc24_16_nihonbashi", "uc24_13_sapporo"}
+    assert set(SCENE_HANDOFFS).issubset(FOUNDATION_DATASETS)
+    assert "undergroundScenes" not in FOUNDATION_DATASETS
+
+    catalog = service.scene_catalog()
+    assert [item["scene_id"] for item in catalog["scenes"]] == [
+        "nihonbashi-utilities",
+        "sapporo-station-underground",
+    ]
+    assert service.scene_handoff("uc24_16_nihonbashi")["scene_id"] == "nihonbashi-utilities"
+    assert service.scene_handoff("uc24_13_sapporo")["scene_id"] == "sapporo-station-underground"
+    assert "uc24_16_nihonbashi" not in service.bootstrap()
+    assert "uc24_13_sapporo" not in service.bootstrap()
+
+    rows = {item["key"]: item for item in service.catalog()}
+    assert rows["uc24_16_nihonbashi"]["scene_handoff_ready"] is True
+    assert rows["uc24_13_sapporo"]["scene_handoff_ready"] is True
+
+    with pytest.raises(DatasetNotFoundError):
+        service.scene_handoff("osmSapporoUndergroundAccess")
 
 
 def test_asset_manifest_readiness_requires_every_local_cache_file(tmp_path: Path) -> None:
