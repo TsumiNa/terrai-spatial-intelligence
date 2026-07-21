@@ -21,39 +21,62 @@ import { open, openAudit, WIDE } from "./support/ui";
  *  The map canvas is excluded throughout: MapLibre and deck.gl own that markup.
  */
 
-/** Violations present on `main` at the time this baseline was taken.
+/** Violations present on `main` when this baseline was taken.
+ *
+ *  Asserted as an exact set of rule ids plus a ceiling on total nodes, rather
+ *  than an exact node count per rule. The counts are not portable: macOS
+ *  reports 14 `color-contrast` nodes and the Linux runner reports 15, because
+ *  the font stack falls back differently and one label lands on the other side
+ *  of the size threshold axe uses. A check that goes red for that reason is one
+ *  people stop believing.
+ *
+ *  What survives the relaxation is what matters: a violation of a **new kind**
+ *  fails, and violations **multiplying** fails. What is lost is that fixing one
+ *  no longer fails, so the ceilings can drift below reality — the id list is the
+ *  part that keeps this honest, since removing a category does fail.
  *
  *  `aria-hidden-focus` appears only while the drawer is closed: it carries
  *  `aria-hidden="true"` over a focusable close button, which is defect 4 in the
  *  plan. It disappears when open because the attribute is toggled off.
  */
-const CLOSED_BASELINE = [
-  "aria-hidden-focus (serious) x1",
-  "color-contrast (serious) x14",
-  "nested-interactive (serious) x18",
-];
+const CLOSED_BASELINE = {
+  ids: ["aria-hidden-focus", "color-contrast", "nested-interactive"],
+  maxNodes: 34,
+};
 
-const OPEN_BASELINE = ["color-contrast (serious) x14", "nested-interactive (serious) x18"];
+const OPEN_BASELINE = {
+  ids: ["color-contrast", "nested-interactive"],
+  maxNodes: 33,
+};
 
-async function violations(page: Page): Promise<string[]> {
+type Scan = { ids: string[]; nodes: number };
+
+async function scan(page: Page): Promise<Scan> {
   const result = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .exclude("#map")
     .analyze();
-  return result.violations.map((v) => `${v.id} (${v.impact}) x${v.nodes.length}`).sort();
+  return {
+    ids: result.violations.map((v) => v.id).sort(),
+    nodes: result.violations.reduce((total, v) => total + v.nodes.length, 0),
+  };
 }
 
 test("the closed exhibition matches its recorded violations", async ({ page }) => {
   await page.setViewportSize(WIDE);
   await open(page, { module: "slope" });
-  expect(await violations(page)).toEqual(CLOSED_BASELINE);
+  const result = await scan(page);
+  expect(result.ids).toEqual(CLOSED_BASELINE.ids);
+  expect(result.nodes).toBeLessThanOrEqual(CLOSED_BASELINE.maxNodes);
 });
 
 test("the open audit drawer matches its recorded violations", async ({ page }) => {
   await page.setViewportSize(WIDE);
   await open(page, { module: "slope" });
   await openAudit(page);
-  expect(await violations(page)).toEqual(OPEN_BASELINE);
+  const result = await scan(page);
+  expect(result.ids).toEqual(OPEN_BASELINE.ids);
+  expect(result.nodes).toBeLessThanOrEqual(OPEN_BASELINE.maxNodes);
 });
 
 // --- Defects stage 05 removes -------------------------------------------------

@@ -43,7 +43,7 @@ Run `uv run python -m terrai_spatial validate` after adding or changing document
 
 Regenerate deliberately, never to turn a red build green:
 
-- **Locally**, for the platform you are on: `cd webapp && npx playwright test visual_test.ts --update-snapshots`
+- **Locally**, for the platform you are on: `cd webapp && npx playwright test e2e/visual_test.ts --update-snapshots`
 - **For Linux**, run the `Visual baselines` workflow from the Actions tab, download the `visual-baselines-linux` artifact, review every changed image, and commit the ones you intend to keep.
 
 A diff during a refactor is a defect. A diff during an intended redesign is the thing being reviewed.
