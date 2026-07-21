@@ -6,12 +6,13 @@ export default defineConfig({
   // Tests only read; nothing shares state, so they can all run at once. Without
   // this only whole files parallelise, which leaves the 14 visual tests serial.
   fullyParallel: true,
-  // Playwright drops to a single worker when it detects CI, which made
-  // fullyParallel do nothing there. Two is deliberate rather than one per core:
-  // these tests render maps through software WebGL, and four workers on the
-  // four-core runner starved each other until map-dependent tests timed out.
-  // A flaky suite is worse than a slow one when it guards the visual baselines.
-  workers: process.env.CI ? 2 : undefined,
+  // `workers` is deliberately left at Playwright's defaults, which means one
+  // worker on CI. Overriding it was measured and rejected: these tests render
+  // maps through software WebGL, so they are CPU-bound rather than
+  // concurrency-bound. Four workers on the four-core runner starved each other
+  // until map-dependent tests timed out, and two bought 12s. That is a poor
+  // trade for the suite that guards the visual baselines. Locally, where cores
+  // are spare, fullyParallel alone takes the suite from about 93s to 27s.
   use: { baseURL: "http://127.0.0.1:4300" },
   webServer: [
     {
