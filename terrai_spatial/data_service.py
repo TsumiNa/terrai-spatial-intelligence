@@ -13,6 +13,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from .store import StoreSource
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -70,6 +72,71 @@ SCENE_HANDOFFS = {
     "uc24_16_nihonbashi": "data/plateau/uc24_16_nihonbashi/scene_handoff.json",
     "uc24_13_sapporo": "data/plateau/uc24_13_sapporo/scene_handoff.json",
 }
+
+# The FL/SL/AL commitment is schema, not convention: every store row carries
+# its tier and evidence state. Everything integrated today is observed —
+# acquired evidence and deterministic transformations are FL, the heuristic
+# screening products computed from them are AL, and no synthetic value exists
+# yet. The first SL prediction set arrives under a model-run record, never as
+# a relabelling. Per docs/architecture/FL_SL_AL_CONCEPT.md, the satellite
+# embedding remains external FL even though a foundation model produced it.
+DATASET_TIERS: dict[str, tuple[str, str]] = {
+    "buildings": ("AL", "observed"),
+    "buildingSummary": ("AL", "observed"),
+    "roads": ("AL", "observed"),
+    "roadSummary": ("AL", "observed"),
+    "solar": ("AL", "observed"),
+    "solarContext": ("FL", "observed"),
+    "solarSummary": ("AL", "observed"),
+    "hubs": ("AL", "observed"),
+    "corridors": ("AL", "observed"),
+    "delivery": ("AL", "observed"),
+    "jointSummary": ("AL", "observed"),
+    "gridScreen": ("FL", "observed"),
+    "gsiEvacuation": ("FL", "observed"),
+    "facilities": ("AL", "observed"),
+    "embeddingEvidence": ("FL", "observed"),
+    "embeddingSummary": ("FL", "observed"),
+    "yokohamaZones": ("AL", "observed"),
+    "mobaraZones": ("AL", "observed"),
+    "multiscaleSummary": ("AL", "observed"),
+    "landClassification50k": ("FL", "observed"),
+    "floodHistory": ("FL", "observed"),
+    "landHistory": ("FL", "observed"),
+    "landslideWarning": ("FL", "observed"),
+    "multistageFlood": ("FL", "observed"),
+    "publishedLandPrice": ("FL", "observed"),
+    "embankmentRegulation": ("FL", "observed"),
+    "railway": ("FL", "observed"),
+    "landUseMesh": ("FL", "observed"),
+    "prefecturalLandPrice": ("FL", "observed"),
+    "uc24_16_nihonbashi": ("FL", "observed"),
+    "uc24_13_sapporo": ("FL", "observed"),
+    "osmSapporoUndergroundAccess": ("FL", "observed"),
+    "kunijibanBoreholes": ("FL", "observed"),
+}
+
+
+def store_sources() -> list[StoreSource]:
+    """Every dataset the service exposes, as build sources for the store.
+
+    GeoJSON datasets land in ``features``; JSON products, asset manifests and
+    the scene catalog/handoffs land in ``documents`` under the keys the
+    service uses today.
+    """
+
+    missing = sorted(set(ALL_DATASETS) - set(DATASET_TIERS))
+    if missing:
+        raise RuntimeError(f"datasets lack a tier assignment: {', '.join(missing)}")
+    sources = []
+    for key, relative in ALL_DATASETS.items():
+        tier, evidence_state = DATASET_TIERS[key]
+        kind = "features" if relative.endswith(".geojson") else "document"
+        sources.append(StoreSource(key, relative, kind, tier, evidence_state))
+    sources.append(StoreSource("sceneCatalog", SCENE_CATALOG_PATH, "document", "FL", "observed"))
+    for owner, relative in SCENE_HANDOFFS.items():
+        sources.append(StoreSource(f"sceneHandoff:{owner}", relative, "document", "FL", "observed"))
+    return sources
 
 SOURCE_GROUPS = (
     {"name": "GSI", "role": "terrain, designated evacuation and visual basemaps", "access": "public"},
