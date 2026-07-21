@@ -1,6 +1,6 @@
 # Projected CRS Measurement
 
-- Status: Planned
+- Status: In progress
 
 ## Context
 

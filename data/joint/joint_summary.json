@@ -5,13 +5,13 @@
     "count": 30,
     "priority_count": 30,
     "pv_capacity_proxy_kwp": 2204,
-    "served_high_risk_building_links": 1345
+    "served_high_risk_building_links": 1351
   },
   "compound_corridors": {
     "count": 150,
     "priority_count": 79,
     "road_length_km": 16.4,
-    "high_risk_building_links": 2587
+    "high_risk_building_links": 2591
   },
   "solar_delivery_cells": {
     "count": 23,

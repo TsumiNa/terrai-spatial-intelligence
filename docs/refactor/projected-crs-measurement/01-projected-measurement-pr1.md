@@ -1,6 +1,6 @@
 # PR1 Plan: Projected Measurement for the Build Pipelines
 
-- Status: Planned
+- Status: In progress
 - Refactor: `projected-crs-measurement`
 
 ## Goal

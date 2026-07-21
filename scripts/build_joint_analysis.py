@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """Build TerrAI cross-module decision products from the three PoC datasets.
 
-The script intentionally uses only Python's standard library so that the demo can
-be regenerated without a GIS stack. All distances are local planar approximations
-and should be replaced by a projected CRS workflow in a production system.
+Distances are measured in the shared projected CRS (EPSG:6677); storage and
+delivery stay EPSG:4326.
 """
 
 from __future__ import annotations
 
 import json
-import math
 import sys
 from pathlib import Path
 
@@ -18,44 +16,19 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from terrai_spatial.pipeline.io import write_json_atomic  # noqa: E402
+from terrai_spatial.pipeline.measurement import (  # noqa: E402
+    distance_m,
+    point_line_distance_m,
+    project_line,
+    project_point,
+)
 
 DATA = ROOT / "data"
-LAT0 = math.radians(35.4465)
-M_PER_DEG_LAT = 111_320.0
-M_PER_DEG_LON = M_PER_DEG_LAT * math.cos(LAT0)
 
 
 def load_json(path: Path) -> dict:
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)
-
-
-def xy(point: list[float]) -> tuple[float, float]:
-    return point[0] * M_PER_DEG_LON, point[1] * M_PER_DEG_LAT
-
-
-def distance_m(a: list[float], b: list[float]) -> float:
-    ax, ay = xy(a)
-    bx, by = xy(b)
-    return math.hypot(ax - bx, ay - by)
-
-
-def point_segment_distance_m(point: list[float], a: list[float], b: list[float]) -> float:
-    px, py = xy(point)
-    ax, ay = xy(a)
-    bx, by = xy(b)
-    dx, dy = bx - ax, by - ay
-    if dx == 0 and dy == 0:
-        return math.hypot(px - ax, py - ay)
-    t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)))
-    return math.hypot(px - (ax + t * dx), py - (ay + t * dy))
-
-
-def point_line_distance_m(point: list[float], coordinates: list[list[float]]) -> float:
-    return min(
-        point_segment_distance_m(point, coordinates[index], coordinates[index + 1])
-        for index in range(len(coordinates) - 1)
-    )
 
 
 def clamp(value: float, low: float = 0.0, high: float = 100.0) -> float:
@@ -67,10 +40,10 @@ def feature_collection(features: list[dict]) -> dict:
 
 
 def build_compound_corridors(buildings: list[dict], roads: list[dict]) -> list[dict]:
-    building_points = [(feature, feature["properties"]["centroid"]) for feature in buildings]
+    building_points = [(feature, project_point(feature["properties"]["centroid"])) for feature in buildings]
     results = []
     for road in roads:
-        line = road["geometry"]["coordinates"]
+        line = project_line(road["geometry"]["coordinates"])
         nearby = [
             feature
             for feature, point in building_points
@@ -102,10 +75,11 @@ def build_compound_corridors(buildings: list[dict], roads: list[dict]) -> list[d
 
 def build_resilience_hubs(buildings: list[dict], roads: list[dict]) -> list[dict]:
     high_points = [
-        feature["properties"]["centroid"]
+        project_point(feature["properties"]["centroid"])
         for feature in buildings
         if feature["properties"]["risk_band"] == "high"
     ]
+    road_lines = [(road, project_line(road["geometry"]["coordinates"])) for road in roads]
     results = []
     for building in buildings:
         props = building["properties"]
@@ -113,12 +87,12 @@ def build_resilience_hubs(buildings: list[dict], roads: list[dict]) -> list[dict
         if footprint < 140 or props["risk_band"] == "high" or props["slope_deg"] > 12:
             continue
 
-        point = props["centroid"]
-        nearest_road = min(
-            roads,
-            key=lambda road: point_line_distance_m(point, road["geometry"]["coordinates"]),
+        point = project_point(props["centroid"])
+        nearest_road, nearest_line = min(
+            road_lines,
+            key=lambda pair: point_line_distance_m(point, pair[1]),
         )
-        nearest_distance = point_line_distance_m(point, nearest_road["geometry"]["coordinates"])
+        nearest_distance = point_line_distance_m(point, nearest_line)
         if nearest_distance > 150:
             continue
         served_high = sum(distance_m(point, high_point) <= 150 for high_point in high_points)
