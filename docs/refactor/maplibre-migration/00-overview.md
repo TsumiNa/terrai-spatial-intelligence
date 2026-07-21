@@ -65,6 +65,6 @@ Each stage ships as its own pull request, states its own acceptance commands, an
 
 ## Open questions carried into implementation
 
-1. Whether the UI source language stays Simplified Chinese or moves to English, aligning with the documentation policy. Stage 02 forces this decision.
+1. ~~Whether the UI source language stays Simplified Chinese or moves to English.~~ **Settled in stage 02:** the message key set is defined by the English catalog (`webapp/src/lib/i18n/messages.ts`), aligning the UI source language with the documentation policy; the Chinese and Japanese catalogs are compile-checked against it, and the default *display* language remains Simplified Chinese for exhibition parity.
 2. Whether MapLibre terrain from GSI elevation works outside the throwaway spike. Not required by any stage here, but wanted for surface context.
 3. The output shape of `geo_pfn` subsurface prediction, which decides whether stage 07 needs volumetric ray marching or only discrete surfaces and boreholes.

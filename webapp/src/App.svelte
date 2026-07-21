@@ -1,8 +1,65 @@
-<main>
-  <h1>TerrAI Spatial Intelligence</h1>
-  <p>
-    Svelte exhibition shell. Not yet the served frontend — the current
-    exhibition remains under <code>frontend/</code> until the migration
-    reaches parity.
-  </p>
-</main>
+<script lang="ts">
+  import { onMount } from "svelte";
+
+  import { createApiClient } from "./lib/api/client";
+  import type { Bootstrap } from "./lib/api/types";
+  import AuditDrawer from "./lib/components/AuditDrawer.svelte";
+  import Hero from "./lib/components/Hero.svelte";
+  import MapCard from "./lib/components/MapCard.svelte";
+  import Metrics from "./lib/components/Metrics.svelte";
+  import QueuePanel from "./lib/components/QueuePanel.svelte";
+  import Sidebar from "./lib/components/Sidebar.svelte";
+  import Topbar from "./lib/components/Topbar.svelte";
+  import { i18n } from "./lib/i18n/i18n.svelte";
+  import { buildModuleVM } from "./lib/modules";
+  import { app } from "./lib/state.svelte";
+
+  const vm = $derived(app.data ? buildModuleVM(app.module, app.view, app.data) : null);
+
+  $effect(() => {
+    document.documentElement.lang = i18n.lang === "zh" ? "zh-CN" : i18n.lang;
+  });
+
+  $effect(() => {
+    if (vm) app.syncUrl(vm.activeView);
+  });
+
+  onMount(async () => {
+    try {
+      const client = createApiClient();
+      const { data, error } = await client.GET("/api/v1/bootstrap");
+      if (error || !data) throw new Error(`bootstrap: ${error ? JSON.stringify(error) : "empty response"}`);
+      // The endpoint returns an open object in the OpenAPI schema; the shape
+      // itself is maintained by hand in lib/api/types.ts.
+      app.setData(data as unknown as Bootstrap);
+    } catch (cause) {
+      app.setLoadError(cause instanceof Error ? cause.message : String(cause));
+    }
+  });
+</script>
+
+<div class="app-shell">
+  <Sidebar />
+  <main class="workspace">
+    <Topbar {vm} />
+    {#if vm}
+      <Hero {vm} />
+      <Metrics {vm} />
+      <section class="analysis-grid">
+        <MapCard {vm} />
+        <QueuePanel {vm} />
+      </section>
+    {/if}
+  </main>
+</div>
+
+<AuditDrawer />
+
+<div class="loading" class:done={app.data !== null}>
+  {#if app.loadError}
+    <strong>{i18n.t("loading.failed")}</strong><span>{app.loadError}</span>
+  {:else}
+    <div class="loader"></div>
+    <span>{i18n.t("loading.connecting")}</span>
+  {/if}
+</div>

@@ -1,8 +1,8 @@
 # PR2 Plan: App Shell and Compile-Time i18n
 
-- Status: Planned
+- Status: Completed
 - Refactor: `maplibre-migration`
-- PR: #2
+- PR: #13
 
 ## Goal
 
