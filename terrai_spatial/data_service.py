@@ -51,8 +51,10 @@ FOUNDATION_DATASETS: dict[str, str] = {
     "railway": "data/mlit/railway.geojson",
     "landUseMesh": "data/mlit/land_use_mesh.geojson",
     "prefecturalLandPrice": "data/mlit/prefectural_land_price.geojson",
+    "uc24_16_nihonbashi": "data/plateau/uc24_16_nihonbashi/manifest.json",
 }
 ALL_DATASETS = {**DATASETS, **FOUNDATION_DATASETS}
+ASSET_MANIFEST_DATASETS = {"uc24_16_nihonbashi"}
 
 SOURCE_GROUPS = (
     {"name": "GSI", "role": "terrain, designated evacuation and visual basemaps", "access": "public"},
@@ -101,15 +103,37 @@ class DataService:
             exists = path.is_file()
             # Do not deserialize large on-demand layers merely to render health
             # or catalog metadata; that would defeat their delivery boundary.
-            value = self.load(key) if exists and key in DATASETS else None
+            value = self.load(key) if exists and (key in DATASETS or key in ASSET_MANIFEST_DATASETS) else None
+            asset_roots = None
+            if key in ASSET_MANIFEST_DATASETS:
+                manifest_files = value.get("files", []) if isinstance(value, dict) else []
+                ready = exists and bool(manifest_files) and all(
+                    self._safe_manifest_file_exists(item) for item in manifest_files
+                )
+                asset_roots = [
+                    resource["tileset_url"]
+                    for resource in value.get("resources", [])
+                    if isinstance(resource, dict) and isinstance(resource.get("tileset_url"), str)
+                ] if isinstance(value, dict) else []
+            else:
+                ready = exists
             rows.append(
                 {
                     "key": key,
                     "path": relative,
-                    "ready": exists,
-                    "kind": "geojson" if relative.endswith(".geojson") else "json",
+                    "ready": ready,
+                    "kind": (
+                        "asset_manifest"
+                        if key in ASSET_MANIFEST_DATASETS
+                        else "geojson" if relative.endswith(".geojson") else "json"
+                    ),
                     "delivery": "bootstrap" if key in DATASETS else "on_demand",
-                    "feature_count": len(value.get("features", [])) if isinstance(value, dict) else None,
+                    "feature_count": (
+                        value.get("feature_count")
+                        if key in ASSET_MANIFEST_DATASETS and isinstance(value, dict)
+                        else len(value.get("features", [])) if isinstance(value, dict) else None
+                    ),
+                    "asset_roots": asset_roots,
                     "modified_at": (
                         datetime.fromtimestamp(path.stat().st_mtime, tz=UTC).isoformat() if exists else None
                     ),
@@ -117,8 +141,15 @@ class DataService:
             )
         return rows
 
+    def _safe_manifest_file_exists(self, relative: Any) -> bool:
+        if not isinstance(relative, str):
+            return False
+        path = (self.root / relative).resolve()
+        root = self.root.resolve()
+        return root in path.parents and path.is_file() and path.stat().st_size > 0
+
     def health(self) -> dict[str, Any]:
-        catalog = self.catalog()
+        catalog = [row for row in self.catalog() if row["key"] not in ASSET_MANIFEST_DATASETS]
         ready = sum(1 for row in catalog if row["ready"])
         return {
             "status": "ready" if ready == len(catalog) else "degraded",

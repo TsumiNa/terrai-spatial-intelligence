@@ -120,6 +120,21 @@ TASKS = {
         force_argument=True,
         check_stale=False,
     ),
+    "underground_utilities": DataTask(
+        "underground_utilities",
+        "restore and audit the PLATEAU UC24-16 Nihonbashi utility scene",
+        "scripts/fetch_plateau_uc24_16.py",
+        inputs=("data/plateau/uc24_16_nihonbashi/source_manifest.json",),
+        outputs=(
+            "data/plateau/uc24_16_nihonbashi/manifest.json",
+            "data/plateau/uc24_16_nihonbashi/audit_index.json",
+        ),
+        manifest="data/plateau/uc24_16_nihonbashi/manifest.json",
+        network=True,
+        force_argument=True,
+        offline_argument=True,
+        check_stale=False,
+    ),
     "grid": DataTask(
         "grid",
         "download the local-only TEPCO cache when needed and rebuild its screen",
