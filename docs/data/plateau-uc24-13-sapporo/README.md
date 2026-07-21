@@ -29,6 +29,8 @@ This dataset supplies observed structural geometry for scene `sapporo-station-un
 
 The separate OSM snapshot adds community access/topology context. It does not validate, overwrite or snap PLATEAU geometry. A shared scene ID expresses spatial context only; source-specific IDs, timestamps, files and licences remain separate.
 
+`data/plateau/uc24_13_sapporo/scene_handoff.json` is derived auxiliary metadata owned by the same dataset key. It records the measured extent, a reversible `EPSG:4979` → `EPSG:4978` → local ENU-metre frame, WGS 84 ellipsoid-height reference and `unknown` orthometric datum. The 70,718 PLATEAU rows are observed underground-structure evidence and the 195 OSM features are independently observed access context; terrain/buildings, boreholes, strata and SL predictions remain unresolved, and the geographically separate Nihonbashi utilities are not applicable. `data/scenes/underground/catalog.json` discovers the scene without creating another FL dataset key. Both files rebuild deterministically with `uv run python -m terrai_spatial data ensure --only underground_scenes --offline` and stay outside `/bootstrap`.
+
 ## License
 
 The official catalog applies [PLATEAU Site Policy, section 3](https://www.mlit.go.jp/plateau/site-policy/). Commercial reuse is generally permitted with source attribution, modification notices and checks for separately identified third-party rights.

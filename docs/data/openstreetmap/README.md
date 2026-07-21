@@ -23,6 +23,8 @@ OpenStreetMap community database: https://www.openstreetmap.org/copyright . The 
 
 Building footprints support slope exposure and roof-capacity proxies; roads support continuity, accessibility, and solar logistics; water/land use support setbacks and context; transmission lines provide distance proxies in Mobara. Sapporo OSM features provide independent community access/topology context for scene `sapporo-station-underground` and are queried on demand through dataset key `osmSapporoUndergroundAccess`. They remain separate from PLATEAU geometry and do not validate or overwrite it. Main products are under `data/yokohama/`, `data/mobara/`, `data/joint/`, and `data/osm/sapporo_underground_access/`.
 
+The renderer-neutral Sapporo handoff at `data/plateau/uc24_13_sapporo/scene_handoff.json` references the 195-feature GeoJSON as observed access topology with its own OSM snapshot time, query hash, ODbL licence and audit path. It does not snap OSM features to PLATEAU surfaces, infer depth or treat an absent access tag as permission. The handoff is discovered through `data/scenes/underground/catalog.json`; neither file creates another OSM dataset key or enters `/bootstrap`.
+
 ## License
 
 Open Database License (ODbL). Attribute OpenStreetMap contributors; publicly distributed derivative databases may trigger share-alike obligations.

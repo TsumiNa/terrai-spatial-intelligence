@@ -29,6 +29,8 @@
 
 独立的 OSM 快照只补充社区 access/topology 上下文，不校验、覆盖或吸附 PLATEAU 几何。共同 scene ID 仅表示空间背景；各自的 ID、时间戳、文件和 license 始终分离。
 
+`data/plateau/uc24_13_sapporo/scene_handoff.json` 是由同一数据集 key 所有的派生辅助元数据。它记录实测范围、可逆的 `EPSG:4979` → `EPSG:4978` → 本地 ENU 米制坐标框架、WGS 84 椭球高参考，以及为 `unknown` 的正高基准。70,718 条 PLATEAU 记录是观测地下结构证据，195 个 OSM 要素是独立观测的出入口上下文；地形/建筑、钻孔、地层与 SL 预测保持 unresolved，地理上分离的日本桥管线为 not applicable。`data/scenes/underground/catalog.json` 在不创建新 FL 数据集 key 的情况下发现该场景。两份文件均可通过 `uv run python -m terrai_spatial data ensure --only underground_scenes --offline` 确定性重建，且不进入 `/bootstrap`。
+
 ## License
 
 官方目录适用 [PLATEAU Site Policy 第 3 节](https://www.mlit.go.jp/plateau/site-policy/)。通常允许商业使用，但必须注明来源和修改，并检查单独标出的第三方权利。

@@ -1,6 +1,6 @@
 # PR3 Plan: Renderer-neutral Underground Scene Handoff
 
-- Status: Planned
+- Status: Completed
 - Refactor: `underground-observation-foundation`
 - Depends on: PR1 and PR2 merged
 - Downstream consumer: `maplibre-migration/07-site-scene-three-pr7`
@@ -55,6 +55,13 @@ Publish one renderer-neutral scene catalog and per-scene handoff that lets the l
 - Reverting PR3 leaves PR1 and PR2 source integrations usable and valid.
 - `uv run pytest`, `uv run python -m terrai_spatial validate`, Ruff for changed Python and `git diff --check` pass.
 
+## Implementation outcome
+
+- `scripts/build_underground_scenes.py` deterministically derives one catalog and two source-owned handoffs from the committed UC24-16, UC24-13 and OSM manifests; the `underground_scenes` data task rebuilds them without network access.
+- Both frames use the source `EPSG:4979` longitude/latitude/ellipsoid-height coordinates, `EPSG:4978` ECEF world coordinates and an east/north/up local frame in metres. The matrices are generated from each measured source extent and tested in both directions.
+- Nihonbashi exposes 810 network rows and 311 access-structure rows. Sapporo exposes 70,718 structural rows plus 195 independent OSM access features. Every other required family is explicitly `unresolved` or `not_applicable` without asset paths, counts or model identities.
+- The file-backed service discovers the catalog and resolves a handoff only through `uc24_16_nihonbashi` or `uc24_13_sapporo`; no scene dataset key or endpoint was added, and `/bootstrap` remains unchanged.
+
 ## Handoff
 
-After this PR merges, update `docs/refactor/maplibre-migration/07-site-scene-three-pr7.md` from `Blocked` to `Planned` and narrow its first implementation to observed structural scenes. The PR7 endpoint may return the handoff plus selected assets for a bbox, but it must preserve availability states and local-frame provenance. Geo_pfn volumetric rendering remains a later plan and must not be smuggled into PR7 merely because its original blocker mentioned prediction shape.
+This PR updates `docs/refactor/maplibre-migration/07-site-scene-three-pr7.md` from `Blocked` to `Planned` and narrows its first implementation to observed structural scenes. After merge, the PR7 endpoint may return the handoff plus selected assets for a bbox, but it must preserve availability states and local-frame provenance. Geo_pfn volumetric rendering remains a later plan and must not be smuggled into PR7 merely because its original blocker mentioned prediction shape.

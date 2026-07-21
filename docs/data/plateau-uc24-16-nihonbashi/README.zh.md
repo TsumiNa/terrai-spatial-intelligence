@@ -30,6 +30,8 @@
 
 `data/plateau/uc24_16_nihonbashi/audit_index.json` 将每个源要素 ID 对应到资源、glTF tile、原始属性、缺失状态、取回时间及压缩包哈希。源深度属性与绝对三维位置保持分离，不得重复扣减。
 
+`data/plateau/uc24_16_nihonbashi/scene_handoff.json` 是由同一数据集 key 所有的派生辅助元数据。它记录实测源范围、可逆的 `EPSG:4979` → `EPSG:4978` → 本地 ENU 米制坐标框架、WGS 84 椭球高参考，以及为 `unknown` 的正高基准。810 条管网记录和 311 条出入口结构记录被标为观测证据；同址地形/建筑、钻孔、地层和 SL 预测保持 unresolved，札幌公共地下空间结构为 not applicable。`data/scenes/underground/catalog.json` 在不注册新 FL 数据集 key 的前提下发现该场景。两份文件均可通过 `uv run python -m terrai_spatial data ensure --only underground_scenes --offline` 确定性重建，且不进入 `/bootstrap`。
+
 ## License
 
 官方目录适用 [PLATEAU Site Policy 第3节](https://www.mlit.go.jp/plateau/site-policy/)。原则上允许包括商业用途在内的再利用，但必须保留来源署名、说明修改，并检查单独标出的第三方权利。取回清单保留官方资源 URL 和许可声明。
