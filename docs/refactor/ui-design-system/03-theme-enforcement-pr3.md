@@ -1,6 +1,6 @@
 # PR3 Plan: Theme Enforcement
 
-- Status: Planned
+- Status: Completed
 - Refactor: `ui-design-system`
 - PR: #3
 
@@ -21,6 +21,7 @@ Make an off-system value fail a check rather than merge. Without this stage, the
    The distinction is positional, not textual: a variant is everything before the final `:` in a class, the utility is what follows it. Apply the rule to the utility only. In `data-[state=open]:bg-forest`, `data-[state=open]` is a variant and `bg-forest` is the utility; in `data-[state=open]:bg-[#1f7a58]` the same variant is fine and `bg-[#1f7a58]` is the violation.
 2. Wire it into the same command contributors already run, so it fails in the place they already look.
 3. Document the rule in `AGENTS.md` beside the other executable contracts, including how to add a token when one is genuinely needed.
+4. **Give TypeScript a single colour source.** Found while implementing: `.svelte` files contain no colour literals at all, but fifteen were scattered through `modules.ts` and `style-rules.ts`, because the map needs numeric values. Nine were off-palette, and `lime` had drifted to mean two different greens. A check that scanned only Svelte would have missed the majority of this product's colour.
 4. Tests that confirm the check catches each violation class, verified by injecting one and watching it fail.
 
 ## Non-goals
@@ -29,7 +30,8 @@ No styling change. No opinion on class ordering or formatting — this is about 
 
 ## Implementation notes
 
-- Decide where this lives. Open question 3 in the overview: the JavaScript toolchain is where the files are, but `terrai validate` is where this repository's other executable contracts already live, and contributors already run it. Either is defensible; record which and why.
+- **Resolved: it lives in the JavaScript toolchain**, as a vitest suite next to the files it inspects, so it runs on `npm run test` and in the Web app CI job. `terrai validate` was the alternative, but parsing Svelte from Python puts the feedback in the wrong loop for frontend work.
+- Three false-positive classes were found and fixed while implementing, each of which would have made the rule untrustworthy: it flagged colours named in **comments**, it flagged this project's own **`rgba()` helper** because the pattern matched the bare function name, and it flagged the **fixtures in its own test**. A rule that cries wolf gets disabled.
 - An escape hatch will be needed eventually. Prefer one that is visible in review — a named exception list in one file, not a comment that can be sprinkled anywhere.
 - The check must not fire on the map libraries' own class names, which this project does not control.
 

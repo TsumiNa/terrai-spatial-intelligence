@@ -46,6 +46,19 @@
   --color-amber: #e2a43c;
   --color-red: #d75b4c;
   --color-blue: #397ca3;
+  /* Map fills and strokes. These live in TypeScript too, because deck.gl needs
+   * numeric values; src/lib/theme.ts mirrors them and is the only file allowed
+   * to write a colour literal. */
+  --color-hub: #8fc85a;
+  --color-gray: #a9b5af;
+  --color-transmission: #8e5eaa;
+  --color-exposure-outline: #7b342b;
+  --color-building-outline: #687b74;
+  --color-building-outline-soft: #6e7e78;
+  --color-building-fill: #8b9994;
+  --color-corridor-outline: #0c4e34;
+  --color-zone-outline: #104b35;
+
   --color-transparent: transparent;
   --color-current: currentColor;
 
