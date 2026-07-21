@@ -14,20 +14,24 @@ export default defineConfig({
   // trade for the suite that guards the visual baselines. Locally, where cores
   // are spare, fullyParallel alone takes the suite from about 93s to 27s.
   use: { baseURL: "http://127.0.0.1:4300" },
+  // reuseExistingServer is off for both servers: with it on, any leftover
+  // process on the port silently replaces the freshly built app or API and
+  // the suite tests stale code. An occupied port now fails the run loudly —
+  // kill the stray process and rerun.
   webServer: [
     {
       // `npm run build` also runs svelte-check over 897 files, which the Web app
       // job already did. Only the bundle is needed to serve the app.
       command: "npx vite build && npm run preview",
       url: "http://127.0.0.1:4300",
-      reuseExistingServer: true,
+      reuseExistingServer: false,
       timeout: 120000,
     },
     {
       command: "uv run python -m terrai_spatial api --no-ensure-data",
       url: "http://127.0.0.1:8000/api/v1/health",
       cwd: "..",
-      reuseExistingServer: true,
+      reuseExistingServer: false,
       timeout: 60000,
     },
   ],
