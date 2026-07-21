@@ -304,20 +304,29 @@ export function createSiteScene(
   resize();
   renderLoop();
 
+  let requestedAxis: SectionAxis | null = null;
+  let requestedPosition = 0;
+  const applySection = () => {
+    sectionEnabled = requestedAxis !== null;
+    if (requestedAxis) {
+      sectionPlane.normal.set(requestedAxis === "x" ? -1 : 0, requestedAxis === "y" ? -1 : 0, requestedAxis === "z" ? -1 : 0);
+      sectionPlane.constant = sectionPlaneConstant(requestedAxis, requestedPosition, localFrameGroup.scale.z);
+    }
+    for (const material of clippableMaterials) {
+      material.clippingPlanes = sectionEnabled ? [sectionPlane] : [];
+      material.needsUpdate = true;
+    }
+  };
+
   return {
     setExaggeration(factor) {
       localFrameGroup.scale.z = factor;
+      applySection();
     },
     setSection(axis, position) {
-      sectionEnabled = axis !== null;
-      if (axis) {
-        sectionPlane.normal.set(axis === "x" ? -1 : 0, axis === "y" ? -1 : 0, axis === "z" ? -1 : 0);
-        sectionPlane.constant = position;
-      }
-      for (const material of clippableMaterials) {
-        material.clippingPlanes = sectionEnabled ? [sectionPlane] : [];
-        material.needsUpdate = true;
-      }
+      requestedAxis = axis;
+      requestedPosition = position;
+      applySection();
     },
     resize,
     destroy() {
@@ -337,6 +346,12 @@ export function createSiteScene(
  * the scene origin height) — stated in the viewer copy, never invented as a
  * measured depth. OSM geometry is never snapped to PLATEAU structures.
  */
+/** Clipping planes live in world space while the requested section position is
+ * in local metres; only the z axis rides the vertical-exaggeration scale. */
+export function sectionPlaneConstant(axis: SectionAxis, position: number, zScale: number): number {
+  return axis === "z" ? position * zScale : position;
+}
+
 export function buildAccessOverlay(
   features: { geometry: { type: string; coordinates: unknown }; properties: Record<string, unknown> }[],
   frame: SceneBundle["handoff"]["local_frame"],

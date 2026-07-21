@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 
-import { buildAccessOverlay } from "./scene";
+import { buildAccessOverlay, sectionPlaneConstant } from "./scene";
 import type { EvidenceSource } from "./catalog";
 import type { LocalFrame } from "./frame";
 
@@ -52,4 +52,17 @@ it("places features without a stated level at the origin reference height", () =
       .getAttribute("position")
       .getZ(0);
   expect(z(withHeight)).not.toBeCloseTo(z(withoutHeight), 1);
+});
+
+it("keeps the z section at the requested local height under exaggeration", () => {
+  // The Copilot-flagged case: a z cut at 50 local metres with 2x exaggeration
+  // must move the world-space plane to 100, not stay at 50.
+  expect(sectionPlaneConstant("z", 50, 2)).toBe(100);
+  expect(sectionPlaneConstant("z", -12.5, 3)).toBe(-37.5);
+  expect(sectionPlaneConstant("z", 50, 1)).toBe(50);
+});
+
+it("leaves horizontal sections untouched by vertical exaggeration", () => {
+  expect(sectionPlaneConstant("x", 50, 2)).toBe(50);
+  expect(sectionPlaneConstant("y", -200, 3)).toBe(-200);
 });
