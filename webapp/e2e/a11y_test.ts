@@ -132,3 +132,16 @@ test("the drawer confines assistive technology to itself", async ({ page }) => {
   const inside = await page.evaluate(() => !!document.activeElement?.closest(".audit-drawer"));
   expect(inside).toBe(true);
 });
+
+test("the page behind the drawer cannot be scrolled", async ({ page }) => {
+  // The old drawer locked scrolling by adding `audit-open` to <body>, and
+  // `app.css` had a rule for it. The primitive locks inline instead, so that
+  // rule was deleted; this asserts the behaviour survived the deletion.
+  await page.setViewportSize({ width: 1440, height: 500 });
+  await open(page, { module: "slope" });
+  expect(await page.evaluate(() => getComputedStyle(document.body).overflow)).toBe("visible");
+
+  await openAudit(page);
+  expect(await page.evaluate(() => getComputedStyle(document.body).overflow)).toBe("hidden");
+  expect(await page.evaluate(() => document.body.className)).not.toContain("audit-open");
+});
