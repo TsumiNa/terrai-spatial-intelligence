@@ -415,8 +415,13 @@ def contract_failures() -> list[str]:
     return failures
 
 
-def command_validate(_: argparse.Namespace) -> None:
-    failures = contract_failures() + data_task_failures()
+def command_validate(args: argparse.Namespace) -> None:
+    # Data-task readiness is derived from working-copy modification times, and a
+    # fresh clone gives every file the same checkout timestamp. CI therefore
+    # checks repository content only; freshness is a working-copy concern.
+    failures = contract_failures()
+    if not args.skip_data_tasks:
+        failures += data_task_failures()
     if failures:
         print("TerrAI validation failed:")
         for failure in failures:
@@ -475,6 +480,11 @@ def build_parser() -> argparse.ArgumentParser:
     data.set_defaults(func=command_data)
 
     validate = subparsers.add_parser("validate", help="validate required assets and JSON/GeoJSON")
+    validate.add_argument(
+        "--skip-data-tasks",
+        action="store_true",
+        help="check repository content only; skip data-task freshness, which depends on file times",
+    )
     validate.set_defaults(func=command_validate)
     return parser
 

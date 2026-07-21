@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A superseded run tells you nothing useful, and these jobs install a browser.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  python:
+    name: Python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Install
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check terrai_spatial/ scripts/
+
+      - name: Test
+        run: uv run pytest -q
+
+      # Data-task freshness is derived from file modification times, and a fresh
+      # clone stamps every file with the checkout time. Only repository content
+      # is a property of the commit, so only that is checked here.
+      - name: Validate repository contracts
+        run: uv run python -m terrai_spatial validate --skip-data-tasks
+
+  webapp:
+    name: Web app
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: webapp
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Type check
+        run: npm run check
+
+      - name: Unit test
+        run: npm run test
+
+      # `npm run build` also runs svelte-check, which the previous step did.
+      - name: Build
+        run: npx vite build
+
+  e2e:
+    name: End to end
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+
+      - name: Install Python environment
+        run: uv sync --locked
+
+      - name: Install web dependencies
+        run: npm ci
+        working-directory: webapp
+
+      # Cached separately from node_modules: the browser is large and changes
+      # only when the Playwright version does.
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('webapp/package-lock.json') }}
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+        working-directory: webapp
+
+      # playwright.config.ts starts both the built web app and the FastAPI
+      # service itself, so nothing needs to be launched here.
+      - name: End-to-end test
+        run: npm run test:e2e
+        working-directory: webapp
+
+      - name: Upload report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: webapp/playwright-report/
+          retention-days: 7
