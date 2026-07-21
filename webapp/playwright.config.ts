@@ -7,9 +7,11 @@ export default defineConfig({
   // this only whole files parallelise, which leaves the 14 visual tests serial.
   fullyParallel: true,
   // Playwright drops to a single worker when it detects CI, which made
-  // fullyParallel do nothing there. The runner has four cores and both servers
-  // are already up before the first test, so the workers only cost browsers.
-  workers: process.env.CI ? 4 : undefined,
+  // fullyParallel do nothing there. Two is deliberate rather than one per core:
+  // these tests render maps through software WebGL, and four workers on the
+  // four-core runner starved each other until map-dependent tests timed out.
+  // A flaky suite is worse than a slow one when it guards the visual baselines.
+  workers: process.env.CI ? 2 : undefined,
   use: { baseURL: "http://127.0.0.1:4300" },
   webServer: [
     {
