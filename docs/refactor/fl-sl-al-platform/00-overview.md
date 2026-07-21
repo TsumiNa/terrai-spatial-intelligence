@@ -107,7 +107,7 @@ node --check frontend/app.js
 node --check frontend/audit.js
 node --check frontend/i18n.js
 uv run pytest
-uvx ruff check .
+uv run ruff check .
 uv run python -m terrai_spatial validate
 git diff --check
 ```

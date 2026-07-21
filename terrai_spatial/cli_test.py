@@ -284,7 +284,7 @@ def test_fetch_parses_every_downloading_task_and_rejects_others() -> None:
 # is undecidable there. CI needs to check repository content without it.
 
 
-def test_validate_skipping_data_tasks_still_checks_repository_content() -> None:
+def test_validate_accepts_the_skip_data_tasks_flag() -> None:
     parser = build_parser()
     assert parser.parse_args(["validate", "--skip-data-tasks"]).skip_data_tasks is True
     assert parser.parse_args(["validate"]).skip_data_tasks is False
