@@ -99,7 +99,14 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('webapp/package-lock.json') }}
 
       - name: Install Playwright browser
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
+        working-directory: webapp
+
+      # The browser is cached but its OS packages are not part of that cache.
+      - name: Install Playwright system dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
         working-directory: webapp
 
       # playwright.config.ts starts both the built web app and the FastAPI
