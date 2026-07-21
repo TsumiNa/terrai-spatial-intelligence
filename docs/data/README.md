@@ -11,6 +11,7 @@ This directory documents datasets already integrated into the TerrAI Foundation 
 | GSI designated evacuation data | Integrated, national base | [Shelters and hazard-specific emergency places](gsi-designated-evacuation/README.md) |
 | Google Satellite Embedding V1 | Integrated | [Annual remote-sensing representation](google-satellite-embedding/README.md) |
 | OpenStreetMap | Integrated | [Buildings, roads, and context](openstreetmap/README.md) |
+| PLATEAU UC24-13 Sapporo | Integrated, on-demand sample | [Observed underground structures](plateau-uc24-13-sapporo/README.md) |
 | PLATEAU UC24-16 Nihonbashi | Integrated, on-demand sample | [Observed underground utilities](plateau-uc24-16-nihonbashi/README.md) |
 | Yokohama regional disaster bases | Integrated, local validation/supplement | [Official public facilities](yokohama-disaster-bases/README.md) |
 | NASA POWER | Integrated | [Solar climate context](nasa-power/README.md) |

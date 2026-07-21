@@ -47,6 +47,25 @@
       "rights_limit": "Attribution required; public derivative databases may trigger share-alike; completeness is not guaranteed"
     },
     {
+      "id": "openstreetmap_sapporo_underground_access",
+      "theme": "subway_entrances_tracks_and_underground_walkway_context",
+      "status": "integrated",
+      "source_updated_at": "2026-07-21T10:51:01Z",
+      "retrieved_at": "2026-07-21T10:53:05Z",
+      "format": "Bounded Overpass JSON normalized to GeoJSON",
+      "access_cost": "free ODbL data; public Overpass instance subject to shared-service availability",
+      "license": "Open Database License 1.0",
+      "official_page": "https://www.openstreetmap.org/copyright",
+      "query_endpoint": "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+      "local_output": [
+        "data/osm/sapporo_underground_access/query.overpassql",
+        "data/osm/sapporo_underground_access/features.geojson",
+        "data/osm/sapporo_underground_access/metadata.json"
+      ],
+      "spatial_limit": "Frozen Sapporo scene bbox; intersecting source ways retain complete geometry and are not clipped",
+      "rights_limit": "Attribution required; public derivative databases may trigger share-alike; absence of an access restriction is not proof of legal public access or current opening"
+    },
+    {
       "id": "plateau_uc24_16_nihonbashi",
       "theme": "observed_underground_utility_sample",
       "status": "integrated",
@@ -66,6 +85,26 @@
       ],
       "spatial_limit": "Nine-resource Nihonbashi demonstration sample only; not a current or complete utility ledger",
       "rights_limit": "Attribution and third-party-rights checks are required; not suitable for excavation, engineering or emergency use"
+    },
+    {
+      "id": "plateau_uc24_13_sapporo",
+      "theme": "observed_underground_structures",
+      "status": "integrated",
+      "source_updated_at": "2025-05-26T09:23:39.701566",
+      "sample_vintage": "2024 fiscal year",
+      "retrieved_at": "2026-07-21T10:44:35Z",
+      "format": "3D Tiles 1.0 with B3DM batch tables",
+      "access_cost": "free direct public download; no account or API key",
+      "license": "PLATEAU Site Policy, section 3",
+      "official_page": "https://www.geospatial.jp/ckan/dataset/plateau-uc24-13",
+      "package_api": "https://www.geospatial.jp/ckan/api/3/action/package_show?id=plateau-uc24-13",
+      "local_cache": "data/external/plateau_uc24_13/ (Git-ignored source ZIPs and expanded 3D Tiles)",
+      "local_output": [
+        "data/plateau/uc24_13_sapporo/source_manifest.json",
+        "data/plateau/uc24_13_sapporo/manifest.json"
+      ],
+      "spatial_limit": "Two-resource Sapporo underground-mall and municipal-subway-station demonstration sample only",
+      "rights_limit": "Attribution and third-party-rights checks are required; not a complete, live or authoritative station model"
     },
     {
       "id": "yokohama_official_disaster_bases",

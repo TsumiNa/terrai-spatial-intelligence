@@ -1,6 +1,6 @@
 # PR2 Plan: UC24-13 and OSM Underground Access Foundation Data
 
-- Status: Planned
+- Status: Completed
 - Refactor: `underground-observation-foundation`
 - Depends on: PR1 merged
 - Downstream consumer: `maplibre-migration/07-site-scene-three-pr7`
