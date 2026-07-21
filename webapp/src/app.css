@@ -81,22 +81,26 @@
    architecture-board styles were dropped; the map placeholder block is new
    for the pre-MapLibre stages.
 
-   These custom properties stay until stage 04 ports the components that read
-   them. They mirror the @theme block above rather than competing with it. */
+   These rules are inherited from the exhibition as built. They will be
+   rewritten with the applications rather than ported twice; what mattered here
+   was that their colour is checked and has one definition. */
 
+/* Aliases, not a second declaration. These names are what the rules below were
+ * written against; pointing them at the theme tokens means a colour has exactly
+ * one value, which is how `lime` came to mean two different greens before. */
 :root {
-  --ink: #10231e;
-  --muted: #667770;
-  --line: #dfe7e2;
-  --paper: #f4f7f3;
-  --white: #ffffff;
-  --forest: #164d3b;
-  --green: #1f7a58;
-  --lime: #a9d96e;
-  --amber: #e2a43c;
-  --red: #d75b4c;
-  --blue: #397ca3;
-  --shadow: 0 14px 34px rgba(26, 55, 45, .09);
+  --ink: var(--color-ink);
+  --muted: var(--color-muted);
+  --line: var(--color-line);
+  --paper: var(--color-paper);
+  --white: var(--color-white);
+  --forest: var(--color-forest);
+  --green: var(--color-green);
+  --lime: var(--color-lime);
+  --amber: var(--color-amber);
+  --red: var(--color-red);
+  --blue: var(--color-blue);
+  --shadow: var(--shadow-card);
 }
 
 * { box-sizing: border-box; }
