@@ -111,6 +111,11 @@ SELECT rowid, min_x, max_x, min_y, max_y FROM features WHERE min_x IS NOT NULL
 
 INSERT_DOCUMENT = "INSERT INTO documents (key, document_json) VALUES (?, ?)"
 
+SELECT_DATASET_KIND = "SELECT kind FROM datasets WHERE key = ?"
+SELECT_ENVELOPE = "SELECT envelope_json FROM datasets WHERE key = ?"
+SELECT_DOCUMENT = "SELECT document_json FROM documents WHERE key = ?"
+SELECT_FEATURES = "SELECT ordinal, feature_json FROM features WHERE dataset_key = ? ORDER BY ordinal"
+
 # The R-tree join is a conservative float32 prefilter; the float64 columns on
 # `features` decide intersection exactly, preserving the scan's semantics.
 WINDOW_QUERY = """
@@ -310,10 +315,15 @@ def build_store(root: Path, target: Path, sources: Sequence[StoreSource]) -> dic
     return counts
 
 
-def open_store(path: Path) -> sqlite3.Connection:
-    """Read-only connection; a schema version mismatch means rebuild."""
+def open_store(path: Path, *, check_same_thread: bool = True) -> sqlite3.Connection:
+    """Read-only connection; a schema version mismatch means rebuild.
 
-    connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+    The serving process passes ``check_same_thread=False``: one read-only
+    connection per worker, shared across the request threadpool, serialized
+    by SQLite's own mutex.
+    """
+
+    connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True, check_same_thread=check_same_thread)
     try:
         version = connection.execute("PRAGMA user_version").fetchone()[0]
     except sqlite3.Error:
@@ -326,6 +336,39 @@ def open_store(path: Path) -> sqlite3.Connection:
             "rebuild it with: uv run python -m terrai_spatial data ensure --only store"
         )
     return connection
+
+
+def dataset_kind(connection: sqlite3.Connection, key: str) -> str | None:
+    row = connection.execute(SELECT_DATASET_KIND, (key,)).fetchone()
+    return row[0] if row else None
+
+
+def read_document(connection: sqlite3.Connection, key: str) -> Any | None:
+    row = connection.execute(SELECT_DOCUMENT, (key,)).fetchone()
+    return json.loads(row[0]) if row else None
+
+
+def read_envelope(connection: sqlite3.Connection, key: str) -> dict[str, Any] | None:
+    """The collection's top-level members with ``features`` empty, in source order."""
+
+    row = connection.execute(SELECT_ENVELOPE, (key,)).fetchone()
+    return json.loads(row[0]) if row and row[0] is not None else None
+
+
+def read_collection(connection: sqlite3.Connection, key: str) -> dict[str, Any] | None:
+    """The full FeatureCollection, features parsed in source order."""
+
+    envelope = read_envelope(connection, key)
+    if envelope is None:
+        return None
+    envelope["features"] = [json.loads(text) for _, text in all_features(connection, key)]
+    return envelope
+
+
+def all_features(connection: sqlite3.Connection, key: str) -> list[tuple[int, str]]:
+    """(ordinal, feature_json) for every feature of a dataset, in source order."""
+
+    return connection.execute(SELECT_FEATURES, (key,)).fetchall()
 
 
 def window_features(connection: sqlite3.Connection, key: str, bbox: tuple[float, float, float, float]) -> list[tuple[int, str]]:

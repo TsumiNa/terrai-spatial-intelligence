@@ -1,8 +1,28 @@
 # PR3 Plan: Store-backed Data Service
 
-- Status: Planned
+- Status: Completed
 - Refactor: `data-pipeline-and-store`
 - Depends on: PR2 merged
+- PR: #46
+
+## Completion record
+
+- The measurement (medians of five warm runs, peak RSS per fresh process): `landHistory`
+  window 981 ms / 427 MiB → 88 ms / 124 MiB; `landUseMesh` window 788 ms / 267 MiB →
+  11 ms / 30 MiB; `landUseMesh` attribute filter 719 ms / 270 MiB → 154 ms / 176 MiB;
+  bootstrap 386 ms / 90 MiB → 331 ms / 131 MiB (RSS honestly higher there: SQLite page
+  cache, no shared parse cache). The table now sits in
+  `docs/refactor/rust-api-backend/00-overview.md`, whose entry condition 2 is recorded as
+  not met — the storage layer resolved the latency question.
+- One deviation: attribute filters stay in Python over the windowed candidates. The
+  plan's own table-driven pinning showed SQL cannot reproduce `str(value)` equality or
+  Python's bool-as-number comparisons; `MATCH_TABLE` in
+  `data_service_identity_test.py` records the cases. The window — the measured cost —
+  is SQL against the R-tree.
+- Response identity is proven by an oracle subclass preserving the retired file-scan
+  implementation, byte-for-byte across every endpoint with the clock frozen.
+- `catalog()` still reads the files directly: it reports facts about the committed
+  files (existence, mtime, readiness), not about the store derived from them.
 
 ## Goal
 

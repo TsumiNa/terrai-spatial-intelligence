@@ -1,19 +1,31 @@
-"""Read-only JSON/GeoJSON service for the TerrAI exhibition API.
+"""Read-only dataset service for the TerrAI exhibition API.
 
-The PoC intentionally keeps the foundation layer as independent files.  This
-module is the only backend component that knows their filesystem locations;
-the browser consumes stable dataset keys and API responses instead.
+The committed JSON/GeoJSON files stay the canonical interchange and
+provenance format; serving reads the spatially indexed store derived from
+them by the ``store`` data task. This module is the only backend component
+that knows where data lives; the browser consumes stable dataset keys and
+API responses instead.
 """
 
 from __future__ import annotations
 
 import json
-from copy import deepcopy
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from .store import StoreSource
+from .store import (
+    STORE_PATH,
+    StoreSource,
+    all_features,
+    dataset_kind,
+    open_store,
+    read_collection,
+    read_document,
+    read_envelope,
+    verify_store,
+    window_features,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -154,12 +166,43 @@ class DatasetNotFoundError(KeyError):
 
 
 class DataService:
-    """Load, cache, query and summarize the file-backed PoC datasets."""
+    """Load, query and summarize the datasets through the derived store."""
 
     def __init__(self, root: Path = ROOT) -> None:
         self.root = root
-        self._cache: dict[str, tuple[int, Any]] = {}
-        self._scene_cache: dict[str, tuple[int, Any]] = {}
+        self._store: Any = None
+
+    def _connection(self) -> Any:
+        if self._store is None:
+            path = self.root / STORE_PATH
+            if not path.is_file():
+                raise RuntimeError(
+                    f"the spatial store is missing at {STORE_PATH}; "
+                    "build it with: uv run python -m terrai_spatial data ensure"
+                )
+            self._store = open_store(path, check_same_thread=False)
+        return self._store
+
+    def require_store(self) -> None:
+        """Refuse to serve from a missing or drifted store, loudly.
+
+        Startup calls this so a broken pipeline surfaces as a named failure
+        with the command that fixes it, never as quietly stale responses.
+        """
+
+        path = self.root / STORE_PATH
+        if not path.is_file():
+            raise RuntimeError(
+                f"the spatial store is missing at {STORE_PATH}; "
+                "build it with: uv run python -m terrai_spatial data ensure"
+            )
+        failures = verify_store(self.root, path, expected_keys=[source.key for source in store_sources()])
+        if failures:
+            raise RuntimeError(
+                "the spatial store failed its manifest check: "
+                + "; ".join(failures)
+                + " — rebuild it with: uv run python -m terrai_spatial data ensure --only store"
+            )
 
     def path_for(self, key: str) -> Path:
         try:
@@ -168,41 +211,40 @@ class DataService:
             raise DatasetNotFoundError(key) from error
         return self.root / relative
 
-    def load(self, key: str) -> Any:
-        path = self.path_for(key)
-        modified_ns = path.stat().st_mtime_ns
-        cached = self._cache.get(key)
-        if cached and cached[0] == modified_ns:
-            return deepcopy(cached[1])
-        with path.open(encoding="utf-8") as handle:
-            value = json.load(handle)
-        self._cache[key] = (modified_ns, value)
-        return deepcopy(value)
+    def _missing_from_store(self, key: str) -> RuntimeError:
+        return RuntimeError(
+            f"{key} is missing from the spatial store; "
+            "rebuild it with: uv run python -m terrai_spatial data ensure --only store"
+        )
 
-    def _load_scene_file(self, relative: str) -> Any:
-        path = self.root / relative
-        modified_ns = path.stat().st_mtime_ns
-        cached = self._scene_cache.get(relative)
-        if cached and cached[0] == modified_ns:
-            return deepcopy(cached[1])
-        with path.open(encoding="utf-8") as handle:
-            value = json.load(handle)
-        self._scene_cache[relative] = (modified_ns, value)
-        return deepcopy(value)
+    def _document(self, key: str) -> Any:
+        value = read_document(self._connection(), key)
+        if value is None:
+            raise self._missing_from_store(key)
+        return value
+
+    def load(self, key: str) -> Any:
+        if key not in ALL_DATASETS:
+            raise DatasetNotFoundError(key)
+        connection = self._connection()
+        if dataset_kind(connection, key) == "document":
+            return self._document(key)
+        value = read_collection(connection, key)
+        if value is None:
+            raise self._missing_from_store(key)
+        return value
 
     def scene_catalog(self) -> dict[str, Any]:
         """Return renderer-neutral scene discovery without adding a dataset key."""
 
-        return self._load_scene_file(SCENE_CATALOG_PATH)
+        return self._document("sceneCatalog")
 
     def scene_handoff(self, owner_dataset_key: str) -> dict[str, Any]:
         """Resolve scene metadata through its existing Foundation dataset key."""
 
-        try:
-            relative = SCENE_HANDOFFS[owner_dataset_key]
-        except KeyError as error:
-            raise DatasetNotFoundError(owner_dataset_key) from error
-        return self._load_scene_file(relative)
+        if owner_dataset_key not in SCENE_HANDOFFS:
+            raise DatasetNotFoundError(owner_dataset_key)
+        return self._document(f"sceneHandoff:{owner_dataset_key}")
 
     def scene_bundle(self, scene_id: str) -> dict[str, Any]:
         """One catalogued scene with its full handoff, resolved by scene id.
@@ -219,14 +261,22 @@ class DataService:
                 return {"scene": entry, "handoff": self.scene_handoff(entry["owner_dataset_key"])}
         raise DatasetNotFoundError(scene_id)
 
+    @staticmethod
+    def _read_json_file(path: Path) -> Any:
+        with path.open(encoding="utf-8") as handle:
+            return json.load(handle)
+
     def catalog(self) -> list[dict[str, Any]]:
+        # The catalog describes the committed files themselves — existence,
+        # modification time, readiness — so it reads them directly rather
+        # than the store derived from them.
         rows = []
         for key, relative in ALL_DATASETS.items():
             path = self.root / relative
             exists = path.is_file()
             # Do not deserialize large on-demand layers merely to render health
             # or catalog metadata; that would defeat their delivery boundary.
-            value = self.load(key) if exists and (key in DATASETS or key in ASSET_MANIFEST_DATASETS) else None
+            value = self._read_json_file(path) if exists and (key in DATASETS or key in ASSET_MANIFEST_DATASETS) else None
             asset_roots = None
             if key in ASSET_MANIFEST_DATASETS:
                 manifest_files = value.get("files", []) if isinstance(value, dict) else []
@@ -364,28 +414,34 @@ class DataService:
         limit: int = 5000,
         bbox: tuple[float, float, float, float] | None = None,
     ) -> dict[str, Any]:
-        value = self.load(key)
-        if not isinstance(value, dict) or value.get("type") != "FeatureCollection":
+        if key not in ALL_DATASETS:
+            raise DatasetNotFoundError(key)
+        connection = self._connection()
+        envelope = read_envelope(connection, key)
+        if envelope is None or envelope.get("type") != "FeatureCollection":
             raise ValueError(f"{key} is not a GeoJSON FeatureCollection")
-        features = value.get("features", [])
+        # The R-tree answers the window; only the windowed candidates are
+        # parsed. Attribute filters stay in Python deliberately: `equals`
+        # compares `str(value)` and Python treats booleans as numbers, and
+        # no SQL expression reproduces either exactly — the pinned-semantics
+        # tests are the record of that decision.
+        rows = window_features(connection, key, bbox) if bbox else all_features(connection, key)
+        features = [json.loads(text) for _, text in rows]
         if where:
             features = [
                 feature
                 for feature in features
                 if self._matches(feature.get("properties", {}), where, equals, minimum, maximum)
             ]
-        if bbox:
-            features = [feature for feature in features if self._intersects_bbox(feature.get("geometry"), bbox)]
         if sort:
             features = sorted(
                 features,
                 key=lambda feature: self._sortable(feature.get("properties", {}).get(sort)),
                 reverse=descending,
             )
-        result = deepcopy(value)
-        result["features"] = features[:limit]
-        result["query"] = {"matched": len(features), "returned": len(result["features"])}
-        return result
+        envelope["features"] = features[:limit]
+        envelope["query"] = {"matched": len(features), "returned": len(envelope["features"])}
+        return envelope
 
     def _select(
         self,
@@ -428,36 +484,6 @@ class DataService:
         if maximum is not None and (not isinstance(value, (int, float)) or value > maximum):
             return False
         return True
-
-    @classmethod
-    def _intersects_bbox(
-        cls, geometry: dict[str, Any] | None, bbox: tuple[float, float, float, float]
-    ) -> bool:
-        if not geometry:
-            return False
-        coordinates = list(cls._coordinate_pairs(geometry.get("coordinates")))
-        if not coordinates:
-            return False
-        min_x, min_y, max_x, max_y = bbox
-        geometry_min_x = min(x for x, _ in coordinates)
-        geometry_max_x = max(x for x, _ in coordinates)
-        geometry_min_y = min(y for _, y in coordinates)
-        geometry_max_y = max(y for _, y in coordinates)
-        return not (
-            geometry_max_x < min_x
-            or geometry_min_x > max_x
-            or geometry_max_y < min_y
-            or geometry_min_y > max_y
-        )
-
-    @classmethod
-    def _coordinate_pairs(cls, value: Any):
-        if isinstance(value, list) and len(value) >= 2 and all(isinstance(item, (int, float)) for item in value[:2]):
-            yield float(value[0]), float(value[1])
-            return
-        if isinstance(value, list):
-            for item in value:
-                yield from cls._coordinate_pairs(item)
 
 
 service = DataService()

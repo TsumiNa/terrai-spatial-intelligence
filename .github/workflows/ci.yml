@@ -34,6 +34,12 @@ jobs:
       - name: Lint
         run: uv run ruff check terrai_spatial/ scripts/
 
+      # The service tests exercise the store-backed DataService, and the
+      # store is a derived artifact every clone rebuilds from committed
+      # files — exactly what this does, with no network.
+      - name: Build derived data
+        run: uv run python -m terrai_spatial data ensure --only store --offline
+
       - name: Test
         run: uv run pytest -q
 

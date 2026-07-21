@@ -199,6 +199,35 @@ def test_unknown_dataset_key_is_rejected() -> None:
         service.load("no-such-dataset")
 
 
+def test_missing_store_and_missing_store_content_fail_loudly(tmp_path: Path) -> None:
+    import sqlite3
+
+    from terrai_spatial.store import STORE_PATH, StoreSource, build_store
+
+    absent = DataService(tmp_path)
+    with pytest.raises(RuntimeError, match="spatial store is missing"):
+        absent.load("jointSummary")
+    with pytest.raises(RuntimeError, match="spatial store is missing"):
+        absent.require_store()
+
+    (tmp_path / "data/joint").mkdir(parents=True)
+    (tmp_path / "data/joint/joint_summary.json").write_text("{\"generated_at\": \"2026-07-20\"}", encoding="utf-8")
+    build_store(
+        tmp_path,
+        tmp_path / STORE_PATH,
+        [StoreSource("jointSummary", "data/joint/joint_summary.json", "document", "AL", "observed")],
+    )
+    local_service = DataService(tmp_path)
+    assert local_service.load("jointSummary") == {"generated_at": "2026-07-20"}
+
+    writable = sqlite3.connect(tmp_path / STORE_PATH)
+    writable.execute("DELETE FROM documents WHERE key = 'jointSummary'")
+    writable.commit()
+    writable.close()
+    with pytest.raises(RuntimeError, match="missing from the spatial store"):
+        DataService(tmp_path).load("jointSummary")
+
+
 def test_feature_query_rejects_a_dataset_that_is_not_a_feature_collection() -> None:
     with pytest.raises(ValueError, match="not a GeoJSON FeatureCollection"):
         service.query_features("jointSummary")

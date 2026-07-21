@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "TerrAI Spatial Intelligence API",
-    "description": "Read-only file-backed APIs for the TerrAI commercial exhibition prototype.",
+    "description": "Read-only APIs for the TerrAI commercial exhibition prototype, served from the spatial store derived from the committed datasets.",
     "version": "1.0.0"
   },
   "paths": {
