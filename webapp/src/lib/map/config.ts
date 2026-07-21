@@ -47,6 +47,18 @@ export function rasterId(region: RegionKey, kind: RasterKind): string {
   return `terrai-${region}-${kind}`;
 }
 
+/**
+ * The vector style's own building layers. Analytical scores live in the
+ * exhibition's GeoJSON, not in the vector tiles, so a building-level analysis
+ * cannot recolour these — it hides them and draws the analysis colour as the
+ * only building colour instead.
+ */
+export function vectorBuildingLayerIds(style: StyleSpecification): string[] {
+  return style.layers
+    .filter((layer) => "source-layer" in layer && layer["source-layer"] === "building")
+    .map((layer) => layer.id);
+}
+
 export function rasterTileUrl(assetBase: string, region: RegionKey, kind: RasterKind): string {
   const { extension } = RASTER_CEILINGS[kind];
   return `${assetBase}/tiles/${region}/${kind}/{z}/{x}-{y}.${extension}`;

@@ -1,6 +1,6 @@
 import { expect, it, vi } from "vitest";
 
-import { POPUPS, assetUrl, buildAnalyticalLayers, geometryBounds, queuePopup } from "./layers";
+import { POPUPS, assetUrl, buildAnalyticalLayers, drawsOwnBuildings, geometryBounds, queuePopup } from "./layers";
 import { rgba } from "./style-rules";
 import type { Bootstrap, Feature, FeatureCollection } from "../api/types";
 
@@ -141,6 +141,20 @@ it("formats popup values from feature properties", () => {
   expect(spec.title(props, t as never)).toBe("M-1");
   expect(spec.fields[0].value(props, t as never)).toBe(2);
   expect(spec.fields[1].value(props, t as never)).toBe("坡度、水体");
+});
+
+it("hides the basemap's buildings exactly where an analysis colours them", () => {
+  expect(drawsOwnBuildings("slope", "all")).toBe(true);
+  expect(drawsOwnBuildings("slope", "high")).toBe(true);
+  expect(drawsOwnBuildings("facilities", "official")).toBe(true);
+  expect(drawsOwnBuildings("facilities", "network")).toBe(true);
+  expect(drawsOwnBuildings("overview", "urban")).toBe(true);
+  expect(drawsOwnBuildings("overview", "renewable")).toBe(false);
+  expect(drawsOwnBuildings("joint", "hubs")).toBe(true);
+  expect(drawsOwnBuildings("joint", "corridors")).toBe(false);
+  expect(drawsOwnBuildings("roads", "all")).toBe(false);
+  expect(drawsOwnBuildings("evidence", "yokohama_change")).toBe(false);
+  expect(drawsOwnBuildings("development", "delivery")).toBe(false);
 });
 
 it("converts hex colours with opacity into RGBA data", () => {

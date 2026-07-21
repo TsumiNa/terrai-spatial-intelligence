@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { RASTER_CEILINGS, REGION_CAMERAS, composeStyle, rasterId, rasterTileUrl } from "./config";
+import { RASTER_CEILINGS, REGION_CAMERAS, composeStyle, rasterId, rasterTileUrl, vectorBuildingLayerIds } from "./config";
 
 const baseStyle: StyleSpecification = {
   version: 8,
@@ -44,6 +44,20 @@ it("bounds every raster source to its region so panning cannot 404", () => {
   const mobara = composed.sources[rasterId("mobara", "hillshade")] as { bounds?: number[]; attribution?: string };
   expect(mobara.bounds).toEqual([...REGION_CAMERAS.mobara.bounds]);
   expect(mobara.attribution).toContain("GSI");
+});
+
+it("identifies the vector style's building layers by source-layer", () => {
+  const style: StyleSpecification = {
+    version: 8,
+    sources: { v: { type: "vector", tiles: ["https://example.test/{z}/{x}/{y}.pbf"] } },
+    layers: [
+      { id: "background", type: "background" },
+      { id: "bldg-1", type: "fill", source: "v", "source-layer": "building" },
+      { id: "road-1", type: "line", source: "v", "source-layer": "road" },
+      { id: "bldg-2", type: "line", source: "v", "source-layer": "building" },
+    ],
+  };
+  expect(vectorBuildingLayerIds(style)).toEqual(["bldg-1", "bldg-2"]);
 });
 
 it("does not mutate the fetched vector style", () => {

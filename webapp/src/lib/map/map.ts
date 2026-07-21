@@ -26,12 +26,15 @@ import {
   VECTOR_STYLE_URL,
   composeStyle,
   rasterId,
+  vectorBuildingLayerIds,
 } from "./config";
 
 export interface ExhibitionMap {
   setRegion(region: RegionKey): void;
   setBasemap(basemap: BasemapKey): void;
   setAnalyticalLayers(layers: Layer[]): void;
+  /** Hide the basemap's own buildings while an analysis colours buildings. */
+  setVectorBuildingsVisible(visible: boolean): void;
   openPopup(lngLat: [number, number], content: HTMLElement, onClose?: () => void): void;
   closePopup(): void;
   /** Frame a feature the way the queue always has: fit its bounds, capped. */
@@ -47,9 +50,11 @@ export async function createExhibitionMap(
   const response = await fetch(VECTOR_STYLE_URL);
   if (!response.ok) throw new Error(`vector style request failed: ${response.status}`);
   const style = composeStyle(await response.json(), assetBase);
+  const buildingLayers = vectorBuildingLayerIds(style);
 
   let region = initial.region;
   let basemap = initial.basemap;
+  let vectorBuildingsVisible = true;
 
   const map = new maplibregl.Map({
     container,
@@ -85,6 +90,9 @@ export async function createExhibitionMap(
         map.setLayoutProperty(rasterId(r, kind), "visibility", visible ? "visible" : "none");
       }
     }
+    for (const id of buildingLayers) {
+      map.setLayoutProperty(id, "visibility", vectorBuildingsVisible ? "visible" : "none");
+    }
   };
   void loaded.then(applyVisibility);
 
@@ -102,6 +110,11 @@ export async function createExhibitionMap(
     },
     setAnalyticalLayers(layers) {
       overlay.setProps({ layers });
+    },
+    setVectorBuildingsVisible(visible) {
+      if (visible === vectorBuildingsVisible) return;
+      vectorBuildingsVisible = visible;
+      void loaded.then(applyVisibility);
     },
     openPopup(lngLat, content, onClose) {
       popup.remove(); // fires close → previous cleanup
