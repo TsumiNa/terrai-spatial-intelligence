@@ -10,11 +10,11 @@
 
 - **形式と構造:** Apache Parquet 3 file。ボーリングごとの nested table、地層区間ごとの flat table、SPT 試験ごとの flat table です。`data/external/kunijiban_borehole/manifest.json` は asset、byte 数、SHA-256、timestamp、件数、provenance class を記録します。
 - **coverage と CRS:** KuniJiban から user が抽出した地域 selection であり、全国完全 coverage ではありません。水平座標は WGS 84 経緯度（`EPSG:4326`）です。標高単位は m ですが、鉛直 datum は source 依存で未正規化です。港湾・河川 record は local datum の場合があります。提供 package は権威ある bounding box を定義していません。
-- **粒度と量:** ボーリング 12,067、地層区間 122,693、SPT 観測 239,137。Parquet 3 asset の合計は 12,010,681 bytes です。
+- **粒度と量:** ボーリング 11,703、地層区間 122,693、SPT 観測 239,137。Parquet 3 asset の合計は 11,993,633 bytes です。利用可能な地層がなく、関連 layer/SPT row もない `pdf_vlm_empty` 364 本は FL snapshot から除外しました。
 - **時点:** integration run は 2026-06-27 に完了し、`retrieved_at=2026-06-27T13:04:00+09:00` として記録します。公開者の単一 snapshot 日はなく、各ボーリングの調査時点は異なります。KuniJiban record は予告なく修正される場合があります。
 - **主要 field と単位:** ボーリング ID、地域、source class、緯度/経度（decimal degree）、地盤標高（m）、総掘進長と地下水深（m）、地層下端深度（m）、日本語原文の地層名/記号、正規化 layer category、SPT 深度（m）、SPT N 値（打撃回数）。nested table は audit 用の source または synthetic XML も保持します。
-- **Provenance:** 6,462 本は source JGS XML から parse、5,241 本は柱状図 PDF から VLM が再構成、364 本の PDF record は利用可能な地層を含みません。各 record の `data_source` を必ず保持し、VLM 抽出 field を source 観測として扱いません。
-- **既知の gap:** 86 本は標高欠損、地下水位は 6,030 本で populated、364 record は layer 0 件です。調査目的、精度、legacy 試験の単位、標高 datum、鮮度は異なります。SPT N > 100 は review が必要で、報告最大値 794 は明らかな source outlier です。
+- **Provenance:** 6,462 本は source JGS XML から parse、5,241 本は柱状図 PDF から VLM が再構成したものです。各 record の `data_source` を必ず保持し、VLM 抽出 field を source 観測として扱いません。処理 report の 12,067 row は filter 前の run 結果であり、現在の FL 件数ではありません。
+- **既知の gap:** 86 本は標高欠損、地下水位は 6,030 本で populated です。調査目的、精度、legacy 試験の単位、標高 datum、鮮度は異なります。SPT N > 100 は review が必要で、報告最大値 794 は明らかな source outlier です。
 
 ## 出典
 

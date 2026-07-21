@@ -12,16 +12,20 @@
   "source_updated_at_note": "The supplied regional extract has no single publisher snapshot timestamp; individual survey dates may differ by borehole.",
   "horizontal_crs": "WGS 84 longitude/latitude (EPSG:4326)",
   "vertical_datum": "source-dependent and not normalized",
-  "feature_count": 12067,
+  "feature_count": 11703,
   "record_counts": {
-    "boreholes": 12067,
+    "boreholes": 11703,
     "layers": 122693,
     "spt_tests": 239137
   },
   "provenance_counts": {
     "raw_xml": 6462,
-    "pdf_vlm": 5241,
-    "pdf_vlm_empty": 364
+    "pdf_vlm": 5241
+  },
+  "filters_applied": {
+    "excluded_data_source": "pdf_vlm_empty",
+    "excluded_boreholes": 364,
+    "reason": "Records contain no usable stratigraphy and no related layer or SPT rows."
   },
   "files": [
     "data/external/kunijiban_borehole/integrated_boreholes.parquet",
@@ -35,9 +39,9 @@
       "path": "data/external/kunijiban_borehole/integrated_boreholes.parquet",
       "asset_url": "/api/v1/assets/external/kunijiban_borehole/integrated_boreholes.parquet",
       "format": "Apache Parquet",
-      "rows": 12067,
-      "bytes": 9177709,
-      "sha256": "6841f9ab352312c3f72be95ae914575061b61ed982a301fd539fa3d9dc04aad5"
+      "rows": 11703,
+      "bytes": 9160661,
+      "sha256": "3db962c27eeb1ee09a5f3ba478cafd4622889982c91eeccbda6c28ebd4fec068"
     },
     {
       "role": "stratigraphic_layers_flat",
@@ -59,7 +63,7 @@
     }
   ],
   "quality_notes": [
-    "Keep data_source on every record: raw_xml is source XML, while pdf_vlm and pdf_vlm_empty are model-extracted or empty PDF reconstructions.",
+    "Keep data_source on every record: raw_xml is source XML, while pdf_vlm is a model-extracted PDF reconstruction.",
     "Elevation datum is not normalized and may use local harbour or river reference surfaces.",
     "Groundwater and test values represent survey-time conditions and may not describe current conditions.",
     "The extract is a user-supplied regional subset, not complete national KuniJiban coverage."
