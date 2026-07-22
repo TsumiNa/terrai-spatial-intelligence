@@ -8,8 +8,9 @@ of two million features (docs/refactor/kanto-foundation-coverage/00-overview.md)
 
 Admission principle (docs/architecture/FL_SL_AL_CONCEPT.md): a dataset joins
 this table only if it ships GIS data or aligns through coordinates, elevation
-or a defined projection. A source with neither is recorded in the source
-registry as not integrated — never drawn through invented georeference.
+against a stated vertical datum, or a defined projection. A source with no
+such anchor is recorded in the source registry as not integrated — never
+drawn through invented georeference.
 """
 
 from __future__ import annotations
