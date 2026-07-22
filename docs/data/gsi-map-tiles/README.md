@@ -2,26 +2,24 @@
 
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
-- FL status: Integrated and cached for pilot areas
-- Layers: standard map, latest nationwide imagery, hillshade, slope map
+- FL status: Streamed live, nationwide
+- Layers: standard vector map, latest nationwide imagery, hillshade, slope map
 
 ## Data description
 
-- **Format** — XYZ raster tiles, 256 × 256 px, fetched from `https://cyberjapandata.gsi.go.jp/xyz`. PNG for the standard, hillshade, and slope layers; JPEG for the orthophoto layer.
-- **Layers and zoom levels cached** — `std` (standard map) at z15; `seamlessphoto` (nationwide latest orthophoto/satellite mosaic) at z15–17; `hillshademap` (DEM-derived hillshade) at z15–16; `slopemap` (DEM-derived slope rendering) at z15.
+- **Format** — the standard basemap is the GSI vector tile style (`experimental_bvmap`, z4–16); the raster basemaps are XYZ tiles, 256 × 256 px: `seamlessphoto` (JPEG, z2–18), `hillshademap` (PNG, z2–16), `slopemap` (PNG, z3–15). All stream live from `https://cyberjapandata.gsi.go.jp/xyz`.
 - **CRS** — Web Mercator (EPSG:3857), the standard XYZ tiling scheme.
-- **Coverage cached here** — only the two demo bounding boxes, not any wider area.
-- **Volume and layout** — 141 tile files, each listed in `data/tiles/manifest.json`, stored as `data/tiles/<region>/[layer]/<z>/<x>-<y>.<ext>`. The standard layer omits the layer folder segment.
-- **Vintage** — a fixed snapshot taken when the cache was built; there is no automatic refresh, and the publisher updates the upstream layers independently.
-- **Known gaps** — hillshade and slope are *rendered images*, not numeric rasters: they cannot be sampled for elevation or degrees, and any numeric terrain value in this project comes from the DEM products instead. The cached zoom ceilings bound the maximum visible detail; requesting deeper zooms in the UI upsamples these tiles rather than fetching new ones.
+- **Coverage** — nationwide; beyond each source's maximum zoom the UI upsamples instead of requesting tiles that would 404.
+- **Vintage** — whatever GSI currently publishes; there is no local snapshot, and the publisher updates the layers independently.
+- **Known gaps** — hillshade and slope are *rendered images*, not numeric rasters: they cannot be sampled for elevation or degrees, and any numeric terrain value in this project comes from the DEM products instead.
 
 ## Source
 
-GSI layer catalog: https://maps.gsi.go.jp/development/ichiran.html . The project caches pilot tiles including `seamlessphoto`, `hillshademap`, and `slopemap`.
+GSI layer catalog: https://maps.gsi.go.jp/development/ichiran.html . The project streams `std.json` (vector), `seamlessphoto`, `hillshademap`, and `slopemap`.
 
 ## Use in this project
 
-Basemap and visual review of roofs, vegetation, farmland, water, construction state, ridges/valleys, and slope. Tiles are served through `/api/v1/assets/*`; runtime does not contact GSI. Visual basemaps do not enter scores.
+Basemap and visual review of roofs, vegetation, farmland, water, construction state, ridges/valleys, and slope, at any location in the coverage. Tiles stream from GSI at render time and are never stored or redistributed. Visual basemaps do not enter scores.
 
 ## License
 

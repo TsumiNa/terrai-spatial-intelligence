@@ -12,7 +12,6 @@
   import { buildAnalyticalLayers, buildWindowedFeatureLayer, drawsOwnBuildings, geometryBounds, queuePopup, type PopupSpec } from "../map/layers";
   import { buildUndergroundLayers } from "../map/underground-layers";
   import { createExhibitionMap, type ExhibitionMap } from "../map/map";
-  import { RASTER_REGIONS } from "../map/config";
   import { normalizeView, undergroundAuditContext, undergroundClassKey } from "../modules";
   import { familyResources, materialLabel, summarizeAsset, type UndergroundFamily, type UndergroundResource } from "../underground";
   import { matchScene, sceneExtent, type SceneCatalog } from "../scene/catalog";
@@ -243,7 +242,7 @@
   onMount(() => {
     let disposed = false;
     let api: ExhibitionMap | undefined;
-    createExhibitionMap(container, assetBase, { region: vm.region, basemap: app.basemap })
+    createExhibitionMap(container, { region: vm.region, basemap: app.basemap })
       .then((created) => {
         if (disposed) created.destroy();
         else {
@@ -340,7 +339,6 @@
             class="basemap-button"
             class:active={key === app.basemap}
             title={i18n.t(basemapLabel[key].title)}
-            disabled={key !== "standard" && !RASTER_REGIONS.includes(vm.region)}
             onclick={() => app.selectBasemap(key)}
           >
             {i18n.t(basemapLabel[key].label)}

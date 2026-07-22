@@ -27,37 +27,42 @@ export const REGION_CAMERAS: Record<RegionKey, { center: [number, number]; zoom:
 
 export const REGION_KEYS = Object.keys(REGION_CAMERAS) as RegionKey[];
 
-/** Regions with a committed raster basemap cache. Nihonbashi has none: the
- * vector style covers it nationwide, and no raster source is declared for it
- * so no request can 404. */
-export const RASTER_REGIONS: RegionKey[] = ["yokohama", "mobara"];
-
 export type RasterKind = Exclude<BasemapKey, "standard">;
 
 export const RASTER_KINDS: RasterKind[] = ["photo", "hillshade", "slope"];
 
-/** extension + real maximum tile level per cached raster layer. */
-export const RASTER_CEILINGS: Record<RasterKind, { extension: "jpg" | "png"; maxzoom: number }> = {
-  photo: { extension: "jpg", maxzoom: 18 },
-  hillshade: { extension: "png", maxzoom: 16 },
-  slope: { extension: "png", maxzoom: 15 },
-};
-
+/** The live nationwide GSI raster layers. The zoom bounds are the sources'
+ * published ranges; beyond maxzoom MapLibre overscales instead of requesting
+ * tiles that would 404. The per-region tile cache died with the demo-scope
+ * framing: the vector basemap has always streamed from GSI, and the rasters
+ * now follow the same dependency to the same host. */
 export const GSI_ATTRIBUTION =
   '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル (GSI)</a>';
+
+export const RASTER_SOURCES: Record<RasterKind, { url: string; minzoom: number; maxzoom: number; attribution: string }> = {
+  // seamlessphoto blends third-party imagery; GSI's tile catalog requires
+  // their credits alongside the GSI one when the layer is shown.
+  photo: {
+    url: "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg",
+    minzoom: 2,
+    maxzoom: 18,
+    attribution: `${GSI_ATTRIBUTION}・Landsat 8（courtesy USGS/NASA）・GEBCO・GRUS画像（© Axelspace）`,
+  },
+  hillshade: { url: "https://cyberjapandata.gsi.go.jp/xyz/hillshademap/{z}/{x}/{y}.png", minzoom: 2, maxzoom: 16, attribution: GSI_ATTRIBUTION },
+  slope: { url: "https://cyberjapandata.gsi.go.jp/xyz/slopemap/{z}/{x}/{y}.png", minzoom: 3, maxzoom: 15, attribution: GSI_ATTRIBUTION },
+};
 
 /** The floor fits the whole mainland-Kanto acquisition window (2.3 degrees
  * of longitude) into a 1600 px viewport: 512·2⁹/360 ≈ 728 px per degree.
  * Below their own measured floors the windowed foundation layers say
- * "zoom in" instead of loading, and the cached raster basemaps
- * (minzoom 15) fall back to the nationwide vector style underneath, so
- * zooming out degrades nothing but tile detail. */
+ * "zoom in" instead of loading, so zooming out degrades nothing but tile
+ * detail. */
 export const MIN_ZOOM = 9;
 export const MAX_ZOOM = 18;
 export const MAX_PITCH = 85;
 
-export function rasterId(region: RegionKey, kind: RasterKind): string {
-  return `terrai-${region}-${kind}`;
+export function rasterId(kind: RasterKind): string {
+  return `terrai-${kind}`;
 }
 
 /**
@@ -72,33 +77,26 @@ export function vectorBuildingLayerIds(style: StyleSpecification): string[] {
     .map((layer) => layer.id);
 }
 
-export function rasterTileUrl(assetBase: string, region: RegionKey, kind: RasterKind): string {
-  const { extension } = RASTER_CEILINGS[kind];
-  return `${assetBase}/tiles/${region}/${kind}/{z}/{x}-{y}.${extension}`;
-}
-
 /**
- * Append the six cached raster basemaps (2 regions × 3 kinds) to the GSI
- * vector style, all hidden. The active one is a visibility toggle, so
- * switching basemaps never rebuilds the style and never moves the camera.
+ * Append the three nationwide raster basemaps to the GSI vector style, all
+ * hidden. The active one is a visibility toggle, so switching basemaps never
+ * rebuilds the style and never moves the camera.
  */
-export function composeStyle(vectorStyle: StyleSpecification, assetBase: string): StyleSpecification {
+export function composeStyle(vectorStyle: StyleSpecification): StyleSpecification {
   const sources: Record<string, SourceSpecification> = { ...vectorStyle.sources };
   const layers: LayerSpecification[] = [...vectorStyle.layers];
-  for (const region of RASTER_REGIONS) {
-    for (const kind of RASTER_KINDS) {
-      const id = rasterId(region, kind);
-      sources[id] = {
-        type: "raster",
-        tiles: [rasterTileUrl(assetBase, region, kind)],
-        tileSize: 256,
-        minzoom: 15,
-        maxzoom: RASTER_CEILINGS[kind].maxzoom,
-        bounds: REGION_CAMERAS[region].bounds,
-        attribution: GSI_ATTRIBUTION,
-      };
-      layers.push({ id, type: "raster", source: id, layout: { visibility: "none" } });
-    }
+  for (const kind of RASTER_KINDS) {
+    const id = rasterId(kind);
+    const { url, minzoom, maxzoom, attribution } = RASTER_SOURCES[kind];
+    sources[id] = {
+      type: "raster",
+      tiles: [url],
+      tileSize: 256,
+      minzoom,
+      maxzoom,
+      attribution,
+    };
+    layers.push({ id, type: "raster", source: id, layout: { visibility: "none" } });
   }
   return { ...vectorStyle, sources, layers };
 }

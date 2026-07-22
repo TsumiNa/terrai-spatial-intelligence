@@ -99,10 +99,8 @@ sequenceDiagram
     Frontend->>Frontend: Render module, metrics, map, and action queue
 
     par Map resources for the viewport
-        Browser->>API: GET /assets/tiles/...
-        API->>Assets: Read tile
-        Assets-->>API: PNG/JPEG
-        API-->>Browser: Image resource
+        Browser->>GSI: GET basemap tiles (cyberjapandata.gsi.go.jp)
+        GSI-->>Browser: Vector/raster tiles
     and Remote-sensing evidence overlay
         Browser->>API: GET /assets/google/...image...
         API->>Assets: Read image

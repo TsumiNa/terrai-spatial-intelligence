@@ -27,8 +27,8 @@ test("entering the underground module is one action and leaving restores the sur
   await page.locator('[data-module="underground"]').click();
   await expect(page.locator("h1")).toHaveText("城市语境中的实测地下管线");
   await expect(page.locator(".region-pill")).toHaveText("东京 · 日本桥");
-  // Raster basemaps have no Nihonbashi cache and disable rather than 404.
-  await expect(page.locator(".basemap-button", { hasText: "影像" })).toBeDisabled();
+  // The nationwide live rasters cover every region; nothing disables here.
+  await expect(page.locator(".basemap-button", { hasText: "影像" })).toBeEnabled();
 
   await page.locator('[data-module="overview"]').click();
   await expect(page.locator("h1")).toHaveText("城市韧性与新能源机会");

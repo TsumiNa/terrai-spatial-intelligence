@@ -99,10 +99,8 @@ sequenceDiagram
     Frontend->>Frontend: モジュール、指標、地図、行動キューを描画
 
     par 表示範囲の地図リソース
-        Browser->>API: GET /assets/tiles/...
-        API->>Assets: タイルを読む
-        Assets-->>API: PNG/JPEG
-        API-->>Browser: 画像
+        Browser->>GSI: GET basemap tiles (cyberjapandata.gsi.go.jp)
+        GSI-->>Browser: ベクトル／ラスタタイル
     and リモートセンシング証拠オーバーレイ
         Browser->>API: GET /assets/google/...image...
         API->>Assets: 画像を読む

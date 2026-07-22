@@ -7,19 +7,20 @@ async function waitForMap(page: Page) {
 }
 
 test("both regions load with GSI attribution", async ({ page }) => {
-  const mobaraTiles: string[] = [];
+  const photoTiles: string[] = [];
   page.on("response", (response) => {
-    if (response.url().includes("/api/v1/assets/tiles/mobara/photo/")) mobaraTiles.push(response.url());
+    if (response.url().includes("cyberjapandata.gsi.go.jp/xyz/seamlessphoto/")) photoTiles.push(response.url());
   });
 
   await waitForMap(page);
   await expect(page.locator(".maplibregl-ctrl-attrib")).toContainText("地理院");
 
-  // Mobara via the overview's renewable tab, with the photo basemap active.
+  // Mobara via the overview's renewable tab, with the photo basemap active —
+  // the live nationwide imagery streams there just as it does everywhere.
   await page.locator(".basemap-button", { hasText: "影像" }).click();
   await page.locator(".view-tab", { hasText: "茂原" }).click();
   await expect(page.locator(".region-pill")).toHaveText("千叶 · 茂原市");
-  await expect.poll(() => mobaraTiles.length, { timeout: 15000 }).toBeGreaterThan(0);
+  await expect.poll(() => photoTiles.length, { timeout: 15000 }).toBeGreaterThan(0);
 });
 
 test("basemap switching keeps the single map instance (no camera rebuild)", async ({ page }) => {
@@ -35,7 +36,7 @@ test("basemap switching keeps the single map instance (no camera rebuild)", asyn
 test("zooming past the raster ceilings produces no failed tile requests", async ({ page }) => {
   const failures: string[] = [];
   page.on("response", (response) => {
-    if (response.url().includes("/api/v1/assets/tiles/") && response.status() >= 400) failures.push(response.url());
+    if (response.url().includes("cyberjapandata.gsi.go.jp/xyz/") && response.status() >= 400) failures.push(response.url());
   });
 
   await waitForMap(page);

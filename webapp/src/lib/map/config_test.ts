@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { RASTER_CEILINGS, REGION_CAMERAS, composeStyle, rasterId, rasterTileUrl, vectorBuildingLayerIds } from "./config";
+import { RASTER_SOURCES, composeStyle, rasterId, vectorBuildingLayerIds } from "./config";
 
 const baseStyle: StyleSpecification = {
   version: 8,
@@ -10,40 +10,34 @@ const baseStyle: StyleSpecification = {
   layers: [{ id: "background", type: "background" }],
 };
 
-it("declares the measured GSI ceilings, not deeper", () => {
-  expect(RASTER_CEILINGS.photo.maxzoom).toBe(18);
-  expect(RASTER_CEILINGS.hillshade.maxzoom).toBe(16);
-  expect(RASTER_CEILINGS.slope.maxzoom).toBe(15);
+it("declares the published GSI zoom ranges, not deeper", () => {
+  expect(RASTER_SOURCES.photo.maxzoom).toBe(18);
+  expect(RASTER_SOURCES.hillshade.maxzoom).toBe(16);
+  expect(RASTER_SOURCES.slope.maxzoom).toBe(15);
+  expect(RASTER_SOURCES.slope.minzoom).toBe(3);
 });
 
-it("builds per-region tile URLs against the API asset mount", () => {
-  expect(rasterTileUrl("http://127.0.0.1:8000/api/v1/assets", "yokohama", "photo")).toBe(
-    "http://127.0.0.1:8000/api/v1/assets/tiles/yokohama/photo/{z}/{x}-{y}.jpg",
-  );
-  expect(rasterTileUrl("http://127.0.0.1:8000/api/v1/assets", "mobara", "slope")).toBe(
-    "http://127.0.0.1:8000/api/v1/assets/tiles/mobara/slope/{z}/{x}-{y}.png",
-  );
+it("streams every raster basemap live from the GSI tile host", () => {
+  for (const { url } of Object.values(RASTER_SOURCES)) {
+    expect(url).toMatch(/^https:\/\/cyberjapandata\.gsi\.go\.jp\/xyz\//);
+    expect(url).toContain("{z}/{x}/{y}");
+  }
 });
 
-it("appends six hidden raster layers on top of the vector style", () => {
-  const composed = composeStyle(baseStyle, "http://x/api/v1/assets");
-  expect(Object.keys(composed.sources)).toHaveLength(7);
-  expect(composed.layers).toHaveLength(7);
+it("appends three hidden nationwide raster layers on top of the vector style", () => {
+  const composed = composeStyle(baseStyle);
+  expect(Object.keys(composed.sources)).toHaveLength(4);
+  expect(composed.layers).toHaveLength(4);
   for (const layer of composed.layers.slice(1)) {
     expect(layer.type).toBe("raster");
     expect(layer.layout).toEqual({ visibility: "none" });
   }
   // rasters render above every vector layer so an opaque basemap covers it
   expect(composed.layers[0].id).toBe("background");
-});
-
-it("bounds every raster source to its region so panning cannot 404", () => {
-  const composed = composeStyle(baseStyle, "http://x/api/v1/assets");
-  const yokohama = composed.sources[rasterId("yokohama", "photo")] as { bounds?: number[] };
-  expect(yokohama.bounds).toEqual([...REGION_CAMERAS.yokohama.bounds]);
-  const mobara = composed.sources[rasterId("mobara", "hillshade")] as { bounds?: number[]; attribution?: string };
-  expect(mobara.bounds).toEqual([...REGION_CAMERAS.mobara.bounds]);
-  expect(mobara.attribution).toContain("GSI");
+  const photo = composed.sources[rasterId("photo")] as { bounds?: number[]; attribution?: string };
+  // nationwide: no bounds clamp remains from the retired per-region cache
+  expect(photo.bounds).toBeUndefined();
+  expect(photo.attribution).toContain("GSI");
 });
 
 it("identifies the vector style's building layers by source-layer", () => {
@@ -62,6 +56,6 @@ it("identifies the vector style's building layers by source-layer", () => {
 
 it("does not mutate the fetched vector style", () => {
   const before = JSON.stringify(baseStyle);
-  composeStyle(baseStyle, "http://x/api/v1/assets");
+  composeStyle(baseStyle);
   expect(JSON.stringify(baseStyle)).toBe(before);
 });

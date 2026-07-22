@@ -81,15 +81,6 @@ TASKS = {
         offline_argument=True,
         check_stale=False,
     ),
-    "tiles": DataTask(
-        "tiles",
-        "cache GSI standard, imagery, relief and slope tiles",
-        "scripts/fetch_visual_tiles.py",
-        outputs=("data/tiles/manifest.json",),
-        manifest="data/tiles/manifest.json",
-        network=True,
-        force_argument=True,
-    ),
     "embedding": DataTask(
         "embedding",
         "fetch and process Google Satellite Embedding crops",
