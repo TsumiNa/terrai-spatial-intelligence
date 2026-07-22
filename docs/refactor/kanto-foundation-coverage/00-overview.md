@@ -84,16 +84,46 @@ minutes-long, RAM-hungry local operation and is documented as such.
 - No `/api/v1` contract changes: same routes, same shapes.
 - No CI acquisition of wide data, ever: CI stays offline and hermetic.
 
+## Revision (2026-07-22, after PR2 merged)
+
+Direction changed by the project owner: **there are not two data scopes.** The
+demo/wide split — and the "demonstration context" framing itself — is dropped. The
+Kanto acquisition *is* the MLIT foundation data; expanding FL coverage is normal
+development, not a special wide mode beside a demo mode.
+
+What that means concretely:
+
+- `data/mlit/` becomes a gitignored reproducible acquisition cache (the PLATEAU
+  category), produced by one fetch script at the Kanto window. The committed subsets
+  leave git; the per-file wide-over-demo resolution from PR2 is removed as one scope
+  needs no resolving.
+- Every environment holds the same data world. CI provisions `data/mlit` through the
+  Actions cache keyed on the acquisition table, fetching on a miss — no fixture data,
+  no scope divergence.
+- The store build and the identity oracle must stop assuming collections fit in
+  memory: the land-use mesh is ~2 million features and CI runners have ~7 GB.
+
+PR1's streamed writer, Kanto archive table and window registry carry over unchanged;
+PR2's freshness guard carries over; PR2's resolution layer is deliberately short-lived.
+
 ## Planned PRs
 
-1. `01-wide-acquisition-pr1.md` — the wide-region registry entry, the wide fetch script
-   (streaming writes), its data task, and the gitignore entry. Inert until run.
-2. `02-store-scope-resolution-pr2.md` — per-file wide-over-demo source resolution in the
-   data service; store inputs and staleness follow; a store-freshness guard in the
-   identity suite.
-3. `03-coverage-surfacing-pr3.md` — widen the foundation-layer registry extents in the
-   webapp and update the ten MLIT data cards (trilingual) to state the two-scope
-   coverage honestly, including the partial-sheet caveats.
+1. `01-wide-acquisition-pr1.md` — **merged (#52)** — the Kanto archive table, streamed
+   writer and acquisition windows (built as an opt-in second scope, since revised).
+2. `02-store-scope-resolution-pr2.md` — **merged (#53)** — per-file resolution and the
+   store-freshness guard (the resolution layer is removed again by PR5).
+3. `03-coverage-surfacing-pr3.md` — superseded by the revision; replaced by PR5–PR6.
+4. `04-streaming-store-ingestion-pr4.md` — the store build streams features from disk
+   in batches instead of `json.loads` on whole collections.
+5. `05-single-scope-acquisition-pr5.md` — one acquisition scope: the fetch script
+   acquires the Kanto window into a gitignored `data/mlit/`, the committed subsets and
+   the two-scope machinery are removed, CI provisions through the Actions cache, and
+   the identity suite scales by collection size.
+6. `06-coverage-surfacing-pr6.md` — webapp registry extents and the ten trilingual
+   data cards state the Kanto coverage (including the partial-sheet caveats).
+7. `07-fl-admission-principle-pr7.md` — record the FL spatial-alignment admission
+   principle (no GIS data and no coordinate/elevation/projection alignment path →
+   never integrated as FL) in the concept document and the acquisition script.
 
-After PR3 merges, the wide fetch and store rebuild run once on the exhibition machine
-(not in a PR), and the result is verified visually across the four prefectures.
+After PR6 merges, the fetch and store rebuild run once on the exhibition machine, and
+the result is verified visually across the four prefectures.

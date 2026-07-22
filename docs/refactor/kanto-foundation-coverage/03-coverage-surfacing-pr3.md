@@ -1,6 +1,8 @@
 # PR3 Plan: Surface the Widened Coverage
 
-- Status: Planned
+- Status: Superseded — the two-scope split this plan surfaces was dropped by the
+  owner's revision (see `00-overview.md`); its content returns as PR6 in single-scope
+  wording.
 - Refactor: `kanto-foundation-coverage`
 
 ## Goal
