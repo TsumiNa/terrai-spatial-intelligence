@@ -46,7 +46,13 @@ export const RASTER_CEILINGS: Record<RasterKind, { extension: "jpg" | "png"; max
 export const GSI_ATTRIBUTION =
   '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル (GSI)</a>';
 
-export const MIN_ZOOM = 14;
+/** The floor fits the whole mainland-Kanto acquisition window (2.3 degrees
+ * of longitude) into a 1600 px viewport: 512·2⁹/360 ≈ 728 px per degree.
+ * Below their own measured floors the windowed foundation layers say
+ * "zoom in" instead of loading, and the cached raster basemaps
+ * (minzoom 15) fall back to the nationwide vector style underneath, so
+ * zooming out degrades nothing but tile detail. */
+export const MIN_ZOOM = 9;
 export const MAX_ZOOM = 18;
 export const MAX_PITCH = 85;
 
