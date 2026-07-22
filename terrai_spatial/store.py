@@ -40,13 +40,19 @@ import sqlite3
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterable, Sequence
+from typing import Any, Iterable, Iterator, Sequence
 
 from .pipeline.io import file_sha256
 
 
 STORE_PATH = "var/store/terrai.sqlite"
 SCHEMA_VERSION = 1
+
+# Collections at least this large stream from disk instead of json.loads: the
+# Kanto land-use mesh is ~2 million features and CI runners have ~7 GB.
+STREAM_THRESHOLD_BYTES = 64 * 1024 * 1024
+_STREAM_CHUNK_BYTES = 8 * 1024 * 1024
+_INSERT_BATCH_ROWS = 10_000
 
 TIERS = ("FL", "SL", "AL")
 EVIDENCE_STATES = ("observed", "synthetic", "unresolved")
@@ -183,6 +189,158 @@ def feature_bbox(geometry: dict[str, Any] | None) -> tuple[float, float, float, 
     )
 
 
+class _FeatureStream:
+    """The feature iterator with a ``close()`` that always releases the file.
+
+    A generator that was never started skips its ``finally`` entirely, so the
+    handle is closed here directly as well — idempotently — covering callers
+    that read only the envelope or abandon iteration early.
+    """
+
+    def __init__(self, generator: Iterator[dict[str, Any]], handle: Any) -> None:
+        self._generator = generator
+        self._handle = handle
+
+    def __iter__(self) -> "_FeatureStream":
+        return self
+
+    def __next__(self) -> dict[str, Any]:
+        return next(self._generator)
+
+    def close(self) -> None:
+        self._generator.close()
+        self._handle.close()
+
+
+def stream_feature_collection(
+    path: Path, *, chunk_bytes: int = _STREAM_CHUNK_BYTES
+) -> tuple[dict[str, Any], _FeatureStream]:
+    """Incremental FeatureCollection reader: envelope members plus a feature
+    iterator, in bounded memory.
+
+    The envelope holds every top-level member in file order with ``features``
+    emptied. Members that follow the features array are appended only as the
+    iterator is exhausted — the order ``build_store`` consumes them in.
+    Exhaust the iterator or ``close()`` it; both release the file handle.
+    Malformed input raises with the path and an approximate byte offset.
+    """
+
+    decoder = json.JSONDecoder()
+    handle = path.open("r", encoding="utf-8")
+    state = {"buffer": "", "index": 0, "consumed": 0}
+
+    def fail(message: str) -> RuntimeError:
+        offset = state["consumed"] + state["index"]
+        return RuntimeError(f"invalid FeatureCollection: {path}: {message} near byte {offset}")
+
+    def refill() -> bool:
+        chunk = handle.read(chunk_bytes)
+        if not chunk:
+            return False
+        state["buffer"] += chunk
+        return True
+
+    def compact() -> None:
+        if state["index"] > chunk_bytes:
+            state["consumed"] += state["index"]
+            state["buffer"] = state["buffer"][state["index"] :]
+            state["index"] = 0
+
+    def peek() -> str | None:
+        """The next non-whitespace character, with the cursor moved to it."""
+        while True:
+            buffer, index = state["buffer"], state["index"]
+            while index < len(buffer) and buffer[index] in " \t\r\n":
+                index += 1
+            state["index"] = index
+            if index < len(buffer):
+                return buffer[index]
+            if not refill():
+                return None
+
+    def take(expected: str) -> None:
+        found = peek()
+        if found != expected:
+            raise fail(f"expected {expected!r}, found {found!r}")
+        state["index"] += 1
+
+    def next_value() -> Any:
+        if peek() is None:
+            raise fail("truncated document")
+        while True:
+            try:
+                parsed, end = decoder.raw_decode(state["buffer"], state["index"])
+            except ValueError:
+                if refill():
+                    continue
+                raise fail("truncated or malformed value") from None
+            # A value ending exactly at the buffer boundary may be the prefix
+            # of a longer token (`12` of `123`); read ahead before accepting.
+            if end == len(state["buffer"]) and refill():
+                continue
+            state["index"] = end
+            compact()
+            return parsed
+
+    envelope: dict[str, Any] = {}
+    features_found = False
+    try:
+        take("{")
+        while True:
+            if peek() == "}":
+                state["index"] += 1
+                break
+            if envelope or features_found:
+                take(",")
+            key = next_value()
+            if not isinstance(key, str):
+                raise fail("object member key is not a string")
+            take(":")
+            if key == "features":
+                features_found = True
+                envelope[key] = []
+                break
+            envelope[key] = next_value()
+    except BaseException:
+        handle.close()
+        raise
+
+    def features() -> Iterator[dict[str, Any]]:
+        try:
+            if features_found:
+                take("[")
+                first = True
+                while True:
+                    if peek() == "]":
+                        state["index"] += 1
+                        break
+                    if not first:
+                        take(",")
+                    feature = next_value()
+                    first = False
+                    if not isinstance(feature, dict):
+                        raise fail("feature is not an object")
+                    yield feature
+                while True:
+                    if peek() == "}":
+                        state["index"] += 1
+                        break
+                    take(",")
+                    key = next_value()
+                    if not isinstance(key, str):
+                        raise fail("object member key is not a string")
+                    if key == "features":
+                        raise fail("duplicate features member")
+                    take(":")
+                    envelope[key] = next_value()
+            if peek() is not None:
+                raise fail("content after the root object")
+        finally:
+            handle.close()
+
+    return envelope, _FeatureStream(features(), handle)
+
+
 def _source_stamp(value: dict[str, Any]) -> tuple[str | None, str | None, str | None]:
     """(license, retrieved_at, source_updated_at) from embedded metadata, verbatim."""
 
@@ -199,8 +357,19 @@ def _built_at(root: Path, sources: Sequence[StoreSource]) -> str:
     return datetime.fromtimestamp(newest, tz=UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-def build_store(root: Path, target: Path, sources: Sequence[StoreSource]) -> dict[str, int]:
-    """Build the store atomically: temp path, validate, rename over the old one."""
+def build_store(
+    root: Path,
+    target: Path,
+    sources: Sequence[StoreSource],
+    *,
+    stream_threshold: int = STREAM_THRESHOLD_BYTES,
+) -> dict[str, int]:
+    """Build the store atomically: temp path, validate, rename over the old one.
+
+    Collections at or above ``stream_threshold`` bytes stream from disk and
+    insert in batches; smaller files keep the whole-parse path. Both paths
+    produce byte-identical stores from the same inputs.
+    """
 
     _require_rtree()
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -220,37 +389,55 @@ def build_store(root: Path, target: Path, sources: Sequence[StoreSource]) -> dic
         counts = {"features": 0, "documents": 0}
         for source in sorted(sources, key=lambda item: item.key):
             path = root / source.path
-            value = json.loads(path.read_text(encoding="utf-8"))
             sha256 = file_sha256(path)
             if source.kind == "features":
-                if not isinstance(value, dict) or value.get("type") != "FeatureCollection":
-                    raise RuntimeError(f"{source.key} is not a GeoJSON FeatureCollection: {source.path}")
-                features = value.get("features", [])
+                if path.stat().st_size >= stream_threshold:
+                    members, feature_iter = stream_feature_collection(path)
+                else:
+                    value = json.loads(path.read_text(encoding="utf-8"))
+                    if not isinstance(value, dict):
+                        raise RuntimeError(f"{source.key} is not a GeoJSON FeatureCollection: {source.path}")
+                    members = value
+                    feature_iter = iter(value.get("features", []))
                 rows = []
+                count = 0
                 dataset_bbox: list[float] | None = None
-                for ordinal, feature in enumerate(features):
-                    bbox = feature_bbox(feature.get("geometry"))
-                    rows.append(
-                        (
-                            source.key,
-                            ordinal,
-                            json.dumps(feature, ensure_ascii=False, separators=(",", ":")),
-                            *(bbox if bbox else (None, None, None, None)),
+                try:
+                    for feature in feature_iter:
+                        bbox = feature_bbox(feature.get("geometry"))
+                        rows.append(
+                            (
+                                source.key,
+                                count,
+                                json.dumps(feature, ensure_ascii=False, separators=(",", ":")),
+                                *(bbox if bbox else (None, None, None, None)),
+                            )
                         )
-                    )
-                    if bbox:
-                        if dataset_bbox is None:
-                            dataset_bbox = list(bbox)
-                        else:
-                            dataset_bbox = [
-                                min(dataset_bbox[0], bbox[0]),
-                                min(dataset_bbox[1], bbox[1]),
-                                max(dataset_bbox[2], bbox[2]),
-                                max(dataset_bbox[3], bbox[3]),
-                            ]
+                        count += 1
+                        if bbox:
+                            if dataset_bbox is None:
+                                dataset_bbox = list(bbox)
+                            else:
+                                dataset_bbox = [
+                                    min(dataset_bbox[0], bbox[0]),
+                                    min(dataset_bbox[1], bbox[1]),
+                                    max(dataset_bbox[2], bbox[2]),
+                                    max(dataset_bbox[3], bbox[3]),
+                                ]
+                        if len(rows) >= _INSERT_BATCH_ROWS:
+                            connection.executemany(INSERT_FEATURE, rows)
+                            rows.clear()
+                finally:
+                    closer = getattr(feature_iter, "close", None)
+                    if closer is not None:
+                        closer()
                 connection.executemany(INSERT_FEATURE, rows)
-                envelope = {name: ([] if name == "features" else item) for name, item in value.items()}
-                license_text, retrieved_at, source_updated_at = _source_stamp(value)
+                # A streamed envelope is complete only after iteration, so the
+                # shape check for both paths lives here.
+                if members.get("type") != "FeatureCollection":
+                    raise RuntimeError(f"{source.key} is not a GeoJSON FeatureCollection: {source.path}")
+                envelope = {name: ([] if name == "features" else item) for name, item in members.items()}
+                license_text, retrieved_at, source_updated_at = _source_stamp(members)
                 connection.execute(
                     INSERT_DATASET,
                     (
@@ -264,14 +451,15 @@ def build_store(root: Path, target: Path, sources: Sequence[StoreSource]) -> dic
                         license_text,
                         retrieved_at,
                         source_updated_at,
-                        len(features),
+                        count,
                         *(dataset_bbox if dataset_bbox else (None, None, None, None)),
                         json.dumps(envelope, ensure_ascii=False, separators=(",", ":")),
                         built_at,
                     ),
                 )
-                counts["features"] += len(features)
+                counts["features"] += count
             else:
+                value = json.loads(path.read_text(encoding="utf-8"))
                 if not isinstance(value, dict):
                     raise RuntimeError(f"{source.key} document root is not an object: {source.path}")
                 connection.execute(

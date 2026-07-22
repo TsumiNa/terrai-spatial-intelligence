@@ -238,3 +238,96 @@ def test_every_service_dataset_has_a_store_source_and_the_path_is_gitignored() -
         check=False,
     )
     assert ignored.returncode == 0, "the store file must be gitignored"
+
+
+def test_streamed_and_loaded_ingestion_produce_byte_identical_stores(tmp_path: Path) -> None:
+    sources = write_fixture_root(tmp_path)
+    loaded = tmp_path / "loaded.sqlite"
+    streamed = tmp_path / "streamed.sqlite"
+
+    store.build_store(tmp_path, loaded, sources)
+    store.build_store(tmp_path, streamed, sources, stream_threshold=0)
+
+    assert loaded.read_bytes() == streamed.read_bytes()
+
+
+def test_stream_reader_matches_json_loads_with_tiny_chunks(tmp_path: Path) -> None:
+    collection = {
+        "type": "FeatureCollection",
+        "name": "駅の例",
+        "metadata": {"license": "CC BY 4.0", "nested": {"深い": [1, 2.5, None, True]}},
+        "features": EDGE_FEATURES,
+    }
+    path = tmp_path / "sample.geojson"
+    path.write_text(json.dumps(collection, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    # 16-byte chunks force refills and buffer compaction on every token.
+    envelope, features = store.stream_feature_collection(path, chunk_bytes=16)
+    streamed = list(features)
+
+    assert streamed == EDGE_FEATURES
+    assert envelope == {"type": "FeatureCollection", "name": "駅の例", "metadata": collection["metadata"], "features": []}
+
+
+def test_stream_reader_completes_members_after_the_features_array(tmp_path: Path) -> None:
+    path = tmp_path / "trailing.geojson"
+    path.write_text(
+        '{"type":"FeatureCollection","features":[{"type":"Feature","geometry":null,"properties":{}}],"name":"after"}',
+        encoding="utf-8",
+    )
+
+    envelope, features = store.stream_feature_collection(path)
+    assert "name" not in envelope  # not yet read: it follows the array
+    assert len(list(features)) == 1
+    assert envelope["name"] == "after"
+
+
+def test_stream_reader_fails_loudly_on_truncated_and_trailing_garbage(tmp_path: Path) -> None:
+    truncated = tmp_path / "truncated.geojson"
+    truncated.write_text('{"type":"FeatureCollection","features":[{"type":"Fea', encoding="utf-8")
+    envelope, features = store.stream_feature_collection(truncated)
+    with pytest.raises(RuntimeError, match="truncated.geojson"):
+        list(features)
+
+    trailing = tmp_path / "garbage.geojson"
+    trailing.write_text('{"type":"FeatureCollection","features":[]}{"again":true}', encoding="utf-8")
+    envelope, features = store.stream_feature_collection(trailing)
+    with pytest.raises(RuntimeError, match="content after the root object"):
+        list(features)
+
+
+def test_stream_reader_round_trips_a_real_mlit_dataset() -> None:
+    path = PROJECT_ROOT / "data/mlit/railway.geojson"
+    loaded = json.loads(path.read_text(encoding="utf-8"))
+
+    envelope, features = store.stream_feature_collection(path)
+    streamed = list(features)
+
+    assert streamed == loaded["features"]
+    assert envelope == {**{name: value for name, value in loaded.items() if name != "features"}, "features": []}
+
+
+def test_stream_reader_close_releases_the_file_even_without_iteration(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    path = tmp_path / "sample.geojson"
+    path.write_text(json.dumps({"type": "FeatureCollection", "features": EDGE_FEATURES}), encoding="utf-8")
+
+    opened = []
+    real_open = Path.open
+
+    def spy(self, *args, **kwargs):  # noqa: ANN001 - Path.open signature
+        handle = real_open(self, *args, **kwargs)
+        opened.append(handle)
+        return handle
+
+    monkeypatch.setattr(Path, "open", spy)
+
+    # Abandoned before the first feature: close() must still release the file.
+    _, features = store.stream_feature_collection(path)
+    assert len(opened) == 1 and not opened[0].closed
+    features.close()
+    assert opened[0].closed
+
+    # Exhaustion releases it too.
+    _, features = store.stream_feature_collection(path)
+    list(features)
+    assert opened[1].closed
