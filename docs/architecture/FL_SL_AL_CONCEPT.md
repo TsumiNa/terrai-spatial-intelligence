@@ -44,6 +44,7 @@ FL stores acquired real-world evidence and deterministic transformations that pr
 - Missingness, dates, coverage, resolution, and license boundaries remain explicit.
 - Format conversion, coordinate normalization, quality checks, and deterministic slope from DEM remain FL; they do not invent unobserved facts.
 - Customer data entering FL is not automatically shared across customers; tenancy and permissions are later Factor of Develop work.
+- Spatial alignment is an admission requirement: a source enters FL only when it ships GIS data or can be aligned through coordinates, elevation against a stated vertical datum, or a defined projection. A source with no such anchor is never drawn through invented georeference; it is recorded in the source registry as not integrated, with the reason.
 
 Current FL includes GSI, MLIT land/hazard/transport/price layers, OpenStreetMap, Yokohama open data, NASA POWER, TEPCO public CSV, Google Satellite Embedding, and the user-supplied KuniJiban subsurface extract. The embedding remains external FL even though it was produced by a foundation model. KuniJiban rows retain whether they came from source XML or VLM extraction; model-extracted fields are never relabelled as source observations. Large layers are catalogued and queried on demand rather than included in the frontend bootstrap. Sources prohibited for commercial use are excluded from integration; their evaluation may remain as documentation.
 
