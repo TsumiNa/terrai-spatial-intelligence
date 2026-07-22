@@ -43,7 +43,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: data/mlit
-          key: mlit-${{ hashFiles('scripts/fetch_mlit_foundation.py', 'terrai_spatial/pipeline/regions.py') }}
+          key: mlit-${{ hashFiles('scripts/fetch_mlit_foundation.py', 'terrai_spatial/pipeline/regions.py', 'terrai_spatial/pipeline/io.py', 'terrai_spatial/pipeline/http.py', 'terrai_spatial/pipeline/provenance.py') }}
 
       - name: Fetch foundation data on cache miss
         if: steps.mlit-cache.outputs.cache-hit != 'true'
