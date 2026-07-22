@@ -40,8 +40,23 @@ jobs:
         run: npx playwright install --with-deps chromium
         working-directory: webapp
 
+      # The MLIT foundation data is a gitignored Kanto-scope acquisition
+      # (~2.3 GB of GeoJSON, ~2.7M features): restored from the Actions cache
+      # keyed on the acquisition table, fetched from MLIT only when that
+      # table changes.
+      - name: Restore foundation data
+        id: mlit-cache
+        uses: actions/cache@v4
+        with:
+          path: data/mlit
+          key: mlit-${{ hashFiles('scripts/fetch_mlit_foundation.py', 'terrai_spatial/pipeline/regions.py') }}
+
+      - name: Fetch foundation data on cache miss
+        if: steps.mlit-cache.outputs.cache-hit != 'true'
+        run: uv run python -m terrai_spatial fetch mlit
+
       # The API refuses to start without the derived store; build it from
-      # the committed files before the suite launches the server.
+      # the provisioned files before the suite launches the server.
       - name: Build derived data
         run: uv run python -m terrai_spatial data ensure --only store --offline
 

@@ -26,7 +26,14 @@ from terrai_spatial.data_service import (
     DatasetNotFoundError,
     store_sources,
 )
-from terrai_spatial.store import STORE_PATH, verify_store
+from terrai_spatial.store import (
+    STORE_PATH,
+    STREAM_THRESHOLD_BYTES,
+    open_store,
+    read_envelope,
+    stream_feature_collection,
+    verify_store,
+)
 from terrai_spatial.store_test import scan_intersects
 
 
@@ -45,7 +52,12 @@ def fresh_store() -> None:
 
 
 class FileBackedOracle(DataService):
-    """The pre-store service: raw files, linear scans, per-access copies."""
+    """The pre-store service: raw files, linear scans, per-access copies.
+
+    Kanto-scale collections stream through the same incremental reader the
+    store build uses, so the oracle stays bounded in memory while remaining a
+    genuinely independent scan of the source file.
+    """
 
     def load(self, key: str) -> Any:
         path = self.path_for(key)
@@ -73,25 +85,39 @@ class FileBackedOracle(DataService):
         limit: int = 5000,
         bbox: tuple[float, float, float, float] | None = None,
     ) -> dict[str, Any]:
-        value = self.load(key)
-        if not isinstance(value, dict) or value.get("type") != "FeatureCollection":
-            raise ValueError(f"{key} is not a GeoJSON FeatureCollection")
-        features = value.get("features", [])
-        if where:
-            features = [
-                feature
-                for feature in features
-                if self._matches(feature.get("properties", {}), where, equals, minimum, maximum)
-            ]
-        if bbox:
-            features = [feature for feature in features if scan_intersects(feature.get("geometry"), bbox)]
+        path = self.path_for(key)
+        if path.suffix == ".geojson" and path.stat().st_size >= STREAM_THRESHOLD_BYTES:
+            envelope, feature_iter = stream_feature_collection(path)
+            features = []
+            for feature in feature_iter:
+                if where and not self._matches(feature.get("properties", {}), where, equals, minimum, maximum):
+                    continue
+                if bbox and not scan_intersects(feature.get("geometry"), bbox):
+                    continue
+                features.append(feature)
+            if envelope.get("type") != "FeatureCollection":
+                raise ValueError(f"{key} is not a GeoJSON FeatureCollection")
+            result = envelope
+        else:
+            value = self.load(key)
+            if not isinstance(value, dict) or value.get("type") != "FeatureCollection":
+                raise ValueError(f"{key} is not a GeoJSON FeatureCollection")
+            features = value.get("features", [])
+            if where:
+                features = [
+                    feature
+                    for feature in features
+                    if self._matches(feature.get("properties", {}), where, equals, minimum, maximum)
+                ]
+            if bbox:
+                features = [feature for feature in features if scan_intersects(feature.get("geometry"), bbox)]
+            result = deepcopy(value)
         if sort:
             features = sorted(
                 features,
                 key=lambda feature: self._sortable(feature.get("properties", {}).get(sort)),
                 reverse=descending,
             )
-        result = deepcopy(value)
         result["features"] = features[:limit]
         result["query"] = {"matched": len(features), "returned": len(result["features"])}
         return result
@@ -116,12 +142,19 @@ store_backed = DataService(ROOT)
 oracle = FileBackedOracle(ROOT)
 
 YOKOHAMA_WINDOW = (139.58, 35.44, 139.60, 35.46)
+TOKYO_WINDOW = (139.69, 35.68, 139.71, 35.70)
+OMIYA_WINDOW = (139.61, 35.89, 139.63, 35.91)
+HACHIOJI_WINDOW = (139.26, 35.62, 139.30, 35.66)
 SAPPORO_WINDOW = (141.350, 43.055, 141.357, 43.071)
 
+# Kanto-scale collections are always queried through a window here: the store
+# side without a bbox parses every row, and the oracle would hold every match.
 QUERY_MATRIX = [
     {"key": "landHistory", "bbox": YOKOHAMA_WINDOW},
-    {"key": "landUseMesh", "bbox": YOKOHAMA_WINDOW, "where": "terrai_region", "equals": "yokohama"},
-    {"key": "landUseMesh", "where": "terrai_region", "equals": "mobara", "limit": 500},
+    {"key": "landUseMesh", "bbox": YOKOHAMA_WINDOW, "where": "terrai_region", "equals": "kanto"},
+    {"key": "landUseMesh", "bbox": TOKYO_WINDOW, "limit": 500},
+    {"key": "multistageFlood", "bbox": OMIYA_WINDOW},
+    {"key": "landslideWarning", "bbox": HACHIOJI_WINDOW, "limit": 200},
     {"key": "solar", "where": "status", "equals": "preferred", "sort": "score", "limit": 3},
     {"key": "buildings", "where": "risk_score", "minimum": 50.0, "sort": "risk_score", "descending": False, "limit": 100},
     {"key": "roads", "sort": "priority_score", "limit": 10},
@@ -138,9 +171,35 @@ QUERY_MATRIX = [
 ]
 
 
+def _large_collection(key: str) -> bool:
+    path = oracle.path_for(key)
+    return ALL_DATASETS[key].endswith(".geojson") and path.stat().st_size >= STREAM_THRESHOLD_BYTES
+
+
 def test_every_dataset_loads_byte_identically_from_the_store() -> None:
     for key in ALL_DATASETS:
+        if _large_collection(key):
+            continue  # a full parse of a gigabyte collection on both sides; identity below
         assert canonical(store_backed.load(key)) == canonical(oracle.load(key)), key
+
+
+def test_large_collections_match_by_envelope_count_and_window() -> None:
+    """Full-collection byte identity is intractable at Kanto scale; the same
+    guarantee decomposes into envelope identity, feature-count identity and
+    the windowed-query identity the matrix below exercises."""
+
+    connection = open_store(ROOT / STORE_PATH)
+    try:
+        for key in [key for key in ALL_DATASETS if _large_collection(key)]:
+            envelope, features = stream_feature_collection(oracle.path_for(key))
+            count = sum(1 for _ in features)
+            assert canonical(read_envelope(connection, key)) == canonical(envelope), key
+            stored = connection.execute(
+                "SELECT feature_count FROM datasets WHERE key = ?", (key,)
+            ).fetchone()[0]
+            assert stored == count, key
+    finally:
+        connection.close()
 
 
 def test_health_catalog_and_bootstrap_are_byte_identical(frozen_clock: None) -> None:

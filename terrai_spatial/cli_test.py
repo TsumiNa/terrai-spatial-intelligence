@@ -295,11 +295,12 @@ def test_skipping_data_tasks_does_not_weaken_the_content_contracts() -> None:
     assert contract_failures() == []
 
 
-def test_contract_validation_skips_the_wide_foundation_cache() -> None:
+def test_contract_validation_skips_the_mlit_acquisition() -> None:
+    # The Kanto products are gigabyte-scale; whole-tree JSON validation must
+    # not parse them (or anything else placed in the acquisition directory).
     from terrai_spatial.cli import ROOT, contract_failures
-    from terrai_spatial.data_tasks import MLIT_WIDE_DIR
 
-    probe = ROOT / MLIT_WIDE_DIR / "cli-test-probe.geojson"
+    probe = ROOT / "data/mlit/cli-test-probe.geojson"
     probe.parent.mkdir(parents=True, exist_ok=True)
     probe.write_text("{ deliberately invalid", encoding="utf-8")
     try:

@@ -6,10 +6,11 @@ at the point of use rather than re-declaring the numbers.
 
 Decisions this module records, so they are not rediscovered per script:
 
-- The analysis windows in ``STUDY_BOUNDS`` and the wider boxes in
-  ``MLIT_CONTEXT_BOUNDS`` are deliberately different. MLIT layers are acquired
-  with surrounding context so features straddling the analysis window arrive
-  whole; the analyses themselves stay inside the study windows.
+- ``STUDY_BOUNDS`` are analysis windows; ``MLIT_ACQUISITION_BOUNDS`` is data
+  coverage. The MLIT foundation layers are acquired once for mainland Kanto
+  (docs/refactor/kanto-foundation-coverage/00-overview.md) and serve every
+  analysis through the windowed store; the analyses themselves stay inside
+  their study windows.
 - The two build scripts' planar-approximation reference latitudes (35.4465
   and 35.446) disagreed by accident, not intent. They are formulas, not
   bounding boxes, so they stay in the scripts until the
@@ -24,26 +25,18 @@ from __future__ import annotations
 
 Bounds = tuple[float, float, float, float]
 
-# The demonstration analysis windows. These are the numbers every analysis,
-# tile cache and embedding crop used before this registry existed.
+# The analysis windows. These are the numbers every analysis, tile cache and
+# embedding crop used before this registry existed.
 STUDY_BOUNDS: dict[str, Bounds] = {
     "yokohama": (139.5835, 35.4426, 139.5935, 35.4504),
     "mobara": (140.2757, 35.4387, 140.2913, 35.4513),
 }
 
-# Wider acquisition context for the MLIT foundation subsets — intentional,
-# not drift; see the module docstring.
-MLIT_CONTEXT_BOUNDS: dict[str, Bounds] = {
-    "yokohama": (139.54, 35.39, 139.66, 35.515),
-    "mobara": (140.22, 35.38, 140.35, 35.51),
-}
-
-# The wide acquisition windows for the Kanto foundation coverage
-# (docs/refactor/kanto-foundation-coverage/00-overview.md). "kanto" covers
-# mainland Tokyo, Kanagawa, Chiba and Saitama with margin, excluding the
-# Izu/Ogasawara islands; "hakone_west" clips land-use-mesh sheet 5238 to
-# Kanagawa's western sliver instead of ingesting a block of Shizuoka.
-MLIT_WIDE_BOUNDS: dict[str, Bounds] = {
+# The MLIT foundation acquisition windows. "kanto" covers mainland Tokyo,
+# Kanagawa, Chiba and Saitama with margin, excluding the Izu/Ogasawara
+# islands; "hakone_west" clips land-use-mesh sheet 5238 to Kanagawa's western
+# sliver instead of ingesting a block of Shizuoka.
+MLIT_ACQUISITION_BOUNDS: dict[str, Bounds] = {
     "kanto": (138.65, 34.85, 140.95, 36.30),
     "hakone_west": (138.90, 35.10, 139.00, 35.33),
 }

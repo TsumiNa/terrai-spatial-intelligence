@@ -131,3 +131,27 @@ def test_safe_extract_zip_enforces_the_member_size_cap(tmp_path: Path) -> None:
     extracted = io.safe_extract_zip(archive_path, tmp_path / "ok", max_member_bytes=1024)
     assert extracted == [tmp_path / "ok" / "large.bin"]
     assert extracted[0].read_bytes() == b"x" * 64
+
+
+def test_safe_extract_zip_treats_backslashes_as_directory_separators(tmp_path: Path) -> None:
+    # Legacy kokjo archives (1:50k land-classification sheets) separate
+    # directories with backslashes and CP932 member names.
+    archive = tmp_path / "legacy.zip"
+    with zipfile.ZipFile(archive, "w") as handle:
+        handle.writestr("Sheet\\表層地質図\\PL_layer.shp", b"shape bytes")
+        handle.writestr("Sheet\\readme.txt", b"text")
+
+    extracted = io.safe_extract_zip(archive, tmp_path / "out")
+
+    assert (tmp_path / "out/Sheet/表層地質図/PL_layer.shp").read_bytes() == b"shape bytes"
+    assert (tmp_path / "out/Sheet/readme.txt").read_bytes() == b"text"
+    assert len(extracted) == 2
+
+
+def test_safe_extract_zip_still_rejects_backslash_traversal(tmp_path: Path) -> None:
+    archive = tmp_path / "evil.zip"
+    with zipfile.ZipFile(archive, "w") as handle:
+        handle.writestr("..\\escape.txt", b"nope")
+
+    with pytest.raises(RuntimeError, match="unsafe ZIP member"):
+        io.safe_extract_zip(archive, tmp_path / "out")

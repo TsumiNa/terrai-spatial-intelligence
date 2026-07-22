@@ -8,15 +8,13 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from .data_service import MLIT_WIDE_DIR, store_sources
+from .data_service import store_sources
 from .pipeline.io import json_file_failure, valid_data_file
 from .store import STORE_PATH
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# Scope-resolved at process start: once wide products exist they are the
-# store's inputs, so their arrival or refresh makes the store stale.
 STORE_INPUTS = tuple(sorted({source.path for source in store_sources()}))
 
 
@@ -37,9 +35,6 @@ class DataTask:
     offline_argument: bool = False
     check_stale: bool = True
     repair_missing_cache: bool = False
-    # Absent outputs are a valid steady state: the task fills an opt-in local
-    # cache, runs only when explicitly selected, and never fails validation.
-    optional: bool = False
 
 
 @dataclass(frozen=True)
@@ -70,19 +65,11 @@ EMBEDDING_OUTPUTS = (
     "data/google/satellite_embedding/mobara_latent_2024.png",
 )
 
-MLIT_OUTPUTS = (
-    "data/mlit/land_classification_50k.geojson",
-    "data/mlit/flood_history.geojson",
-    "data/mlit/land_history.geojson",
-    "data/mlit/landslide_warning.geojson",
-    "data/mlit/multistage_flood.geojson",
-    "data/mlit/published_land_price.geojson",
-    "data/mlit/embankment_regulation.geojson",
-    "data/mlit/railway.geojson",
-    "data/mlit/land_use_mesh.geojson",
-    "data/mlit/prefectural_land_price.geojson",
-    "data/mlit/metadata.json",
-)
+# Only the manifest is declared: readiness checks parse declared JSON outputs
+# in full, and the Kanto GeoJSON products are gigabyte-scale. The store build
+# is the loud validator of the products themselves, and its inputs
+# (STORE_INPUTS) still name every product file for staleness.
+MLIT_OUTPUTS = ("data/mlit/metadata.json",)
 
 TASKS = {
     "bootstrap": DataTask(
@@ -124,26 +111,12 @@ TASKS = {
     ),
     "mlit": DataTask(
         "mlit",
-        "download and subset open MLIT foundation datasets for both demo contexts",
+        "download and subset open MLIT foundation datasets for the Kanto window",
         "scripts/fetch_mlit_foundation.py",
         outputs=MLIT_OUTPUTS,
         network=True,
         force_argument=True,
         check_stale=False,
-    ),
-    "mlit_wide": DataTask(
-        "mlit_wide",
-        "download and subset the MLIT foundation datasets for the wide Kanto window",
-        "scripts/fetch_mlit_foundation_wide.py",
-        # Only the manifest is declared: readiness checks parse declared JSON
-        # outputs in full, and the wide GeoJSON products are gigabyte-scale.
-        # The store build is the loud validator of the wide files themselves.
-        outputs=(f"{MLIT_WIDE_DIR}/metadata.json",),
-        network=True,
-        automatic=False,
-        force_argument=True,
-        check_stale=False,
-        optional=True,
     ),
     "underground_utilities": DataTask(
         "underground_utilities",
@@ -298,10 +271,6 @@ def task_state(name: str, root: Path = ROOT) -> TaskState:
     if missing_outputs:
         if missing_inputs:
             return TaskState(name, "blocked", f"missing inputs: {', '.join(missing_inputs)}")
-        # `optional` covers only true absence; a present-but-invalid output is
-        # corruption and must surface as `missing`, never hide behind opt-in.
-        if task.optional and not any(path.is_file() for path in outputs):
-            return TaskState(name, "optional", f"opt-in outputs are absent; fetch {name} to create them")
         return TaskState(name, "missing", f"missing outputs: {', '.join(missing_outputs)}")
     if missing_inputs:
         return TaskState(name, "ready", "outputs are present; optional rebuild inputs are unavailable")
@@ -366,7 +335,6 @@ def ensure_data(
         )
         should_run = force_requested
         should_run = should_run or state.status in {"missing", "stale"}
-        should_run = should_run or (state.status == "optional" and selected is not None and name in selected)
         should_run = should_run or (task.repair_missing_cache and allow_network and bool(missing_cache))
         if not should_run:
             print(f"[TerrAI data] {name}: {state.status} — {state.reason}", flush=True)
