@@ -294,3 +294,17 @@ def test_store_sources_and_path_for_follow_scope_resolution(tmp_path: Path) -> N
     service = DataService(tmp_path)
     assert service.path_for("landUseMesh") == wide
     assert service.path_for("railway") == tmp_path / "data/mlit/railway.geojson"
+
+
+def test_resolution_treats_a_vanishing_wide_file_as_absent(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from terrai_spatial.data_service import MLIT_WIDE_DIR, resolved_dataset_path
+
+    wide = tmp_path / MLIT_WIDE_DIR / "railway.geojson"
+    wide.parent.mkdir(parents=True)
+    wide.write_text('{"type":"FeatureCollection","features":[]}', encoding="utf-8")
+
+    # The file passes is_file() but is deleted before stat() — the race a
+    # concurrent fetch/cleanup can produce must read as an absent product.
+    monkeypatch.setattr(Path, "is_file", lambda self: True)
+    monkeypatch.setattr(Path, "stat", lambda self, **kwargs: (_ for _ in ()).throw(FileNotFoundError(self)))
+    assert resolved_dataset_path("data/mlit/railway.geojson", tmp_path) == "data/mlit/railway.geojson"

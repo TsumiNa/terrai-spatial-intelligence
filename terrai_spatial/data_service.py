@@ -84,8 +84,13 @@ def resolved_dataset_path(relative: str, root: Path) -> str:
     if relative.startswith("data/mlit/"):
         wide = f"{MLIT_WIDE_DIR}/{Path(relative).name}"
         candidate = root / wide
-        if candidate.is_file() and candidate.stat().st_size > 0:
-            return wide
+        try:
+            if candidate.is_file() and candidate.stat().st_size > 0:
+                return wide
+        except OSError:
+            # A wide file vanishing between the checks is an absent product,
+            # not a request failure.
+            pass
     return relative
 ASSET_MANIFEST_DATASETS = {
     "uc24_16_nihonbashi",
