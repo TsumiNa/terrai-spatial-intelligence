@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { RASTER_SOURCES, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId, vectorBuildingLayerIds } from "./config";
+import { RASTER_SOURCES, TERRAIN_SOURCE_ID, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId, vectorBuildingLayerIds } from "./config";
 import { palette } from "../theme";
 
 const baseStyle: StyleSpecification = {
@@ -25,10 +25,15 @@ it("streams every raster basemap live from the GSI tile host", () => {
   }
 });
 
-it("appends three hidden nationwide raster layers on top of the vector style", () => {
+it("appends three hidden nationwide raster layers and the terrain DEM source", () => {
   const composed = composeStyle(baseStyle);
-  expect(Object.keys(composed.sources)).toHaveLength(4);
+  // vector + three rasters + the raster-dem terrain source (no layer of its own)
+  expect(Object.keys(composed.sources)).toHaveLength(5);
   expect(composed.layers).toHaveLength(4);
+  const dem = composed.sources[TERRAIN_SOURCE_ID] as { type?: string; encoding?: string; tiles?: string[] };
+  expect(dem.type).toBe("raster-dem");
+  expect(dem.encoding).toBe("mapbox");
+  expect(dem.tiles?.[0]).toMatch(/^gsidem:\/\/https:\/\/cyberjapandata\.gsi\.go\.jp/);
   for (const layer of composed.layers.slice(1)) {
     expect(layer.type).toBe("raster");
     expect(layer.layout).toEqual({ visibility: "none" });

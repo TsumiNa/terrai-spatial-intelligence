@@ -58,6 +58,16 @@ export const RASTER_SOURCES: Record<RasterKind, { url: string; minzoom: number; 
  * one view for orientation, one drag to anywhere in the coverage. Below
  * their own measured floors the windowed foundation layers say "zoom in"
  * instead of loading, so zooming out degrades nothing but tile detail. */
+/** The 2.5D surface under the 起伏 basemap: GSI's 10 m DEM (dem_png, z1–14)
+ * through the transcoding protocol in ./dem.ts. The exaggeration is a
+ * legibility choice for observation, not survey scale, and the pitch is the
+ * angle the surface reads at without hiding the far half of the viewport. */
+export const TERRAIN_SOURCE_ID = "terrai-terrain-dem";
+export const TERRAIN_TILE_URL = "gsidem://https://cyberjapandata.gsi.go.jp/xyz/dem_png/{z}/{x}/{y}.png";
+export const TERRAIN_MAXZOOM = 14;
+export const TERRAIN_EXAGGERATION = 1.5;
+export const TERRAIN_PITCH = 55;
+
 export const MIN_ZOOM = 7;
 export const MAX_ZOOM = 18;
 export const MAX_PITCH = 85;
@@ -129,6 +139,14 @@ export function composeStyle(vectorStyle: StyleSpecification): StyleSpecificatio
   const frozen = neutralizeBasemapBuildings(freezeHighZoomCartography(vectorStyle));
   const sources: Record<string, SourceSpecification> = { ...frozen.sources };
   const layers: LayerSpecification[] = [...frozen.layers];
+  sources[TERRAIN_SOURCE_ID] = {
+    type: "raster-dem",
+    tiles: [TERRAIN_TILE_URL],
+    tileSize: 256,
+    maxzoom: TERRAIN_MAXZOOM,
+    encoding: "mapbox",
+    attribution: GSI_ATTRIBUTION,
+  };
   for (const kind of RASTER_KINDS) {
     const id = rasterId(kind);
     const { url, minzoom, maxzoom, attribution } = RASTER_SOURCES[kind];

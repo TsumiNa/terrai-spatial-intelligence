@@ -16,6 +16,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import type { RegionKey } from "../modules";
 import type { BasemapKey } from "../state.svelte";
+import { registerGsiDemProtocol } from "./dem";
 import {
   MAX_PITCH,
   MAX_ZOOM,
@@ -26,6 +27,9 @@ import {
   composeStyle,
   rasterId,
   vectorBuildingLayerIds,
+  TERRAIN_EXAGGERATION,
+  TERRAIN_PITCH,
+  TERRAIN_SOURCE_ID,
 } from "./config";
 
 /** Camera pitch of the lowered underground view, within the raised MAX_PITCH. */
@@ -69,6 +73,7 @@ export async function createExhibitionMap(
   container: HTMLElement,
   initial: { region: RegionKey; basemap: BasemapKey },
 ): Promise<ExhibitionMap> {
+  registerGsiDemProtocol(maplibregl);
   const response = await fetch(VECTOR_STYLE_URL);
   if (!response.ok) throw new Error(`vector style request failed: ${response.status}`);
   const style = composeStyle(await response.json());
@@ -169,6 +174,17 @@ export async function createExhibitionMap(
     for (const id of buildingLayers) {
       map.setLayoutProperty(id, "visibility", vectorBuildingsVisible ? "visible" : "none");
     }
+    // 起伏 is the 2.5D mode: the hillshade drapes over the GSI DEM surface.
+    // The underground stage owns the camera when active, so terrain waits.
+    const wantsTerrain = basemap === "hillshade" && !undergroundMode;
+    const hasTerrain = map.getTerrain() !== null;
+    if (wantsTerrain && !hasTerrain) {
+      map.setTerrain({ source: TERRAIN_SOURCE_ID, exaggeration: TERRAIN_EXAGGERATION });
+      map.easeTo({ pitch: TERRAIN_PITCH });
+    } else if (!wantsTerrain && hasTerrain) {
+      map.setTerrain(null);
+      if (!undergroundMode) map.easeTo({ pitch: 0 });
+    }
   };
   void loaded.then(applyVisibility);
 
@@ -206,6 +222,7 @@ export async function createExhibitionMap(
       undergroundMode = on;
       map.getCanvas().style.opacity = on ? String(UNDERGROUND_SURFACE_OPACITY) : "";
       map.easeTo({ pitch: on ? UNDERGROUND_PITCH : 0 });
+      void loaded.then(applyVisibility);
     },
     openPopup(lngLat, content, onClose) {
       popup.remove(); // fires close → previous cleanup
