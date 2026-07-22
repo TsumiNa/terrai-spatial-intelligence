@@ -2,7 +2,8 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { RASTER_SOURCES, composeStyle, freezeHighZoomCartography, rasterId, vectorBuildingLayerIds } from "./config";
+import { RASTER_SOURCES, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId, vectorBuildingLayerIds } from "./config";
+import { palette } from "../theme";
 
 const baseStyle: StyleSpecification = {
   version: 8,
@@ -80,4 +81,24 @@ it("freezes the z16 cartography past the vector tile ceiling", () => {
   expect("maxzoom" in byId["reaches-18"]).toBe(false);
   // …and the large-scale edge cartography never appears.
   expect(byId["large-scale-only"]).toBeUndefined();
+});
+
+it("neutralizes the basemap's cartographic buildings to palette grays", () => {
+  const style: StyleSpecification = {
+    version: 8,
+    sources: { v: { type: "vector", tiles: ["https://example.test/{z}/{x}/{y}.pbf"] } },
+    layers: [
+      { id: "bldg-fill", type: "fill", source: "v", "source-layer": "building", paint: { "fill-color": "rgba(255,119,51,1)" } },
+      { id: "bldg-line", type: "line", source: "v", "source-layer": "building", paint: { "line-color": "rgba(255,119,51,1)" } },
+      { id: "road-line", type: "line", source: "v", "source-layer": "road", paint: { "line-color": "rgb(255,255,255)" } },
+    ],
+  };
+  const neutral = neutralizeBasemapBuildings(style);
+  const byId = Object.fromEntries(neutral.layers.map((layer) => [layer.id, layer]));
+  const paintOf = (id: string) => (byId[id] as unknown as { paint: Record<string, string> }).paint;
+  expect(paintOf("bldg-fill")["fill-color"]).toBe(palette.line);
+  expect(paintOf("bldg-fill")["fill-outline-color"]).toBe(palette.gray);
+  expect(paintOf("bldg-line")["line-color"]).toBe(palette.gray);
+  // everything that is not a building keeps GSI's own cartography
+  expect(paintOf("road-line")["line-color"]).toBe("rgb(255,255,255)");
 });
