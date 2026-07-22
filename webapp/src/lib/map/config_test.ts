@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { RASTER_SOURCES, composeStyle, rasterId, vectorBuildingLayerIds } from "./config";
+import { RASTER_SOURCES, composeStyle, freezeHighZoomCartography, rasterId, vectorBuildingLayerIds } from "./config";
 
 const baseStyle: StyleSpecification = {
   version: 8,
@@ -58,4 +58,26 @@ it("does not mutate the fetched vector style", () => {
   const before = JSON.stringify(baseStyle);
   composeStyle(baseStyle);
   expect(JSON.stringify(baseStyle)).toBe(before);
+});
+
+it("freezes the z16 cartography past the vector tile ceiling", () => {
+  const style: StyleSpecification = {
+    version: 8,
+    sources: { v: { type: "vector", tiles: ["https://example.test/{z}/{x}/{y}.pbf"], maxzoom: 16 } },
+    layers: [
+      { id: "mid-handoff", type: "fill", source: "v", "source-layer": "landforma", minzoom: 8, maxzoom: 14 },
+      { id: "reaches-17", type: "fill", source: "v", "source-layer": "building", minzoom: 14, maxzoom: 17 },
+      { id: "reaches-18", type: "line", source: "v", "source-layer": "road", minzoom: 11, maxzoom: 18 },
+      { id: "large-scale-only", type: "line", source: "v", "source-layer": "road", minzoom: 17, maxzoom: 18 },
+    ],
+  };
+  const frozen = freezeHighZoomCartography(style);
+  const byId = Object.fromEntries(frozen.layers.map((layer) => [layer.id, layer]));
+  // GSI's mid-zoom hand-offs stay exactly as designed…
+  expect(byId["mid-handoff"].maxzoom).toBe(14);
+  // …layers that reached the z17 switch overscale to the camera ceiling…
+  expect("maxzoom" in byId["reaches-17"]).toBe(false);
+  expect("maxzoom" in byId["reaches-18"]).toBe(false);
+  // …and the large-scale edge cartography never appears.
+  expect(byId["large-scale-only"]).toBeUndefined();
 });

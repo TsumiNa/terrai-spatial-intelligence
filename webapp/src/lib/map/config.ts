@@ -52,12 +52,12 @@ export const RASTER_SOURCES: Record<RasterKind, { url: string; minzoom: number; 
   slope: { url: "https://cyberjapandata.gsi.go.jp/xyz/slopemap/{z}/{x}/{y}.png", minzoom: 3, maxzoom: 15, attribution: GSI_ATTRIBUTION },
 };
 
-/** The floor fits the whole mainland-Kanto acquisition window (2.3 degrees
- * of longitude) into a 1600 px viewport: 512·2⁹/360 ≈ 728 px per degree.
- * Below their own measured floors the windowed foundation layers say
- * "zoom in" instead of loading, so zooming out degrades nothing but tile
- * detail. */
-export const MIN_ZOOM = 9;
+/** The floor shows the mainland-Kanto acquisition window with room around
+ * it (512·2⁷/360 ≈ 182 px per degree, so the 2.3-degree window is ~420 px):
+ * one view for orientation, one drag to anywhere in the coverage. Below
+ * their own measured floors the windowed foundation layers say "zoom in"
+ * instead of loading, so zooming out degrades nothing but tile detail. */
+export const MIN_ZOOM = 7;
 export const MAX_ZOOM = 18;
 export const MAX_PITCH = 85;
 
@@ -78,13 +78,35 @@ export function vectorBuildingLayerIds(style: StyleSpecification): string[] {
 }
 
 /**
+ * The GSI standard style switches to large-scale edge-only cartography at
+ * z17 and runs out of layers entirely at z18 (its tiles cap at z16), which
+ * read as a sudden wireframe and then a blank map. Freeze the z16
+ * cartography instead: drop the z17+ variant layers and let every layer
+ * that reached z17 overscale to the camera ceiling. Mid-zoom styling
+ * (including hand-offs at z14/z16) is GSI's design and stays untouched.
+ */
+export function freezeHighZoomCartography(style: StyleSpecification): StyleSpecification {
+  const layers = style.layers
+    .filter((layer) => (layer.minzoom ?? 0) < 17)
+    .map((layer) => {
+      if (layer.maxzoom !== undefined && layer.maxzoom >= 17) {
+        const { maxzoom: _dropped, ...rest } = layer;
+        return rest as LayerSpecification;
+      }
+      return layer;
+    });
+  return { ...style, layers };
+}
+
+/**
  * Append the three nationwide raster basemaps to the GSI vector style, all
  * hidden. The active one is a visibility toggle, so switching basemaps never
  * rebuilds the style and never moves the camera.
  */
 export function composeStyle(vectorStyle: StyleSpecification): StyleSpecification {
-  const sources: Record<string, SourceSpecification> = { ...vectorStyle.sources };
-  const layers: LayerSpecification[] = [...vectorStyle.layers];
+  const frozen = freezeHighZoomCartography(vectorStyle);
+  const sources: Record<string, SourceSpecification> = { ...frozen.sources };
+  const layers: LayerSpecification[] = [...frozen.layers];
   for (const kind of RASTER_KINDS) {
     const id = rasterId(kind);
     const { url, minzoom, maxzoom, attribution } = RASTER_SOURCES[kind];
@@ -98,5 +120,5 @@ export function composeStyle(vectorStyle: StyleSpecification): StyleSpecificatio
     };
     layers.push({ id, type: "raster", source: id, layout: { visibility: "none" } });
   }
-  return { ...vectorStyle, sources, layers };
+  return { ...frozen, sources, layers };
 }
