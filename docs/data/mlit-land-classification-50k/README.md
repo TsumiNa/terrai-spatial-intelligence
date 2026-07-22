@@ -2,7 +2,7 @@
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
 ## Data description
-Map-sheet Shapefiles covering geology, soil and related classification themes; source vintage and schemas vary by sheet. TerrAI clips Yokohama and Mobara to GeoJSON and preserves original fields, layer names and timestamps.
+Map-sheet Shapefiles covering geology, soil and related classification themes; source vintage and schemas vary by sheet. TerrAI clips the 15 GIS-digitised Kanto sheets to GeoJSON and preserves original fields, layer names and timestamps. Only these sheets were ever digitised upstream, so coverage has sheet-shaped gaps.
 ## Source
 [National Land Survey download](https://nlftp.mlit.go.jp/kokjo/inspect/landclassification/download.html)
 ## Use in this project

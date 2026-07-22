@@ -2,7 +2,7 @@
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
 ## Data description
-Reference points dated 2025-07-01 with price, year-on-year change and land/use attributes. Price is normally yen/m²; forestry points use yen/10a.
+Reference points dated 2025-07-01 with price, year-on-year change and land/use attributes. Price is normally yen/m²; forestry points use yen/10a. Acquired for Saitama, Chiba, Tokyo and Kanagawa.
 ## Source
 [L02-2025 official page](https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L02-2025.html)
 ## Use in this project

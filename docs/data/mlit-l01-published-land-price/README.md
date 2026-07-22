@@ -2,7 +2,7 @@
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
 ## Data description
-Official reference points dated 2026-01-01 with price (yen/m²), area, use, zoning and related attributes. TerrAI retains original L01 fields.
+Official reference points dated 2026-01-01 with price (yen/m²), area, use, zoning and related attributes. TerrAI retains original L01 fields. Acquired for Saitama, Chiba, Tokyo and Kanagawa.
 ## Source
 [L01-2026 official page](https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L01-2026.html)
 ## Use in this project

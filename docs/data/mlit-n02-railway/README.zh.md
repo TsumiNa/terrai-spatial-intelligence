@@ -2,7 +2,7 @@
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
 ## 数据内容
-截至2025-12-31的线路和车站几何，以及运营商、线路、车站字段；使用 UTF-8 版并裁剪两个区域。
+截至2025-12-31的线路和车站几何，以及运营商、线路、车站字段；使用 UTF-8 版并裁剪关东本土窗口。
 ## 来源
 [N02-2025 官方页](https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N02-2025.html)
 ## 在本项目中的使用

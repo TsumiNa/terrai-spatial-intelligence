@@ -2,7 +2,7 @@
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
 ## データの内容
-地形分類、旧土地利用等の複数GISレイヤです。本接続は2011年横浜・千葉図郭を使い、原レイヤとスキーマ情報を保持します。
+地形分類、旧土地利用等の複数GISレイヤです。本接続は2011年調査で公開された関東14図郭を使い、原レイヤとスキーマ情報を保持します。調査対象は一部図郭のみのため、範囲には図郭単位の欠落があります。
 ## 出典
 [国土調査ダウンロード](https://nlftp.mlit.go.jp/kokjo/inspect/landclassification/download.html)
 ## 本 project での利用

@@ -23,13 +23,12 @@ import { ml, type Localized } from "../audit";
 import type { MessageKey } from "../i18n/i18n.svelte";
 import type { Bounds } from "./windowed";
 
-/** MLIT layers are acquired with surrounding context; these are the two
- *  acquisition windows from the pipeline study-area registry
- *  (`terrai_spatial/pipeline/regions.py`). */
-const MLIT_EXTENTS: Bounds[] = [
-  [139.54, 35.39, 139.66, 35.515],
-  [140.22, 35.38, 140.35, 35.51],
-];
+/** The MLIT acquisition window — mainland Kanto (Tokyo, Kanagawa, Chiba,
+ *  Saitama) — from the pipeline region registry's `MLIT_ACQUISITION_BOUNDS`
+ *  (`terrai_spatial/pipeline/regions.py`). Sheet-based sources (the 1:50k
+ *  land classification, the 2011 land history) have sheet-shaped gaps inside
+ *  it; a window there truthfully reports zero features. */
+const MLIT_EXTENTS: Bounds[] = [[138.65, 34.85, 140.95, 36.3]];
 const SAPPORO_EXTENT: Bounds[] = [[141.349592632, 43.054916388, 141.356913521, 43.070980841]];
 
 const MLIT_KSJ_ATTRIBUTION = "「国土数値情報」（国土交通省）を加工して作成";
