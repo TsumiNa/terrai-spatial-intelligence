@@ -121,7 +121,10 @@ PR2's freshness guard carries over; PR2's resolution layer is deliberately short
    the identity suite scales by collection size.
 6. `06-coverage-surfacing-pr6.md` — webapp registry extents and the ten trilingual
    data cards state the Kanto coverage (including the partial-sheet caveats).
-7. `07-fl-admission-principle-pr7.md` — record the FL spatial-alignment admission
+7. `07-ci-fixture-pr7.md` — CI provisions a committed fixture (the exact windows
+   the suites query, derived from a real acquisition) instead of caching or
+   fetching the full data; a cache-miss fetch cost CI ten minutes per workflow.
+8. `08-fl-admission-principle-pr8.md` — record the FL spatial-alignment admission
    principle (no GIS data and no coordinate/elevation/projection alignment path →
    never integrated as FL) in the concept document and the acquisition script.
 

@@ -118,6 +118,16 @@ TASKS = {
         force_argument=True,
         check_stale=False,
     ),
+    "mlit_fixture": DataTask(
+        "mlit_fixture",
+        "derive the committed CI fixture windows from a full MLIT acquisition",
+        "scripts/build_mlit_fixture.py",
+        inputs=("data/mlit/metadata.json",),
+        outputs=("data/mlit_fixture/metadata.json",),
+        automatic=False,
+        force_argument=True,
+        check_stale=False,
+    ),
     "underground_utilities": DataTask(
         "underground_utilities",
         "restore and audit the PLATEAU UC24-16 Nihonbashi utility scene",
