@@ -1,10 +1,10 @@
 # PR6 Plan: Surface the Kanto Coverage
 
-- Status: Completed
+- Status: In progress
 - Refactor: `kanto-foundation-coverage`
 - PR: #56
 
-## Completion record
+## Completion record (to flip to Completed once #56 merges)
 
 - The registry extent is the acquisition window verbatim; the sheet-gap reality is
   stated where the extent is declared, and a window inside a gap reports `empty`
