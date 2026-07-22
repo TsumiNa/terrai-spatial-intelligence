@@ -95,9 +95,10 @@ it("neutralizes the basemap's cartographic buildings to palette grays", () => {
   };
   const neutral = neutralizeBasemapBuildings(style);
   const byId = Object.fromEntries(neutral.layers.map((layer) => [layer.id, layer]));
-  expect((byId["bldg-fill"] as { paint: Record<string, string> }).paint["fill-color"]).toBe(palette.line);
-  expect((byId["bldg-fill"] as { paint: Record<string, string> }).paint["fill-outline-color"]).toBe(palette.gray);
-  expect((byId["bldg-line"] as { paint: Record<string, string> }).paint["line-color"]).toBe(palette.gray);
+  const paintOf = (id: string) => (byId[id] as unknown as { paint: Record<string, string> }).paint;
+  expect(paintOf("bldg-fill")["fill-color"]).toBe(palette.line);
+  expect(paintOf("bldg-fill")["fill-outline-color"]).toBe(palette.gray);
+  expect(paintOf("bldg-line")["line-color"]).toBe(palette.gray);
   // everything that is not a building keeps GSI's own cartography
-  expect((byId["road-line"] as { paint: Record<string, string> }).paint["line-color"]).toBe("rgb(255,255,255)");
+  expect(paintOf("road-line")["line-color"]).toBe("rgb(255,255,255)");
 });
