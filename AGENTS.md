@@ -141,7 +141,11 @@ The FL → SL → AL conceptual language (Foundation / Synthetic / Application l
 
 ## 8. Data and licensing
 
-`data/` (~13 MB) is committed so the demo runs offline, with one exception: TEPCO source CSVs/ZIPs and `*.local.json` are gitignored (publicly readable but redistribution-prohibited). Only the derived `data/mobara/tepco_grid_screen.json` is committed. The `grid` task re-downloads the cache on demand.
+`data/` (~90 MB) is committed so the demo runs offline, with gitignored exceptions:
+
+- TEPCO source CSVs/ZIPs and `*.local.json` (publicly readable but redistribution-prohibited). Only the derived `data/mobara/tepco_grid_screen.json` is committed; the `grid` task re-downloads the cache on demand.
+- PLATEAU source archives and expanded 3D Tiles (reproducible on-demand caches; the selection, retrieval manifests and audit indexes are committed).
+- The wide-scope MLIT foundation cache `data/external/mlit_wide/` (`fetch mlit_wide`, opt-in, gigabyte-scale). The spatial store build prefers a wide product over its committed `data/mlit/` demo subset per file when one exists. CI never fetches it, so CI always builds the demo-scope store; the committed demo subsets stay the canonical test fixtures.
 
 ## 9. Working style
 

@@ -71,6 +71,27 @@ FOUNDATION_DATASETS: dict[str, str] = {
     "kunijibanBoreholes": "data/external/kunijiban_borehole/manifest.json",
 }
 ALL_DATASETS = {**DATASETS, **FOUNDATION_DATASETS}
+
+# The gitignored wide-scope acquisition cache (fetch mlit_wide). A wide
+# product replaces its committed demo subset per file, decided by a cheap
+# stat — never a JSON parse: the wide writer is atomic, so a wide file is
+# either complete or absent. CI has no wide files and always resolves to the
+# committed data (docs/refactor/kanto-foundation-coverage/00-overview.md).
+MLIT_WIDE_DIR = "data/external/mlit_wide"
+
+
+def resolved_dataset_path(relative: str, root: Path) -> str:
+    if relative.startswith("data/mlit/"):
+        wide = f"{MLIT_WIDE_DIR}/{Path(relative).name}"
+        candidate = root / wide
+        try:
+            if candidate.is_file() and candidate.stat().st_size > 0:
+                return wide
+        except OSError:
+            # A wide file vanishing between the checks is an absent product,
+            # not a request failure.
+            pass
+    return relative
 ASSET_MANIFEST_DATASETS = {
     "uc24_16_nihonbashi",
     "uc24_13_sapporo",
@@ -129,12 +150,13 @@ DATASET_TIERS: dict[str, tuple[str, str]] = {
 }
 
 
-def store_sources() -> list[StoreSource]:
+def store_sources(root: Path | None = None) -> list[StoreSource]:
     """Every dataset the service exposes, as build sources for the store.
 
     GeoJSON datasets land in ``features``; JSON products, asset manifests and
     the scene catalog/handoffs land in ``documents`` under the keys the
-    service uses today.
+    service uses today. Paths are scope-resolved: a wide product wins over
+    its committed demo subset.
     """
 
     missing = sorted(set(ALL_DATASETS) - set(DATASET_TIERS))
@@ -143,6 +165,7 @@ def store_sources() -> list[StoreSource]:
     sources = []
     for key, relative in ALL_DATASETS.items():
         tier, evidence_state = DATASET_TIERS[key]
+        relative = resolved_dataset_path(relative, root if root is not None else ROOT)
         kind = "features" if relative.endswith(".geojson") else "document"
         sources.append(StoreSource(key, relative, kind, tier, evidence_state))
     sources.append(StoreSource("sceneCatalog", SCENE_CATALOG_PATH, "document", "FL", "observed"))
@@ -209,7 +232,7 @@ class DataService:
             relative = ALL_DATASETS[key]
         except KeyError as error:
             raise DatasetNotFoundError(key) from error
-        return self.root / relative
+        return self.root / resolved_dataset_path(relative, self.root)
 
     def _missing_from_store(self, key: str) -> RuntimeError:
         return RuntimeError(
@@ -272,6 +295,9 @@ class DataService:
         # than the store derived from them.
         rows = []
         for key, relative in ALL_DATASETS.items():
+            # The catalog's `path` and `modified_at` describe what the store
+            # serves in this environment, so they follow scope resolution.
+            relative = resolved_dataset_path(relative, self.root)
             path = self.root / relative
             exists = path.is_file()
             # Do not deserialize large on-demand layers merely to render health

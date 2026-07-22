@@ -1,7 +1,20 @@
 # PR2 Plan: Per-file Store Scope Resolution
 
-- Status: Planned
+- Status: Completed
 - Refactor: `kanto-foundation-coverage`
+- PR: #53
+
+## Completion record
+
+- `resolved_dataset_path` lives beside `ALL_DATASETS`; `path_for`, `store_sources`
+  and `catalog` follow it, so the identity oracle and the store see the same file in
+  every environment. `MLIT_WIDE_DIR` moved to `data_service` (the task registry and
+  CLI import it from there) — the constant sits with the resolution it governs.
+- Verified end to end against the working copy: planting a wide `railway.geojson`
+  flips the store task to `stale` and `store_sources` to the wide path; removing it
+  restores the demo scope. Both directions are also pinned by `tmp_path` tests.
+- The identity suite now fails fast with the rebuild command when the store has
+  drifted, instead of producing byte-diff walls.
 
 ## Goal
 

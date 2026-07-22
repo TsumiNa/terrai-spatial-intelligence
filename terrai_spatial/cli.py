@@ -13,8 +13,8 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from .data_service import store_sources
-from .data_tasks import MLIT_WIDE_DIR, TASKS, ensure_data, status_rows, validate_json_outputs
+from .data_service import MLIT_WIDE_DIR, store_sources
+from .data_tasks import TASKS, ensure_data, status_rows, validate_json_outputs
 from .store import STORE_PATH, verify_store
 
 
