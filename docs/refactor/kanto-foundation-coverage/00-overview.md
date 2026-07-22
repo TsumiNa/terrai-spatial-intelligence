@@ -23,8 +23,8 @@ plus Kanagawa, Chiba and Saitama prefectures in full.
 | A33-25 landslide warning (GeoJSON, per prefecture) | `_11 _12 _13 _14` | 38.2 MB |
 | A56-25 embankment regulation (per prefecture) | `_11 _12 _13 _14` | ~26 MB |
 | L01-26 / L02-25 land prices (per prefecture) | `_11 _12 _13 _14` each | ~9 MB |
-| A53-25 multi-stage flood | `_83` (the whole Kanto bureau block; already downloaded today) | 14.7 MB |
-| N02-25 railway, FC flood history | national archives (already downloaded today) | 21.8 MB |
+| A53-25 multi-stage flood | `_83` (the whole Kanto bureau block; the same archive the demo scope uses) | 14.7 MB |
+| N02-25 railway, FC flood history | national archives (the same ones the demo scope uses) | 21.8 MB |
 | L03-b-21 land-use mesh (per primary mesh) | `5238 5239 5240 5338 5339 5340 5439 5440` | 137 MB |
 | F3 1:50k land classification (per digitised sheet) | 15 Kanto sheets of the 98 digitised nationally | ~30 MB |
 | land_history_2011 (per 1:25k sheet) | 14 Kanto sheets of the ~70 published nationally | ~50 MB |

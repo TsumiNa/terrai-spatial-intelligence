@@ -13,11 +13,12 @@ coverage honestly in all three languages.
 
 - `webapp/src/lib/features/registry.ts`: `MLIT_EXTENTS` becomes the single wide window
   `(138.65, 34.85, 140.95, 36.30)` from `terrai_spatial/pipeline/regions.py`, with the
-  comment updated to name its source. The Sapporo extent is untouched. In an
-  environment that has not fetched the wide cache, windows between the demo boxes now
-  report `empty` (a truthful zero from the store) rather than `outside`; no e2e test or
-  visual baseline asserts `outside`, and the demo views themselves sit inside both the
-  old and new extents.
+  comment updated to name its source. The Sapporo extent is untouched. Expected
+  behavioural change: in an environment that has not fetched the wide cache, windows
+  between the demo boxes now report `empty` (a truthful zero from the store) rather
+  than `outside`. The `outside` state itself is unchanged and keeps its unit coverage
+  (`windowed_test.ts` exercises it against synthetic extents); the demo views sit
+  inside both the old and new extents.
 - `webapp/src/lib/features/registry_test.ts` (and any other test pinning extents):
   follow the new window.
 - `docs/data/mlit-*/README.md` + `.ja.md` + `.zh.md` (ten cards, thirty files): the
