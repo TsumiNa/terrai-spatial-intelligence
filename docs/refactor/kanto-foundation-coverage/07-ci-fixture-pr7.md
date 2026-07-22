@@ -1,7 +1,19 @@
 # PR7 Plan: CI Provisions a Committed Fixture
 
-- Status: In progress
+- Status: Completed
 - Refactor: `kanto-foundation-coverage`
+- PR: #58
+
+## Completion record
+
+- CI wall-clock returned to its pre-acquisition baseline: Python 15m54s → 39s,
+  End-to-end 19m38s → 3m4s, with no external fetch and no cache to invalidate.
+- The fixture is ~57 MB / ~25k features across the four suite windows; the
+  identity matrix's Saitama window moved to Koshigaya where the A53 data has
+  content (3,032 fixture features instead of an empty-to-empty comparison).
+- Locally simulated CI end to end before the PR: fixture-scope store build in
+  2.1 s, pytest 192 green, Playwright 39 green; the drift check caught the
+  intermediate fixture-built store when the full data returned, as designed.
 
 ## Goal
 

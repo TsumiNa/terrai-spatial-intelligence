@@ -5,6 +5,11 @@ a gitignored reproducible acquisition — one scope, the mainland-Kanto window
 (Tokyo, Kanagawa, Chiba, Saitama) — with provenance on every feature. Outputs
 stream one feature at a time because the land-use mesh alone is on the order
 of two million features (docs/refactor/kanto-foundation-coverage/00-overview.md).
+
+Admission principle (docs/architecture/FL_SL_AL_CONCEPT.md): a dataset joins
+this table only if it ships GIS data or aligns through coordinates, elevation
+or a defined projection. A source with neither is recorded in the source
+registry as not integrated — never drawn through invented georeference.
 """
 
 from __future__ import annotations

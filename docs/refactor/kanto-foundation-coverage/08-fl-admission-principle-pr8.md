@@ -1,6 +1,6 @@
 # PR8 Plan: FL Spatial-alignment Admission Principle
 
-- Status: Planned
+- Status: In progress
 - Refactor: `kanto-foundation-coverage`
 
 ## Goal
