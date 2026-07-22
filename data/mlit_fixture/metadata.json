@@ -1,0 +1,105 @@
+{
+  "purpose": "CI test fixture: the exact windows the suites query, derived from a full acquisition",
+  "derived_from": {
+    "retrieved_at": "2026-07-22T14:52:20Z",
+    "scope": "TerrAI Kanto acquisition: mainland Tokyo, Kanagawa, Chiba and Saitama"
+  },
+  "windows": {
+    "yokohama": [
+      139.56,
+      35.42,
+      139.62,
+      35.48
+    ],
+    "tokyo": [
+      139.68,
+      35.67,
+      139.72,
+      35.71
+    ],
+    "koshigaya": [
+      139.75,
+      35.85,
+      139.81,
+      35.91
+    ],
+    "hachioji": [
+      139.25,
+      35.61,
+      139.31,
+      35.67
+    ]
+  },
+  "datasets": {
+    "landClassification50k": {
+      "output": "data/mlit_fixture/land_classification_50k.geojson",
+      "feature_count": 1142,
+      "source_updated_at": "current download; map-sheet vintage varies",
+      "license": "Public Data License 1.0; Survey Act and redistribution cautions apply",
+      "retrieved_at": "2026-07-22T14:52:20Z"
+    },
+    "floodHistory": {
+      "output": "data/mlit_fixture/flood_history.geojson",
+      "feature_count": 217,
+      "source_updated_at": "2025-03",
+      "license": "Public Data License 1.0; attribution/edit notice and redistribution cautions apply",
+      "retrieved_at": "2026-07-22T14:52:20Z"
+    },
+    "landHistory": {
+      "output": "data/mlit_fixture/land_history.geojson",
+      "feature_count": 3127,
+      "source_updated_at": "2011 survey package",
+      "license": "Public Data License 1.0; Survey Act and redistribution cautions apply",
+      "retrieved_at": "2026-07-22T14:52:20Z"
+    },
+    "landslideWarning": {
+      "output": "data/mlit_fixture/landslide_warning.geojson",
+      "feature_count": 4632,
+      "source_updated_at": "2025-08-01",
+      "license": "CC BY 4.0 with provider-specific partial restrictions",
+      "retrieved_at": "2026-07-22T14:52:20Z"
+    },
+    "multistageFlood": {
+      "output": "data/mlit_fixture/multistage_flood.geojson",
+      "feature_count": 3032,
+      "source_updated_at": "2025 release",
+      "license": "CC BY 4.0",
+      "retrieved_at": "2026-07-22T14:52:20Z"
+    },
+    "publishedLandPrice": {
+      "output": "data/mlit_fixture/published_land_price.geojson",
+      "feature_count": 212,
+      "source_updated_at": "2026-01-01",
+      "license": "CC BY 4.0",
+      "retrieved_at": "2026-07-22T14:52:20Z"
+    },
+    "embankmentRegulation": {
+      "output": "data/mlit_fixture/embankment_regulation.geojson",
+      "feature_count": 22,
+      "source_updated_at": "2025-07-18",
+      "license": "CC BY 4.0; regulatory boundaries must not be modified",
+      "retrieved_at": "2026-07-22T14:52:20Z"
+    },
+    "railway": {
+      "output": "data/mlit_fixture/railway.geojson",
+      "feature_count": 262,
+      "source_updated_at": "2025-12-31",
+      "license": "CC BY 4.0",
+      "retrieved_at": "2026-07-22T14:52:20Z"
+    },
+    "landUseMesh": {
+      "output": "data/mlit_fixture/land_use_mesh.geojson",
+      "feature_count": 12421,
+      "source_updated_at": "2021",
+      "license": "Public Data License 1.0",
+      "retrieved_at": "2026-07-22T14:52:20Z"
+    },
+    "prefecturalLandPrice": {
+      "output": "data/mlit_fixture/prefectural_land_price.geojson",
+      "feature_count": 120,
+      "source_updated_at": "2025-07-01",
+      "license": "CC BY 4.0",
+      "retrieved_at": "2026-07-22T14:52:20Z"
+    }
+  }
+}

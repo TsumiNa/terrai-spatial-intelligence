@@ -143,7 +143,7 @@ oracle = FileBackedOracle(ROOT)
 
 YOKOHAMA_WINDOW = (139.58, 35.44, 139.60, 35.46)
 TOKYO_WINDOW = (139.69, 35.68, 139.71, 35.70)
-OMIYA_WINDOW = (139.61, 35.89, 139.63, 35.91)
+KOSHIGAYA_WINDOW = (139.76, 35.86, 139.80, 35.90)
 HACHIOJI_WINDOW = (139.26, 35.62, 139.30, 35.66)
 SAPPORO_WINDOW = (141.350, 43.055, 141.357, 43.071)
 
@@ -153,7 +153,7 @@ QUERY_MATRIX = [
     {"key": "landHistory", "bbox": YOKOHAMA_WINDOW},
     {"key": "landUseMesh", "bbox": YOKOHAMA_WINDOW, "where": "terrai_region", "equals": "kanto"},
     {"key": "landUseMesh", "bbox": TOKYO_WINDOW, "limit": 500},
-    {"key": "multistageFlood", "bbox": OMIYA_WINDOW},
+    {"key": "multistageFlood", "bbox": KOSHIGAYA_WINDOW},
     {"key": "landslideWarning", "bbox": HACHIOJI_WINDOW, "limit": 200},
     {"key": "solar", "where": "status", "equals": "preferred", "sort": "score", "limit": 3},
     {"key": "buildings", "where": "risk_score", "minimum": 50.0, "sort": "risk_score", "descending": False, "limit": 100},

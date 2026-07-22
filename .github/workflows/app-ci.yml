@@ -94,20 +94,12 @@ jobs:
 
       # playwright.config.ts starts both the built web app and the FastAPI
       # service itself, so nothing needs to be launched here.
-      # The MLIT foundation data is a gitignored Kanto-scope acquisition
-      # (~2.3 GB of GeoJSON, ~2.7M features): restored from the Actions cache
-      # keyed on the acquisition table, fetched from MLIT only when that
-      # table changes.
-      - name: Restore foundation data
-        id: mlit-cache
-        uses: actions/cache@v4
-        with:
-          path: data/mlit
-          key: mlit-${{ hashFiles('scripts/fetch_mlit_foundation.py', 'terrai_spatial/pipeline/regions.py', 'terrai_spatial/pipeline/io.py', 'terrai_spatial/pipeline/http.py', 'terrai_spatial/pipeline/provenance.py') }}
-
-      - name: Fetch foundation data on cache miss
-        if: steps.mlit-cache.outputs.cache-hit != 'true'
-        run: uv run python -m terrai_spatial fetch mlit
+      # Tests need the shape of the foundation data, not its volume: the
+      # committed fixture carries exactly the windows the suites query
+      # (scripts/build_mlit_fixture.py), derived from a real Kanto
+      # acquisition. Local and exhibition environments run `fetch mlit`.
+      - name: Provision foundation-data fixture
+        run: cp -a data/mlit_fixture data/mlit
 
       # The API refuses to start without the derived store; build it from
       # the provisioned files before the suite launches the server.

@@ -143,7 +143,7 @@ The FL → SL → AL conceptual language (Foundation / Synthetic / Application l
 
 Small analysis products and manifests under `data/` (~31 MB) are committed; the large acquisitions are gitignored reproducible pipelines:
 
-- The MLIT foundation data `data/mlit/` — one acquisition scope, the mainland-Kanto window (~2.3 GB of GeoJSON, ~2.7M features), produced by `fetch mlit` and provisioned automatically by `data ensure`. CI restores it from the Actions cache keyed on the acquisition table and fetches only when that table changes. There is no separate demo subset: every environment holds the same data world.
+- The MLIT foundation data `data/mlit/` — one acquisition scope, the mainland-Kanto window (~2.3 GB of GeoJSON, ~2.7M features), produced by `fetch mlit` and provisioned automatically by `data ensure`. CI copies the committed `data/mlit_fixture/` into place instead — the exact windows the suites query, derived from a real acquisition by the `mlit_fixture` task — so CI never fetches. The product has one scope; the fixture is test infrastructure derived from it.
 - TEPCO source CSVs/ZIPs and `*.local.json` (publicly readable but redistribution-prohibited). Only the derived `data/mobara/tepco_grid_screen.json` is committed; the `grid` task re-downloads the cache on demand.
 - PLATEAU source archives and expanded 3D Tiles (reproducible on-demand caches; the selection, retrieval manifests and audit indexes are committed).
 
