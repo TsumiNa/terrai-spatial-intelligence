@@ -255,3 +255,42 @@ def test_scene_bundle_rejects_an_unknown_scene_id() -> None:
     with pytest.raises(DatasetNotFoundError):
         # Owner dataset keys are not scene ids; the catalog is the only path.
         service.scene_bundle("uc24_16_nihonbashi")
+
+
+def test_wide_products_win_per_file_and_fall_back_when_absent_or_empty(tmp_path: Path) -> None:
+    from terrai_spatial.data_service import MLIT_WIDE_DIR, resolved_dataset_path
+
+    relative = "data/mlit/railway.geojson"
+    assert resolved_dataset_path(relative, tmp_path) == relative
+
+    wide = tmp_path / MLIT_WIDE_DIR / "railway.geojson"
+    wide.parent.mkdir(parents=True)
+    wide.write_text('{"type":"FeatureCollection","features":[]}', encoding="utf-8")
+    assert resolved_dataset_path(relative, tmp_path) == f"{MLIT_WIDE_DIR}/railway.geojson"
+
+    # An empty file is not a product; the atomic writer never leaves one, so
+    # this is a deleted-or-never-fetched state and the demo subset serves.
+    wide.write_text("", encoding="utf-8")
+    assert resolved_dataset_path(relative, tmp_path) == relative
+
+    # Only the MLIT foundation paths participate in scope resolution.
+    other = tmp_path / MLIT_WIDE_DIR / "resilience_hubs.geojson"
+    other.write_text("{}", encoding="utf-8")
+    assert resolved_dataset_path("data/joint/resilience_hubs.geojson", tmp_path) == "data/joint/resilience_hubs.geojson"
+
+
+def test_store_sources_and_path_for_follow_scope_resolution(tmp_path: Path) -> None:
+    from terrai_spatial.data_service import MLIT_WIDE_DIR, DataService, store_sources
+
+    wide = tmp_path / MLIT_WIDE_DIR / "land_use_mesh.geojson"
+    wide.parent.mkdir(parents=True)
+    wide.write_text('{"type":"FeatureCollection","features":[]}', encoding="utf-8")
+
+    by_key = {source.key: source for source in store_sources(tmp_path)}
+    assert by_key["landUseMesh"].path == f"{MLIT_WIDE_DIR}/land_use_mesh.geojson"
+    assert by_key["railway"].path == "data/mlit/railway.geojson"
+    assert by_key["hubs"].path == "data/joint/resilience_hubs.geojson"
+
+    service = DataService(tmp_path)
+    assert service.path_for("landUseMesh") == wide
+    assert service.path_for("railway") == tmp_path / "data/mlit/railway.geojson"

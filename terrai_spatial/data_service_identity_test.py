@@ -24,8 +24,24 @@ from terrai_spatial.data_service import (
     SCENE_HANDOFFS,
     DataService,
     DatasetNotFoundError,
+    store_sources,
 )
+from terrai_spatial.store import STORE_PATH, verify_store
 from terrai_spatial.store_test import scan_intersects
+
+
+@pytest.fixture(autouse=True, scope="module")
+def fresh_store() -> None:
+    """Byte comparisons against a drifted store produce walls of JSON diff;
+    fail first with the actual problem and its remedy. Scope resolution makes
+    drift routine — landing or refreshing wide products stales the store."""
+
+    failures = verify_store(ROOT, ROOT / STORE_PATH, expected_keys=[source.key for source in store_sources()])
+    if failures:
+        pytest.fail(
+            "the spatial store has drifted from its sources; rebuild it with: "
+            "uv run python -m terrai_spatial data ensure --only store\n" + "\n".join(failures)
+        )
 
 
 class FileBackedOracle(DataService):

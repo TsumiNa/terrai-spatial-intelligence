@@ -8,19 +8,16 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from .data_service import store_sources
+from .data_service import MLIT_WIDE_DIR, store_sources
 from .pipeline.io import json_file_failure, valid_data_file
 from .store import STORE_PATH
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# Scope-resolved at process start: once wide products exist they are the
+# store's inputs, so their arrival or refresh makes the store stale.
 STORE_INPUTS = tuple(sorted({source.path for source in store_sources()}))
-
-# The gitignored wide-scope foundation cache. Its GeoJSON products are
-# gigabyte-scale, so whole-tree JSON validation must skip this directory; the
-# manifest below stays a declared, validated task output.
-MLIT_WIDE_DIR = "data/external/mlit_wide"
 
 
 @dataclass(frozen=True)
