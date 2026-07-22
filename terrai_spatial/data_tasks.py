@@ -35,6 +35,9 @@ class DataTask:
     offline_argument: bool = False
     check_stale: bool = True
     repair_missing_cache: bool = False
+    # Absent outputs are a valid steady state: the task fills an opt-in local
+    # cache, runs only when explicitly selected, and never fails validation.
+    optional: bool = False
 
 
 @dataclass(frozen=True)
@@ -125,6 +128,20 @@ TASKS = {
         network=True,
         force_argument=True,
         check_stale=False,
+    ),
+    "mlit_wide": DataTask(
+        "mlit_wide",
+        "download and subset the MLIT foundation datasets for the wide Kanto window",
+        "scripts/fetch_mlit_foundation_wide.py",
+        # Only the manifest is declared: readiness checks parse declared JSON
+        # outputs in full, and the wide GeoJSON products are gigabyte-scale.
+        # The store build is the loud validator of the wide files themselves.
+        outputs=("data/external/mlit_wide/metadata.json",),
+        network=True,
+        automatic=False,
+        force_argument=True,
+        check_stale=False,
+        optional=True,
     ),
     "underground_utilities": DataTask(
         "underground_utilities",
@@ -277,6 +294,8 @@ def task_state(name: str, root: Path = ROOT) -> TaskState:
     outputs, missing_outputs = _existing_outputs(task, root)
     missing_inputs = [item for item in task.inputs if not (root / item).is_file()]
     if missing_outputs:
+        if task.optional:
+            return TaskState(name, "optional", f"opt-in outputs are absent; fetch {name} to create them")
         if missing_inputs:
             return TaskState(name, "blocked", f"missing inputs: {', '.join(missing_inputs)}")
         return TaskState(name, "missing", f"missing outputs: {', '.join(missing_outputs)}")
@@ -343,6 +362,7 @@ def ensure_data(
         )
         should_run = force_requested
         should_run = should_run or state.status in {"missing", "stale"}
+        should_run = should_run or (state.status == "optional" and selected is not None and name in selected)
         should_run = should_run or (task.repair_missing_cache and allow_network and bool(missing_cache))
         if not should_run:
             print(f"[TerrAI data] {name}: {state.status} — {state.reason}", flush=True)

@@ -38,5 +38,15 @@ MLIT_CONTEXT_BOUNDS: dict[str, Bounds] = {
     "mobara": (140.22, 35.38, 140.35, 35.51),
 }
 
+# The wide acquisition windows for the Kanto foundation coverage
+# (docs/refactor/kanto-foundation-coverage/00-overview.md). "kanto" covers
+# mainland Tokyo, Kanagawa, Chiba and Saitama with margin, excluding the
+# Izu/Ogasawara islands; "hakone_west" clips land-use-mesh sheet 5238 to
+# Kanagawa's western sliver instead of ingesting a block of Shizuoka.
+MLIT_WIDE_BOUNDS: dict[str, Bounds] = {
+    "kanto": (138.65, 34.85, 140.95, 36.30),
+    "hakone_west": (138.90, 35.10, 139.00, 35.33),
+}
+
 # The bounded Overpass window for the Sapporo underground access snapshot.
 SAPPORO_UNDERGROUND_ACCESS_BOUNDS: Bounds = (141.349592632, 43.054916388, 141.356913521, 43.070980841)

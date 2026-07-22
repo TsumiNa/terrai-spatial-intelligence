@@ -252,3 +252,39 @@ def test_every_task_runs_on_the_current_interpreter(
         assert command[0] == sys.executable, f"{name} did not use the current interpreter"
         assert Path(command[1]).name == Path(task.script).name, name
         assert "--extra" not in command and "--group" not in command, name
+
+
+def test_optional_task_with_absent_outputs_is_a_valid_steady_state(tmp_path: Path) -> None:
+    task = TASKS["mlit_wide"]
+    assert task.optional is True and task.automatic is False and task.network is True
+
+    state = task_state("mlit_wide", tmp_path)
+    assert state.status == "optional"
+    assert "opt-in" in state.reason
+
+    write_json(tmp_path / task.outputs[0])
+    assert task_state("mlit_wide", tmp_path).status == "ready"
+
+
+def test_optional_task_runs_only_when_explicitly_selected(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    script = tmp_path / TASKS["mlit_wide"].script
+    script.parent.mkdir(parents=True)
+    script.write_text("# test\n", encoding="utf-8")
+    ran: list[str] = []
+
+    def fake_run(task, root, force, allow_network):  # noqa: ANN001 - test double
+        ran.append(task.name)
+        write_json(root / task.outputs[0])
+
+    monkeypatch.setattr("terrai_spatial.data_tasks._run", fake_run)
+
+    ensure_data(root=tmp_path, selected=["mlit_wide"], allow_network=True)
+    assert ran == ["mlit_wide"]
+
+    (tmp_path / TASKS["mlit_wide"].outputs[0]).unlink()
+    ran.clear()
+    with pytest.raises(RuntimeError):
+        # The unselected run still fails on unrelated missing tasks, but the
+        # optional task itself must not be attempted.
+        ensure_data(root=tmp_path, selected=None, allow_network=False)
+    assert "mlit_wide" not in ran

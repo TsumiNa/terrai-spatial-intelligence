@@ -188,7 +188,7 @@ def data_task_failures() -> list[str]:
     failures = [
         f"data task {state.name}: {state.status}: {state.reason}"
         for state in status_rows()
-        if state.status != "ready"
+        if state.status not in {"ready", "optional"}
     ]
     store_path = ROOT / STORE_PATH
     if store_path.is_file():
