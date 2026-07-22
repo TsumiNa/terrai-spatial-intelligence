@@ -60,20 +60,6 @@ def test_joint_missing_and_stale_outputs_are_detected(tmp_path: Path) -> None:
     assert task_state("joint", tmp_path).status == "missing"
 
 
-def test_tile_manifest_detects_a_missing_cached_file(tmp_path: Path) -> None:
-    tile = tmp_path / "data/tiles/yokohama/15/1-1.png"
-    tile.parent.mkdir(parents=True)
-    tile.write_bytes(b"valid tile")
-    manifest = tmp_path / "data/tiles/manifest.json"
-    manifest.write_text(json.dumps({"files": [str(tile.relative_to(tmp_path))]}), encoding="utf-8")
-
-    assert task_state("tiles", tmp_path).status == "ready"
-    tile.unlink()
-    state = task_state("tiles", tmp_path)
-    assert state.status == "missing"
-    assert "1-1.png" in state.reason
-
-
 def test_corrupt_packaged_json_is_incomplete(tmp_path: Path) -> None:
     for relative in BOOTSTRAP_OUTPUTS:
         path = tmp_path / relative

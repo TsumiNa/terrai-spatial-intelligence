@@ -59,7 +59,6 @@ REQUIRED_FILES = [
     "terrai_spatial/data_tasks.py",
     "scripts/ensure_data.py",
     "scripts/bootstrap_packaged_data.py",
-    "data/tiles/manifest.json",
     "data/yokohama/building_risk.geojson",
     "data/yokohama/road_priority.geojson",
     "data/yokohama/official_facility_resilience.geojson",
@@ -297,7 +296,7 @@ def contract_failures() -> list[str]:
         "docs/architecture/FRONTEND_BACKEND.md": (
             "sequenceDiagram",
             "GET /bootstrap",
-            "GET /assets/tiles/",
+            "cyberjapandata.gsi.go.jp",
             "GET /features/solar",
         ),
     }

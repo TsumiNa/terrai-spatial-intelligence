@@ -99,10 +99,8 @@ sequenceDiagram
     Frontend->>Frontend: 渲染当前模块、指标、地图和行动队列
 
     par 地图按当前视窗取资源
-        Browser->>API: GET /assets/tiles/...
-        API->>Assets: 读取瓦片
-        Assets-->>API: PNG/JPEG
-        API-->>Browser: 图像资源
+        Browser->>GSI: GET basemap tiles (cyberjapandata.gsi.go.jp)
+        GSI-->>Browser: 矢量/栅格瓦片
     and 遥感证据视图需要覆盖图
         Browser->>API: GET /assets/google/...image...
         API->>Assets: 读取遥感图像

@@ -175,7 +175,7 @@ def test_call_sequence_document_tracks_runtime_in_three_languages(language: str 
     relative = canonical if language is None else localized_document(canonical, language)
     call_structure = read(relative)
     assert call_structure.count("sequenceDiagram") == 3
-    for token in ("GET /bootstrap", "GET /assets/tiles/", "GET /features/solar", "SQLite"):
+    for token in ("GET /bootstrap", "cyberjapandata.gsi.go.jp", "GET /features/solar", "SQLite"):
         assert token in call_structure
 
 

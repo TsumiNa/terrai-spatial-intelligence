@@ -22,7 +22,6 @@ import {
   MIN_ZOOM,
   RASTER_KINDS,
   REGION_CAMERAS,
-  RASTER_REGIONS,
   VECTOR_STYLE_URL,
   composeStyle,
   rasterId,
@@ -68,12 +67,11 @@ export interface ExhibitionMap {
 
 export async function createExhibitionMap(
   container: HTMLElement,
-  assetBase: string,
   initial: { region: RegionKey; basemap: BasemapKey },
 ): Promise<ExhibitionMap> {
   const response = await fetch(VECTOR_STYLE_URL);
   if (!response.ok) throw new Error(`vector style request failed: ${response.status}`);
-  const style = composeStyle(await response.json(), assetBase);
+  const style = composeStyle(await response.json());
   const buildingLayers = vectorBuildingLayerIds(style);
 
   let region = initial.region;
@@ -165,11 +163,8 @@ export async function createExhibitionMap(
   const loaded = new Promise<void>((resolve) => map.once("load", () => resolve()));
 
   const applyVisibility = () => {
-    for (const r of RASTER_REGIONS) {
-      for (const kind of RASTER_KINDS) {
-        const visible = r === region && kind === basemap;
-        map.setLayoutProperty(rasterId(r, kind), "visibility", visible ? "visible" : "none");
-      }
+    for (const kind of RASTER_KINDS) {
+      map.setLayoutProperty(rasterId(kind), "visibility", kind === basemap ? "visible" : "none");
     }
     for (const id of buildingLayers) {
       map.setLayoutProperty(id, "visibility", vectorBuildingsVisible ? "visible" : "none");
