@@ -13,7 +13,7 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from .data_service import MLIT_WIDE_DIR, store_sources
+from .data_service import store_sources
 from .data_tasks import TASKS, ensure_data, status_rows, validate_json_outputs
 from .store import STORE_PATH, verify_store
 
@@ -188,7 +188,7 @@ def data_task_failures() -> list[str]:
     failures = [
         f"data task {state.name}: {state.status}: {state.reason}"
         for state in status_rows()
-        if state.status not in {"ready", "optional"}
+        if state.status != "ready"
     ]
     store_path = ROOT / STORE_PATH
     if store_path.is_file():
@@ -241,10 +241,10 @@ def contract_failures() -> list[str]:
             failures.append(f"missing: {relative}")
 
     for path in sorted((ROOT / "data").rglob("*.json")) + sorted((ROOT / "data").rglob("*.geojson")):
-        # The wide foundation cache holds gigabyte-scale opt-in products; its
-        # manifest is a declared task output above, and the store build is the
-        # loud validator of the wide files themselves.
-        if path.is_relative_to(ROOT / MLIT_WIDE_DIR):
+        # The MLIT acquisition holds gigabyte-scale products; its manifest is
+        # a declared task output above, and the store build is the loud
+        # validator of the products themselves.
+        if path.is_relative_to(ROOT / "data/mlit"):
             continue
         ok, message = validate_json(path)
         if not ok:

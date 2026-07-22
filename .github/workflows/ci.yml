@@ -34,9 +34,24 @@ jobs:
       - name: Lint
         run: uv run ruff check terrai_spatial/ scripts/
 
+      # The MLIT foundation data is a gitignored Kanto-scope acquisition
+      # (~2.3 GB of GeoJSON, ~2.7M features): restored from the Actions cache
+      # keyed on the acquisition table, fetched from MLIT only when that
+      # table changes.
+      - name: Restore foundation data
+        id: mlit-cache
+        uses: actions/cache@v4
+        with:
+          path: data/mlit
+          key: mlit-${{ hashFiles('scripts/fetch_mlit_foundation.py', 'terrai_spatial/pipeline/regions.py', 'terrai_spatial/pipeline/io.py', 'terrai_spatial/pipeline/http.py', 'terrai_spatial/pipeline/provenance.py') }}
+
+      - name: Fetch foundation data on cache miss
+        if: steps.mlit-cache.outputs.cache-hit != 'true'
+        run: uv run python -m terrai_spatial fetch mlit
+
       # The service tests exercise the store-backed DataService, and the
-      # store is a derived artifact every clone rebuilds from committed
-      # files — exactly what this does, with no network.
+      # store is a derived artifact rebuilt from the provisioned data files —
+      # exactly what this does, with no further network access.
       - name: Build derived data
         run: uv run python -m terrai_spatial data ensure --only store --offline
 

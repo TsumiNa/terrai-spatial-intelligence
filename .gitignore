@@ -26,7 +26,7 @@ data/external/plateau_uc24_13/
 # refresh must never enter git.
 var/
 
-# The wide-scope MLIT foundation cache is a reproducible on-demand acquisition
-# (fetch mlit_wide); the committed demo subsets under data/mlit stay the
-# canonical CI inputs.
-data/external/mlit_wide/
+# The MLIT foundation data is a reproducible acquisition at the Kanto window
+# (fetch mlit), provisioned by ensure_data locally and by the Actions cache in
+# CI. Gigabyte-scale products never enter git.
+data/mlit/

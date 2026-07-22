@@ -131,7 +131,11 @@ def safe_extract_zip(archive_path: Path, destination: Path, *, max_member_bytes:
     extracted: list[Path] = []
     with zipfile.ZipFile(archive_path) as archive:
         for member in archive.infolist():
-            relative = safe_relative_path(member.filename, label="ZIP member")
+            # Legacy kokjo archives (the 1:50k land-classification sheets)
+            # separate directories with backslashes; treat them as the
+            # separators they are, then apply every traversal check.
+            member_name = member.filename.replace("\\", "/")
+            relative = safe_relative_path(member_name, label="ZIP member")
             if stat.S_ISLNK(member.external_attr >> 16):
                 raise RuntimeError(f"unsafe ZIP member: symbolic link {member.filename!r}")
             if max_member_bytes is not None and member.file_size > max_member_bytes:
@@ -140,7 +144,7 @@ def safe_extract_zip(archive_path: Path, destination: Path, *, max_member_bytes:
             resolved = target.resolve()
             if resolved != destination.resolve() and destination.resolve() not in resolved.parents:
                 raise RuntimeError(f"unsafe ZIP member: {member.filename!r}")
-            if member.is_dir():
+            if member.is_dir() or member_name.endswith("/"):
                 target.mkdir(parents=True, exist_ok=True)
                 continue
             target.parent.mkdir(parents=True, exist_ok=True)
