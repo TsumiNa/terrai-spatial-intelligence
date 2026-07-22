@@ -81,6 +81,9 @@ def build(*, source: Path = SOURCE, output: Path = OUTPUT) -> dict[str, Any]:
             if collection is not None:
                 collection.discard()
             raise
+        finally:
+            # An exception above would otherwise leave the source handle to GC.
+            features.close()
         if collection is None:
             metadata = dict(envelope.get("metadata") or {})
             metadata["scope"] = f"CI fixture windows derived from: {metadata.get('scope', 'unknown scope')}"
