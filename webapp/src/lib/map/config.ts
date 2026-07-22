@@ -36,14 +36,21 @@ export const RASTER_KINDS: RasterKind[] = ["photo", "hillshade", "slope"];
  * tiles that would 404. The per-region tile cache died with the demo-scope
  * framing: the vector basemap has always streamed from GSI, and the rasters
  * now follow the same dependency to the same host. */
-export const RASTER_SOURCES: Record<RasterKind, { url: string; minzoom: number; maxzoom: number }> = {
-  photo: { url: "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg", minzoom: 2, maxzoom: 18 },
-  hillshade: { url: "https://cyberjapandata.gsi.go.jp/xyz/hillshademap/{z}/{x}/{y}.png", minzoom: 2, maxzoom: 16 },
-  slope: { url: "https://cyberjapandata.gsi.go.jp/xyz/slopemap/{z}/{x}/{y}.png", minzoom: 3, maxzoom: 15 },
-};
-
 export const GSI_ATTRIBUTION =
   '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル (GSI)</a>';
+
+export const RASTER_SOURCES: Record<RasterKind, { url: string; minzoom: number; maxzoom: number; attribution: string }> = {
+  // seamlessphoto blends third-party imagery; GSI's tile catalog requires
+  // their credits alongside the GSI one when the layer is shown.
+  photo: {
+    url: "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg",
+    minzoom: 2,
+    maxzoom: 18,
+    attribution: `${GSI_ATTRIBUTION}・Landsat 8（courtesy USGS/NASA）・GEBCO・GRUS画像（© Axelspace）`,
+  },
+  hillshade: { url: "https://cyberjapandata.gsi.go.jp/xyz/hillshademap/{z}/{x}/{y}.png", minzoom: 2, maxzoom: 16, attribution: GSI_ATTRIBUTION },
+  slope: { url: "https://cyberjapandata.gsi.go.jp/xyz/slopemap/{z}/{x}/{y}.png", minzoom: 3, maxzoom: 15, attribution: GSI_ATTRIBUTION },
+};
 
 /** The floor fits the whole mainland-Kanto acquisition window (2.3 degrees
  * of longitude) into a 1600 px viewport: 512·2⁹/360 ≈ 728 px per degree.
@@ -80,14 +87,14 @@ export function composeStyle(vectorStyle: StyleSpecification): StyleSpecificatio
   const layers: LayerSpecification[] = [...vectorStyle.layers];
   for (const kind of RASTER_KINDS) {
     const id = rasterId(kind);
-    const { url, minzoom, maxzoom } = RASTER_SOURCES[kind];
+    const { url, minzoom, maxzoom, attribution } = RASTER_SOURCES[kind];
     sources[id] = {
       type: "raster",
       tiles: [url],
       tileSize: 256,
       minzoom,
       maxzoom,
-      attribution: GSI_ATTRIBUTION,
+      attribution,
     };
     layers.push({ id, type: "raster", source: id, layout: { visibility: "none" } });
   }
