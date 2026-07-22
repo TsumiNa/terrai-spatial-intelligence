@@ -86,3 +86,19 @@ def test_discard_removes_the_partial_file(tmp_path: Path) -> None:
     streamed.add({"type": "Feature", "geometry": None, "properties": {}})
     streamed.discard()
     assert list(tmp_path.iterdir()) == []
+
+
+def test_concurrent_writers_to_the_same_target_do_not_interleave(tmp_path: Path) -> None:
+    # Two overlapping builds (an ensure-triggered fetch beside a manual one)
+    # must each write their own temporary file; the last to close wins whole.
+    first = StreamedCollection(tmp_path / "same.geojson", "ksj-test", {"round": 1})
+    second = StreamedCollection(tmp_path / "same.geojson", "ksj-test", {"round": 2})
+    first.add({"type": "Feature", "geometry": None, "properties": {"from": "first"}})
+    second.add({"type": "Feature", "geometry": None, "properties": {"from": "second"}})
+    first.close()
+    second.close()
+
+    value = json.loads((tmp_path / "same.geojson").read_text(encoding="utf-8"))
+    assert value["metadata"] == {"round": 2}
+    assert value["features"][0]["properties"] == {"from": "second"}
+    assert sorted(item.name for item in tmp_path.iterdir()) == ["same.geojson"]
