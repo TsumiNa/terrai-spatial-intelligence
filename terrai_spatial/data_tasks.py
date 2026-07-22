@@ -17,6 +17,11 @@ ROOT = Path(__file__).resolve().parents[1]
 
 STORE_INPUTS = tuple(sorted({source.path for source in store_sources()}))
 
+# The gitignored wide-scope foundation cache. Its GeoJSON products are
+# gigabyte-scale, so whole-tree JSON validation must skip this directory; the
+# manifest below stays a declared, validated task output.
+MLIT_WIDE_DIR = "data/external/mlit_wide"
+
 
 @dataclass(frozen=True)
 class DataTask:
@@ -136,7 +141,7 @@ TASKS = {
         # Only the manifest is declared: readiness checks parse declared JSON
         # outputs in full, and the wide GeoJSON products are gigabyte-scale.
         # The store build is the loud validator of the wide files themselves.
-        outputs=("data/external/mlit_wide/metadata.json",),
+        outputs=(f"{MLIT_WIDE_DIR}/metadata.json",),
         network=True,
         automatic=False,
         force_argument=True,
@@ -294,10 +299,12 @@ def task_state(name: str, root: Path = ROOT) -> TaskState:
     outputs, missing_outputs = _existing_outputs(task, root)
     missing_inputs = [item for item in task.inputs if not (root / item).is_file()]
     if missing_outputs:
-        if task.optional:
-            return TaskState(name, "optional", f"opt-in outputs are absent; fetch {name} to create them")
         if missing_inputs:
             return TaskState(name, "blocked", f"missing inputs: {', '.join(missing_inputs)}")
+        # `optional` covers only true absence; a present-but-invalid output is
+        # corruption and must surface as `missing`, never hide behind opt-in.
+        if task.optional and not any(path.is_file() for path in outputs):
+            return TaskState(name, "optional", f"opt-in outputs are absent; fetch {name} to create them")
         return TaskState(name, "missing", f"missing outputs: {', '.join(missing_outputs)}")
     if missing_inputs:
         return TaskState(name, "ready", "outputs are present; optional rebuild inputs are unavailable")

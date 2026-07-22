@@ -293,3 +293,16 @@ def test_validate_accepts_the_skip_data_tasks_flag() -> None:
 def test_skipping_data_tasks_does_not_weaken_the_content_contracts() -> None:
     # The flag must drop only the working-copy check, never a contract.
     assert contract_failures() == []
+
+
+def test_contract_validation_skips_the_wide_foundation_cache() -> None:
+    from terrai_spatial.cli import ROOT, contract_failures
+    from terrai_spatial.data_tasks import MLIT_WIDE_DIR
+
+    probe = ROOT / MLIT_WIDE_DIR / "cli-test-probe.geojson"
+    probe.parent.mkdir(parents=True, exist_ok=True)
+    probe.write_text("{ deliberately invalid", encoding="utf-8")
+    try:
+        assert not [failure for failure in contract_failures() if "cli-test-probe" in failure]
+    finally:
+        probe.unlink()

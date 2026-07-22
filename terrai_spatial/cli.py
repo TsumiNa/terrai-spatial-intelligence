@@ -14,7 +14,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from .data_service import store_sources
-from .data_tasks import TASKS, ensure_data, status_rows, validate_json_outputs
+from .data_tasks import MLIT_WIDE_DIR, TASKS, ensure_data, status_rows, validate_json_outputs
 from .store import STORE_PATH, verify_store
 
 
@@ -241,6 +241,11 @@ def contract_failures() -> list[str]:
             failures.append(f"missing: {relative}")
 
     for path in sorted((ROOT / "data").rglob("*.json")) + sorted((ROOT / "data").rglob("*.geojson")):
+        # The wide foundation cache holds gigabyte-scale opt-in products; its
+        # manifest is a declared task output above, and the store build is the
+        # loud validator of the wide files themselves.
+        if path.is_relative_to(ROOT / MLIT_WIDE_DIR):
+            continue
         ok, message = validate_json(path)
         if not ok:
             failures.append(f"invalid {path.relative_to(ROOT)}: {message}")

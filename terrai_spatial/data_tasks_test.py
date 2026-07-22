@@ -288,3 +288,29 @@ def test_optional_task_runs_only_when_explicitly_selected(tmp_path: Path, monkey
         # optional task itself must not be attempted.
         ensure_data(root=tmp_path, selected=None, allow_network=False)
     assert "mlit_wide" not in ran
+
+
+def test_optional_never_hides_corruption_or_blocked_states(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    # A present-but-invalid output is corruption, not an unfetched cache.
+    task = TASKS["mlit_wide"]
+    invalid = tmp_path / task.outputs[0]
+    invalid.parent.mkdir(parents=True)
+    invalid.write_text("{ not json", encoding="utf-8")
+    assert task_state("mlit_wide", tmp_path).status == "missing"
+
+    # Missing inputs take precedence over the opt-in state.
+    from terrai_spatial.data_tasks import DataTask
+
+    monkeypatch.setitem(
+        TASKS,
+        "optional_with_inputs",
+        DataTask(
+            "optional_with_inputs",
+            "test double",
+            "scripts/none.py",
+            inputs=("data/never/exists.json",),
+            outputs=("data/never/output.json",),
+            optional=True,
+        ),
+    )
+    assert task_state("optional_with_inputs", tmp_path).status == "blocked"
