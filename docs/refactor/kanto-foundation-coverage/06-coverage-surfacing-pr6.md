@@ -1,7 +1,20 @@
 # PR6 Plan: Surface the Kanto Coverage
 
-- Status: Planned
+- Status: Completed
 - Refactor: `kanto-foundation-coverage`
+- PR: #56
+
+## Completion record
+
+- The registry extent is the acquisition window verbatim; the sheet-gap reality is
+  stated where the extent is declared, and a window inside a gap reports `empty`
+  truthfully rather than `outside`.
+- The edge-touching-window unit test kept its intent and moved to the Kanto
+  window's western edge.
+- All thirty card files updated in one pass with per-string assertions; the two
+  sheet-based sources carry the partial-coverage caveat in all three languages.
+- Verified against the coherent re-acquired store: webapp unit 113, Playwright 39
+  (visual byte-stable), identity suite 8, `terrai validate` green.
 
 ## Goal
 
