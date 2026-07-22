@@ -305,3 +305,29 @@ def test_stream_reader_round_trips_a_real_mlit_dataset() -> None:
 
     assert streamed == loaded["features"]
     assert envelope == {**{name: value for name, value in loaded.items() if name != "features"}, "features": []}
+
+
+def test_stream_reader_close_releases_the_file_even_without_iteration(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    path = tmp_path / "sample.geojson"
+    path.write_text(json.dumps({"type": "FeatureCollection", "features": EDGE_FEATURES}), encoding="utf-8")
+
+    opened = []
+    real_open = Path.open
+
+    def spy(self, *args, **kwargs):  # noqa: ANN001 - Path.open signature
+        handle = real_open(self, *args, **kwargs)
+        opened.append(handle)
+        return handle
+
+    monkeypatch.setattr(Path, "open", spy)
+
+    # Abandoned before the first feature: close() must still release the file.
+    _, features = store.stream_feature_collection(path)
+    assert len(opened) == 1 and not opened[0].closed
+    features.close()
+    assert opened[0].closed
+
+    # Exhaustion releases it too.
+    _, features = store.stream_feature_collection(path)
+    list(features)
+    assert opened[1].closed

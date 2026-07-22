@@ -189,15 +189,39 @@ def feature_bbox(geometry: dict[str, Any] | None) -> tuple[float, float, float, 
     )
 
 
+class _FeatureStream:
+    """The feature iterator with a ``close()`` that always releases the file.
+
+    A generator that was never started skips its ``finally`` entirely, so the
+    handle is closed here directly as well — idempotently — covering callers
+    that read only the envelope or abandon iteration early.
+    """
+
+    def __init__(self, generator: Iterator[dict[str, Any]], handle: Any) -> None:
+        self._generator = generator
+        self._handle = handle
+
+    def __iter__(self) -> "_FeatureStream":
+        return self
+
+    def __next__(self) -> dict[str, Any]:
+        return next(self._generator)
+
+    def close(self) -> None:
+        self._generator.close()
+        self._handle.close()
+
+
 def stream_feature_collection(
     path: Path, *, chunk_bytes: int = _STREAM_CHUNK_BYTES
-) -> tuple[dict[str, Any], "Iterator[dict[str, Any]]"]:
+) -> tuple[dict[str, Any], _FeatureStream]:
     """Incremental FeatureCollection reader: envelope members plus a feature
     iterator, in bounded memory.
 
     The envelope holds every top-level member in file order with ``features``
     emptied. Members that follow the features array are appended only as the
     iterator is exhausted — the order ``build_store`` consumes them in.
+    Exhaust the iterator or ``close()`` it; both release the file handle.
     Malformed input raises with the path and an approximate byte offset.
     """
 
@@ -314,7 +338,7 @@ def stream_feature_collection(
         finally:
             handle.close()
 
-    return envelope, features()
+    return envelope, _FeatureStream(features(), handle)
 
 
 def _source_stamp(value: dict[str, Any]) -> tuple[str | None, str | None, str | None]:
@@ -378,30 +402,35 @@ def build_store(
                 rows = []
                 count = 0
                 dataset_bbox: list[float] | None = None
-                for feature in feature_iter:
-                    bbox = feature_bbox(feature.get("geometry"))
-                    rows.append(
-                        (
-                            source.key,
-                            count,
-                            json.dumps(feature, ensure_ascii=False, separators=(",", ":")),
-                            *(bbox if bbox else (None, None, None, None)),
+                try:
+                    for feature in feature_iter:
+                        bbox = feature_bbox(feature.get("geometry"))
+                        rows.append(
+                            (
+                                source.key,
+                                count,
+                                json.dumps(feature, ensure_ascii=False, separators=(",", ":")),
+                                *(bbox if bbox else (None, None, None, None)),
+                            )
                         )
-                    )
-                    count += 1
-                    if bbox:
-                        if dataset_bbox is None:
-                            dataset_bbox = list(bbox)
-                        else:
-                            dataset_bbox = [
-                                min(dataset_bbox[0], bbox[0]),
-                                min(dataset_bbox[1], bbox[1]),
-                                max(dataset_bbox[2], bbox[2]),
-                                max(dataset_bbox[3], bbox[3]),
-                            ]
-                    if len(rows) >= _INSERT_BATCH_ROWS:
-                        connection.executemany(INSERT_FEATURE, rows)
-                        rows.clear()
+                        count += 1
+                        if bbox:
+                            if dataset_bbox is None:
+                                dataset_bbox = list(bbox)
+                            else:
+                                dataset_bbox = [
+                                    min(dataset_bbox[0], bbox[0]),
+                                    min(dataset_bbox[1], bbox[1]),
+                                    max(dataset_bbox[2], bbox[2]),
+                                    max(dataset_bbox[3], bbox[3]),
+                                ]
+                        if len(rows) >= _INSERT_BATCH_ROWS:
+                            connection.executemany(INSERT_FEATURE, rows)
+                            rows.clear()
+                finally:
+                    closer = getattr(feature_iter, "close", None)
+                    if closer is not None:
+                        closer()
                 connection.executemany(INSERT_FEATURE, rows)
                 # A streamed envelope is complete only after iteration, so the
                 # shape check for both paths lives here.
