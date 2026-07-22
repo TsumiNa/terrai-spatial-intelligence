@@ -1,7 +1,21 @@
 # PR1 Plan: Wide-scope Acquisition Task
 
-- Status: Planned
+- Status: Completed
 - Refactor: `kanto-foundation-coverage`
+- PR: #52
+
+## Completion record
+
+- 56 archives across the ten datasets: 4 prefectures each for A33/L01/A56/L02, 15 F3
+  sheets, 14 land-history sheets, 8 primary meshes (5238 clipped to Hakone-west), plus
+  the three national/bureau archives the demo scope already uses.
+- The wide table inherits ids, vintages, licences and include modes from the demo
+  table (`_wide()`), so the two scopes cannot drift; a test pins the mirroring.
+- The registry gained the explicit `optional` task concept instead of a special case:
+  absent outputs are a valid steady state, validation passes, `ensure` runs the task
+  only when explicitly selected, and `fetch mlit_wide` forces it.
+- The streamed writer is byte-compatible with the atomic compact writer, proven by a
+  byte-for-byte test, and discards its partial file on failure.
 
 ## Goal
 
