@@ -186,8 +186,14 @@ class StreamedCollection:
     def __init__(self, path: Path, name: str, metadata: dict[str, Any]) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         self._path = path
-        self._temporary = path.with_name(path.name + ".part")
-        self._handle = self._temporary.open("w", encoding="utf-8")
+        # A unique temporary name per writer, like the atomic writers in
+        # pipeline.io: concurrent builds must never interleave into one
+        # temp file and publish garbage through the final rename.
+        handle = tempfile.NamedTemporaryFile(
+            "w", encoding="utf-8", dir=path.parent, prefix=path.name + ".", suffix=".part", delete=False
+        )
+        self._temporary = Path(handle.name)
+        self._handle = handle
         envelope = serialize_json({"type": "FeatureCollection", "name": name, "metadata": metadata}, compact=True)
         self._handle.write(envelope[:-1] + ',"features":[')
         self.count = 0
