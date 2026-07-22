@@ -1,7 +1,17 @@
 # PR8 Plan: FL Spatial-alignment Admission Principle
 
-- Status: In progress
+- Status: Completed
 - Refactor: `kanto-foundation-coverage`
+- PR: #59
+
+## Completion record
+
+- The admission bullet lives in the FL section of all three language versions of
+  the concept document, and the acquisition script's docstring mirrors it
+  verbatim, including the vertical-datum qualifier.
+- No mechanical validation was added, by design: the registry has no per-source
+  geometry schema; the principle binds evaluation and the registry records
+  outcomes with reasons, as its five `confirmed_not_integrated` entries already do.
 
 ## Goal
 
