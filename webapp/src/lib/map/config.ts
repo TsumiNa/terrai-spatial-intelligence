@@ -12,6 +12,7 @@
 import type { StyleSpecification, LayerSpecification, SourceSpecification } from "maplibre-gl";
 
 import type { RegionKey } from "../modules";
+import { palette } from "../theme";
 import type { BasemapKey } from "../state.svelte";
 
 export const VECTOR_STYLE_URL = "https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/std.json";
@@ -99,12 +100,33 @@ export function freezeHighZoomCartography(style: StyleSpecification): StyleSpeci
 }
 
 /**
+ * The GSI style paints its cartographic buildings in oranges that collide
+ * with the analysis palette, and whether an orange building was data or
+ * cartography could only be settled by clicking it. Neutralize the basemap's
+ * buildings instead: any colored building on this map is analysis data, and
+ * every gray one is basemap texture. Reuses existing palette neutrals.
+ */
+export function neutralizeBasemapBuildings(style: StyleSpecification): StyleSpecification {
+  const layers = style.layers.map((layer): LayerSpecification => {
+    if (!("source-layer" in layer) || layer["source-layer"] !== "building") return layer;
+    if (layer.type === "fill") {
+      return { ...layer, paint: { ...layer.paint, "fill-color": palette.line, "fill-outline-color": palette.gray } };
+    }
+    if (layer.type === "line") {
+      return { ...layer, paint: { ...layer.paint, "line-color": palette.gray } };
+    }
+    return layer;
+  });
+  return { ...style, layers };
+}
+
+/**
  * Append the three nationwide raster basemaps to the GSI vector style, all
  * hidden. The active one is a visibility toggle, so switching basemaps never
  * rebuilds the style and never moves the camera.
  */
 export function composeStyle(vectorStyle: StyleSpecification): StyleSpecification {
-  const frozen = freezeHighZoomCartography(vectorStyle);
+  const frozen = neutralizeBasemapBuildings(freezeHighZoomCartography(vectorStyle));
   const sources: Record<string, SourceSpecification> = { ...frozen.sources };
   const layers: LayerSpecification[] = [...frozen.layers];
   for (const kind of RASTER_KINDS) {
