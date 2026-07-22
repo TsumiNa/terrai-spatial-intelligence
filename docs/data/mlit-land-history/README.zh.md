@@ -2,7 +2,7 @@
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
 ## 数据内容
-包含地貌、历史土地利用等多图层。本项目接入2011年横滨和千叶图幅，并保留源图层和字段信息。
+包含地貌、历史土地利用等多图层。本项目接入 2011 年调查发布的关东 14 幅图幅，并保留源图层和字段信息。该调查仅覆盖部分图幅，覆盖存在按图幅缺失。
 ## 来源
 [国土调查下载](https://nlftp.mlit.go.jp/kokjo/inspect/landclassification/download.html)
 ## 在本项目中的使用

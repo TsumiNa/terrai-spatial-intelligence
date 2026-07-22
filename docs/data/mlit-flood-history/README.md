@@ -2,7 +2,7 @@
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
 ## Data description
-Event polygons for recorded floods from 1896–2019, published through March 2025. TerrAI preserves event date/name/source fields and clips both demo contexts; historical absence is not proof of no risk.
+Event polygons for recorded floods from 1896–2019, published through March 2025. TerrAI preserves event date/name/source fields and clips the mainland-Kanto window (Tokyo, Kanagawa, Chiba, Saitama); historical absence is not proof of no risk.
 ## Source
 [National Land Survey download](https://nlftp.mlit.go.jp/kokjo/inspect/landclassification/download.html)
 ## Use in this project

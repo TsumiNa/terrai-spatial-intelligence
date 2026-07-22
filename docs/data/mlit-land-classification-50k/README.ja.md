@@ -2,7 +2,7 @@
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
 ## データの内容
-地質・土壌等の図郭単位Shapefileです。年代と属性は図郭ごとに異なります。TerrAIは横浜・茂原をGeoJSONへ切り出し、原属性・レイヤ名・時刻を保持します。
+地質・土壌等の図郭単位Shapefileです。年代と属性は図郭ごとに異なります。TerrAIはGIS化済みの関東15図郭をGeoJSONへ切り出し、原属性・レイヤ名・時刻を保持します。GIS化は一部図郭のみのため、範囲には図郭単位の欠落があります。
 ## 出典
 [国土調査ダウンロード](https://nlftp.mlit.go.jp/kokjo/inspect/landclassification/download.html)
 ## 本 project での利用

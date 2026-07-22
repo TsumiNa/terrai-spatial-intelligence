@@ -193,8 +193,9 @@ describe("window helpers", () => {
   });
 
   it("treats an edge-touching window as inside the extent", () => {
-    expect(intersectsAny([139.66, 35.3, 139.7, 35.39], LAND_HISTORY.extents)).toBe(true);
-    expect(intersectsAny([139.67, 35.3, 139.7, 35.3899], LAND_HISTORY.extents)).toBe(false);
+    // Against the Kanto acquisition window's western edge (138.65).
+    expect(intersectsAny([138.6, 34.9, 138.65, 35.0], LAND_HISTORY.extents)).toBe(true);
+    expect(intersectsAny([138.6, 34.9, 138.6499, 35.0], LAND_HISTORY.extents)).toBe(false);
   });
 });
 

@@ -2,7 +2,7 @@
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
 ## 数据内容
-2026-01-01 标准地，含价格（日元/m²）、面积、用途、规划等 L01 原字段。
+2026-01-01 标准地，含价格（日元/m²）、面积、用途、规划等 L01 原字段。获取埼玉、千叶、东京、神奈川四都县。
 ## 来源
 [L01-2026 官方页](https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L01-2026.html)
 ## 在本项目中的使用

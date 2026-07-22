@@ -2,7 +2,7 @@
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
 ## 数据内容
-宅地造成工程及特定填土等管制区面，源日期为2025-07-18，保留 A56 字段。
+宅地造成工程及特定填土等管制区面，源日期为2025-07-18，保留 A56 字段。获取埼玉、千叶、东京、神奈川四都县。
 ## 来源
 [A56-2025 官方页](https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-A56-2025.html)
 ## 在本项目中的使用

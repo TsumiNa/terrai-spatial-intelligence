@@ -2,7 +2,7 @@
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
 ## 数据内容
-按图幅提供地质、土壤等 Shapefile；年代和字段会随图幅变化。TerrAI 裁剪横滨、茂原并转为 GeoJSON，保留原字段、图层名和时间戳。
+按图幅提供地质、土壤等 Shapefile；年代和字段会随图幅变化。TerrAI 裁剪已 GIS 化的关东 15 幅图幅并转为 GeoJSON，保留原字段、图层名和时间戳。上游仅对部分图幅做了 GIS 化，覆盖存在按图幅缺失。
 ## 来源
 [国土调查下载](https://nlftp.mlit.go.jp/kokjo/inspect/landclassification/download.html)
 ## 在本项目中的使用

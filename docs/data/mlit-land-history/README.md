@@ -2,7 +2,7 @@
 [English](README.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
 ## Data description
-Multi-layer GIS packages describing landform, former land use and related history; this integration uses 2011 Yokohama and Chiba map packages and retains source layer/schema metadata.
+Multi-layer GIS packages describing landform, former land use and related history; this integration uses the 14 Kanto sheets published in the 2011 survey and retains source layer/schema metadata; the survey covered only selected metropolitan sheets, so coverage has sheet-shaped gaps.
 ## Source
 [National Land Survey download](https://nlftp.mlit.go.jp/kokjo/inspect/landclassification/download.html)
 ## Use in this project
