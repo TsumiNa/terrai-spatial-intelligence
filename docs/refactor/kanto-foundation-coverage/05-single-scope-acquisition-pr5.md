@@ -1,7 +1,22 @@
 # PR5 Plan: Single-scope Kanto Acquisition
 
-- Status: Planned
+- Status: Completed
 - Refactor: `kanto-foundation-coverage`
+- PR: #55
+
+## Completion record
+
+- The acquisition ran in full before the PR opened: 2,701,168 features / 2.3 GB of
+  GeoJSON (landUseMesh 2,243,637); the store rebuilt through the streaming path in
+  78 s to 2.9 GB; pytest and the whole Playwright suite ran green against it.
+- The real F3 archives surfaced a pipeline gap: legacy kokjo zips separate
+  directories with backslashes (CP932 names). `safe_extract_zip` treats backslashes
+  as separators now, traversal checks intact, regression-tested both ways.
+- Identity at scale decomposes: envelope + count + windowed queries for collections
+  ≥64 MB (streaming oracle), full byte identity below. The matrix gained Tokyo,
+  Omiya and Hachioji windows.
+- CI provisions `data/mlit` from the Actions cache keyed on the acquisition table;
+  the ten registry `retrieved_at` stamps follow the acquisition date.
 
 ## Goal
 
