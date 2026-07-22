@@ -1,7 +1,18 @@
 # PR4 Plan: Streaming Store Ingestion
 
-- Status: Planned
+- Status: Completed
 - Refactor: `kanto-foundation-coverage`
+- PR: #54
+
+## Completion record
+
+- The full store built from the real repository data through both ingestion paths is
+  byte-identical (92.7 MB), with no speed cost (2.2 s streamed vs 2.3 s loaded).
+- The reader is exercised down to 16-byte chunks, forcing a refill and buffer
+  compaction on virtually every token, and against a real committed MLIT dataset.
+- Envelope members that follow the features array are supported and pinned by test;
+  the shape check for both paths runs after iteration, when a streamed envelope is
+  complete.
 
 ## Goal
 
