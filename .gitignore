@@ -30,3 +30,7 @@ var/
 # (fetch mlit), provisioned by ensure_data locally and by the Actions cache in
 # CI. Gigabyte-scale products never enter git.
 data/mlit/
+
+# The OSM Kanto building footprints share the same reproducible-acquisition
+# treatment (fetch osm_kanto).
+data/osm/kanto_buildings/

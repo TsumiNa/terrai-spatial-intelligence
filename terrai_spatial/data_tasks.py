@@ -109,6 +109,17 @@ TASKS = {
         force_argument=True,
         check_stale=False,
     ),
+    "osm_kanto": DataTask(
+        "osm_kanto",
+        "extract mainland-Kanto OSM building footprints from the pinned snapshot",
+        "scripts/fetch_osm_kanto_buildings.py",
+        # Only the manifest is declared: the streamed product is gigabyte-scale
+        # and declared JSON outputs are parsed in full on every status check.
+        outputs=("data/osm/kanto_buildings/metadata.json",),
+        network=True,
+        force_argument=True,
+        check_stale=False,
+    ),
     "mlit_fixture": DataTask(
         "mlit_fixture",
         "derive the committed CI fixture windows from a full MLIT acquisition",
