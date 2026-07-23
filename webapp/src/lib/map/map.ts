@@ -30,6 +30,7 @@ import {
   MAX_PITCH,
   MAX_ZOOM,
   MIN_ZOOM,
+  FALLBACK_RASTER_LAYER_ID,
   RASTER_KINDS,
   REGION_CAMERAS,
   LOCAL_STYLE_URL,
@@ -93,6 +94,16 @@ export async function createExhibitionMap(
   // sprite must be resolved to our own origin here or v6 rejects it and no
   // icons load.
   style.sprite = new URL(LOCAL_SPRITE_URL, window.location.origin).href;
+
+  // Ops switch: `?fallback=raster` starts the map on the production-raster
+  // fallback (the operational answer if GSI announces a bvmap change). Baked
+  // into the style before construction so it is visible from the first frame,
+  // with no dependence on load timing.
+  const opsFallback = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("fallback") === "raster";
+  if (opsFallback) {
+    const fallbackLayer = style.layers.find((layer) => layer.id === FALLBACK_RASTER_LAYER_ID);
+    if (fallbackLayer) fallbackLayer.layout = { ...fallbackLayer.layout, visibility: "visible" };
+  }
 
   let region = initial.region;
   let basemap = initial.basemap;
@@ -198,6 +209,60 @@ export async function createExhibitionMap(
     }
   };
   void loaded.then(applyVisibility);
+
+  // --- production-raster availability fallback (basemap-resilience) --------
+  // The experimental vector tiles carry no SLA. When they fail, promote the
+  // hidden GSI production-raster layer once (one-way per session) so the wide
+  // view degrades to raster streets rather than a blank map. The OSM detail
+  // layer, foundation overlays and analyses are unaffected — they are our data.
+  // Identify the source by the experimental tiles this fallback specifically
+  // guards — not merely "the first vector source" — so an added vector source
+  // cannot misdirect the error counting.
+  const vectorSourceId = Object.entries(style.sources).find(
+    ([, source]) => source.type === "vector" && (source.tiles ?? []).some((tile) => tile.includes("experimental_bvmap")),
+  )?.[0];
+  // Already active if the ops switch baked it into the style above.
+  let fallbackActive = opsFallback;
+  const activateFallback = (reason: string): void => {
+    if (fallbackActive) return;
+    fallbackActive = true;
+    // Gate on the *style* being loaded, not the map "load" event: when the
+    // vector tiles are dead, "load" (first complete render) may never fire, but
+    // the style — and this layer — are present, so showing it must not wait on
+    // tiles that will never arrive. Re-check on each styledata until the style
+    // is ready (tile errors can fire before the style finishes loading).
+    const show = (): void => {
+      if (!map.isStyleLoaded()) {
+        map.once("styledata", show);
+        return;
+      }
+      if (map.getLayer(FALLBACK_RASTER_LAYER_ID)) map.setLayoutProperty(FALLBACK_RASTER_LAYER_ID, "visibility", "visible");
+    };
+    show();
+    console.warn(`[basemap] vector tiles unavailable — GSI production-raster fallback active (${reason}).`);
+  };
+  // Auto-promotion: a measured threshold within a window, so a stray tile 404
+  // never flaps the basemap, but a dead source promotes and stays. The window is
+  // generous: a genuinely dead source fails every requested tile (dozens), so it
+  // crosses the threshold easily even when rendering is slow, while four real
+  // failures within it in a healthy session stays very unlikely.
+  const FALLBACK_WINDOW_MS = 20000;
+  const FALLBACK_THRESHOLD = 4;
+  const vectorErrorTimes: number[] = [];
+  map.on("error", (event) => {
+    if (fallbackActive) return; // one-way: stop counting once promoted
+    const detail = event as { sourceId?: string; error?: { message?: string } };
+    const fromVector = detail.sourceId === vectorSourceId || (detail.error?.message ?? "").includes("experimental_bvmap");
+    if (!fromVector) return;
+    const now = performance.now();
+    vectorErrorTimes.push(now);
+    // Keep only the most recent timestamps within the window, bounded by the
+    // threshold, so a rapidly-failing source cannot grow this without limit.
+    while (vectorErrorTimes.length > FALLBACK_THRESHOLD || (vectorErrorTimes.length > 0 && now - vectorErrorTimes[0] > FALLBACK_WINDOW_MS)) {
+      vectorErrorTimes.shift();
+    }
+    if (vectorErrorTimes.length >= FALLBACK_THRESHOLD) activateFallback("repeated tile failures");
+  });
 
   return {
     setRegion(next) {

@@ -1,7 +1,15 @@
 # PR2 Plan: Production-raster Fallback
 
-- Status: Planned
+- Status: Completed
 - Refactor: `basemap-resilience`
+
+> Implementation note: activation must NOT gate on the map `"load"` event —
+> when the vector source is dead, `"load"` (first complete render) may never
+> fire, so the fallback would never show. Both triggers avoid it: the ops switch
+> bakes the layer's visibility into the style before construction, and the
+> auto-promotion path shows the layer once the *style* is loaded
+> (`isStyleLoaded`/`styledata`), independent of tiles. Auto threshold: 4 vector
+> tile errors within a 20 s window, one-way per session.
 
 ## Goal
 
