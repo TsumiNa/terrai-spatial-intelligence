@@ -4,7 +4,7 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, FALLBACK_RASTER_LAYER_ID, FALLBACK_RASTER_SOURCE_ID, FALLBACK_STD_RASTER_URL, LOCAL_SPRITE_URL, RASTER_KINDS, RASTER_SOURCES, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
+import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, FALLBACK_RASTER_LAYER_ID, FALLBACK_RASTER_SOURCE_ID, FALLBACK_STD_RASTER_URL, LOCAL_SPRITE_URL, RASTER_KINDS, RASTER_SOURCES, RELIEF_TINT_FADE_END_ZOOM, RELIEF_TINT_LAYER_ID, RELIEF_TINT_MAX_OPACITY, RELIEF_TINT_SOURCE_ID, RELIEF_TINT_START_ZOOM, RELIEF_TINT_URL, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
 import { palette } from "../theme";
 import { rgba } from "./style-rules";
 
@@ -39,10 +39,10 @@ it("streams every raster basemap live from the GSI tile host", () => {
 it("appends the nationwide raster layers and the terrain DEM source", () => {
   const composed = composeStyle(baseStyle);
   // composeStyle adds, over baseStyle: the raster-dem terrain + the hidden
-  // fallback source + one source per user raster…
-  expect(Object.keys(composed.sources)).toHaveLength(Object.keys(baseStyle.sources).length + 2 + RASTER_KINDS.length);
-  // …and the hidden fallback layer + one layer per user raster.
-  expect(composed.layers).toHaveLength(baseStyle.layers.length + 1 + RASTER_KINDS.length);
+  // fallback source + the relief-tint source + one source per user raster…
+  expect(Object.keys(composed.sources)).toHaveLength(Object.keys(baseStyle.sources).length + 3 + RASTER_KINDS.length);
+  // …and the hidden fallback layer + the relief-tint layer + one per user raster.
+  expect(composed.layers).toHaveLength(baseStyle.layers.length + 2 + RASTER_KINDS.length);
   const dem = composed.sources[TERRAIN_SOURCE_ID] as { type?: string; encoding?: string; tiles?: string[] };
   expect(dem.type).toBe("raster-dem");
   expect(dem.encoding).toBe("mapbox");
@@ -72,6 +72,27 @@ it("appends a hidden production-raster fallback below the user rasters", () => {
   const idx = (id: string) => composed.layers.findIndex((l) => l.id === id);
   for (const kind of RASTER_KINDS) {
     expect(idx(FALLBACK_RASTER_LAYER_ID)).toBeLessThan(idx(rasterId(kind)));
+  }
+});
+
+it("adds a hidden colour-by-height tint above the user rasters, capped past the fade", () => {
+  const composed = composeStyle(baseStyle);
+  const src = composed.sources[RELIEF_TINT_SOURCE_ID] as { type?: string; tiles?: string[] };
+  expect(src.type).toBe("raster");
+  expect(src.tiles?.[0]).toBe(RELIEF_TINT_URL);
+  const tint = composed.layers.find((l) => l.id === RELIEF_TINT_LAYER_ID);
+  expect(tint?.layout).toEqual({ visibility: "none" });
+  // hidden at/above the fade end so no tint tiles are requested locally
+  expect(tint?.maxzoom).toBe(RELIEF_TINT_FADE_END_ZOOM);
+  // the opacity fades from full at the wide-view start to 0 at the fade end
+  const opacity = (tint as { paint?: Record<string, unknown> }).paint?.["raster-opacity"] as unknown[];
+  expect(opacity[0]).toBe("interpolate");
+  expect(opacity.slice(3, 5)).toEqual([RELIEF_TINT_START_ZOOM, RELIEF_TINT_MAX_OPACITY]);
+  expect(opacity.slice(-2)).toEqual([RELIEF_TINT_FADE_END_ZOOM, 0]);
+  // above every user raster, so it draws over the shaded relief
+  const idx = (id: string) => composed.layers.findIndex((l) => l.id === id);
+  for (const kind of RASTER_KINDS) {
+    expect(idx(RELIEF_TINT_LAYER_ID)).toBeGreaterThan(idx(rasterId(kind)));
   }
 });
 

@@ -78,6 +78,28 @@ test("the 2.5D toggle tilts every basemap but adds 3D terrain only on imagery/re
   await expect(page).not.toHaveURL(/tilt=1/);
 });
 
+test("hillshade shows the colour-by-height tint at wide zoom, only in that mode", async ({ page }) => {
+  const reliefTiles: string[] = [];
+  page.on("response", (r) => {
+    if (r.url().includes("cyberjapandata.gsi.go.jp/xyz/relief/")) reliefTiles.push(r.url());
+  });
+
+  await waitForMap(page);
+  // imagery at a wide view: the tint is bound to the hillshade mode, so nothing
+  // requests the colour-by-height raster here even where it would be meaningful.
+  await page.locator(".basemap-button", { hasText: "影像" }).click();
+  for (let i = 0; i < 8; i += 1) {
+    await page.locator(".maplibregl-ctrl-zoom-out").click({ timeout: 1000 }).catch(() => {});
+    await page.waitForTimeout(200);
+  }
+  await page.waitForTimeout(1500);
+  expect(reliefTiles).toEqual([]);
+
+  // switch to hillshade at the same wide view: now the tint streams in
+  await page.locator(".basemap-button", { hasText: "起伏" }).click();
+  await expect.poll(() => reliefTiles.length, { timeout: 15000 }).toBeGreaterThan(0);
+});
+
 test("boots and renders with gsi-cyberjapan.github.io blocked (pinned snapshot)", async ({ page }) => {
   // The experimental GitHub Pages host served the style and its sprite; both are
   // now vendored, so nothing should reach that host. Abort any request to it and
