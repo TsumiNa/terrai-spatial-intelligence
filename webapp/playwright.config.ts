@@ -3,6 +3,11 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "e2e",
   testMatch: /.*_test\.ts/,
+  // The densest module chrome (the slope building queue) can need longer than
+  // the 5s default to reach visual stability under software WebGL on the CI
+  // runner — v6's renderer is heavier than v5's. Raise the screenshot timeout so
+  // the baseline captures a settled page rather than timing out mid-render.
+  expect: { toHaveScreenshot: { timeout: 15000 } },
   // Tests only read; nothing shares state, so they can all run at once. Without
   // this only whole files parallelise, which leaves the 14 visual tests serial.
   fullyParallel: true,
