@@ -1,6 +1,6 @@
 # OSM High-zoom Detail Layer
 
-- Status: Planned
+- Status: Completed — the three-PR sequence (#65–#67) merged; the z16 windowed clickable OSM buildings ship
 
 ## Context
 

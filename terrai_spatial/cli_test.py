@@ -229,6 +229,10 @@ def test_every_refactor_document_declares_a_known_state() -> None:
     for path in documents:
         if path.name.endswith((".ja.md", ".zh.md")):
             continue
+        # history.md is the at-a-glance index, not a plan; it carries per-refactor
+        # states in prose, not a single status line of its own.
+        if path.name == "history.md" and path.parent == ROOT / "docs/refactor":
+            continue
         assert refactor_status_failures(path) == [], path
 # --- fetch targets ------------------------------------------------------------
 
