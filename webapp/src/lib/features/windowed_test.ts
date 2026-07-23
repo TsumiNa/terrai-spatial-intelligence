@@ -206,3 +206,26 @@ it("request helper propagates a server error as a thrown error", async () => {
     "windowed request for landHistory failed",
   );
 });
+
+it("sends the per-layer window budget instead of the default when given", async () => {
+  vi.useFakeTimers();
+  const api = fakeApi([async () => ({ data: { features: [feature("a")], query: { matched: 1 } } })]);
+  const states: WindowedState[] = [];
+  const client = createWindowedFeatureClient({
+    api,
+    datasetKey: "osmBuildings",
+    extents: LAND_HISTORY.extents,
+    minZoom: 16,
+    windowLimit: 15000,
+    onState: (state) => states.push(state),
+  });
+
+  client.viewChanged({ bounds: YOKOHAMA_VIEW, zoom: 16.2 });
+  await vi.runAllTimersAsync();
+
+  expect(api.calls).toHaveLength(1);
+  expect(api.calls[0].query.limit).toBe(15000);
+  expect(states.at(-1)?.status).toBe("ready");
+  client.destroy();
+  vi.useRealTimers();
+});
