@@ -295,7 +295,7 @@ def test_skipping_data_tasks_does_not_weaken_the_content_contracts() -> None:
     assert contract_failures() == []
 
 
-def test_contract_validation_skips_the_mlit_acquisition() -> None:
+def test_contract_validation_skips_the_gigabyte_scale_acquisitions() -> None:
     # The Kanto products are gigabyte-scale; whole-tree JSON validation must
     # not parse them (or anything else placed in the acquisition directory).
     from terrai_spatial.cli import ROOT, contract_failures

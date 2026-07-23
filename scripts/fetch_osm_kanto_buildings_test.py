@@ -80,3 +80,10 @@ def test_build_writes_a_valid_collection_and_manifest_offline(tmp_path: Path) ->
     assert manifest["downloads"][0]["sha256"]
     written = json.loads((tmp_path / "out/metadata.json").read_text(encoding="utf-8"))
     assert written == manifest
+
+
+def test_manifest_reports_the_actual_output_location(tmp_path: Path) -> None:
+    fixture = tmp_path / "toy.osm"
+    write_fixture(fixture)
+    manifest = build(output=tmp_path / "elsewhere", source_path=fixture)
+    assert manifest["output"] == str(tmp_path / "elsewhere/buildings.geojson")

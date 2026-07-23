@@ -137,11 +137,16 @@ def build(*, output: Path = OUTPUT, source_path: Path | None = None) -> dict[str
             collection.discard()
             raise
         collection.close()
+    product = output / "buildings.geojson"
+    try:
+        product_path = str(product.relative_to(ROOT))
+    except ValueError:  # test/offline runs write outside the repository
+        product_path = str(product)
     manifest = {
         "retrieved_at": retrieved_at,
         "scope": SCOPE,
         "dataset_id": DATASET_ID,
-        "output": "data/osm/kanto_buildings/buildings.geojson",
+        "output": product_path,
         "source_updated_at": source_updated_at,
         "license": LICENSE,
         "feature_count": collection.count,
