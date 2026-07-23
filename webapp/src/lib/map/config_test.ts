@@ -4,6 +4,7 @@ import type { StyleSpecification } from "maplibre-gl";
 
 import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, RASTER_SOURCES, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
 import { palette } from "../theme";
+import { rgba } from "./style-rules";
 
 const baseStyle: StyleSpecification = {
   version: 8,
@@ -89,8 +90,10 @@ it("neutralizes the basemap's cartographic buildings to palette grays", () => {
   const paintOf = (id: string) => (byId[id] as unknown as { paint: Record<string, string> }).paint;
   expect(paintOf("bldg-fill")["fill-color"]).toBe(BASEMAP_BUILDING_FILL);
   expect(paintOf("bldg-fill")["fill-outline-color"]).toBe(palette.gray);
-  // a visible fill, not the near-invisible pale that made the city look empty
-  expect(BASEMAP_BUILDING_FILL).toContain("0.5");
+  // a visible gray from the palette at 0.5 alpha — not the near-invisible pale
+  // that made the city look empty
+  const [r, g, b] = rgba(palette.gray);
+  expect(BASEMAP_BUILDING_FILL).toBe(`rgba(${r}, ${g}, ${b}, 0.5)`);
   expect(paintOf("bldg-line")["line-color"]).toBe(palette.gray);
   // everything that is not a building keeps GSI's own cartography
   expect(paintOf("road-line")["line-color"]).toBe("rgb(255,255,255)");

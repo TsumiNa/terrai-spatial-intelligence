@@ -101,7 +101,7 @@ export function freezeHighZoomCartography(style: StyleSpecification): StyleSpeci
 /** A palette color as a MapLibre-ready `rgba(...)` string; the guard permits
  *  this because the channels come from the palette, not a literal. */
 function paletteRgba(hex: string, alpha: number): string {
-  const [r, g, b] = rgba(hex, alpha);
+  const [r, g, b] = rgba(hex);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
