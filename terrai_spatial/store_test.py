@@ -331,3 +331,22 @@ def test_stream_reader_close_releases_the_file_even_without_iteration(tmp_path: 
     _, features = store.stream_feature_collection(path)
     list(features)
     assert opened[1].closed
+
+
+def test_limit_is_pushed_into_sql_for_window_and_all(tmp_path: Path) -> None:
+    sources = write_fixture_root(tmp_path)
+    target = tmp_path / "s.sqlite"
+    store.build_store(tmp_path, target, sources)
+    conn = store.open_store(target)
+    try:
+        # all_features honours a SQL LIMIT and matches the unbounded prefix
+        full = store.all_features(conn, "edge")
+        assert store.all_features(conn, "edge", limit=2) == full[:2]
+        assert store.dataset_feature_count(conn, "edge") == len(full)
+        # window count equals the windowed row count, and the limit bounds rows
+        bbox = (0.0, 0.0, 10.0, 10.0)
+        win = store.window_features(conn, "edge", bbox)
+        assert store.count_window(conn, "edge", bbox) == len(win)
+        assert store.window_features(conn, "edge", bbox, limit=1) == win[:1]
+    finally:
+        conn.close()

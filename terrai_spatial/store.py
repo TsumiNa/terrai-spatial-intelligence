@@ -121,6 +121,7 @@ SELECT_DATASET_KIND = "SELECT kind FROM datasets WHERE key = ?"
 SELECT_ENVELOPE = "SELECT envelope_json FROM datasets WHERE key = ?"
 SELECT_DOCUMENT = "SELECT document_json FROM documents WHERE key = ?"
 SELECT_FEATURES = "SELECT ordinal, feature_json FROM features WHERE dataset_key = ? ORDER BY ordinal"
+SELECT_FEATURE_COUNT = "SELECT feature_count FROM datasets WHERE key = ?"
 
 # The R-tree join is a conservative float32 prefilter; the float64 columns on
 # `features` decide intersection exactly, preserving the scan's semantics.
@@ -138,6 +139,17 @@ WHERE r.max_x >= ? AND r.min_x <= ? AND r.max_y >= ? AND r.min_y <= ?
   AND f.dataset_key = ?
   AND f.max_x >= ? AND f.min_x <= ? AND f.max_y >= ? AND f.min_y <= ?
 ORDER BY f.ordinal
+"""
+
+# Counting the window shares the R-tree-driven shape; it never reads
+# feature_json, so it answers `matched` in milliseconds.
+COUNT_WINDOW_QUERY = """
+SELECT COUNT(*)
+FROM features_rtree r
+CROSS JOIN features f ON f.rowid = r.id
+WHERE r.max_x >= ? AND r.min_x <= ? AND r.max_y >= ? AND r.min_y <= ?
+  AND f.dataset_key = ?
+  AND f.max_x >= ? AND f.min_x <= ? AND f.max_y >= ? AND f.min_y <= ?
 """
 
 
@@ -529,6 +541,11 @@ def open_store(path: Path, *, check_same_thread: bool = True) -> sqlite3.Connect
             f"store schema version is {version}, expected {SCHEMA_VERSION}; "
             "rebuild it with: uv run python -m terrai_spatial data ensure --only store"
         )
+    # Read-only serving tuning: memory-map the file and grow the page cache so
+    # repeated windowed reads hit RAM rather than the pager. Affects speed
+    # only, never results, so the store's determinism is untouched.
+    connection.execute("PRAGMA mmap_size = 268435456")  # 256 MiB
+    connection.execute("PRAGMA cache_size = -65536")  # 64 MiB page cache
     return connection
 
 
@@ -559,20 +576,51 @@ def read_collection(connection: sqlite3.Connection, key: str) -> dict[str, Any] 
     return envelope
 
 
-def all_features(connection: sqlite3.Connection, key: str) -> list[tuple[int, str]]:
-    """(ordinal, feature_json) for every feature of a dataset, in source order."""
+def all_features(
+    connection: sqlite3.Connection, key: str, *, limit: int | None = None
+) -> list[tuple[int, str]]:
+    """(ordinal, feature_json) for a dataset in source order; ``limit`` bounds
+    it at the SQL level so the caller never materializes rows it will discard."""
 
-    return connection.execute(SELECT_FEATURES, (key,)).fetchall()
+    if limit is None:
+        return connection.execute(SELECT_FEATURES, (key,)).fetchall()
+    return connection.execute(SELECT_FEATURES + " LIMIT ?", (key, limit)).fetchall()
 
 
-def window_features(connection: sqlite3.Connection, key: str, bbox: tuple[float, float, float, float]) -> list[tuple[int, str]]:
-    """(ordinal, feature_json) rows whose bbox intersects the window, in source order."""
+def window_features(
+    connection: sqlite3.Connection,
+    key: str,
+    bbox: tuple[float, float, float, float],
+    *,
+    limit: int | None = None,
+) -> list[tuple[int, str]]:
+    """(ordinal, feature_json) rows whose bbox intersects the window, in source
+    order; ``limit`` bounds it at the SQL level."""
+
+    west, south, east, north = bbox
+    params = (west, east, south, north, key, west, east, south, north)
+    if limit is None:
+        return connection.execute(WINDOW_QUERY, params).fetchall()
+    return connection.execute(WINDOW_QUERY + " LIMIT ?", (*params, limit)).fetchall()
+
+
+def count_window(connection: sqlite3.Connection, key: str, bbox: tuple[float, float, float, float]) -> int:
+    """How many features intersect the window — the ``matched`` total, without
+    reading any feature_json."""
 
     west, south, east, north = bbox
     return connection.execute(
-        WINDOW_QUERY,
+        COUNT_WINDOW_QUERY,
         (west, east, south, north, key, west, east, south, north),
-    ).fetchall()
+    ).fetchone()[0]
+
+
+def dataset_feature_count(connection: sqlite3.Connection, key: str) -> int:
+    """A dataset's total feature count from the manifest — the ``matched`` total
+    for an unwindowed query, without scanning a row."""
+
+    row = connection.execute(SELECT_FEATURE_COUNT, (key,)).fetchone()
+    return row[0] if row and row[0] is not None else 0
 
 
 def verify_store(root: Path, path: Path, *, expected_keys: Sequence[str] | None = None) -> list[str]:

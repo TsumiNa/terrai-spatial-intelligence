@@ -169,6 +169,7 @@ QUERY_MATRIX = [
     {"key": "solar", "where": "status", "minimum": 1.0},
     {"key": "landHistory", "bbox": (0.0, 0.0, 1.0, 1.0)},
     {"key": "gsiEvacuation", "bbox": (139.0, 35.0, 141.0, 36.0), "limit": 50},
+    {"key": "railway", "limit": 5},  # no bbox, no filter → the no-bbox fast path
 ]
 
 
@@ -265,3 +266,32 @@ def test_match_semantics_are_pinned_by_table() -> None:
     for properties, field, equals, minimum, maximum, expected in MATCH_TABLE:
         got = DataService._matches(properties, field, equals, minimum, maximum)
         assert got is expected, (properties, field, equals, minimum, maximum)
+
+
+def test_unwindowed_limit_query_pushes_the_limit_into_sql(monkeypatch: pytest.MonkeyPatch) -> None:
+    # The former cliff loaded and parsed every row before slicing. Assert the
+    # mechanism rather than a wall-clock: the no-bbox no-filter path must read
+    # only `limit` rows (SQL LIMIT) and take `matched` from the manifest count,
+    # never the unbounded scan.
+    key = "osmBuildings" if "osmBuildings" in ALL_DATASETS else "landUseMesh"
+    calls: dict[str, Any] = {}
+    real_all = data_service_module.all_features
+    real_count = data_service_module.dataset_feature_count
+
+    def spy_all(connection: Any, dataset_key: str, *, limit: int | None = None) -> Any:
+        calls["all_features_limit"] = limit
+        return real_all(connection, dataset_key, limit=limit)
+
+    def spy_count(connection: Any, dataset_key: str) -> int:
+        calls["counted"] = True
+        return real_count(connection, dataset_key)
+
+    monkeypatch.setattr(data_service_module, "all_features", spy_all)
+    monkeypatch.setattr(data_service_module, "dataset_feature_count", spy_count)
+
+    result = store_backed.query_features(key, limit=5)
+
+    assert calls["all_features_limit"] == 5  # bounded read, not a full scan
+    assert calls.get("counted") is True  # matched from the manifest, not len()
+    assert result["query"]["returned"] == 5
+    assert result["query"]["matched"] > 5  # the whole-dataset total
