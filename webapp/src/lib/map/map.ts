@@ -31,6 +31,7 @@ import {
   MAX_ZOOM,
   MIN_ZOOM,
   FALLBACK_RASTER_LAYER_ID,
+  RELIEF_TINT_LAYER_ID,
   RASTER_KINDS,
   REGION_CAMERAS,
   LOCAL_STYLE_URL,
@@ -202,6 +203,9 @@ export async function createExhibitionMap(
     for (const kind of RASTER_KINDS) {
       map.setLayoutProperty(rasterId(kind), "visibility", kind === basemap ? "visible" : "none");
     }
+    // The colour-by-height tint shows only in hillshade mode (its zoom-fade
+    // decides where it is meaningful); underground reads through the surface.
+    map.setLayoutProperty(RELIEF_TINT_LAYER_ID, "visibility", basemap === "hillshade" && !undergroundMode ? "visible" : "none");
     const hasTerrain = map.getTerrain() !== null;
     // The underground stage reads through the surface and owns the camera: drop
     // the terrain and let it set its own pitch.

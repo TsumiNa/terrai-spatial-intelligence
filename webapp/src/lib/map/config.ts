@@ -168,6 +168,19 @@ export const FALLBACK_RASTER_SOURCE_ID = "terrai-fallback-std";
 export const FALLBACK_RASTER_LAYER_ID = "terrai-fallback-std-layer";
 export const FALLBACK_STD_RASTER_URL = "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png";
 
+/** The colour-by-height tint drawn over the hillshade at wide zoom
+ * (basemap-view-modes): GSI's 色別標高図 (`relief`), a hypsometric elevation
+ * raster. It reads the region's elevation structure at an overview; once the view
+ * is local it says nothing useful and would only muddy the shaded relief, so its
+ * opacity fades with zoom and the layer hides past the fade end (its `maxzoom`),
+ * where no tiles are requested. Shown only in hillshade mode (applyVisibility). */
+export const RELIEF_TINT_SOURCE_ID = "terrai-relief-tint";
+export const RELIEF_TINT_LAYER_ID = "terrai-relief-tint-layer";
+export const RELIEF_TINT_URL = "https://cyberjapandata.gsi.go.jp/xyz/relief/{z}/{x}/{y}.png";
+export const RELIEF_TINT_MAX_OPACITY = 0.6;
+/** Opacity reaches 0 here, and the layer is hidden at and above it. */
+export const RELIEF_TINT_FADE_END_ZOOM = 13;
+
 /**
  * Append the three nationwide raster basemaps to the GSI vector style, all
  * hidden. The active one is a visibility toggle, so switching basemaps never
@@ -211,6 +224,28 @@ export function composeStyle(vectorStyle: StyleSpecification): StyleSpecificatio
     };
     layers.push({ id, type: "raster", source: id, layout: { visibility: "none" } });
   }
+  // The colour-by-height tint sits above the user rasters so it draws over the
+  // shaded relief when hillshade is active. Its opacity fades from a wide view to
+  // 0 by RELIEF_TINT_FADE_END_ZOOM, and the layer's maxzoom hides it past there so
+  // no tint tiles are requested locally. applyVisibility toggles it with the mode.
+  sources[RELIEF_TINT_SOURCE_ID] = {
+    type: "raster",
+    tiles: [RELIEF_TINT_URL],
+    tileSize: 256,
+    minzoom: 5,
+    maxzoom: 15,
+    attribution: GSI_ATTRIBUTION,
+  };
+  layers.push({
+    id: RELIEF_TINT_LAYER_ID,
+    type: "raster",
+    source: RELIEF_TINT_SOURCE_ID,
+    maxzoom: RELIEF_TINT_FADE_END_ZOOM,
+    layout: { visibility: "none" },
+    paint: {
+      "raster-opacity": ["interpolate", ["linear"], ["zoom"], 5, RELIEF_TINT_MAX_OPACITY, 9, RELIEF_TINT_MAX_OPACITY * 0.55, RELIEF_TINT_FADE_END_ZOOM, 0],
+    },
+  });
   // Repoint the sprite off the experimental host to the vendored copy. glyphs
   // stay on maps.gsi.go.jp (a different, non-experimental host) and tiles on
   // cyberjapandata, so blocking gsi-cyberjapan.github.io leaves the map intact.

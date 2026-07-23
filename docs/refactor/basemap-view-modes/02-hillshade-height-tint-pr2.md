@@ -1,7 +1,13 @@
 # PR2 Plan: Hillshade Colour-by-Height Tint
 
-- Status: Planned
+- Status: Completed
 - Refactor: `basemap-view-modes`
+
+> Implementation note: GSI `relief` (色別標高図, maxzoom 15) as the tint, a raster
+> layer above the user rasters with a zoom `raster-opacity` interpolation
+> (`RELIEF_TINT_MAX_OPACITY` at z5 → 0 by `RELIEF_TINT_FADE_END_ZOOM` = 13) and a
+> layer `maxzoom` at the fade end so no tint tiles are requested locally. Shown
+> only in hillshade mode (applyVisibility), independent of the 2.5D toggle.
 
 ## Goal
 
