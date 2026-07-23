@@ -6,10 +6,10 @@
   },
   "windows": {
     "yokohama": [
-      139.578,
-      35.438,
-      139.602,
-      35.455
+      139.582,
+      35.441,
+      139.598,
+      35.452
     ],
     "tokyo": [
       139.69,
@@ -21,6 +21,6 @@
   "dataset_id": "osm-kanto-buildings-260101",
   "source_updated_at": "2026-01-01T21:21:30Z",
   "license": "Open Database License (ODbL) 1.0",
-  "feature_count": 18151,
+  "feature_count": 12563,
   "output": "data/osm_kanto_fixture/buildings.geojson"
 }

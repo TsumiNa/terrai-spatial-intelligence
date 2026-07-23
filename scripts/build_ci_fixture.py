@@ -53,7 +53,10 @@ FIXTURE_WINDOWS: dict[str, Bounds] = {
 # the Playwright handover viewport (with pan margin) and the identity
 # matrix's Tokyo window.
 OSM_FIXTURE_WINDOWS: dict[str, Bounds] = {
-    "yokohama": (139.578, 35.438, 139.602, 35.455),
+    # Tight around the default viewport and its keyboard pans: software-GL CI
+    # tessellates every fixture building in view, and the wider first cut
+    # crashed runners once the detail layer joined every module.
+    "yokohama": (139.582, 35.441, 139.598, 35.452),
     "tokyo": (139.69, 35.68, 139.71, 35.70),
 }
 
