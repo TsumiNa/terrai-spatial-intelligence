@@ -8,6 +8,14 @@ that was only evaluated but not yet decided for execution says so.
 
 Open a refactor's `00-overview.md` for its full rationale and per-PR plans.
 
+## interactive-al-compute
+
+- Folder: `interactive-al-compute/`
+- Created: 2026-07-24
+- Description: Change what is computed where, along FL → SL → AL. Precompute the invariant DEM-derived **materials** (slope/relief/low_point/aspect/curvature/dist-to-water) region-wide into the store as FL, keyed by `feature_id`; recombine them into AL metrics **live in the frontend** with user-tunable coefficients (formula + provenance preserved); route heavy SL simulation to a separate on-demand compute service. Replaces the demo's precompute-the-product-then-filter model, which cannot express runtime configuration/correction/what-if and stops at the Yokohama area.
+- State: **Planned** — direction agreed, not started; three PRs (FL materials precompute → interactive frontend AL recombination → retire frozen AL products as source of truth).
+- Note: Sits **after** `osm-basemap-tiles` and `local-3d-work-mode` (data/rendering foundation first). Coverage is region-wide batch, **never lazy fill-on-read** (that would make the read API stateful/racy, spike first-visitor latency, fork the byte-identity validation, and leave hot-path dead code). Materials go in the store, not the tiles (the `osm-basemap-tiles` render/analyse boundary). The SL compute service is named as the boundary but built under `rust-api-backend`, where the Python-vs-Rust decision lives. **Awaiting the owner's go decision before any PR begins.**
+
 ## local-3d-work-mode
 
 - Folder: `local-3d-work-mode/`
@@ -22,7 +30,7 @@ Open a refactor's `00-overview.md` for its full rationale and per-PR plans.
 - Created: 2026-07-23
 - Description: Build one self-hosted **merged** building vector tileset (PMTiles) — OSM primary, 基盤地図情報 filling OSM's suburban/rural gaps, PLATEAU heights joined for 2.5D — so complete, dense city fabric renders at every zoom, moving the wide-view basemap off live GSI. A single build-time merge removes the GSI-vs-OSM double-drawing problem and the empty-map risk of OSM-only tiles, and can absorb the clickable z16+ layer too, retiring the buildings API path.
 - State: **Planned** — assessed feasible and licence-cleared, not started; five PRs (FGD acquisition → merged tile generation → basemap integration → PLATEAU height + 2.5D extrusion → retire the windowed path).
-- Note: One merged tileset, not two overlaid layers — the OSM-primary / 基盤地図情報-fill decision is resolved at build time into a single building layer, each feature tagged `footprint_source` (`osm` | `fgd`); render never double-draws. Scope is buildings only, so it does **not** replace the live-GSI style JSON or the non-building vector layers (roads/water/labels/land) — hardening those is `basemap-resilience`, a complementary refactor. Reframed 2026-07-24 from OSM-only tiles to the OSM + 基盤地図情報 + PLATEAU merge after confirming OSM-only would read empty outside dense cities. Licence cleared: 基盤地図情報 is **測量法 承認申請-exempt** (attribution + 加工表示 only), PLATEAU is Site Policy §3 — both fine for offline, commercial, self-built distribution (see `docs/summary/government-3d-building-sources/`). Feasibility unchanged (3–15 min preprocessing, ~300–700 MB PMTiles, near-zero serving CPU); near-free on a zero-egress host (Cloudflare R2 + CDN), GCP egress-driven ~$5–320/mo. **Awaiting the owner's go decision before any PR begins.**
+- Note: One merged tileset, not two overlaid layers — the OSM-primary / 基盤地図情報-fill decision is resolved at build time into a single building layer, each feature tagged `footprint_source` (`osm` | `fgd`); render never double-draws. Tiles carry **render/identity only** (`feature_id`, `footprint_source`, `building`, `height`); analytical materials (slope/relief/…) go in the FL store keyed by `feature_id`, not the tiles — the render/analyse boundary, precomputed by `interactive-al-compute`. Scope is buildings only, so it does **not** replace the live-GSI style JSON or the non-building vector layers (roads/water/labels/land) — hardening those is `basemap-resilience`, a complementary refactor. Reframed 2026-07-24 from OSM-only tiles to the OSM + 基盤地図情報 + PLATEAU merge after confirming OSM-only would read empty outside dense cities. Licence cleared: 基盤地図情報 is **測量法 承認申請-exempt** (attribution + 加工表示 only), PLATEAU is Site Policy §3 — both fine for offline, commercial, self-built distribution (see `docs/summary/government-3d-building-sources/`). Feasibility unchanged (3–15 min preprocessing, ~300–700 MB PMTiles, near-zero serving CPU); near-free on a zero-egress host (Cloudflare R2 + CDN), GCP egress-driven ~$5–320/mo. **Awaiting the owner's go decision before any PR begins.**
 
 ## basemap-resilience
 
