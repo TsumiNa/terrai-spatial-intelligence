@@ -85,7 +85,7 @@ export async function createExhibitionMap(
   // from constructing. A failure here is a deployment error (our own asset
   // missing), not an upstream outage.
   const response = await fetch(LOCAL_STYLE_URL);
-  if (!response.ok) throw new Error(`local vector style unavailable: ${response.status}`);
+  if (!response.ok) throw new Error(`local vector style unavailable: ${LOCAL_STYLE_URL} ${response.status} ${response.statusText}`);
   const style = composeStyle(await response.json());
 
   let region = initial.region;
