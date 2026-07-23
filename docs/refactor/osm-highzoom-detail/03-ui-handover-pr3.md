@@ -1,7 +1,27 @@
 # PR3 Plan: The Zoom-threshold Handover
 
-- Status: Planned
+- Status: Completed
 - Refactor: `osm-highzoom-detail`
+- PR: #67
+
+## Completion record
+
+- The handover is exactly one building inventory at any zoom: GSI's neutralized
+  texture below z16 (a `maxzoom` clamp in `composeStyle`), the windowed OSM data
+  objects at and above it, auto-managed with the standard basemap and suppressed
+  wherever a module draws its own buildings.
+- Real windows busted the assumed budget immediately: a quantized z16 window over
+  the default view matched 5,642 footprints and dense central-Tokyo fabric reaches
+  ~10k, so the server limit ceiling rose to 20,000 and the registry gained a
+  per-layer `windowLimit` (15,000 here) — the budget is feature count, not the
+  tessellation weight the old land-history bound guarded against.
+- A latent popup bug surfaced and is fixed: the layer-rebuild effect closed the
+  active popup on every windowed-overlay state change (any window arrival killed
+  queue popups once the detail layer was live in most modules). Popup lifecycle
+  now has its own effect keyed only on module/view/data.
+- The detail style needed one revision: the "continuity" pale fill vanished
+  against the 宅地 background the clamped texture leaves behind; the shipped
+  style is neutral mid-gray, clearly structure, far from any analysis color.
 
 ## Goal
 

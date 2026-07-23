@@ -237,7 +237,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 5000,
+              "maximum": 20000,
               "minimum": 1,
               "default": 5000,
               "title": "Limit"

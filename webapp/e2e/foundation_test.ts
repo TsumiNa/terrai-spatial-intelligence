@@ -122,3 +122,24 @@ test("layer visibility survives module and region switches", async ({ page }) =>
   await expect(page.locator(".map-attribution")).toContainText("国土交通省");
   await expectStatus(page, "landHistory", /belowZoom|loading|ready|empty/);
 });
+
+test("the standard basemap hands its buildings over to windowed OSM data", async ({ page }) => {
+  const requests = trackRequests(page, "osmBuildings");
+  // roads draws no buildings of its own, so the detail layer is active.
+  await open(page, { module: "roads" });
+
+  // Auto-managed: no toggle was touched, yet the handover zoom requests data
+  // and the ODbL notice joins the attribution strip.
+  await expect.poll(() => requests.urls.length, { timeout: 15000 }).toBeGreaterThan(0);
+  await expect(page.locator(".map-attribution")).toContainText("OpenStreetMap");
+
+  // The layer is basemap experience, not a listed toggle.
+  await page.locator(".foundation-toggle").click();
+  await expect(page.locator('.foundation-item[data-layer="osmBuildings"]')).toHaveCount(0);
+  await page.keyboard.press("Escape");
+
+  // Modules that draw their own buildings suppress it — with no other
+  // foundation layer active the whole attribution strip goes away.
+  await open(page, { module: "slope" });
+  await expect(page.locator(".map-attribution")).toHaveCount(0);
+});
