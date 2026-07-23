@@ -11,8 +11,17 @@
 
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import type { Layer } from "@deck.gl/core";
-import maplibregl from "maplibre-gl";
+import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+// v6 ships an ESM worker. Its filename is chosen by a dev/prod ternary, which
+// defeats Vite's static `new URL(...)` worker analysis, so the worker is never
+// emitted and its request hangs (main-thread fallback, no vector tiles, and
+// `networkidle` never settles). Route it through Vite's worker pipeline with
+// `?worker&url` (not plain `?url`, which drops the shared sibling chunk) and
+// register it. See MapLibre `setWorkerUrl` docs.
+import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
+
+maplibregl.setWorkerUrl(workerUrl);
 
 import type { RegionKey } from "../modules";
 import type { BasemapKey } from "../state.svelte";

@@ -12,7 +12,7 @@
  * Mapbox scheme: elevation = −10000 + 0.1·(R·2¹⁶ + G·2⁸ + B).
  */
 
-import type maplibregl from "maplibre-gl";
+import type * as maplibregl from "maplibre-gl";
 
 const GSI_INVALID = 8388608; // 2^23
 const GSI_WRAP = 16777216; // 2^24
