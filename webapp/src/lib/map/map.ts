@@ -33,6 +33,7 @@ import {
   RASTER_KINDS,
   REGION_CAMERAS,
   LOCAL_STYLE_URL,
+  LOCAL_SPRITE_URL,
   composeStyle,
   rasterId,
   TERRAIN_EXAGGERATION,
@@ -87,6 +88,11 @@ export async function createExhibitionMap(
   const response = await fetch(LOCAL_STYLE_URL);
   if (!response.ok) throw new Error(`local vector style unavailable: ${LOCAL_STYLE_URL} ${response.status} ${response.statusText}`);
   const style = composeStyle(await response.json());
+  // MapLibre v6 requires an absolute sprite URL: the style is passed as an
+  // object (no style URL to resolve against), so the repointed root-relative
+  // sprite must be resolved to our own origin here or v6 rejects it and no
+  // icons load.
+  style.sprite = new URL(LOCAL_SPRITE_URL, window.location.origin).href;
 
   let region = initial.region;
   let basemap = initial.basemap;

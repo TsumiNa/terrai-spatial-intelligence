@@ -23,6 +23,25 @@ test("both regions load with GSI attribution", async ({ page }) => {
   await expect.poll(() => photoTiles.length, { timeout: 15000 }).toBeGreaterThan(0);
 });
 
+test("loads the vendored sprite from an absolute URL (v6 requires it)", async ({ page }) => {
+  const spriteResponses: boolean[] = [];
+  const invalidSpriteErrors: string[] = [];
+  page.on("response", (r) => {
+    if (r.url().includes("/basemap/sprite/std")) spriteResponses.push(r.ok());
+  });
+  page.on("console", (m) => {
+    if (m.text().includes("Invalid sprite URL")) invalidSpriteErrors.push(m.text());
+  });
+
+  await waitForMap(page);
+  await page.waitForTimeout(1500);
+  // the sprite json/png were fetched from our own origin and succeeded…
+  expect(spriteResponses.length).toBeGreaterThan(0);
+  expect(spriteResponses.every(Boolean)).toBe(true);
+  // …and MapLibre v6 raised no "must be absolute" rejection
+  expect(invalidSpriteErrors).toEqual([]);
+});
+
 test("basemap switching keeps the single map instance (no camera rebuild)", async ({ page }) => {
   await waitForMap(page);
   const canvas = await page.locator("#map .maplibregl-canvas").elementHandle();
