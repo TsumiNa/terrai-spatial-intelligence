@@ -48,6 +48,16 @@
   // viewports in and plain state snapshots out. Visibility itself lives in
   // app state, so it survives module, view, region and language switches.
   const renderableLayers = renderableFoundationLayers();
+  // The basemap-detail layer joins the windowed machinery automatically on
+  // the standard basemap, in modules that do not draw their own buildings —
+  // it is part of the basemap experience, never a manual toggle.
+  function activeDetailKeys(): string[] {
+    const module = app.module;
+    const view = normalizeView(module, app.view);
+    const wanted =
+      app.basemap === "standard" && module !== "underground" && !drawsOwnBuildings(module, view);
+    return wanted ? renderableLayers.filter((entry) => entry.basemapDetail).map((entry) => entry.key) : [];
+  }
   let foundationStates = $state.raw<Record<string, WindowedState>>({});
   // Non-reactive by design: clients are synced incrementally, so toggling
   // one layer never recreates the others or drops their window caches.
@@ -64,9 +74,10 @@
   });
 
   $effect(() => {
-    const wanted = new Set(
-      app.foundationLayers.filter((key) => renderableLayers.some((entry) => entry.key === key)),
-    );
+    const wanted = new Set([
+      ...app.foundationLayers.filter((key) => renderableLayers.some((entry) => entry.key === key)),
+      ...activeDetailKeys(),
+    ]);
     untrack(() => {
       for (const [key, client] of [...foundationClients]) {
         if (wanted.has(key)) continue;
@@ -85,6 +96,7 @@
           datasetKey: entry.key,
           extents: entry.extents,
           minZoom: entry.minZoom,
+          windowLimit: entry.windowLimit,
           onState: (state) => (foundationStates = { ...foundationStates, [entry.key]: state }),
         });
         foundationClients.set(key, client);
@@ -99,7 +111,7 @@
   });
 
   const activeAttributions = $derived(
-    app.foundationLayers
+    [...activeDetailKeys(), ...app.foundationLayers]
       .map((key) => foundationLayer(key))
       .filter((entry) => entry !== undefined)
       .map((entry) => `${i18n.t(entry.name)} — ${entry.attribution} · ${entry.license}`),
@@ -267,14 +279,24 @@
     mapApi?.setUndergroundMode(app.module === "underground");
   });
 
-  // Analytical layers rebuild only when module, view or data change — not on
-  // a language switch; popup content resolves its language at open time.
+  // A popup belongs to the module/view/data it was opened in; leaving any of
+  // them closes it. Deliberately NOT part of the layer-rebuild effect below:
+  // that one also re-runs on every windowed-overlay state change, and a
+  // detail-layer window arriving must never close an open popup.
+  $effect(() => {
+    void app.module;
+    void app.view;
+    void app.data;
+    mapApi?.closePopup();
+  });
+
+  // Layers rebuild when module, view, data or an overlay window change — not
+  // on a language switch; popup content resolves its language at open time.
   $effect(() => {
     const module = app.module;
     const view = normalizeView(module, app.view);
     const data = app.data;
     if (!mapApi || !data) return;
-    mapApi.closePopup();
     if (module === "underground") {
       const underground = app.underground;
       const resources =
@@ -286,7 +308,7 @@
       // Foundation overlays are context: they render beneath the analysis,
       // and deck's topmost-first picking means an analytical feature wins
       // any contested click.
-      const overlays = app.foundationLayers
+      const overlays = [...activeDetailKeys(), ...app.foundationLayers]
         .map((key) => ({ key, state: foundationStates[key] }))
         .filter((item) => item.state?.status === "ready")
         .map(({ key, state }) =>
@@ -360,7 +382,7 @@
               sideOffset={6}
               aria-label={i18n.t("layers.aria")}
             >
-              {#each renderableLayers as entry (entry.key)}
+              {#each renderableLayers.filter((entry) => !entry.basemapDetail) as entry (entry.key)}
                 {@const on = app.foundationLayers.includes(entry.key)}
                 {@const status = on ? (foundationStates[entry.key]?.status ?? "loading") : "off"}
                 <button

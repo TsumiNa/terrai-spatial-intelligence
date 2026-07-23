@@ -105,7 +105,10 @@ def features(
     maximum: float | None = None,
     sort: str | None = None,
     descending: bool = True,
-    limit: Annotated[int, Query(ge=1, le=5000)] = 5000,
+    # The ceiling serves the densest legitimate windows: the OSM building
+    # detail layer sees ~5-10k simple footprints in a quantized z16 window
+    # over central-Tokyo fabric. Analytical layers keep requesting far less.
+    limit: Annotated[int, Query(ge=1, le=20000)] = 5000,
     bbox: Annotated[list[float] | None, Query(min_length=4, max_length=4)] = None,
 ) -> dict:
     """Filter, sort and spatially window a GeoJSON FeatureCollection."""

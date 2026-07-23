@@ -130,13 +130,31 @@ export function neutralizeBasemapBuildings(style: StyleSpecification): StyleSpec
   return { ...style, layers };
 }
 
+/** Past this zoom the standard basemap's building texture yields to the
+ * windowed OSM building objects (the measured floor from the OSM detail
+ * plan: a Shinjuku-scale z16 window is 1,857 buildings / 1.1 MB raw). */
+export const BASEMAP_DETAIL_HANDOVER_ZOOM = 16;
+
+/**
+ * Clamp the basemap's building layers to the handover zoom so exactly one
+ * building inventory shows at any zoom: GSI's cartographic texture below
+ * it, the clickable OSM data objects at and above it.
+ */
+export function clampBasemapBuildings(style: StyleSpecification, handover: number = BASEMAP_DETAIL_HANDOVER_ZOOM): StyleSpecification {
+  const layers = style.layers.map((layer): LayerSpecification => {
+    if (!("source-layer" in layer) || layer["source-layer"] !== "building") return layer;
+    return { ...layer, maxzoom: Math.min(layer.maxzoom ?? 24, handover) };
+  });
+  return { ...style, layers };
+}
+
 /**
  * Append the three nationwide raster basemaps to the GSI vector style, all
  * hidden. The active one is a visibility toggle, so switching basemaps never
  * rebuilds the style and never moves the camera.
  */
 export function composeStyle(vectorStyle: StyleSpecification): StyleSpecification {
-  const frozen = neutralizeBasemapBuildings(freezeHighZoomCartography(vectorStyle));
+  const frozen = clampBasemapBuildings(neutralizeBasemapBuildings(freezeHighZoomCartography(vectorStyle)));
   const sources: Record<string, SourceSpecification> = { ...frozen.sources };
   const layers: LayerSpecification[] = [...frozen.layers];
   sources[TERRAIN_SOURCE_ID] = {

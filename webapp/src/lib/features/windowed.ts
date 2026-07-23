@@ -24,8 +24,10 @@ export const WINDOWED_MIN_ZOOM = 16;
  *  miss, and every pixel of pan is not a distinct window. */
 export const WINDOW_GRID_DEGREES = 0.01;
 export const WINDOW_DEBOUNCE_MS = 250;
-/** The server truncates at its own ceiling; a truncated window is reported as
- *  oversized and renders nothing rather than silently showing a subset. */
+/** The default per-window feature budget; a truncated window is reported as
+ *  oversized and renders nothing rather than silently showing a subset.
+ *  Layers with denser-but-simpler features (the OSM building detail) raise
+ *  it per registry entry, within the server's own ceiling. */
 export const WINDOW_LIMIT = 5000;
 
 /** `[west, south, east, north]` — the order the API's bbox parameter expects.
@@ -81,9 +83,10 @@ export async function requestWindow(
   key: string,
   window: Bounds,
   signal: AbortSignal,
+  limit: number = WINDOW_LIMIT,
 ): Promise<WindowResult> {
   const { data, error } = await api.GET("/api/v1/features/{key}", {
-    params: { path: { key }, query: { bbox: [...window], limit: WINDOW_LIMIT } },
+    params: { path: { key }, query: { bbox: [...window], limit } },
     signal,
   });
   if (error || !data) throw new Error(`windowed request for ${key} failed`);
@@ -112,10 +115,13 @@ export function createWindowedFeatureClient(options: {
   onState: (state: WindowedState) => void;
   /** Per-layer floor from the registry; the default is the measured bound. */
   minZoom?: number;
+  /** Per-layer window budget from the registry. */
+  windowLimit?: number;
   debounceMs?: number;
 }): WindowedFeatureClient {
   const debounceMs = options.debounceMs ?? WINDOW_DEBOUNCE_MS;
   const minZoom = options.minZoom ?? WINDOWED_MIN_ZOOM;
+  const windowLimit = options.windowLimit ?? WINDOW_LIMIT;
   const cache = new Map<string, WindowResult>();
   let timer: ReturnType<typeof setTimeout> | null = null;
   let inflight: AbortController | null = null;
@@ -145,7 +151,7 @@ export function createWindowedFeatureClient(options: {
     const controller = new AbortController();
     inflight = controller;
     options.onState({ status: "loading", features: [], matched: 0 });
-    requestWindow(options.api, options.datasetKey, window, controller.signal).then(
+    requestWindow(options.api, options.datasetKey, window, controller.signal, windowLimit).then(
       (result) => {
         if (destroyed || controller.signal.aborted) return;
         cache.set(cacheKey, result);

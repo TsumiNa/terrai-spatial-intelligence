@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { RASTER_SOURCES, TERRAIN_SOURCE_ID, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId, vectorBuildingLayerIds } from "./config";
+import { BASEMAP_DETAIL_HANDOVER_ZOOM, RASTER_SOURCES, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId, vectorBuildingLayerIds } from "./config";
 import { palette } from "../theme";
 
 const baseStyle: StyleSpecification = {
@@ -106,4 +106,21 @@ it("neutralizes the basemap's cartographic buildings to palette grays", () => {
   expect(paintOf("bldg-line")["line-color"]).toBe(palette.gray);
   // everything that is not a building keeps GSI's own cartography
   expect(paintOf("road-line")["line-color"]).toBe("rgb(255,255,255)");
+});
+
+it("clamps basemap buildings to the handover zoom and nothing else", () => {
+  const style: StyleSpecification = {
+    version: 8,
+    sources: { v: { type: "vector", tiles: ["https://example.test/{z}/{x}/{y}.pbf"] } },
+    layers: [
+      { id: "bldg-early", type: "fill", source: "v", "source-layer": "building", minzoom: 13, maxzoom: 14 },
+      { id: "bldg-open", type: "fill", source: "v", "source-layer": "building", minzoom: 14 },
+      { id: "road", type: "line", source: "v", "source-layer": "road", minzoom: 11 },
+    ],
+  };
+  const clamped = clampBasemapBuildings(style);
+  const byId = Object.fromEntries(clamped.layers.map((layer) => [layer.id, layer]));
+  expect(byId["bldg-early"].maxzoom).toBe(14); // already below the handover
+  expect(byId["bldg-open"].maxzoom).toBe(BASEMAP_DETAIL_HANDOVER_ZOOM);
+  expect(byId["road"].maxzoom).toBeUndefined();
 });
