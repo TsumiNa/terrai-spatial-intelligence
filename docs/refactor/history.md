@@ -22,7 +22,7 @@ Open a refactor's `00-overview.md` for its full rationale and per-PR plans.
 - Created: 2026-07-23
 - Description: Build one self-hosted **merged** building vector tileset (PMTiles) — OSM primary, 基盤地図情報 filling OSM's suburban/rural gaps, PLATEAU heights joined for 2.5D — so complete, dense city fabric renders at every zoom, moving the wide-view basemap off live GSI. A single build-time merge removes the GSI-vs-OSM double-drawing problem and the empty-map risk of OSM-only tiles, and can absorb the clickable z16+ layer too, retiring the buildings API path.
 - State: **Planned** — assessed feasible and licence-cleared, not started; five PRs (FGD acquisition → merged tile generation → basemap integration → PLATEAU height + 2.5D extrusion → retire the windowed path).
-- Note: Reframed 2026-07-24 from OSM-only tiles to the OSM + 基盤地図情報 + PLATEAU merge after confirming OSM-only would read empty outside dense cities. Licence cleared: 基盤地図情報 is **測量法 承認申請-exempt** (attribution + 加工表示 only), PLATEAU is Site Policy §3 — both fine for offline, commercial, self-built distribution (see `docs/summary/government-3d-building-sources/`). Feasibility unchanged (3–15 min preprocessing, ~300–700 MB PMTiles, near-zero serving CPU); near-free on a zero-egress host (Cloudflare R2 + CDN), GCP egress-driven ~$5–320/mo. **Awaiting the owner's go decision before any PR begins.**
+- Note: One merged tileset, not two overlaid layers — the OSM-primary / 基盤地図情報-fill decision is resolved at build time into a single building layer, each feature tagged `footprint_source` (`osm` | `fgd`); render never double-draws. Scope is buildings only, so it does **not** replace the live-GSI style JSON or the non-building vector layers (roads/water/labels/land) — hardening those is `basemap-resilience`, a complementary refactor. Reframed 2026-07-24 from OSM-only tiles to the OSM + 基盤地図情報 + PLATEAU merge after confirming OSM-only would read empty outside dense cities. Licence cleared: 基盤地図情報 is **測量法 承認申請-exempt** (attribution + 加工表示 only), PLATEAU is Site Policy §3 — both fine for offline, commercial, self-built distribution (see `docs/summary/government-3d-building-sources/`). Feasibility unchanged (3–15 min preprocessing, ~300–700 MB PMTiles, near-zero serving CPU); near-free on a zero-egress host (Cloudflare R2 + CDN), GCP egress-driven ~$5–320/mo. **Awaiting the owner's go decision before any PR begins.**
 
 ## basemap-resilience
 
@@ -30,7 +30,7 @@ Open a refactor's `00-overview.md` for its full rationale and per-PR plans.
 - Created: 2026-07-23
 - Description: Pin a local snapshot of the GSI vector style and add a production-raster fallback, so the wide-view basemap survives the experimental endpoints changing or dying.
 - State: **Planned** — not started.
-- Note: Recorded for owner evaluation; execution not scheduled. Both PR plans carry full Goal/Scope/Non-goals/Implementation/Acceptance.
+- Note: Complementary to `osm-basemap-tiles`, not overlapping — that replaces the GSI **building** cartography with owned tiles; this hardens the **remaining** live-GSI dependency (the `std.json` boot path, whose failure stops the map from constructing at all, and the non-building vector layers: roads/water/labels/land). While `osm-basemap-tiles` stays buildings-only the two are disjoint; it does retire the building-related style transforms, shrinking one exposure here. Recorded for owner evaluation; execution not scheduled. Both PR plans carry full Goal/Scope/Non-goals/Implementation/Acceptance.
 
 ## osm-highzoom-detail
 
