@@ -35,12 +35,32 @@ Blocked on measured triggers and are out of this sequence.)
 
 ## The order
 
-### Phase 0 — `basemap-resilience` (early, independent, cheap insurance)
+### Phase 0 — Pre-flight (early, independent, before frontend integration)
 
-Do this first, in parallel with anything. The live GSI-dependent basemap stays the
-production path for the whole tiles build below, so hardening it early protects
-the demo/commercial showing while the big work proceeds. Low effort (~an afternoon
-per PR).
+Two low-risk items that are **not** multi-PR refactors but should land early,
+before any frontend-heavy work in Phase 1+ builds on the map layer.
+
+**MapLibre v6 upgrade** — maintenance, not a refactor (recorded in the
+`maplibre-v6-upgrade-decision` memory, so it has no `docs/refactor/` folder). Do
+it **before `osm-basemap-tiles` PR3** (basemap integration), so all downstream
+frontend work targets v6 rather than being written on 5.24 and migrated later.
+
+- **Gate first: verify WebGL2 on the exhibition/kiosk hardware** — the only real
+  risk (v6 drops WebGL1). ~95% global; any modern iPad (iPadOS 15+) is fine, but
+  confirm the actual display devices.
+- Code change is tiny: bump `webapp/package.json` `maplibre-gl` `^5.24.0` → `^6`,
+  change `webapp/src/lib/map/map.ts` default import
+  `import maplibregl from "maplibre-gl"` → `import * as maplibregl` (v6 is
+  ESM-only; the `import type` lines in dem.ts/config.ts are unaffected). No
+  `addProtocol`/gsidem, `setData`-2nd-param, `styleimagemissing`, or
+  Map-extends-Camera breakage in the project. Run `npm run build` + the Playwright
+  suites.
+- Not for perf/power (v6 gains are incremental and unquantified) — purely to stay
+  current and let the downstream frontend target v6.
+
+**`basemap-resilience`** — 2 PRs, ~an afternoon each. The live GSI-dependent
+basemap stays the production path for the whole tiles build below, so hardening it
+early protects the demo/commercial showing while the big work proceeds.
 
 1. `01-style-snapshot-pr1.md` — vendor and locally serve the pinned `std.json`.
 2. `02-raster-fallback-pr2.md` — production-raster fallback + activation.
@@ -84,9 +104,9 @@ vectorize and misses budget.
 
 ## One-line sequence
 
-`basemap-resilience` (anytime, early) → `osm-basemap-tiles` (1→5) →
-`local-3d-work-mode` (after tiles PR4) → `interactive-al-compute` →
-`rust-api-backend` (only if its entry conditions are met).
+MapLibre v6 upgrade + `basemap-resilience` (Phase 0, early; v6 before tiles PR3) →
+`osm-basemap-tiles` (1→5) → `local-3d-work-mode` (after tiles PR4) →
+`interactive-al-compute` → `rust-api-backend` (only if its entry conditions are met).
 
 ## Process discipline per PR (from the repo conventions)
 
