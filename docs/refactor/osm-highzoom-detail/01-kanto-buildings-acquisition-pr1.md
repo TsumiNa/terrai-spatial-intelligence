@@ -1,7 +1,21 @@
 # PR1 Plan: Kanto OSM Building Acquisition
 
-- Status: Planned
+- Status: Completed
 - Refactor: `osm-highzoom-detail`
+- PR: #65
+
+## Completion record
+
+- Full acquisition: **5,371,292 buildings / 3.1 GB / 3m20s** including the ~400 MB
+  snapshot download; extract timestamp `2026-01-01T21:21:30Z` read from the PBF
+  header as the vintage.
+- Real data promptly justified the honesty counter: 14 degenerate OSM
+  multipolygons are rejected by the geometry factory, skipped, and recorded in the
+  manifest as `invalid_geometries_skipped`.
+- pyosmium v4 wrinkle worth remembering: `SimpleWriter` silently writes empty
+  objects from plain dicts — the test fixture must use `osmium.osm.mutable`
+  objects, and the tag filter passed to `with_areas` does not exempt the caller
+  from checking `building` in tags.
 
 ## Goal
 
