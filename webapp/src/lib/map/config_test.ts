@@ -4,7 +4,7 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, LOCAL_SPRITE_URL, RASTER_SOURCES, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
+import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, FALLBACK_RASTER_LAYER_ID, FALLBACK_RASTER_SOURCE_ID, FALLBACK_STD_RASTER_URL, LOCAL_SPRITE_URL, RASTER_SOURCES, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
 import { palette } from "../theme";
 import { rgba } from "./style-rules";
 
@@ -40,9 +40,10 @@ it("streams every raster basemap live from the GSI tile host", () => {
 
 it("appends three hidden nationwide raster layers and the terrain DEM source", () => {
   const composed = composeStyle(baseStyle);
-  // vector + three rasters + the raster-dem terrain source (no layer of its own)
-  expect(Object.keys(composed.sources)).toHaveLength(5);
-  expect(composed.layers).toHaveLength(4);
+  // vector + three rasters + the raster-dem terrain source + the hidden fallback
+  expect(Object.keys(composed.sources)).toHaveLength(6);
+  // background + three rasters + the hidden fallback raster
+  expect(composed.layers).toHaveLength(5);
   const dem = composed.sources[TERRAIN_SOURCE_ID] as { type?: string; encoding?: string; tiles?: string[] };
   expect(dem.type).toBe("raster-dem");
   expect(dem.encoding).toBe("mapbox");
@@ -57,6 +58,22 @@ it("appends three hidden nationwide raster layers and the terrain DEM source", (
   // nationwide: no bounds clamp remains from the retired per-region cache
   expect(photo.bounds).toBeUndefined();
   expect(photo.attribution).toContain("GSI");
+});
+
+it("appends a hidden production-raster fallback below the user rasters", () => {
+  const composed = composeStyle(baseStyle);
+  const src = composed.sources[FALLBACK_RASTER_SOURCE_ID] as { type?: string; tiles?: string[] };
+  expect(src.type).toBe("raster");
+  expect(src.tiles?.[0]).toBe(FALLBACK_STD_RASTER_URL);
+  // the production std endpoint, not the experimental bvmap
+  expect(FALLBACK_STD_RASTER_URL).toMatch(/^https:\/\/cyberjapandata\.gsi\.go\.jp\/xyz\/std\//);
+  const fallbackLayer = composed.layers.find((l) => l.id === FALLBACK_RASTER_LAYER_ID);
+  expect(fallbackLayer?.layout).toEqual({ visibility: "none" });
+  // below every user raster so a selected basemap still covers it
+  const idx = (id: string) => composed.layers.findIndex((l) => l.id === id);
+  for (const kind of ["photo", "hillshade", "slope"] as const) {
+    expect(idx(FALLBACK_RASTER_LAYER_ID)).toBeLessThan(idx(rasterId(kind)));
+  }
 });
 
 it("does not mutate the fetched vector style", () => {

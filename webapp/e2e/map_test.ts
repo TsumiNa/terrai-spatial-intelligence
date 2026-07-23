@@ -69,6 +69,45 @@ test("boots and renders with gsi-cyberjapan.github.io blocked (pinned snapshot)"
   expect(blockedHits).toEqual([]);
 });
 
+test("degrades to the production-raster fallback when the vector tiles fail", async ({ page }) => {
+  // Only the fallback requests xyz/std — no user basemap uses it.
+  const stdTiles: string[] = [];
+  page.on("response", (r) => {
+    if (r.url().includes("cyberjapandata.gsi.go.jp/xyz/std/")) stdTiles.push(r.url());
+  });
+  // Kill the experimental vector tiles: repeated errors promote the fallback.
+  await page.route("**cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/**", (route) => route.abort());
+
+  await waitForMap(page);
+  await expect(page.locator(".maplibregl-ctrl-attrib")).toContainText("地理院");
+  // the GSI production raster now streams the wide-view streets
+  await expect.poll(() => stdTiles.length, { timeout: 30000 }).toBeGreaterThan(0);
+});
+
+test("the ops switch (?fallback=raster) starts on the production raster", async ({ page }) => {
+  const stdTiles: string[] = [];
+  page.on("response", (r) => {
+    if (r.url().includes("cyberjapandata.gsi.go.jp/xyz/std/")) stdTiles.push(r.url());
+  });
+  // The operational answer if GSI announces a bvmap change: force the fallback on
+  // from the start. Vector tiles are healthy here, so this proves the switch —
+  // not a failure — promotes the layer.
+  await page.goto("/?fallback=raster");
+  await expect(page.locator("#map .maplibregl-canvas")).toBeVisible({ timeout: 20000 });
+  await expect.poll(() => stdTiles.length, { timeout: 20000 }).toBeGreaterThan(0);
+});
+
+test("leaves the fallback hidden and unrequested in normal operation", async ({ page }) => {
+  const stdTiles: string[] = [];
+  page.on("response", (r) => {
+    if (r.url().includes("cyberjapandata.gsi.go.jp/xyz/std/")) stdTiles.push(r.url());
+  });
+  await waitForMap(page);
+  await page.waitForTimeout(2500);
+  // vector tiles are healthy, so the fallback never promotes and asks for nothing
+  expect(stdTiles).toEqual([]);
+});
+
 test("zooming past the raster ceilings produces no failed tile requests", async ({ page }) => {
   const failures: string[] = [];
   page.on("response", (response) => {

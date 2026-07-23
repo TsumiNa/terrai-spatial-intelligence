@@ -162,10 +162,21 @@ export function clampBasemapBuildings(style: StyleSpecification, handover: numbe
   return { ...style, layers };
 }
 
+/** The availability fallback (basemap-resilience): GSI's **production** raster
+ * 標準地図 (non-experimental, z0–18, same terms), a hidden layer promoted only
+ * when the experimental vector tiles fail. It is not a user basemap option — it
+ * is an availability measure — so it lives outside `RASTER_KINDS`. */
+export const FALLBACK_RASTER_SOURCE_ID = "terrai-fallback-std";
+export const FALLBACK_RASTER_LAYER_ID = "terrai-fallback-std-layer";
+export const FALLBACK_STD_RASTER_URL = "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png";
+
 /**
  * Append the three nationwide raster basemaps to the GSI vector style, all
  * hidden. The active one is a visibility toggle, so switching basemaps never
- * rebuilds the style and never moves the camera.
+ * rebuilds the style and never moves the camera. Also append the hidden
+ * production-raster availability fallback (below the user rasters, above the
+ * vector layers, so a user basemap still covers it and a dead vector source
+ * does not).
  */
 export function composeStyle(vectorStyle: StyleSpecification): StyleSpecification {
   const frozen = clampBasemapBuildings(neutralizeBasemapBuildings(freezeHighZoomCartography(vectorStyle)));
@@ -179,6 +190,16 @@ export function composeStyle(vectorStyle: StyleSpecification): StyleSpecificatio
     encoding: "mapbox",
     attribution: GSI_ATTRIBUTION,
   };
+  // The fallback sits just above the vector layers and below the user rasters.
+  sources[FALLBACK_RASTER_SOURCE_ID] = {
+    type: "raster",
+    tiles: [FALLBACK_STD_RASTER_URL],
+    tileSize: 256,
+    minzoom: 0,
+    maxzoom: 18,
+    attribution: GSI_ATTRIBUTION,
+  };
+  layers.push({ id: FALLBACK_RASTER_LAYER_ID, type: "raster", source: FALLBACK_RASTER_SOURCE_ID, layout: { visibility: "none" } });
   for (const kind of RASTER_KINDS) {
     const id = rasterId(kind);
     const { url, minzoom, maxzoom, attribution } = RASTER_SOURCES[kind];
