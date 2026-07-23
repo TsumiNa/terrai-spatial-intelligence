@@ -124,12 +124,18 @@ SELECT_FEATURES = "SELECT ordinal, feature_json FROM features WHERE dataset_key 
 
 # The R-tree join is a conservative float32 prefilter; the float64 columns on
 # `features` decide intersection exactly, preserving the scan's semantics.
+# The R-tree must drive this query: it returns the window's spatial
+# candidates, each resolved by rowid. Left alone the planner instead drives
+# from the `dataset_key` primary-key range and probes the R-tree once per row,
+# making the query O(dataset size) rather than O(features in the window) —
+# invisible while datasets held thousands of rows, costly at millions.
+# `CROSS JOIN` fixes the join order, which is SQLite's documented way to do it.
 WINDOW_QUERY = """
 SELECT f.ordinal, f.feature_json
-FROM features f
-JOIN features_rtree r ON r.id = f.rowid
-WHERE f.dataset_key = ?
-  AND r.max_x >= ? AND r.min_x <= ? AND r.max_y >= ? AND r.min_y <= ?
+FROM features_rtree r
+CROSS JOIN features f ON f.rowid = r.id
+WHERE r.max_x >= ? AND r.min_x <= ? AND r.max_y >= ? AND r.min_y <= ?
+  AND f.dataset_key = ?
   AND f.max_x >= ? AND f.min_x <= ? AND f.max_y >= ? AND f.min_y <= ?
 ORDER BY f.ordinal
 """
@@ -565,7 +571,7 @@ def window_features(connection: sqlite3.Connection, key: str, bbox: tuple[float,
     west, south, east, north = bbox
     return connection.execute(
         WINDOW_QUERY,
-        (key, west, east, south, north, west, east, south, north),
+        (west, east, south, north, key, west, east, south, north),
     ).fetchall()
 
 
