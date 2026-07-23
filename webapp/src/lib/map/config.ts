@@ -16,7 +16,18 @@ import { palette } from "../theme";
 import { rgba } from "./style-rules";
 import type { BasemapKey } from "../state.svelte";
 
+/** The upstream experimental style — the *source* of the pinned snapshot, kept
+ * for `scripts/refresh_gsi_style.py` and provenance. The map no longer fetches
+ * this at runtime (basemap-resilience): a dead GitHub Pages URL must never stop
+ * the map from constructing. */
 export const VECTOR_STYLE_URL = "https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/std.json";
+/** What the map actually loads: a repo-owned snapshot served from our own origin,
+ * so it cannot die independently of the app. */
+export const LOCAL_STYLE_URL = "/basemap/gsi-std-style.json";
+/** The vendored sprite, repointed off gsi-cyberjapan.github.io. That host serves
+ * only the style and this sprite; glyphs (maps.gsi.go.jp) and vector tiles
+ * (cyberjapandata) live elsewhere and are untouched here. */
+export const LOCAL_SPRITE_URL = "/basemap/sprite/std";
 
 /** MapLibre zooms are 512px-tile zooms: one less than the Leaflet values the
  * old exhibition used with 256px GSI tiles. Nihonbashi's camera frames the
@@ -181,5 +192,8 @@ export function composeStyle(vectorStyle: StyleSpecification): StyleSpecificatio
     };
     layers.push({ id, type: "raster", source: id, layout: { visibility: "none" } });
   }
-  return { ...frozen, sources, layers };
+  // Repoint the sprite off the experimental host to the vendored copy. glyphs
+  // stay on maps.gsi.go.jp (a different, non-experimental host) and tiles on
+  // cyberjapandata, so blocking gsi-cyberjapan.github.io leaves the map intact.
+  return { ...frozen, sprite: LOCAL_SPRITE_URL, sources, layers };
 }

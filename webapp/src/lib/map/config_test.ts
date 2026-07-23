@@ -1,10 +1,22 @@
+import { readFileSync } from "node:fs";
+
 import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, RASTER_SOURCES, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
+import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, LOCAL_SPRITE_URL, RASTER_SOURCES, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
 import { palette } from "../theme";
 import { rgba } from "./style-rules";
+
+/** The pinned snapshot the webapp actually serves (basemap-resilience). Reading
+ *  it here means a refresh that drops the members the transforms rely on fails in
+ *  CI, not silently in production. */
+const vendoredStyle = JSON.parse(
+  readFileSync(new URL("../../../public/basemap/gsi-std-style.json", import.meta.url), "utf-8"),
+) as StyleSpecification;
+
+const buildingLayers = (style: StyleSpecification) =>
+  style.layers.filter((l) => "source-layer" in l && (l as { "source-layer"?: string })["source-layer"] === "building");
 
 const baseStyle: StyleSpecification = {
   version: 8,
@@ -97,6 +109,25 @@ it("neutralizes the basemap's cartographic buildings to palette grays", () => {
   expect(paintOf("bldg-line")["line-color"]).toBe(palette.gray);
   // everything that is not a building keeps GSI's own cartography
   expect(paintOf("road-line")["line-color"]).toBe("rgb(255,255,255)");
+});
+
+it("the vendored GSI snapshot still carries the members the transforms rely on", () => {
+  // neutralize/clamp need the `building` source-layer to exist
+  expect(buildingLayers(vendoredStyle).length).toBeGreaterThan(0);
+  // freezeHighZoomCartography acts on layers whose maxzoom reaches the z17 switch
+  expect(vendoredStyle.layers.filter((l) => (l.maxzoom ?? 0) >= 17).length).toBeGreaterThan(0);
+});
+
+it("composes the vendored snapshot, repointing the sprite off the experimental host", () => {
+  const composed = composeStyle(vendoredStyle);
+  // the sprite is the only other gsi-cyberjapan.github.io asset — repoint it local
+  expect(composed.sprite).toBe(LOCAL_SPRITE_URL);
+  // glyphs (maps.gsi.go.jp) and the vector source (cyberjapandata) are untouched
+  expect(composed.glyphs).toBe(vendoredStyle.glyphs);
+  // every building layer is clamped to the handover after compose
+  for (const l of buildingLayers(composed)) {
+    expect(l.maxzoom ?? 99).toBeLessThanOrEqual(BASEMAP_DETAIL_HANDOVER_ZOOM);
+  }
 });
 
 it("clamps basemap buildings to the handover zoom and nothing else", () => {

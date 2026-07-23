@@ -32,7 +32,7 @@ import {
   MIN_ZOOM,
   RASTER_KINDS,
   REGION_CAMERAS,
-  VECTOR_STYLE_URL,
+  LOCAL_STYLE_URL,
   composeStyle,
   rasterId,
   TERRAIN_EXAGGERATION,
@@ -80,8 +80,12 @@ export async function createExhibitionMap(
   initial: { region: RegionKey; basemap: BasemapKey },
 ): Promise<ExhibitionMap> {
   registerGsiDemProtocol(maplibregl);
-  const response = await fetch(VECTOR_STYLE_URL);
-  if (!response.ok) throw new Error(`vector style request failed: ${response.status}`);
+  // The style is a repo-owned snapshot served from our own origin, not the
+  // experimental GitHub Pages host — so its dying can no longer stop the map
+  // from constructing. A failure here is a deployment error (our own asset
+  // missing), not an upstream outage.
+  const response = await fetch(LOCAL_STYLE_URL);
+  if (!response.ok) throw new Error(`local vector style unavailable: ${response.status}`);
   const style = composeStyle(await response.json());
 
   let region = initial.region;
