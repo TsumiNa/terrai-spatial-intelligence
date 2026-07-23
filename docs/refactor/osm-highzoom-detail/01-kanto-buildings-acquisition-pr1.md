@@ -20,9 +20,11 @@ product with per-feature identity and provenance into the gitignored data tree.
   carrying `osm_id`, `osm_type`, the `building` tag value, `name`/`levels` when
   present, and provenance (`terrai_source_url`, extract timestamp from the PBF
   header as `source_updated_at`, `retrieved_at`).
-- A `metadata.json` manifest (counts, sha256, extract timestamp, scope statement),
-  declared as the task's only output — the product is expected in the hundreds of
-  megabytes to a few gigabytes, and readiness checks must stay cheap.
+- A `metadata.json` manifest (counts, sha256, extract timestamp, scope statement).
+  The script writes both the manifest and the streamed GeoJSON product, but only
+  the manifest is *declared* as a task output for readiness checks — the product
+  is expected in the hundreds of megabytes to a few gigabytes, and declared JSON
+  outputs are parsed in full on every status check.
 - `data_tasks.py`: register `osm_kanto` (network, automatic, `check_stale=False`),
   mirroring the `mlit` task; `.gitignore` gains `data/osm/kanto_buildings/`.
 - Tests without network: tag/geometry filtering and provenance stamping against a

@@ -16,7 +16,7 @@ a raw audit record, and attribution states ODbL alongside GSI.
   "© OpenStreetMap contributors", ODbL licence, extract-date vintage, limitations
   copy on community completeness).
 - The layer is part of the basemap experience, not a toggle in the foundation
-  list: it activates with the standard basemap at `zoom ≥` threshold, rendered
+  list: it activates with the standard basemap at `zoom ≥ threshold`, rendered
   through the existing windowed client and a quiet building style from the
   palette; the GSI building layers hide above the threshold (a `maxzoom` clamp in
   `composeStyle`), so exactly one building inventory shows at any zoom.
@@ -35,6 +35,6 @@ a raw audit record, and attribution states ODbL alongside GSI.
 
 ## Acceptance
 
-- `npm run build`/`test`, svelte-check and the Playwright suites green in fixture
-  scope; screenshots across the threshold at a dense ward and a sparse suburb
-  recorded in the completion note.
+- `npm run build` (which runs svelte-check), `npm run test` and
+  `npx playwright test` green in fixture scope; screenshots across the threshold
+  at a dense ward and a sparse suburb recorded in the completion note.
