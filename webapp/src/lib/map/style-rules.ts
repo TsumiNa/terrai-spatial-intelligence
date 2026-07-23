@@ -30,6 +30,8 @@ export const FOUNDATION_OVERLAY_STYLES: Record<string, { line: RGBA; fill: RGBA;
   // The basemap-detail buildings must read against the pale 宅地 background
   // the GSI texture leaves behind at the handover: neutral mid-gray, clearly
   // darker than the ground, still far from any analysis color.
+  // Same gray as the neutralized basemap buildings (config.BASEMAP_BUILDING_FILL)
+  // so crossing the z16 handover shows more detail, not a different color.
   osmBuildings: { line: rgba(palette.gray, 1.0), fill: rgba(palette.gray, 0.5), width: 1 },
   landClassification50k: { line: rgba(palette.hub, 0.8), fill: rgba(palette.hub, 0.14), width: 1 },
   floodHistory: { line: rgba(palette.blue, 0.85), fill: rgba(palette.blue, 0.16), width: 1 },

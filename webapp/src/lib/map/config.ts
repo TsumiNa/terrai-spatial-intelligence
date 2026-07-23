@@ -13,6 +13,7 @@ import type { StyleSpecification, LayerSpecification, SourceSpecification } from
 
 import type { RegionKey } from "../modules";
 import { palette } from "../theme";
+import { rgba } from "./style-rules";
 import type { BasemapKey } from "../state.svelte";
 
 export const VECTOR_STYLE_URL = "https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/std.json";
@@ -97,18 +98,32 @@ export function freezeHighZoomCartography(style: StyleSpecification): StyleSpeci
   return { ...style, layers };
 }
 
+/** A palette color as a MapLibre-ready `rgba(...)` string; the guard permits
+ *  this because the channels come from the palette, not a literal. */
+function paletteRgba(hex: string, alpha: number): string {
+  const [r, g, b] = rgba(hex, alpha);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/** The neutral gray both the basemap's own buildings and the OSM detail layer
+ *  wear, so the z16 handover from one to the other is invisible: a translucent
+ *  gray fill (clearly structure, clearly not analysis color) over the pale
+ *  ground, with a solid gray edge. */
+export const BASEMAP_BUILDING_FILL = paletteRgba(palette.gray, 0.5);
+
 /**
  * The GSI style paints its cartographic buildings in oranges that collide
  * with the analysis palette, and whether an orange building was data or
  * cartography could only be settled by clicking it. Neutralize the basemap's
- * buildings instead: any colored building on this map is analysis data, and
- * every gray one is basemap texture. Reuses existing palette neutrals.
+ * buildings to a visible gray: any colored building on this map is analysis
+ * data, and every gray one is basemap texture — visible city fabric, never
+ * competing color. Matching the OSM detail layer keeps the handover seamless.
  */
 export function neutralizeBasemapBuildings(style: StyleSpecification): StyleSpecification {
   const layers = style.layers.map((layer): LayerSpecification => {
     if (!("source-layer" in layer) || layer["source-layer"] !== "building") return layer;
     if (layer.type === "fill") {
-      return { ...layer, paint: { ...layer.paint, "fill-color": palette.line, "fill-outline-color": palette.gray } };
+      return { ...layer, paint: { ...layer.paint, "fill-color": BASEMAP_BUILDING_FILL, "fill-outline-color": palette.gray } };
     }
     if (layer.type === "line") {
       return { ...layer, paint: { ...layer.paint, "line-color": palette.gray } };
