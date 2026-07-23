@@ -11,6 +11,7 @@
 | GSI 指定避難データ | 接続済み・全国 base | [指定避難所と災害種別指定緊急避難場所](gsi-designated-evacuation/README.ja.md) |
 | Google Satellite Embedding V1 | 接続済み | [年次遥感表現](google-satellite-embedding/README.ja.md) |
 | OpenStreetMap | 接続済み | [建物、道路、context](openstreetmap/README.ja.md) |
+| OSM 関東建物フットプリント | 接続済み、オンデマンド | [高ズーム建物オブジェクト](osm-kanto-buildings/README.ja.md) |
 | PLATEAU UC24-13 札幌 | 接続済み・オンデマンド sample | [観測地下構造物](plateau-uc24-13-sapporo/README.ja.md) |
 | PLATEAU UC24-16 日本橋 | 接続済み・オンデマンド sample | [観測地下埋設物](plateau-uc24-16-nihonbashi/README.ja.md) |
 | KuniJiban ボーリング | 接続済み・オンデマンド地域抽出 | [ボーリング、地層、SPT](kunijiban-boreholes/README.ja.md) |

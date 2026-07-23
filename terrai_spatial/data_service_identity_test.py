@@ -155,6 +155,7 @@ QUERY_MATRIX = [
     {"key": "landUseMesh", "bbox": TOKYO_WINDOW, "limit": 500},
     {"key": "multistageFlood", "bbox": KOSHIGAYA_WINDOW},
     {"key": "landslideWarning", "bbox": HACHIOJI_WINDOW, "limit": 200},
+    {"key": "osmBuildings", "bbox": TOKYO_WINDOW, "limit": 300},
     {"key": "solar", "where": "status", "equals": "preferred", "sort": "score", "limit": 3},
     {"key": "buildings", "where": "risk_score", "minimum": 50.0, "sort": "risk_score", "descending": False, "limit": 100},
     {"key": "roads", "sort": "priority_score", "limit": 10},

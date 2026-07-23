@@ -282,6 +282,18 @@
       "local_output": "data/mlit/land_use_mesh.geojson"
     },
     {
+      "id": "osm_kanto_buildings",
+      "theme": "building_footprints",
+      "status": "integrated",
+      "source_updated_at": "2026-01-01T21:21:30Z",
+      "retrieved_at": "2026-07-23",
+      "format": "Geofabrik .osm.pbf pinned snapshot",
+      "access_cost": "free direct download",
+      "license": "ODbL 1.0",
+      "official_page": "https://download.geofabrik.de/asia/japan/kanto.html",
+      "rights_limit": "Attribution required; share-alike applies to public derivative databases; community completeness is not warranted"
+    },
+    {
       "id": "ksj_l02_2025",
       "theme": "prefectural_land_price_survey",
       "status": "integrated",

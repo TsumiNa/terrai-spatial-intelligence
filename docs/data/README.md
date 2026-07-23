@@ -11,6 +11,7 @@ This directory documents datasets already integrated into the TerrAI Foundation 
 | GSI designated evacuation data | Integrated, national base | [Shelters and hazard-specific emergency places](gsi-designated-evacuation/README.md) |
 | Google Satellite Embedding V1 | Integrated | [Annual remote-sensing representation](google-satellite-embedding/README.md) |
 | OpenStreetMap | Integrated | [Buildings, roads, and context](openstreetmap/README.md) |
+| OSM Kanto building footprints | Integrated, on demand | [High-zoom building objects](osm-kanto-buildings/README.md) |
 | PLATEAU UC24-13 Sapporo | Integrated, on-demand sample | [Observed underground structures](plateau-uc24-13-sapporo/README.md) |
 | PLATEAU UC24-16 Nihonbashi | Integrated, on-demand sample | [Observed underground utilities](plateau-uc24-16-nihonbashi/README.md) |
 | KuniJiban boreholes | Integrated, on-demand regional extract | [Boreholes, strata, and SPT](kunijiban-boreholes/README.md) |
