@@ -4,7 +4,7 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, FALLBACK_RASTER_LAYER_ID, FALLBACK_RASTER_SOURCE_ID, FALLBACK_STD_RASTER_URL, LOCAL_SPRITE_URL, RASTER_SOURCES, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
+import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, FALLBACK_RASTER_LAYER_ID, FALLBACK_RASTER_SOURCE_ID, FALLBACK_STD_RASTER_URL, LOCAL_SPRITE_URL, RASTER_KINDS, RASTER_SOURCES, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
 import { palette } from "../theme";
 import { rgba } from "./style-rules";
 
@@ -71,7 +71,7 @@ it("appends a hidden production-raster fallback below the user rasters", () => {
   expect(fallbackLayer?.layout).toEqual({ visibility: "none" });
   // below every user raster so a selected basemap still covers it
   const idx = (id: string) => composed.layers.findIndex((l) => l.id === id);
-  for (const kind of ["photo", "hillshade", "slope"] as const) {
+  for (const kind of RASTER_KINDS) {
     expect(idx(FALLBACK_RASTER_LAYER_ID)).toBeLessThan(idx(rasterId(kind)));
   }
 });

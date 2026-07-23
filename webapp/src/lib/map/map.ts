@@ -215,7 +215,12 @@ export async function createExhibitionMap(
   // hidden GSI production-raster layer once (one-way per session) so the wide
   // view degrades to raster streets rather than a blank map. The OSM detail
   // layer, foundation overlays and analyses are unaffected — they are our data.
-  const vectorSourceId = Object.entries(style.sources).find(([, source]) => source.type === "vector")?.[0];
+  // Identify the source by the experimental tiles this fallback specifically
+  // guards — not merely "the first vector source" — so an added vector source
+  // cannot misdirect the error counting.
+  const vectorSourceId = Object.entries(style.sources).find(
+    ([, source]) => source.type === "vector" && (source.tiles ?? []).some((tile) => tile.includes("experimental_bvmap")),
+  )?.[0];
   // Already active if the ops switch baked it into the style above.
   let fallbackActive = opsFallback;
   const activateFallback = (reason: string): void => {
@@ -245,12 +250,17 @@ export async function createExhibitionMap(
   const FALLBACK_THRESHOLD = 4;
   const vectorErrorTimes: number[] = [];
   map.on("error", (event) => {
+    if (fallbackActive) return; // one-way: stop counting once promoted
     const detail = event as { sourceId?: string; error?: { message?: string } };
     const fromVector = detail.sourceId === vectorSourceId || (detail.error?.message ?? "").includes("experimental_bvmap");
     if (!fromVector) return;
     const now = performance.now();
     vectorErrorTimes.push(now);
-    while (vectorErrorTimes.length > 0 && now - vectorErrorTimes[0] > FALLBACK_WINDOW_MS) vectorErrorTimes.shift();
+    // Keep only the most recent timestamps within the window, bounded by the
+    // threshold, so a rapidly-failing source cannot grow this without limit.
+    while (vectorErrorTimes.length > FALLBACK_THRESHOLD || (vectorErrorTimes.length > 0 && now - vectorErrorTimes[0] > FALLBACK_WINDOW_MS)) {
+      vectorErrorTimes.shift();
+    }
     if (vectorErrorTimes.length >= FALLBACK_THRESHOLD) activateFallback("repeated tile failures");
   });
 
