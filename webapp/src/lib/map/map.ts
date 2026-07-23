@@ -26,7 +26,6 @@ import {
   VECTOR_STYLE_URL,
   composeStyle,
   rasterId,
-  vectorBuildingLayerIds,
   TERRAIN_EXAGGERATION,
   TERRAIN_PITCH,
   TERRAIN_SOURCE_ID,
@@ -41,8 +40,6 @@ export interface ExhibitionMap {
   setRegion(region: RegionKey): void;
   setBasemap(basemap: BasemapKey): void;
   setAnalyticalLayers(layers: Layer[]): void;
-  /** Hide the basemap's own buildings while an analysis colors buildings. */
-  setVectorBuildingsVisible(visible: boolean): void;
   /**
    * Lower the camera and make the surface translucent so content drawn by the
    * deck overlay reads through it. The camera never goes below ground; the
@@ -77,11 +74,9 @@ export async function createExhibitionMap(
   const response = await fetch(VECTOR_STYLE_URL);
   if (!response.ok) throw new Error(`vector style request failed: ${response.status}`);
   const style = composeStyle(await response.json());
-  const buildingLayers = vectorBuildingLayerIds(style);
 
   let region = initial.region;
   let basemap = initial.basemap;
-  let vectorBuildingsVisible = true;
   let undergroundMode = false;
 
   const map = new maplibregl.Map({
@@ -171,9 +166,6 @@ export async function createExhibitionMap(
     for (const kind of RASTER_KINDS) {
       map.setLayoutProperty(rasterId(kind), "visibility", kind === basemap ? "visible" : "none");
     }
-    for (const id of buildingLayers) {
-      map.setLayoutProperty(id, "visibility", vectorBuildingsVisible ? "visible" : "none");
-    }
     // 起伏 is the 2.5D mode: the hillshade drapes over the GSI DEM surface.
     // The underground stage owns the camera when active, so terrain waits.
     const wantsTerrain = basemap === "hillshade" && !undergroundMode;
@@ -202,11 +194,6 @@ export async function createExhibitionMap(
     },
     setAnalyticalLayers(layers) {
       overlay.setProps({ layers });
-    },
-    setVectorBuildingsVisible(visible) {
-      if (visible === vectorBuildingsVisible) return;
-      vectorBuildingsVisible = visible;
-      void loaded.then(applyVisibility);
     },
     setBoxSelect(onBox) {
       if (!onBox) {

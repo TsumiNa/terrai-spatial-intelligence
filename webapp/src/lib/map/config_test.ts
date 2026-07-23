@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { BASEMAP_DETAIL_HANDOVER_ZOOM, RASTER_SOURCES, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId, vectorBuildingLayerIds } from "./config";
+import { BASEMAP_DETAIL_HANDOVER_ZOOM, RASTER_SOURCES, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
 import { palette } from "../theme";
 
 const baseStyle: StyleSpecification = {
@@ -44,20 +44,6 @@ it("appends three hidden nationwide raster layers and the terrain DEM source", (
   // nationwide: no bounds clamp remains from the retired per-region cache
   expect(photo.bounds).toBeUndefined();
   expect(photo.attribution).toContain("GSI");
-});
-
-it("identifies the vector style's building layers by source-layer", () => {
-  const style: StyleSpecification = {
-    version: 8,
-    sources: { v: { type: "vector", tiles: ["https://example.test/{z}/{x}/{y}.pbf"] } },
-    layers: [
-      { id: "background", type: "background" },
-      { id: "bldg-1", type: "fill", source: "v", "source-layer": "building" },
-      { id: "road-1", type: "line", source: "v", "source-layer": "road" },
-      { id: "bldg-2", type: "line", source: "v", "source-layer": "building" },
-    ],
-  };
-  expect(vectorBuildingLayerIds(style)).toEqual(["bldg-1", "bldg-2"]);
 });
 
 it("does not mutate the fetched vector style", () => {

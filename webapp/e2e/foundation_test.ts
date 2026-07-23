@@ -49,6 +49,10 @@ test("panning loads windowed features and returning to a window hits the cache",
   // proof — loads real windows in the attribution and below-zoom tests.
   const requests = trackRequests(page, "railway");
   await open(page, { module: "slope" });
+  // Timing-sensitive: keyboard pans race software-GL tessellation on CI, so
+  // park the basemap on imagery — the auto building-detail layer is
+  // standard-basemap-only and its windows would stall every keypress.
+  await page.locator(".basemap-button", { hasText: "影像" }).click();
 
   await toggleLayer(page, "railway");
   await expect(page.locator(".map-attribution")).toContainText("国土数値情報");
@@ -110,6 +114,8 @@ test("clicking a foundation feature opens its raw audit record", async ({ page }
 
 test("layer visibility survives module and region switches", async ({ page }) => {
   await open(page, { module: "slope" });
+  // Same tessellation-vs-timing note as the pan test above.
+  await page.locator(".basemap-button", { hasText: "影像" }).click();
   await toggleLayer(page, "landHistory");
   await expect(page.locator(".map-attribution")).toBeVisible();
 
@@ -138,8 +144,9 @@ test("the standard basemap hands its buildings over to windowed OSM data", async
   await expect(page.locator('.foundation-item[data-layer="osmBuildings"]')).toHaveCount(0);
   await page.keyboard.press("Escape");
 
-  // Modules that draw their own buildings suppress it — with no other
-  // foundation layer active the whole attribution strip goes away.
+  // The building experience is uniform: analysis modules keep the detail
+  // layer (their colored buildings draw on top of the same footprints), so
+  // the ODbL notice persists.
   await open(page, { module: "slope" });
-  await expect(page.locator(".map-attribution")).toHaveCount(0);
+  await expect(page.locator(".map-attribution")).toContainText("OpenStreetMap");
 });

@@ -259,15 +259,6 @@ export const POPUPS: Record<string, PopupSpec> = {
   },
 };
 
-/** Views that color building footprints themselves; the basemap's own
- * building layer hides underneath so the analysis color is the only one. */
-export function drawsOwnBuildings(module: ModuleName, view: string): boolean {
-  if (module === "slope" || module === "facilities") return true;
-  if (module === "overview") return view === "urban";
-  if (module === "joint") return view === "hubs";
-  return false;
-}
-
 /** The popup the active queue's target layer binds — a queue click opens it. */
 export function queuePopup(module: ModuleName, view: string): PopupSpec {
   if (module === "overview") return view === "urban" ? POPUPS.hubOverview : POPUPS.deliveryCell;
