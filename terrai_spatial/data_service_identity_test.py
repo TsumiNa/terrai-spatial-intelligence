@@ -268,17 +268,30 @@ def test_match_semantics_are_pinned_by_table() -> None:
         assert got is expected, (properties, field, equals, minimum, maximum)
 
 
-def test_unwindowed_limit_query_does_not_scan_the_whole_dataset() -> None:
-    # The former cliff: a limit-only query loaded and parsed every row first.
-    # osmBuildings is the largest collection; a small limit must return fast
-    # with the manifest total as `matched`.
-    import time
-
+def test_unwindowed_limit_query_pushes_the_limit_into_sql(monkeypatch: pytest.MonkeyPatch) -> None:
+    # The former cliff loaded and parsed every row before slicing. Assert the
+    # mechanism rather than a wall-clock: the no-bbox no-filter path must read
+    # only `limit` rows (SQL LIMIT) and take `matched` from the manifest count,
+    # never the unbounded scan.
     key = "osmBuildings" if "osmBuildings" in ALL_DATASETS else "landUseMesh"
-    start = time.perf_counter()
-    result = store_backed.query_features(key, limit=5)
-    elapsed = time.perf_counter() - start
+    calls: dict[str, Any] = {}
+    real_all = data_service_module.all_features
+    real_count = data_service_module.dataset_feature_count
 
+    def spy_all(connection: Any, dataset_key: str, *, limit: int | None = None) -> Any:
+        calls["all_features_limit"] = limit
+        return real_all(connection, dataset_key, limit=limit)
+
+    def spy_count(connection: Any, dataset_key: str) -> int:
+        calls["counted"] = True
+        return real_count(connection, dataset_key)
+
+    monkeypatch.setattr(data_service_module, "all_features", spy_all)
+    monkeypatch.setattr(data_service_module, "dataset_feature_count", spy_count)
+
+    result = store_backed.query_features(key, limit=5)
+
+    assert calls["all_features_limit"] == 5  # bounded read, not a full scan
+    assert calls.get("counted") is True  # matched from the manifest, not len()
     assert result["query"]["returned"] == 5
     assert result["query"]["matched"] > 5  # the whole-dataset total
-    assert elapsed < 2.0, f"{key} limit-only query took {elapsed:.1f}s — the cliff is back"
