@@ -49,6 +49,10 @@ test("panning loads windowed features and returning to a window hits the cache",
   // proof — loads real windows in the attribution and below-zoom tests.
   const requests = trackRequests(page, "railway");
   await open(page, { module: "slope" });
+  // Timing-sensitive: keyboard pans race software-GL tessellation on CI, so
+  // park the basemap on imagery — the auto building-detail layer is
+  // standard-basemap-only and its windows would stall every keypress.
+  await page.locator(".basemap-button", { hasText: "影像" }).click();
 
   await toggleLayer(page, "railway");
   await expect(page.locator(".map-attribution")).toContainText("国土数値情報");
@@ -110,6 +114,8 @@ test("clicking a foundation feature opens its raw audit record", async ({ page }
 
 test("layer visibility survives module and region switches", async ({ page }) => {
   await open(page, { module: "slope" });
+  // Same tessellation-vs-timing note as the pan test above.
+  await page.locator(".basemap-button", { hasText: "影像" }).click();
   await toggleLayer(page, "landHistory");
   await expect(page.locator(".map-attribution")).toBeVisible();
 
