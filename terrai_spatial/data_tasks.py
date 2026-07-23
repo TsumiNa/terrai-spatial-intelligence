@@ -117,19 +117,15 @@ TASKS = {
         # and declared JSON outputs are parsed in full on every status check.
         outputs=("data/osm/kanto_buildings/metadata.json",),
         network=True,
-        # Not automatic until the store consumes the product (plan PR2): an
-        # ensure-at-startup must not trigger a multi-gigabyte acquisition
-        # nothing reads yet.
-        automatic=False,
         force_argument=True,
         check_stale=False,
     ),
-    "mlit_fixture": DataTask(
-        "mlit_fixture",
-        "derive the committed CI fixture windows from a full MLIT acquisition",
-        "scripts/build_mlit_fixture.py",
-        inputs=("data/mlit/metadata.json",),
-        outputs=("data/mlit_fixture/metadata.json",),
+    "ci_fixture": DataTask(
+        "ci_fixture",
+        "derive the committed CI fixture windows from the full Kanto acquisitions",
+        "scripts/build_ci_fixture.py",
+        inputs=("data/mlit/metadata.json", "data/osm/kanto_buildings/metadata.json"),
+        outputs=("data/mlit_fixture/metadata.json", "data/osm_kanto_fixture/metadata.json"),
         automatic=False,
         force_argument=True,
         check_stale=False,

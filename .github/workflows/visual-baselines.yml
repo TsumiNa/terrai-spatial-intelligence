@@ -41,11 +41,13 @@ jobs:
         working-directory: webapp
 
       # Tests need the shape of the foundation data, not its volume: the
-      # committed fixture carries exactly the windows the suites query
-      # (scripts/build_mlit_fixture.py), derived from a real Kanto
-      # acquisition. Local and exhibition environments run `fetch mlit`.
-      - name: Provision foundation-data fixture
-        run: cp -a data/mlit_fixture data/mlit
+      # committed fixtures carry exactly the windows the suites query
+      # (scripts/build_ci_fixture.py), derived from the real Kanto
+      # acquisitions. Local and exhibition environments fetch in full.
+      - name: Provision foundation-data fixtures
+        run: |
+          cp -a data/mlit_fixture data/mlit
+          cp -a data/osm_kanto_fixture data/osm/kanto_buildings
 
       # The API refuses to start without the derived store; build it from
       # the provisioned files before the suite launches the server.

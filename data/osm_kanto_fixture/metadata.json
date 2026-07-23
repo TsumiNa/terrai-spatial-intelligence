@@ -1,0 +1,26 @@
+{
+  "purpose": "CI test fixture: the exact windows the suites query, derived from a full acquisition",
+  "derived_from": {
+    "retrieved_at": "2026-07-23T03:01:20Z",
+    "scope": "TerrAI Kanto acquisition: OSM building footprints inside the mainland window"
+  },
+  "windows": {
+    "yokohama": [
+      139.578,
+      35.438,
+      139.602,
+      35.455
+    ],
+    "tokyo": [
+      139.69,
+      35.68,
+      139.71,
+      35.7
+    ]
+  },
+  "dataset_id": "osm-kanto-buildings-260101",
+  "source_updated_at": "2026-01-01T21:21:30Z",
+  "license": "Open Database License (ODbL) 1.0",
+  "feature_count": 18151,
+  "output": "data/osm_kanto_fixture/buildings.geojson"
+}
