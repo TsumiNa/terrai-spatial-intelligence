@@ -69,24 +69,46 @@ the decision warrants it.
 
 ## The baked tile schema
 
-Buildings are baked as one merged feature set. Every value that can be measured
-or estimated rides with a `*_source` tag so provenance is never lost:
+The dividing line for what a tile carries is **render, not analyse**: bake only
+what the map needs to draw and identify a building. Analytical materials belong
+in the FL store, not the tiles (see the boundary below). Buildings are baked as
+one merged feature set; every baked value that can be measured or estimated rides
+with a `*_source` tag so provenance is never lost:
 
 - `feature_id` — `osm:<id>` where OSM-sourced, `fgd:<id>` where government-sourced.
+  The join key back to the FL materials in the store.
 - `footprint_source` — `osm` | `fgd`.
 - `building` — class for styling and load priority. OSM's own `building` tag is
   already rich; GSI's 堅牢/高層 structural class is an optional later augment.
 - `height` (metres) + `height_source` — `plateau` (real `measuredHeight`) |
-  `osm_tag` (`height`/`building:levels`) | `estimate` (default). Rides in
-  high-zoom tiles; low-zoom tiles drop it (extrusion is a high-zoom feature).
+  `osm_tag` (`height`/`building:levels`) | `estimate` (default). Height is baked
+  because extrusion is a **render** need; it rides in high-zoom tiles and
+  low-zoom tiles drop it (extrusion is a high-zoom feature).
 - Provenance: snapshot date and licence per source.
 
 Visual differentiation — outline weight, colour, hatch fill keyed on class and
 `*_source` (the KuniJiban-style treatment the owner liked) — is **frontend style
 on these attributes**, not baked, so it changes without re-baking. Re-baking is
-a minutes-long offline batch, so enrichment fields (PLATEAU height/usage/age, the
-GSI structural class, an `osm_id → plateau gml:id` crosswalk) are added by later
-PRs that re-run the merge.
+a minutes-long offline batch, so enrichment fields (PLATEAU usage/age, the GSI
+structural class, an `osm_id → plateau gml:id` crosswalk) are added by later PRs
+that re-run the merge.
+
+### What does NOT go in the tiles — the render/analyse boundary
+
+DEM-derived analytical **materials** — `slope`, `relief`, `low_point`, `aspect`,
+`curvature`, distance-to-water, and the like — are **not** baked into these
+tiles. They are analysis inputs, not rendering inputs, and they belong in the
+FL materials layer of the windowed store, keyed by `feature_id`, served by the
+read API and joined to the tile geometry on the client (the same "geometry from
+the tile, values from the API" split the windowed evidence layers already use).
+
+Baking them here would be the wrong coupling: the basemap tiles are a
+rarely-rebuilt CDN artifact optimised for drawing, while analytical materials
+evolve with what the AL/SL layers need; folding them in would force a full tile
+re-bake and CDN redeploy every time a material is added. The boundary keeps this:
+**tiles carry render/identity; the store carries FL materials and analysis.**
+Region-wide precomputation of those materials and the interactive AL/SL layers
+that consume them are the `interactive-al-compute` refactor.
 
 ## Decision
 
@@ -143,6 +165,9 @@ buildings, 3.1 GB GeoJSON), plus the added 基盤地図情報 fill:
 - No change to the MLIT and analysis evidence layers — they stay on the windowed
   store, the right tool for queryable, scored, provenance-bearing data. Only the
   building **basemap** moves to tiles.
+- No analytical materials in the tiles (slope/relief/low_point/aspect/…): those
+  are FL materials for the store, joined by `feature_id` — the render/analyse
+  boundary above. Their precomputation is `interactive-al-compute`.
 - No PLATEAU 3D model rendering here — that is the local 3D work mode.
 
 ## Planned PRs
