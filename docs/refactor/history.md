@@ -8,6 +8,14 @@ that was only evaluated but not yet decided for execution says so.
 
 Open a refactor's `00-overview.md` for its full rationale and per-PR plans.
 
+## basemap-view-modes
+
+- Folder: `basemap-view-modes/`
+- Created: 2026-07-24
+- Description: Restructure the basemap view modes and 2.5D. Drop the `slope` basemap (keep standard/photo/hillshade); make 2.5D an on-map **toggle** decoupled from the basemap, applied per-mode (standard = perspective only, no terrain; photo/hillshade = perspective + 3D DEM surface); and add an automatic colour-by-height tint in hillshade mode with zoom-driven opacity — pronounced at wide zoom, faded on zoom-in, hidden past a threshold.
+- State: **Planned** — direction agreed, not started; two PRs (view-mode set + 2.5D toggle + per-mode terrain → hillshade colour-by-height tint).
+- Note: The concrete form of the "setTerrain is orthogonal to the basemap" insight from the tile design. Removing the slope **basemap** does not touch the building slope-risk **analysis** (`interactive-al-compute`). Live GSI rasters only (no self-host). Sequence it **after the MapLibre v6 upgrade** (targets v6) and **before `osm-basemap-tiles` PR4** (2.5D building extrusion builds on the final toggle/terrain model); otherwise independent of the tile work. **Awaiting the owner's go decision before any PR begins.**
+
 ## interactive-al-compute
 
 - Folder: `interactive-al-compute/`
