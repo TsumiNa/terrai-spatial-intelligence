@@ -124,13 +124,12 @@ SELECT_FEATURES = "SELECT ordinal, feature_json FROM features WHERE dataset_key 
 
 # The R-tree join is a conservative float32 prefilter; the float64 columns on
 # `features` decide intersection exactly, preserving the scan's semantics.
-# The R-tree MUST drive: it returns the handful of spatial candidates in the
-# window (~thousands), each resolved by rowid. Left to its own devices the
-# planner instead drives from the `dataset_key` primary-key range and probes
-# the R-tree once per row — fine when a dataset had thousands of rows, but
-# 1.4 s once osmBuildings reached 5.4 M. `CROSS JOIN` fixes the join order
-# (SQLite's documented way), turning the window query from O(dataset size)
-# into O(features in the window): measured 1449 ms -> 17 ms, byte-identical.
+# The R-tree must drive this query: it returns the window's spatial
+# candidates, each resolved by rowid. Left alone the planner instead drives
+# from the `dataset_key` primary-key range and probes the R-tree once per row,
+# making the query O(dataset size) rather than O(features in the window) —
+# invisible while datasets held thousands of rows, costly at millions.
+# `CROSS JOIN` fixes the join order, which is SQLite's documented way to do it.
 WINDOW_QUERY = """
 SELECT f.ordinal, f.feature_json
 FROM features_rtree r
