@@ -177,7 +177,12 @@ export const FALLBACK_STD_RASTER_URL = "https://cyberjapandata.gsi.go.jp/xyz/std
 export const RELIEF_TINT_SOURCE_ID = "terrai-relief-tint";
 export const RELIEF_TINT_LAYER_ID = "terrai-relief-tint-layer";
 export const RELIEF_TINT_URL = "https://cyberjapandata.gsi.go.jp/xyz/relief/{z}/{x}/{y}.png";
+/** The wide-view zoom where the tint is at full strength. */
+export const RELIEF_TINT_START_ZOOM = 5;
 export const RELIEF_TINT_MAX_OPACITY = 0.6;
+/** A mid stop so the fade eases out rather than dropping straight to nothing. */
+export const RELIEF_TINT_MID_ZOOM = 9;
+export const RELIEF_TINT_MID_OPACITY = 0.33;
 /** Opacity reaches 0 here, and the layer is hidden at and above it. */
 export const RELIEF_TINT_FADE_END_ZOOM = 13;
 
@@ -243,7 +248,15 @@ export function composeStyle(vectorStyle: StyleSpecification): StyleSpecificatio
     maxzoom: RELIEF_TINT_FADE_END_ZOOM,
     layout: { visibility: "none" },
     paint: {
-      "raster-opacity": ["interpolate", ["linear"], ["zoom"], 5, RELIEF_TINT_MAX_OPACITY, 9, RELIEF_TINT_MAX_OPACITY * 0.55, RELIEF_TINT_FADE_END_ZOOM, 0],
+      // Full at a wide view, easing through the mid stop, gone by the fade end.
+      "raster-opacity": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        RELIEF_TINT_START_ZOOM, RELIEF_TINT_MAX_OPACITY,
+        RELIEF_TINT_MID_ZOOM, RELIEF_TINT_MID_OPACITY,
+        RELIEF_TINT_FADE_END_ZOOM, 0,
+      ],
     },
   });
   // Repoint the sprite off the experimental host to the vendored copy. glyphs

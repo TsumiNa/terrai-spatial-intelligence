@@ -4,7 +4,7 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, FALLBACK_RASTER_LAYER_ID, FALLBACK_RASTER_SOURCE_ID, FALLBACK_STD_RASTER_URL, LOCAL_SPRITE_URL, RASTER_KINDS, RASTER_SOURCES, RELIEF_TINT_FADE_END_ZOOM, RELIEF_TINT_LAYER_ID, RELIEF_TINT_SOURCE_ID, RELIEF_TINT_URL, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
+import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, FALLBACK_RASTER_LAYER_ID, FALLBACK_RASTER_SOURCE_ID, FALLBACK_STD_RASTER_URL, LOCAL_SPRITE_URL, RASTER_KINDS, RASTER_SOURCES, RELIEF_TINT_FADE_END_ZOOM, RELIEF_TINT_LAYER_ID, RELIEF_TINT_MAX_OPACITY, RELIEF_TINT_SOURCE_ID, RELIEF_TINT_START_ZOOM, RELIEF_TINT_URL, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
 import { palette } from "../theme";
 import { rgba } from "./style-rules";
 
@@ -84,6 +84,11 @@ it("adds a hidden colour-by-height tint above the user rasters, capped past the 
   expect(tint?.layout).toEqual({ visibility: "none" });
   // hidden at/above the fade end so no tint tiles are requested locally
   expect(tint?.maxzoom).toBe(RELIEF_TINT_FADE_END_ZOOM);
+  // the opacity fades from full at the wide-view start to 0 at the fade end
+  const opacity = (tint as { paint?: Record<string, unknown> }).paint?.["raster-opacity"] as unknown[];
+  expect(opacity[0]).toBe("interpolate");
+  expect(opacity.slice(3, 5)).toEqual([RELIEF_TINT_START_ZOOM, RELIEF_TINT_MAX_OPACITY]);
+  expect(opacity.slice(-2)).toEqual([RELIEF_TINT_FADE_END_ZOOM, 0]);
   // above every user raster, so it draws over the shaded relief
   const idx = (id: string) => composed.layers.findIndex((l) => l.id === id);
   for (const kind of RASTER_KINDS) {
