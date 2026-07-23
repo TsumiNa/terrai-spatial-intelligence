@@ -240,10 +240,10 @@ def contract_failures() -> list[str]:
             failures.append(f"missing: {relative}")
 
     for path in sorted((ROOT / "data").rglob("*.json")) + sorted((ROOT / "data").rglob("*.geojson")):
-        # The MLIT acquisition holds gigabyte-scale products; its manifest is
-        # a declared task output above, and the store build is the loud
+        # The Kanto acquisitions hold gigabyte-scale products; their manifests
+        # are declared task outputs above, and the store build is the loud
         # validator of the products themselves.
-        if path.is_relative_to(ROOT / "data/mlit"):
+        if path.is_relative_to(ROOT / "data/mlit") or path.is_relative_to(ROOT / "data/osm/kanto_buildings"):
             continue
         ok, message = validate_json(path)
         if not ok:

@@ -109,6 +109,21 @@ TASKS = {
         force_argument=True,
         check_stale=False,
     ),
+    "osm_kanto": DataTask(
+        "osm_kanto",
+        "extract mainland-Kanto OSM building footprints from the pinned snapshot",
+        "scripts/fetch_osm_kanto_buildings.py",
+        # Only the manifest is declared: the streamed product is gigabyte-scale
+        # and declared JSON outputs are parsed in full on every status check.
+        outputs=("data/osm/kanto_buildings/metadata.json",),
+        network=True,
+        # Not automatic until the store consumes the product (plan PR2): an
+        # ensure-at-startup must not trigger a multi-gigabyte acquisition
+        # nothing reads yet.
+        automatic=False,
+        force_argument=True,
+        check_stale=False,
+    ),
     "mlit_fixture": DataTask(
         "mlit_fixture",
         "derive the committed CI fixture windows from a full MLIT acquisition",
