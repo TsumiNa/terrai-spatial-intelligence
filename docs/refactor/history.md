@@ -12,9 +12,9 @@ Open a refactor's `00-overview.md` for its full rationale and per-PR plans.
 
 - Folder: `osm-basemap-tiles/`
 - Created: 2026-07-23
-- Description: Build self-hosted OSM building vector tiles (PMTiles) so dense city fabric renders at every zoom, moving the wide-view basemap from live GSI to snapshot-pinned tiles.
-- State: **Planned** — assessed feasible, not started.
-- Note: Feasibility assessed 2026-07-23 (3–15 min preprocessing, ~300–700 MB PMTiles, near-zero serving CPU, GCP ~$5–$320/mo by traffic). **Awaiting the owner's go decision before any PR begins.**
+- Description: Build self-hosted OSM building vector tiles (PMTiles) so dense city fabric renders at every zoom, moving the wide-view basemap from live GSI to snapshot-pinned tiles; a single source removes the GSI-vs-OSM double-drawing problem and can absorb the clickable z16+ layer too, retiring the buildings API path.
+- State: **Planned** — assessed feasible, not started; three PRs (generate → integrate → retire the windowed path).
+- Note: Feasibility assessed 2026-07-23 (3–15 min preprocessing, ~300–700 MB PMTiles, near-zero serving CPU). Cost is near-free on a zero-egress host (Cloudflare R2 + CDN ≈ storage-only, a few cents/mo regardless of traffic); GCP would be egress-driven ~$5–320/mo. **Awaiting the owner's go decision before any PR begins.**
 
 ## basemap-resilience
 
