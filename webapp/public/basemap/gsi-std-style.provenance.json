@@ -1,0 +1,8 @@
+{
+  "source_style": "https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/std.json",
+  "source_sprite": "https://gsi-cyberjapan.github.io/gsivectortile-mapbox-gl-js/sprite/std",
+  "retrieved": "2026-07-24",
+  "style_sha256": "13b06edfe19c7f70015d455ad3eefcebd94756ef028674cf4a3bcc757171159a",
+  "sprite_png_sha256": "a7faa537bcda87f3ce1eaf6ad464b5d3767522c40a82222c39c2a6c386e962fc",
+  "note": "Pinned snapshot of the GSI experimental vector style + sprite. Refresh with scripts/refresh_gsi_style.py. Style is byte-identical to upstream; the sprite URL is repointed to the local /basemap/sprite/std at compose time. glyphs (maps.gsi.go.jp) and tiles (cyberjapandata) stay live."
+}

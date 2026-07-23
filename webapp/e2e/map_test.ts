@@ -33,6 +33,22 @@ test("basemap switching keeps the single map instance (no camera rebuild)", asyn
   }
 });
 
+test("boots and renders with gsi-cyberjapan.github.io blocked (pinned snapshot)", async ({ page }) => {
+  // The experimental GitHub Pages host served the style and its sprite; both are
+  // now vendored, so nothing should reach that host. Abort any request to it and
+  // prove the map still constructs and renders (tiles from cyberjapandata, glyphs
+  // from maps.gsi.go.jp) with zero hits to the retired host.
+  const blockedHits: string[] = [];
+  await page.route("**gsi-cyberjapan.github.io**", (route) => {
+    blockedHits.push(route.request().url());
+    return route.abort();
+  });
+
+  await waitForMap(page);
+  await expect(page.locator(".maplibregl-ctrl-attrib")).toContainText("地理院");
+  expect(blockedHits).toEqual([]);
+});
+
 test("zooming past the raster ceilings produces no failed tile requests", async ({ page }) => {
   const failures: string[] = [];
   page.on("response", (response) => {

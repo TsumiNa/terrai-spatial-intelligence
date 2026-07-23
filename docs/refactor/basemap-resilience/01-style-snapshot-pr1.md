@@ -1,7 +1,16 @@
 # PR1 Plan: Pinned Style Snapshot
 
-- Status: Planned
+- Status: Completed
 - Refactor: `basemap-resilience`
+
+> Implementation note: the `sprite` proved to be the **only other**
+> `gsi-cyberjapan.github.io` asset (`glyphs` are on maps.gsi.go.jp, tiles on
+> cyberjapandata), so meeting the "renders identically with that host blocked"
+> acceptance required vendoring the **sprite** too, not just `std.json`. Both are
+> vendored under `webapp/public/basemap/`; the style is byte-identical to upstream
+> and its `sprite` is repointed to the local copy at compose time. Verified: an
+> e2e test aborts every request to `gsi-cyberjapan.github.io` and the map still
+> renders with **zero** hits to it.
 
 ## Goal
 

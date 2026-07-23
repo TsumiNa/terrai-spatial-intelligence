@@ -45,7 +45,7 @@ Open a refactor's `00-overview.md` for its full rationale and per-PR plans.
 - Folder: `basemap-resilience/`
 - Created: 2026-07-23
 - Description: Pin a local snapshot of the GSI vector style and add a production-raster fallback, so the wide-view basemap survives the experimental endpoints changing or dying.
-- State: **Planned** — not started.
+- State: **In progress** — PR1 (style + sprite snapshot) done; PR2 (raster fallback) pending.
 - Note: Complementary to `osm-basemap-tiles`, not overlapping — that replaces the GSI **building** cartography with owned tiles; this hardens the **remaining** live-GSI dependency (the `std.json` boot path, whose failure stops the map from constructing at all, and the non-building vector layers: roads/water/labels/land). While `osm-basemap-tiles` stays buildings-only the two are disjoint; it does retire the building-related style transforms, shrinking one exposure here. Recorded for owner evaluation; execution not scheduled. Both PR plans carry full Goal/Scope/Non-goals/Implementation/Acceptance.
 
 ## osm-highzoom-detail
