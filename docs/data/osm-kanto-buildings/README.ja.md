@@ -9,6 +9,10 @@
 
 関東本土取得窓内の建物フットプリント。固定スナップショット `kanto-260101.osm.pbf`（抽出時刻 2026-01-01T21:21:30Z）から抽出した 5,371,292 ポリゴンで、安定した `osm_id`/`osm_type`、`building` 種別、記載があれば `name`/`building:levels`、取得来歴を保持します。ソース中の退化マルチポリゴン 14 件はスキップし manifest に計数します。コミュニティマッピングのため市街地は密、それ以外は疎で、建物が無いことは不存在の証明ではありません。
 
+- **形式** — GeoJSON FeatureCollection 1 件（`buildings.geojson`、約 3.1 GB、MultiPolygon 形状）と `metadata.json` manifest。
+- **CRS** — EPSG:4326（WGS 84 経緯度）。
+- **範囲** — 関東本土取得窓 (138.65, 34.85, 140.95, 36.30)。
+
 ## 出典
 
 [OpenStreetMap](https://www.openstreetmap.org/copyright) データの [Geofabrik extract](https://download.geofabrik.de/asia/japan/kanto.html)。`-latest` ではなく日付固定スナップショットを使い、再実行で同じ台帳を再現します。

@@ -9,6 +9,10 @@
 
 关东本土采集窗口内的建筑轮廓,抽取自固定快照 `kanto-260101.osm.pbf`(抽取时间戳 2026-01-01T21:21:30Z):共 5,371,292 个多边形,每个都带稳定的 `osm_id`/`osm_type`、`building` 类别、有标注时的 `name`/`building:levels`,以及完整获取溯源。源数据中 14 个退化多边形被跳过并计入清单。覆盖度依赖社区测绘:建成区密、其余稀疏——没有建筑不代表实地不存在。
 
+- **格式** — 单个 GeoJSON FeatureCollection(`buildings.geojson`,约 3.1 GB,MultiPolygon 几何)加 `metadata.json` 清单。
+- **坐标系** — EPSG:4326(WGS 84 经纬度)。
+- **范围** — 关东本土采集窗口 (138.65, 34.85, 140.95, 36.30)。
+
 ## 来源
 
 [OpenStreetMap](https://www.openstreetmap.org/copyright) 数据的 [Geofabrik extract](https://download.geofabrik.de/asia/japan/kanto.html)。使用日期固定快照而非 `-latest`,重跑可复现同一清单。

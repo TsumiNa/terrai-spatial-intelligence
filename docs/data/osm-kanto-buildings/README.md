@@ -9,6 +9,10 @@
 
 Building footprints for the mainland-Kanto acquisition window, extracted from the pinned Geofabrik snapshot `kanto-260101.osm.pbf` (extract timestamp 2026-01-01T21:21:30Z): 5,371,292 polygons, each carrying its stable `osm_id`/`osm_type`, the `building` class, `name`/`building:levels` where mapped, and full retrieval provenance. 14 degenerate multipolygons in the source are skipped and counted in the manifest. Coverage is community-mapped: dense in built-up areas, thinner elsewhere — an absent building is not proof of absence.
 
+- **Format** — one GeoJSON FeatureCollection (`buildings.geojson`, ~3.1 GB, MultiPolygon geometries) plus a `metadata.json` manifest.
+- **CRS** — EPSG:4326 (WGS 84 longitude/latitude).
+- **Bounds** — the mainland-Kanto acquisition window (138.65, 34.85, 140.95, 36.30).
+
 ## Source
 
 [Geofabrik extract](https://download.geofabrik.de/asia/japan/kanto.html) of [OpenStreetMap](https://www.openstreetmap.org/copyright) data. Pinned dated snapshot, never `-latest`, so a re-run reproduces the same inventory.

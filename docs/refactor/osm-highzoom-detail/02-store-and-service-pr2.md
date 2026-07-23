@@ -31,8 +31,8 @@ present in CI through fixture windows, and documented as a dataset card.
 - `data_service.py`: `osmBuildings` joins `FOUNDATION_DATASETS`
   (`data/osm/kanto_buildings/buildings.geojson`) with tier `FL, observed`; store
   inputs and staleness follow automatically.
-- CI fixture: `build_mlit_fixture.py` grows to clip this product through the same
-  suite windows (renamed accordingly if its name stops being true), keeping the
+- CI fixture: the fixture builder (renamed `build_ci_fixture.py` once its name
+  stopped being true) grows to clip this product through suite windows, keeping the
   committed fixture small; the fixture manifest records the derivation.
 - Identity suite: the collection exceeds the size threshold, so it is covered by
   the envelope/count/window identity path; a windowed query joins the matrix.
