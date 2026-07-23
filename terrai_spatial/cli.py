@@ -382,6 +382,10 @@ def contract_failures() -> list[str]:
                 )
 
     refactor_root = docs_root / "refactor"
+    # The at-a-glance index of every refactor; its absence means progress can
+    # only be learned by opening each folder, which is what it exists to avoid.
+    if not (refactor_root / "history.md").is_file():
+        failures.append("missing refactor history index: docs/refactor/history.md")
     for refactor_folder in sorted(path for path in refactor_root.iterdir() if path.is_dir()):
         overview = refactor_folder.relative_to(ROOT) / "00-overview.md"
         if not (ROOT / overview).is_file():

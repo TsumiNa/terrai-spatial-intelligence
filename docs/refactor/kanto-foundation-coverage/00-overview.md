@@ -1,6 +1,6 @@
 # Kanto-wide Foundation Coverage
 
-- Status: Planned
+- Status: Completed — the eight-PR sequence (#52–#59) merged; PR3's two-scope surfacing was superseded by the single-scope revision
 
 ## Context
 

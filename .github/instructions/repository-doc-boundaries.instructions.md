@@ -63,6 +63,8 @@ Put concrete English plans in files named `NN-topic-prXa.md`:
 
   The state must stand alone or be followed by a space, so `Completed-ish` is a failure rather than a near miss. Update the line in the same change that changes the fact, not afterwards.
 
+A single English `history.md` lives directly under `docs/refactor/` as the one place that records every refactor at a glance, so no reader has to open each folder to learn what exists and what is done. It has one section per refactor, ordered by creation with the newest first. Each section states the refactor's name, its folder, a one-line description, the current completion state, and a brief note. The note is where a plan that was only evaluated — feasible or not, but not yet decided for execution — says so, so an assessed-but-undecided plan is never mistaken for scheduled work. Add a section when a refactor folder is created and update its state in the same change that changes the fact.
+
 Follow `.github/instructions/branch-and-pr-workflow.instructions.md` when mapping plans to branches, commits, and PRs.
 
 ### `docs/data/`
