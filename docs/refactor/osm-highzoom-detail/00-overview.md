@@ -45,6 +45,17 @@ it.
   hiding everything else, including this layer.
 - Aerial imagery stays live GSI (no OSM equivalent; caching infeasible at scale).
 
+## Revision (2026-07-23, after PR3 merged)
+
+Owner direction after seeing PR3 live: the building experience is **uniform
+across modules**. The inherited rule that building-drawing analyses hide the
+basemap's buildings (and, in PR3, the detail layer) left the city fabric empty
+everywhere outside an analysis patch. With the basemap's buildings neutral gray
+and the analysis buildings being the same OSM footprints, drawing the analysis
+on top of its own outline is unambiguous — so the hiding machinery is removed
+outright: GSI texture below the handover, OSM data objects above it, in every
+module except underground, with analysis colors layered above.
+
 ## Planned PRs
 
 1. `01-kanto-buildings-acquisition-pr1.md` — acquire mainland-Kanto OSM building

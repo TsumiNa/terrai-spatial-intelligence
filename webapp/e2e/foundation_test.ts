@@ -138,8 +138,9 @@ test("the standard basemap hands its buildings over to windowed OSM data", async
   await expect(page.locator('.foundation-item[data-layer="osmBuildings"]')).toHaveCount(0);
   await page.keyboard.press("Escape");
 
-  // Modules that draw their own buildings suppress it — with no other
-  // foundation layer active the whole attribution strip goes away.
+  // The building experience is uniform: analysis modules keep the detail
+  // layer (their colored buildings draw on top of the same footprints), so
+  // the ODbL notice persists.
   await open(page, { module: "slope" });
-  await expect(page.locator(".map-attribution")).toHaveCount(0);
+  await expect(page.locator(".map-attribution")).toContainText("OpenStreetMap");
 });

@@ -77,18 +77,6 @@ export function rasterId(kind: RasterKind): string {
 }
 
 /**
- * The vector style's own building layers. Analytical scores live in the
- * exhibition's GeoJSON, not in the vector tiles, so a building-level analysis
- * cannot recolor these — it hides them and draws the analysis color as the
- * only building color instead.
- */
-export function vectorBuildingLayerIds(style: StyleSpecification): string[] {
-  return style.layers
-    .filter((layer) => "source-layer" in layer && layer["source-layer"] === "building")
-    .map((layer) => layer.id);
-}
-
-/**
  * The GSI standard style switches to large-scale edge-only cartography at
  * z17 and runs out of layers entirely at z18 (its tiles cap at z16), which
  * read as a sudden wireframe and then a blank map. Freeze the z16

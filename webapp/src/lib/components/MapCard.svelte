@@ -9,7 +9,7 @@
   import { foundationLayer, renderableFoundationLayers } from "../features/registry";
   import { createWindowedFeatureClient, type WindowedState } from "../features/windowed";
   import { i18n } from "../i18n/i18n.svelte";
-  import { buildAnalyticalLayers, buildWindowedFeatureLayer, drawsOwnBuildings, geometryBounds, queuePopup, type PopupSpec } from "../map/layers";
+  import { buildAnalyticalLayers, buildWindowedFeatureLayer, geometryBounds, queuePopup, type PopupSpec } from "../map/layers";
   import { buildUndergroundLayers } from "../map/underground-layers";
   import { createExhibitionMap, type ExhibitionMap } from "../map/map";
   import { normalizeView, undergroundAuditContext, undergroundClassKey } from "../modules";
@@ -49,13 +49,12 @@
   // app state, so it survives module, view, region and language switches.
   const renderableLayers = renderableFoundationLayers();
   // The basemap-detail layer joins the windowed machinery automatically on
-  // the standard basemap, in modules that do not draw their own buildings —
-  // it is part of the basemap experience, never a manual toggle.
+  // the standard basemap in every module — the building experience belongs
+  // to the basemap, uniformly: GSI texture below the handover, OSM data
+  // objects above it, and analysis buildings simply draw on top (they are
+  // the same OSM footprints, so the analysis color covers its own outline).
   function activeDetailKeys(): string[] {
-    const module = app.module;
-    const view = normalizeView(module, app.view);
-    const wanted =
-      app.basemap === "standard" && module !== "underground" && !drawsOwnBuildings(module, view);
+    const wanted = app.basemap === "standard" && app.module !== "underground";
     return wanted ? renderableLayers.filter((entry) => entry.basemapDetail).map((entry) => entry.key) : [];
   }
   let foundationStates = $state.raw<Record<string, WindowedState>>({});
@@ -321,7 +320,6 @@
         ...buildAnalyticalLayers(module, view, data, assetBase, { onFeature: openFeaturePopup }),
       ]);
     }
-    mapApi.setVectorBuildingsVisible(!drawsOwnBuildings(module, view));
   });
 
   // Parity with the old shell: a language switch closes any open popup.
