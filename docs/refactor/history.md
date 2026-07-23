@@ -8,13 +8,21 @@ that was only evaluated but not yet decided for execution says so.
 
 Open a refactor's `00-overview.md` for its full rationale and per-PR plans.
 
+## local-3d-work-mode
+
+- Folder: `local-3d-work-mode/`
+- Created: 2026-07-24
+- Description: The second display mode — box-select an area on the map to open it as a high-fidelity local 3D scene: on-demand PLATEAU LOD1/LOD2 building models above ground, the observed subsurface (UC24) below, with SL overlays and AL simulation; on-demand by mesh, telemetry-guided localisation of hot areas, and a fallback to extruding the merged basemap tiles where PLATEAU has no model.
+- State: **Planned** — assessed, not started; four PRs (scene shell → on-demand PLATEAU → subsurface/analysis overlays → telemetry-driven localisation).
+- Note: Complementary to `osm-basemap-tiles` (that is map mode; this is work mode) and shares its PLATEAU acquisition. Source facts (PLATEAU coverage/format/licence) in `docs/summary/government-3d-building-sources/`. Not pre-cached: on-demand first, localise only what usage telemetry shows is hot. **Awaiting the owner's go decision before any PR begins.**
+
 ## osm-basemap-tiles
 
 - Folder: `osm-basemap-tiles/`
 - Created: 2026-07-23
-- Description: Build self-hosted OSM building vector tiles (PMTiles) so dense city fabric renders at every zoom, moving the wide-view basemap from live GSI to snapshot-pinned tiles; a single source removes the GSI-vs-OSM double-drawing problem and can absorb the clickable z16+ layer too, retiring the buildings API path.
-- State: **Planned** — assessed feasible, not started; three PRs (generate → integrate → retire the windowed path).
-- Note: Feasibility assessed 2026-07-23 (3–15 min preprocessing, ~300–700 MB PMTiles, near-zero serving CPU). Cost is near-free on a zero-egress host (Cloudflare R2 + CDN ≈ storage-only, a few cents/mo regardless of traffic); GCP would be egress-driven ~$5–320/mo. **Awaiting the owner's go decision before any PR begins.**
+- Description: Build one self-hosted **merged** building vector tileset (PMTiles) — OSM primary, 基盤地図情報 filling OSM's suburban/rural gaps, PLATEAU heights joined for 2.5D — so complete, dense city fabric renders at every zoom, moving the wide-view basemap off live GSI. A single build-time merge removes the GSI-vs-OSM double-drawing problem and the empty-map risk of OSM-only tiles, and can absorb the clickable z16+ layer too, retiring the buildings API path.
+- State: **Planned** — assessed feasible and licence-cleared, not started; five PRs (FGD acquisition → merged tile generation → basemap integration → PLATEAU height + 2.5D extrusion → retire the windowed path).
+- Note: Reframed 2026-07-24 from OSM-only tiles to the OSM + 基盤地図情報 + PLATEAU merge after confirming OSM-only would read empty outside dense cities. Licence cleared: 基盤地図情報 is **測量法 承認申請-exempt** (attribution + 加工表示 only), PLATEAU is Site Policy §3 — both fine for offline, commercial, self-built distribution (see `docs/summary/government-3d-building-sources/`). Feasibility unchanged (3–15 min preprocessing, ~300–700 MB PMTiles, near-zero serving CPU); near-free on a zero-egress host (Cloudflare R2 + CDN), GCP egress-driven ~$5–320/mo. **Awaiting the owner's go decision before any PR begins.**
 
 ## basemap-resilience
 

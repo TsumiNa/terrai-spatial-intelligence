@@ -1,4 +1,4 @@
-# OSM Self-built Basemap Tiles
+# Self-built Merged Building Basemap Tiles
 
 - Status: Planned
 
@@ -12,105 +12,157 @@ per-feature GeoJSON cannot carry survey-zoom density (a z12 Tokyo window is
 ~348 MB). Survey-zoom density is exactly what tiles are for: generalized and
 dropped per zoom level.
 
-This refactor builds OSM building (and, later, road/water/label) **vector
-tiles** from the pinned Kanto snapshot the project already acquires, so the
-dense city fabric is available at every zoom — the standing hybrid-basemap
-direction, with the wide view moving from GSI to self-built OSM tiles while
-imagery stays live GSI.
+The naive fix — self-build tiles from OSM alone — trades one gap for another.
+OSM building coverage is rich in dense cities but sparse in suburban and rural
+Japan, so an OSM-only basemap would read emptier than the GSI cartography it
+replaces. The government building data GSI's own cartography derives from is far
+more complete, and — as the licence finding below confirms — it is available to
+us on attribution terms.
 
-### Why one source is simpler than deduping two
+So this refactor builds **one merged building tile source** from the pinned
+snapshots the project acquires: OSM as the primary layer (identity and rich
+tags), 基盤地図情報 filling OSM's gaps (nationwide completeness), and PLATEAU
+heights joined in (real measured height where a municipality is modelled). One
+complete, offline-capable tile set replaces the live-GSI building dependency —
+no empty map, and no two-source double-drawing seam.
 
-Today buildings come from two heterogeneous sources: GSI's generalized
-cartography below z16 and the windowed OSM data objects above it. Making them
-coexist without double-drawing is not a matter of layer indexing — the two
-have **non-corresponding geometry** (GSI symbols vs OSM footprints, no 1:1
-match) and **different load lifecycles** (the map engine pulls GSI tiles; a
-debounced, quantized windowed client pulls OSM), so a true "show GSI only
-where OSM is absent" would be a per-building spatial join at render time —
-expensive and imprecise. A single self-built OSM source removes the question
-entirely: there is nothing to reconcile.
+## Why a build-time merge is the right shape
 
-### The endgame this enables
+Making GSI and OSM coexist at **render time** is the wrong path: their geometry
+does not correspond (GSI symbols vs OSM footprints, no 1:1 match) and their load
+lifecycles differ (the engine pulls GSI tiles; a debounced windowed client pulls
+OSM), so "show government data only where OSM is absent" would be a per-building
+spatial join every frame — expensive and imprecise.
 
-Vector tiles carry feature properties, and MapLibre's `queryRenderedFeatures`
-makes tile features clickable. So one PMTiles source can serve **both** the
-wide-view fabric **and** the z16+ clickable objects — buildings become one
-layer, clickable at every zoom, with **no per-request API path at all**. That
-collapses the whole current stack (GSI building layers + neutralization + the
-z16 `maxzoom` clamp + the windowed `osmBuildings` client + the handover logic)
-into a single tile source, and retires the `osmBuildings` query endpoint —
-which also removes the store's largest collection (3.1 GB) and the unwindowed
-full-scan cliff that came with it. The windowed store stays the right tool for
-the queryable, filterable, provenance-bearing evidence layers (MLIT,
-analysis), which are small and benefit from live querying.
+Moved to **build time**, that same join is affordable and can be done once,
+carefully, offline. The output is one consistent layer with a per-building
+`footprint_source`, so at render time there is exactly one building inventory:
+no double-draw, complete coverage (government data fills the OSM gaps, no empty
+map), full offline capability, and honest provenance (measured height never
+masquerades as estimated or vice versa). This is precisely the operation a
+preprocessing step exists for.
 
-## Feasibility (assessed 2026-07-23, recorded for the go decision)
+## Licence — cleared
 
-Grounded in this repo's real data (Geofabrik `kanto-260101` snapshot,
-5,371,292 buildings, 3.1 GB GeoJSON):
+Confirmed against the official GSI approval-application Q&A (recorded in
+`docs/summary/government-3d-building-sources/`): 基盤地図情報 is a 基本測量成果 but
+is **explicitly exempt** from the 測量法 承認申請 requirement, together with the
+GSI tiles. Downloading it, processing it into derived tiles, and distributing
+them — commercially and offline — needs **no application**, only attribution
+plus a processing note (加工表示). PLATEAU is CC-BY-style under its Site Policy
+§3, the same terms the project already accepts for the integrated UC24 scenes.
+The merged tiles carry a mixed licence (OSM ODbL + GSI content terms); both are
+credited, and ODbL share-alike applies only if the merged **database** itself is
+ever published (serving tiles does not trigger it). A final legal sign-off before
+commercial launch is prudent — not because the finding is in doubt, but because
+the decision warrants it.
 
-- **Preprocessing** — planetiler (OSM-native) or tippecanoe (GeoJSON-native):
-  a Kanto buildings-only tileset z0–16 is a **3–15 minute offline batch**, one
-  run per snapshot refresh, same discipline as every data acquisition.
-- **Output** — a single **PMTiles** file, ~300–700 MB buildings-only (vs 3.1 GB
-  raw); ~1–2 GB for a full basemap with roads/water/labels.
-- **Serving load** — PMTiles is a static file served by HTTP range requests:
-  **near-zero application CPU**, cacheable at a CDN edge. It *removes* the
-  windowed-tile query load from the API rather than adding compute; `osm_id`
-  can be baked into tile features so clicks resolve without an API call.
-- **Monthly cost — depends heavily on the host, and the cheapest is near-free.**
-  On GCP the bill is egress-driven: kiosk ~$5, small public ~$25–45, larger
-  public ~$180–320. But that egress is the whole cost, and it is exactly what
-  a zero-egress object store erases: **Cloudflare R2 charges $0 for egress**,
-  so serving the PMTiles from R2 behind Cloudflare's CDN costs essentially only
-  storage (~$0.015/GB·month → a ~1 GB tileset is a few cents a month) **regardless
-  of traffic**. PMTiles is purpose-built for this — a single file served by
-  HTTP range requests from any object store plus a CDN. Trades the GSI
-  operational risk (free, no SLA) for near-zero, predictable cost plus offline
-  capability and full version control.
+## Two display modes this feeds
 
-Conclusion: **technically feasible, near-zero cost on a zero-egress host
-(Cloudflare R2 + CDN), no runtime dependency added.** Awaiting the owner's
-decision to execute.
+- **Map mode (2D / 2.5D) — this refactor.** The merged tiles are the wide-view
+  building fabric at every zoom; 2.5D extrusion reads the baked height on the
+  terrain surface (`fill-extrusion` over `setTerrain`).
+- **Local 3D work mode — `local-3d-work-mode` (separate refactor).** Box-select
+  loads high-fidelity PLATEAU 3D models on demand; it uses PLATEAU directly, not
+  these tiles. The two are complementary: tiles give the fast, complete, wide
+  map; PLATEAU models give the precise local scene.
+
+## The baked tile schema
+
+Buildings are baked as one merged feature set. Every value that can be measured
+or estimated rides with a `*_source` tag so provenance is never lost:
+
+- `feature_id` — `osm:<id>` where OSM-sourced, `fgd:<id>` where government-sourced.
+- `footprint_source` — `osm` | `fgd`.
+- `building` — class for styling and load priority. OSM's own `building` tag is
+  already rich; GSI's 堅牢/高層 structural class is an optional later augment.
+- `height` (metres) + `height_source` — `plateau` (real `measuredHeight`) |
+  `osm_tag` (`height`/`building:levels`) | `estimate` (default). Rides in
+  high-zoom tiles; low-zoom tiles drop it (extrusion is a high-zoom feature).
+- Provenance: snapshot date and licence per source.
+
+Visual differentiation — outline weight, colour, hatch fill keyed on class and
+`*_source` (the KuniJiban-style treatment the owner liked) — is **frontend style
+on these attributes**, not baked, so it changes without re-baking. Re-baking is
+a minutes-long offline batch, so enrichment fields (PLATEAU height/usage/age, the
+GSI structural class, an `osm_id → plateau gml:id` crosswalk) are added by later
+PRs that re-run the merge.
 
 ## Decision
 
-Generate OSM vector tiles from the pinned snapshot and serve them as the
-building fabric. The move is staged (see the PR sequence below): PR2 puts the
-tiles below the z16 handover with the windowed clickable objects still above
-it, and PR3 lets the tile source span all zooms and retires the windowed layer.
-Imagery, hillshade and slope stay live GSI (production endpoints, no OSM
-equivalent).
+Acquire 基盤地図情報 buildings for Kanto (a new government source), merge them with
+the already-acquired OSM buildings offline (OSM primary, FGD fill), generate one
+PMTiles set with the baked schema, and serve it as the building fabric —
+replacing GSI's building cartography entirely, with PLATEAU heights and 2.5D
+extrusion folded in, and the windowed `osmBuildings` path retired once the tiles
+carry clickability. Imagery, hillshade and slope stay live GSI (production
+endpoints, no OSM equivalent).
+
+The move is staged (see the PR sequence): the map works at every step, the
+merged tiles enter below the z16 handover with the windowed clickable objects
+still above them, and only the last PR lets the tile source span all zooms and
+retires the windowed layer.
 
 Alternatives considered:
 
-- *Do nothing (GSI live)* — free but sparse at survey zoom and no offline; the
-  visible-fabric fix (#70) is the accepted interim, not the end state.
-- *Lower the windowed handover* — rejected by measurement: a z14 window is
-  ~20 MB, z12 ~348 MB; raw GeoJSON cannot do survey density.
-- *Commercial basemap (Mapbox/MapTiler)* — per-1000-load SaaS, typically
-  dearer than self-hosted static tiles at scale, and cedes control.
+- *OSM-only tiles* — rejected: empty map in suburban/rural Japan, the very gap
+  the government data closes.
+- *Keep GSI live as a fallback under OSM tiles* — reintroduces render-time
+  double-drawing wherever both have a building, and keeps the GSI dependency.
+  The build-time merge removes both problems.
+- *Lower the windowed handover instead of tiling* — rejected by measurement
+  (z14 window ~20 MB, z12 ~348 MB); raw GeoJSON cannot do survey density.
+- *Commercial basemap (Mapbox/MapTiler)* — per-1000-load SaaS, dearer at scale,
+  and cedes control and offline capability.
+
+## Feasibility and cost (assessed 2026-07-23)
+
+Grounded in this repo's real data (Geofabrik `kanto-260101`, 5,371,292 OSM
+buildings, 3.1 GB GeoJSON), plus the added 基盤地図情報 fill:
+
+- **Preprocessing** — planetiler (OSM-native) or tippecanoe (GeoJSON-native): a
+  Kanto buildings tileset z0–16 is a **3–15 minute offline batch**, one run per
+  snapshot refresh, same discipline as every acquisition. The FGD fill and
+  PLATEAU height join add a spatial-join step but stay within the same batch.
+- **Output** — a single **PMTiles** file, ~300–700 MB buildings-only (vs 3.1 GB
+  raw OSM); the government fill adds footprints in the thin areas but tiles
+  generalize aggressively at low zoom, so the total stays in that band.
+- **Serving** — PMTiles is a static file served by HTTP range requests: near-zero
+  application CPU, cacheable at a CDN edge. It *removes* the windowed-tile query
+  load rather than adding compute.
+- **Cost** — on a zero-egress object store this is near-free: Cloudflare R2
+  charges $0 for egress, so serving from R2 behind a CDN costs essentially only
+  storage (~$0.015/GB·month → a ~1 GB tileset is a few cents/month) regardless
+  of traffic. GCP's egress-driven bill (~$5 kiosk, ~$25–45 small public,
+  ~$180–320 larger) is the alternative if a zero-egress host is not used.
 
 ## Non-goals
 
-- No change to imagery/hillshade/slope (stay live GSI production).
+- No change to imagery/hillshade/slope (live GSI production).
 - No self-hosted raster pyramid; vector tiles only.
-- No change to the MLIT and analysis evidence layers — they stay on the
-  windowed store, which is the right tool for queryable, scored, provenance-
-  bearing data. Only the building **basemap** moves to tiles.
+- No change to the MLIT and analysis evidence layers — they stay on the windowed
+  store, the right tool for queryable, scored, provenance-bearing data. Only the
+  building **basemap** moves to tiles.
+- No PLATEAU 3D model rendering here — that is the local 3D work mode.
 
 ## Planned PRs
 
-Ordered introduce → migrate → remove, so the map stays working at each step.
+Ordered introduce → migrate → remove, so the map works at each step. Each cites
+`docs/summary/government-3d-building-sources/` for the source facts.
 
-1. `01-tile-generation-pr1.md` — a data task that builds the PMTiles from the
-   pinned snapshot, with a spike recording real size and time; gitignored
-   product, committed manifest.
-2. `02-basemap-integration-pr2.md` — serve the PMTiles as the wide-view
-   building fabric under the handover, keep clickability, prove offline. The
-   windowed `osmBuildings` layer still handles z16+ at this step.
-3. `03-retire-windowed-buildings-pr3.md` — the tile source absorbs the z16+
-   clickable objects (`queryRenderedFeatures` on baked-in `osm_id`), and the
-   windowed `osmBuildings` client, its endpoint usage, and the dataset's place
-   in the store are retired — one source, clickable at every zoom, no
-   per-request building query.
+1. `01-government-building-acquisition-pr1.md` — acquire 基盤地図情報 Kanto
+   buildings as a pinned, gitignored source with per-feature provenance,
+   mirroring the OSM acquisition.
+2. `02-merged-tile-generation-pr2.md` — the offline merge (OSM primary + FGD
+   fill) and PMTiles generation with the baked schema; a spike recording real
+   size and time.
+3. `03-basemap-integration-pr3.md` — serve the merged tiles as the wide-view
+   fabric under the handover; clickability; prove offline. The windowed
+   `osmBuildings` layer still handles z16+ at this step.
+4. `04-plateau-height-extrusion-pr4.md` — join PLATEAU `measuredHeight` into the
+   tiles (re-bake), add 2.5D `fill-extrusion` on the terrain surface, honest
+   `height_source`.
+5. `05-retire-windowed-buildings-pr5.md` — the tile source absorbs the z16+
+   clickable objects (`queryRenderedFeatures` on baked ids); the windowed
+   `osmBuildings` client, endpoint usage, and store collection are retired — one
+   source, clickable at every zoom, no per-request building query.
