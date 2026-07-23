@@ -54,9 +54,13 @@ Alternatives considered:
   commercial exhibition is not an acceptable failure mode, and the fix costs
   an afternoon.
 - *Self-host the vector tiles* — removes the dependency entirely but means
-  owning a nationwide tile pyramid build; rejected earlier at the basemap
-  level by the owner (「通用的信息就直接用」), and out of proportion to the
-  risk now that the building experience is already self-hosted.
+  owning a nationwide tile pyramid build; out of proportion to the risk here.
+  Scope matters: the owner has since adopted self-built tiles for the
+  **building** layer (`osm-basemap-tiles`, the OSM + 基盤地図情報 merge), but
+  that is buildings only. Self-hosting the **full** basemap pyramid
+  (roads/water/labels/land) remains rejected (「通用的信息就直接用」) — and that
+  non-building surface is exactly what this refactor instead hardens with a
+  pinned style and a raster fallback, rather than owning.
 - *Switch the wide view to a non-GSI basemap (OSM-based, commercial provider)*
   — trades a no-SLA free official source for either a paid SLA or a
   self-hosting burden, and loses the GSI cartography the exhibition's
