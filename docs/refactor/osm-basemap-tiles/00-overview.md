@@ -76,9 +76,11 @@ decision to execute.
 ## Decision
 
 Generate OSM vector tiles from the pinned snapshot and serve them as the
-wide-view building fabric, replacing GSI's building texture below the z16
-handover (the windowed clickable OSM objects continue above it). Imagery,
-hillshade and slope stay live GSI (production endpoints, no OSM equivalent).
+building fabric. The move is staged (see the PR sequence below): PR2 puts the
+tiles below the z16 handover with the windowed clickable objects still above
+it, and PR3 lets the tile source span all zooms and retires the windowed layer.
+Imagery, hillshade and slope stay live GSI (production endpoints, no OSM
+equivalent).
 
 Alternatives considered:
 

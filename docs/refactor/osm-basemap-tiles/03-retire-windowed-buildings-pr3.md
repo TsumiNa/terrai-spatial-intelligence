@@ -12,10 +12,10 @@ remains.
 
 ## Scope
 
-- Clickability from the tiles: bake `osm_id`, kept tags and provenance into the
-  tile feature properties at generation time (PR1), and resolve clicks with
-  MapLibre `queryRenderedFeatures` into the same raw audit record the windowed
-  popup produced. No API call.
+- Clickability from the tiles: PR1 bakes `osm_id`, the kept tags and provenance
+  into the tile feature properties; this PR resolves clicks against those baked
+  properties with MapLibre `queryRenderedFeatures`, opening the same raw audit
+  record the windowed popup produced. No API call.
 - Remove the frontend windowed `osmBuildings` layer, the z16 `maxzoom` clamp on
   the GSI building layers, and the handover logic — the tile source spans all
   zooms.
@@ -38,5 +38,7 @@ remains.
   properties, with no `/api/v1/features/osmBuildings` request.
 - `git`/store no longer carry `osmBuildings`; `terrai validate` and the store
   build pass; the e2e handover/click suites pass against the tile source.
-- Offline: with both the GSI vector host and the API blocked, buildings still
-  render and remain clickable from the local tiles.
+- Offline: with the GSI vector host blocked, buildings still render and remain
+  clickable from the local tiles, and no `/api/v1/features/osmBuildings` request
+  is made. (The app still loads `/bootstrap`; only the building query path is
+  gone, so this is not a full API blackout.)
