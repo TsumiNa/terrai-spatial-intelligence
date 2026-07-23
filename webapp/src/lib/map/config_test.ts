@@ -38,10 +38,11 @@ it("streams every raster basemap live from the GSI tile host", () => {
 
 it("appends the nationwide raster layers and the terrain DEM source", () => {
   const composed = composeStyle(baseStyle);
-  // vector + the raster-dem terrain + the hidden fallback + the user rasters
-  expect(Object.keys(composed.sources)).toHaveLength(3 + RASTER_KINDS.length);
-  // background + the hidden fallback + the user rasters
-  expect(composed.layers).toHaveLength(2 + RASTER_KINDS.length);
+  // composeStyle adds, over baseStyle: the raster-dem terrain + the hidden
+  // fallback source + one source per user raster…
+  expect(Object.keys(composed.sources)).toHaveLength(Object.keys(baseStyle.sources).length + 2 + RASTER_KINDS.length);
+  // …and the hidden fallback layer + one layer per user raster.
+  expect(composed.layers).toHaveLength(baseStyle.layers.length + 1 + RASTER_KINDS.length);
   const dem = composed.sources[TERRAIN_SOURCE_ID] as { type?: string; encoding?: string; tiles?: string[] };
   expect(dem.type).toBe("raster-dem");
   expect(dem.encoding).toBe("mapbox");

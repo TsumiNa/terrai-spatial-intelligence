@@ -101,6 +101,13 @@ export const app = {
   },
   toggle25D() {
     twoAndHalfD = !twoAndHalfD;
+    // Keep the `?tilt=1` deep link in sync with the toggle, since initialParams
+    // reads it back on load.
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (twoAndHalfD) url.searchParams.set("tilt", "1");
+    else url.searchParams.delete("tilt");
+    window.history.replaceState({}, "", url);
   },
   toggleFoundationLayer(key: string) {
     foundationLayers = foundationLayers.includes(key)

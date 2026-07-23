@@ -64,6 +64,7 @@ test("the 2.5D toggle tilts every basemap but adds 3D terrain only on imagery/re
   // so no DEM tiles are fetched — a warped vector cartographic map reads as noise.
   await page.locator(".view25d-toggle").click();
   await expect(page.locator(".view25d-toggle")).toHaveAttribute("aria-pressed", "true");
+  await expect(page).toHaveURL(/[?&]tilt=1/); // deep link reflects the toggle
   await page.waitForTimeout(1500);
   expect(demTiles).toEqual([]);
 
@@ -71,9 +72,10 @@ test("the 2.5D toggle tilts every basemap but adds 3D terrain only on imagery/re
   await page.locator(".basemap-button", { hasText: "起伏" }).click();
   await expect.poll(() => demTiles.length, { timeout: 15000 }).toBeGreaterThan(0);
 
-  // toggle 2.5D off
+  // toggle 2.5D off — aria and the deep link both clear
   await page.locator(".view25d-toggle").click();
   await expect(page.locator(".view25d-toggle")).toHaveAttribute("aria-pressed", "false");
+  await expect(page).not.toHaveURL(/tilt=1/);
 });
 
 test("boots and renders with gsi-cyberjapan.github.io blocked (pinned snapshot)", async ({ page }) => {

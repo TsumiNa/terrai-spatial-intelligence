@@ -1,6 +1,6 @@
 # PR1 Plan: View Modes and the 2.5D Toggle
 
-- Status: Completed
+- Status: In progress
 - Refactor: `basemap-view-modes`
 
 > Implementation note: the slope **basemap** is removed; the slope **module**
