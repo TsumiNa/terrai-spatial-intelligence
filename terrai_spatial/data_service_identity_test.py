@@ -169,6 +169,7 @@ QUERY_MATRIX = [
     {"key": "solar", "where": "status", "minimum": 1.0},
     {"key": "landHistory", "bbox": (0.0, 0.0, 1.0, 1.0)},
     {"key": "gsiEvacuation", "bbox": (139.0, 35.0, 141.0, 36.0), "limit": 50},
+    {"key": "railway", "limit": 5},  # no bbox, no filter → the no-bbox fast path
 ]
 
 
@@ -265,3 +266,19 @@ def test_match_semantics_are_pinned_by_table() -> None:
     for properties, field, equals, minimum, maximum, expected in MATCH_TABLE:
         got = DataService._matches(properties, field, equals, minimum, maximum)
         assert got is expected, (properties, field, equals, minimum, maximum)
+
+
+def test_unwindowed_limit_query_does_not_scan_the_whole_dataset() -> None:
+    # The former cliff: a limit-only query loaded and parsed every row first.
+    # osmBuildings is the largest collection; a small limit must return fast
+    # with the manifest total as `matched`.
+    import time
+
+    key = "osmBuildings" if "osmBuildings" in ALL_DATASETS else "landUseMesh"
+    start = time.perf_counter()
+    result = store_backed.query_features(key, limit=5)
+    elapsed = time.perf_counter() - start
+
+    assert result["query"]["returned"] == 5
+    assert result["query"]["matched"] > 5  # the whole-dataset total
+    assert elapsed < 2.0, f"{key} limit-only query took {elapsed:.1f}s — the cliff is back"

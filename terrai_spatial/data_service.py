@@ -18,6 +18,8 @@ from .store import (
     STORE_PATH,
     StoreSource,
     all_features,
+    count_window,
+    dataset_feature_count,
     dataset_kind,
     open_store,
     read_collection,
@@ -422,11 +424,28 @@ class DataService:
         envelope = read_envelope(connection, key)
         if envelope is None or envelope.get("type") != "FeatureCollection":
             raise ValueError(f"{key} is not a GeoJSON FeatureCollection")
-        # The R-tree answers the window; only the windowed candidates are
-        # parsed. Attribute filters stay in Python deliberately: `equals`
-        # compares `str(value)` and Python treats booleans as numbers, and
-        # no SQL expression reproduces either exactly — the pinned-semantics
-        # tests are the record of that decision.
+        # Fast path — no attribute filter and no sort. The limit goes to SQL,
+        # so a windowed or unwindowed query never materializes rows it would
+        # discard, and `matched` comes from a count that reads no feature_json.
+        # Without this an unbounded `limit`-only query on a million-row dataset
+        # loaded and parsed every row before slicing (measured 45 s on
+        # osmBuildings); it now returns in milliseconds.
+        if not where and not sort:
+            if bbox:
+                matched = count_window(connection, key, bbox)
+                rows = window_features(connection, key, bbox, limit=limit)
+            else:
+                matched = dataset_feature_count(connection, key)
+                rows = all_features(connection, key, limit=limit)
+            envelope["features"] = [json.loads(text) for _, text in rows]
+            envelope["query"] = {"matched": matched, "returned": len(envelope["features"])}
+            return envelope
+
+        # Filtered/sorted path — the predicate and order both need every
+        # matching feature in hand. Attribute filters stay in Python
+        # deliberately: `equals` compares `str(value)` and Python treats
+        # booleans as numbers, and no SQL expression reproduces either exactly
+        # — the pinned-semantics tests are the record of that decision.
         rows = window_features(connection, key, bbox) if bbox else all_features(connection, key)
         features = [json.loads(text) for _, text in rows]
         if where:
