@@ -21,6 +21,20 @@ act.
 - Record the snapshot's retrieval date beside it (the FL provenance habit,
   applied to a rendering asset).
 
+## Implementation steps
+
+1. Fetch today's `std.json`, commit it under the webapp source with its
+   retrieval date recorded beside it.
+2. Point `createExhibitionMap` at the vendored file; delete the runtime fetch
+   and its failure path.
+3. Add the refresh script (fetch → diff summary → overwrite) and register it
+   as an opt-in task.
+4. Run the style-transform unit tests against the vendored file; add one that
+   fails if the file loses the members the transforms rely on
+   (`source-layer: building`, the z17/z18 layer bands).
+5. Verify boot with `gsi-cyberjapan.github.io` blocked; confirm visual
+   baselines are byte-stable.
+
 ## Non-goals
 
 - No change to which tiles the style points at (still `experimental_bvmap` —

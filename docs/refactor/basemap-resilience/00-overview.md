@@ -48,6 +48,21 @@ view (labels raster-baked, no building texture below the handover), while the
 OSM detail layer, all foundation overlays and every analysis layer continue
 unchanged — they are our data.
 
+Alternatives considered:
+
+- *Do nothing* — free until the day it is not; a boot-time hard failure on a
+  commercial exhibition is not an acceptable failure mode, and the fix costs
+  an afternoon.
+- *Self-host the vector tiles* — removes the dependency entirely but means
+  owning a nationwide tile pyramid build; rejected earlier at the basemap
+  level by the owner (「通用的信息就直接用」), and out of proportion to the
+  risk now that the building experience is already self-hosted.
+- *Switch the wide view to a non-GSI basemap (OSM-based, commercial provider)*
+  — trades a no-SLA free official source for either a paid SLA or a
+  self-hosting burden, and loses the GSI cartography the exhibition's
+  Japanese audience reads natively. Kept as the eventual escape hatch if GSI
+  discontinues the experiment outright.
+
 ## Non-goals
 
 - No self-hosting of any tile pyramid; no change to the confirmed live-GSI

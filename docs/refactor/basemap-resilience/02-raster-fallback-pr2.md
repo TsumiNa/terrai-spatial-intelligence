@@ -23,6 +23,19 @@ detail layer, foundation overlays or analyses.
 - e2e: with vector tile requests blocked, the map still renders streets from
   the raster fallback and the OSM detail layer keeps serving buildings.
 
+## Implementation steps
+
+1. Add the production `std` raster source and a hidden raster layer through
+   the existing plumbing in `composeStyle`.
+2. Wire the ops switch (build-time flag or query parameter) that starts the
+   app on the raster basemap.
+3. Subscribe to MapLibre tile-error events for the vector source; measure a
+   failure threshold that avoids flapping, then promote one-way per session
+   with a console note.
+4. e2e: block `experimental_bvmap` requests, assert streets render from the
+   raster fallback and `osmBuildings` windows keep serving.
+5. Confirm normal operation is unchanged (fallback hidden, baselines stable).
+
 ## Non-goals
 
 - No UI for the fallback beyond the attribution line (it is an availability
