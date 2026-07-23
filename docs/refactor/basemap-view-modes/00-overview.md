@@ -51,6 +51,22 @@ tied to the hillshade mode and to zoom, independent of the 2.5D toggle (so wide
 hillshade is coloured relief whether flat or tilted; when 2.5D is on and the
 terrain is up, wide zoom shows coloured 3D relief).
 
+**Hillshade is computed from a high-resolution DEM, not upscaled.** GSI's
+pre-rendered `hillshademap` raster is capped at z16, so it blurs (overscales)
+beyond it. The fix is not to super-sample the image — upscaling cannot add real
+relief, and ML super-resolution would **fabricate measured-looking terrain**,
+against the project's observed/provenance commitment. Instead the hillshade is
+computed on the client from the DEM (MapLibre's `hillshade` layer over a
+`raster-dem` source), and the DEM source is upgraded to **DEM5A (5 m)** — which
+the project should have used from the start, and which the 基盤地図情報 acquisition
+(`osm-basemap-tiles` PR1) already brings in. Because the same `raster-dem` feeds
+`setTerrain`, this sharpens both the shaded relief and the 2.5D terrain. Three
+principles: **no image super-resolution; sharpness comes from DEM resolution; and
+it converges with the self-host-DEM path** (self-hosted DEM5A tiles, pre-encoded
+to Mapbox terrain-RGB, also retire the runtime transcode). An optional 2× DPR
+render supersamples the *shading computation* (anti-aliasing, not fabricated
+detail).
+
 ## Rationale
 
 - **Decoupling 2.5D from the basemap** is the generalisation already noted while
@@ -85,3 +101,8 @@ terrain is up, wide zoom shows coloured 3D relief).
 2. `02-hillshade-height-tint-pr2.md` — add the colour-by-height tint in hillshade
    mode (GSI `relief`/色別標高図 or equivalent) with zoom-driven opacity that
    fades on zoom-in and hides past a threshold.
+3. `03-hillshade-from-dem-and-resolution-pr3.md` — compute the hillshade on the
+   client from a high-resolution DEM5A (5 m) source instead of the z16-capped
+   pre-rendered raster, sharpening both the shading and the shared 2.5D terrain;
+   optional 2× DPR; no image super-resolution (sharpness from DEM resolution,
+   converging with the self-host-DEM path).

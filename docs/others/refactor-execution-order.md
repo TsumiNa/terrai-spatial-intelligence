@@ -30,11 +30,13 @@ of this sequence.) The MapLibre v6 upgrade is a maintenance task, not a refactor
   GSI style JSON + non-building vector tiles). `osm-basemap-tiles` PR5 only shrinks
   one of its exposures (the GSI building layers); its core is orthogonal.
 - `basemap-view-modes` (drop slope, 2.5D toggle, per-mode terrain, hillshade
-  height tint) is a frontend map-layer refactor. It is independent of the tile
-  **data**, but it rewrites the same 2.5D/terrain plumbing in `map.ts` that
-  `osm-basemap-tiles` PR3–PR4 build on — so it must land **before those**, after
-  the MapLibre v6 upgrade. It can run in parallel with `osm-basemap-tiles`
-  PR1–PR2 (data tasks, no frontend).
+  height tint, DEM-computed hillshade) is a frontend map-layer refactor. It is
+  independent of the tile **data**, but it rewrites the same 2.5D/terrain plumbing
+  in `map.ts` that `osm-basemap-tiles` **PR4** (2.5D building extrusion) builds on
+  — so it must land **before PR4**, after the MapLibre v6 upgrade. It can run in
+  parallel with `osm-basemap-tiles` PR1–PR3 (data tasks + the building-layer
+  integration, none of which touch the 2.5D/terrain plumbing). Its PR3 also wants
+  the DEM5A source that `osm-basemap-tiles` PR1's FGD acquisition brings in.
 - `rust-api-backend` is **entry-condition gated** (measured throughput need +
   settled business scope + separated/embedded decision) and is the home of the SL
   compute service that `interactive-al-compute` names — so it is conditional and
@@ -81,15 +83,19 @@ early protects the demo/commercial showing while the big work proceeds.
 
 ### Phase 1 — `basemap-view-modes` (frontend, before tile integration)
 
-After the v6 upgrade, before `osm-basemap-tiles` PR3–PR4. Rewrites the 2.5D/terrain
-plumbing those PRs build on, so it goes first; independent of the tile data, so it
-can overlap `osm-basemap-tiles` PR1–PR2 (data tasks). Two PRs:
+After the v6 upgrade, before `osm-basemap-tiles` **PR4** (2.5D building extrusion
+builds on the final toggle/terrain model). Independent of the tile data, so it can
+overlap `osm-basemap-tiles` PR1–PR3. Three PRs:
 
 1. `01-view-modes-and-25d-toggle-pr1.md` — drop the `slope` basemap; on-map 2.5D
    switch decoupled from the basemap; per-mode behaviour (standard = pitch only;
    photo/hillshade = pitch + `setTerrain`).
 2. `02-hillshade-height-tint-pr2.md` — hillshade colour-by-height tint with
    zoom-driven opacity (strong wide, faded on zoom-in, hidden past a threshold).
+3. `03-hillshade-from-dem-and-resolution-pr3.md` — compute the hillshade on the
+   client from a high-resolution DEM (DEM5A 5 m) instead of the z16-capped
+   pre-rendered raster, sharpening both the shading and the 2.5D terrain; optional
+   2× DPR. No image super-resolution.
 
 ### Phase 2 — `osm-basemap-tiles` (the foundation)
 
@@ -131,7 +137,7 @@ vectorize and misses budget.
 ## One-line sequence
 
 MapLibre v6 upgrade + `basemap-resilience` (Phase 0, early) → `basemap-view-modes`
-(after v6, before tiles PR3–PR4) → `osm-basemap-tiles` (1→5) → `local-3d-work-mode`
+(after v6, before tiles PR4) → `osm-basemap-tiles` (1→5) → `local-3d-work-mode`
 (after tiles PR4) → `interactive-al-compute` → `rust-api-backend` (only if its
 entry conditions are met).
 
