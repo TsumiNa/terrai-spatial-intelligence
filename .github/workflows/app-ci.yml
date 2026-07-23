@@ -1,18 +1,23 @@
 name: App CI
 
-# The expensive jobs: a Node toolchain, a Vite build, and a Playwright
-# browser. Markdown never reaches the frontend build, so documentation-only
-# changes skip this workflow entirely; the Python workflow in ci.yml still
-# validates the documents themselves.
+# The cheap jobs (type check, unit tests, Vite build) run on every change.
+# The end-to-end job installs a Playwright browser and takes minutes, so it
+# is gated to release tags and manual dispatch to conserve Actions minutes;
+# e2e is otherwise run and fixed locally before merge. Markdown never reaches
+# the frontend build, so documentation-only changes skip this workflow
+# entirely; the Python workflow in ci.yml still validates the documents.
 
 on:
   push:
     branches: [main]
+    tags:
+      - "v*"
     paths-ignore:
       - "**.md"
   pull_request:
     paths-ignore:
       - "**.md"
+  workflow_dispatch:
 
 # A superseded run tells you nothing useful, and these jobs install a browser.
 concurrency:
@@ -51,6 +56,9 @@ jobs:
   e2e:
     name: End to end
     runs-on: ubuntu-latest
+    # Release tags and manual runs only — see the header note. On ordinary
+    # pushes and pull requests this job is skipped; run e2e locally instead.
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
 
