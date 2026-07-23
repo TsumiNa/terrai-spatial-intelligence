@@ -11,11 +11,12 @@ Source of truth for each refactor's own PR steps and status stays in its folder
 and in `docs/refactor/history.md`. This note only fixes the **order across**
 refactors and the **dependencies between** them.
 
-## The five Planned refactors
+## The six Planned refactors
 
 `osm-basemap-tiles`, `local-3d-work-mode`, `interactive-al-compute`,
-`basemap-resilience`, `rust-api-backend`. (`data-pipeline-and-store` PR4/PR5 stay
-Blocked on measured triggers and are out of this sequence.)
+`basemap-view-modes`, `basemap-resilience`, `rust-api-backend`.
+(`data-pipeline-and-store` PR4/PR5 stay Blocked on measured triggers and are out
+of this sequence.) The MapLibre v6 upgrade is a maintenance task, not a refactor.
 
 ## Dependencies that force the order
 
@@ -28,6 +29,14 @@ Blocked on measured triggers and are out of this sequence.)
 - `basemap-resilience` is **independent** of all of the above (it hardens the live
   GSI style JSON + non-building vector tiles). `osm-basemap-tiles` PR5 only shrinks
   one of its exposures (the GSI building layers); its core is orthogonal.
+- `basemap-view-modes` (drop slope, 2.5D toggle, per-mode terrain, hillshade
+  height tint, DEM-computed hillshade) is a frontend map-layer refactor. It is
+  independent of the tile **data**, but it rewrites the same 2.5D/terrain plumbing
+  in `map.ts` that `osm-basemap-tiles` **PR4** (2.5D building extrusion) builds on
+  — so it must land **before PR4**, after the MapLibre v6 upgrade. It can run in
+  parallel with `osm-basemap-tiles` PR1–PR3 (data tasks + the building-layer
+  integration, none of which touch the 2.5D/terrain plumbing). Its PR3 also wants
+  the DEM5A source that `osm-basemap-tiles` PR1's FGD acquisition brings in.
 - `rust-api-backend` is **entry-condition gated** (measured throughput need +
   settled business scope + separated/embedded decision) and is the home of the SL
   compute service that `interactive-al-compute` names — so it is conditional and
@@ -72,7 +81,23 @@ early protects the demo/commercial showing while the big work proceeds.
 1. `01-style-snapshot-pr1.md` — vendor and locally serve the pinned `std.json`.
 2. `02-raster-fallback-pr2.md` — production-raster fallback + activation.
 
-### Phase 1 — `osm-basemap-tiles` (the foundation)
+### Phase 1 — `basemap-view-modes` (frontend, before tile integration)
+
+After the v6 upgrade, before `osm-basemap-tiles` **PR4** (2.5D building extrusion
+builds on the final toggle/terrain model). Independent of the tile data, so it can
+overlap `osm-basemap-tiles` PR1–PR3. Three PRs:
+
+1. `01-view-modes-and-25d-toggle-pr1.md` — drop the `slope` basemap; on-map 2.5D
+   switch decoupled from the basemap; per-mode behaviour (standard = pitch only;
+   photo/hillshade = pitch + `setTerrain`).
+2. `02-hillshade-height-tint-pr2.md` — hillshade colour-by-height tint with
+   zoom-driven opacity (strong wide, faded on zoom-in, hidden past a threshold).
+3. `03-hillshade-from-dem-and-resolution-pr3.md` — compute the hillshade on the
+   client from a high-resolution DEM (DEM5A 5 m) instead of the z16-capped
+   pre-rendered raster, sharpening both the shading and the 2.5D terrain; optional
+   2× DPR. No image super-resolution.
+
+### Phase 2 — `osm-basemap-tiles` (the foundation)
 
 The backbone: it establishes the merged tiles, the `feature_id` contract, the
 extrudable heights, and the PLATEAU acquisition everything downstream reuses. Run
@@ -85,7 +110,7 @@ its five PRs in order:
 Note: `local-3d-work-mode` can start once PR4 lands (PLATEAU acquisition +
 extrudable tiles exist), even before PR5.
 
-### Phase 2 — `local-3d-work-mode` (work mode on the foundation)
+### Phase 3 — `local-3d-work-mode` (work mode on the foundation)
 
 Starts after `osm-basemap-tiles` PR4. Four PRs in order:
 
@@ -93,7 +118,7 @@ Starts after `osm-basemap-tiles` PR4. Four PRs in order:
    extruded merged tiles) → 3. `03` subsurface + SL/AL overlays → 4. `04`
    telemetry-driven selective localisation.
 
-### Phase 3 — `interactive-al-compute` (analysis architecture on top)
+### Phase 4 — `interactive-al-compute` (analysis architecture on top)
 
 Starts after tiles (needs `feature_id`) and, per its overview, after local-3d.
 Three PRs in order:
@@ -101,7 +126,7 @@ Three PRs in order:
 1. `01` FL materials precompute (region-wide) → 2. `02` interactive frontend AL
    recombination → 3. `03` retire frozen AL products as source of truth.
 
-### Phase 4 — `rust-api-backend` (conditional, gated)
+### Phase 5 — `rust-api-backend` (conditional, gated)
 
 Not scheduled. Trigger only if `interactive-al-compute`'s SL compute service (or a
 measured read-throughput need) meets the three entry conditions in that folder's
@@ -111,9 +136,10 @@ vectorize and misses budget.
 
 ## One-line sequence
 
-MapLibre v6 upgrade + `basemap-resilience` (Phase 0, early; v6 before tiles PR3) →
-`osm-basemap-tiles` (1→5) → `local-3d-work-mode` (after tiles PR4) →
-`interactive-al-compute` → `rust-api-backend` (only if its entry conditions are met).
+MapLibre v6 upgrade + `basemap-resilience` (Phase 0, early) → `basemap-view-modes`
+(after v6, before tiles PR4) → `osm-basemap-tiles` (1→5) → `local-3d-work-mode`
+(after tiles PR4) → `interactive-al-compute` → `rust-api-backend` (only if its
+entry conditions are met).
 
 ## Process discipline per PR (from the repo conventions)
 
