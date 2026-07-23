@@ -24,20 +24,21 @@ test("both regions load with GSI attribution", async ({ page }) => {
 });
 
 test("loads the vendored sprite from an absolute URL (v6 requires it)", async ({ page }) => {
-  const spriteResponses: boolean[] = [];
+  const spriteResponses: { ok: boolean; origin: string }[] = [];
   const invalidSpriteErrors: string[] = [];
   page.on("response", (r) => {
-    if (r.url().includes("/basemap/sprite/std")) spriteResponses.push(r.ok());
+    if (r.url().includes("/basemap/sprite/std")) spriteResponses.push({ ok: r.ok(), origin: new URL(r.url()).origin });
   });
   page.on("console", (m) => {
     if (m.text().includes("Invalid sprite URL")) invalidSpriteErrors.push(m.text());
   });
 
   await waitForMap(page);
-  await page.waitForTimeout(1500);
-  // the sprite json/png were fetched from our own origin and succeeded…
-  expect(spriteResponses.length).toBeGreaterThan(0);
-  expect(spriteResponses.every(Boolean)).toBe(true);
+  // wait for the sprite to be fetched rather than a fixed timeout
+  await expect.poll(() => spriteResponses.length, { timeout: 15000 }).toBeGreaterThan(0);
+  const pageOrigin = new URL(page.url()).origin;
+  // the absolute URL resolved to our own origin (the fix) and every fetch succeeded…
+  expect(spriteResponses.every((s) => s.ok && s.origin === pageOrigin)).toBe(true);
   // …and MapLibre v6 raised no "must be absolute" rejection
   expect(invalidSpriteErrors).toEqual([]);
 });
