@@ -3,10 +3,9 @@
  * composition. The imperative wrapper in ./map.ts is the only consumer.
  *
  * Raster maximum levels are the measured GSI source ceilings (see
- * docs/summary/render-stack-evaluation): slopemap z15, hillshademap z16,
- * imagery z18. The local cache mirrors exactly those levels, so declaring
- * them here means MapLibre overscales instead of requesting tiles that
- * would 404.
+ * docs/summary/render-stack-evaluation): hillshademap z16, imagery z18.
+ * Declaring them here means MapLibre overscales instead of requesting tiles
+ * that would 404.
  */
 
 import type { StyleSpecification, LayerSpecification, SourceSpecification } from "maplibre-gl";
@@ -42,7 +41,7 @@ export const REGION_KEYS = Object.keys(REGION_CAMERAS) as RegionKey[];
 
 export type RasterKind = Exclude<BasemapKey, "standard">;
 
-export const RASTER_KINDS: RasterKind[] = ["photo", "hillshade", "slope"];
+export const RASTER_KINDS: RasterKind[] = ["photo", "hillshade"];
 
 /** The live nationwide GSI raster layers. The zoom bounds are the sources'
  * published ranges; beyond maxzoom MapLibre overscales instead of requesting
@@ -62,7 +61,6 @@ export const RASTER_SOURCES: Record<RasterKind, { url: string; minzoom: number; 
     attribution: `${GSI_ATTRIBUTION}・Landsat 8（courtesy USGS/NASA）・GEBCO・GRUS画像（© Axelspace）`,
   },
   hillshade: { url: "https://cyberjapandata.gsi.go.jp/xyz/hillshademap/{z}/{x}/{y}.png", minzoom: 2, maxzoom: 16, attribution: GSI_ATTRIBUTION },
-  slope: { url: "https://cyberjapandata.gsi.go.jp/xyz/slopemap/{z}/{x}/{y}.png", minzoom: 3, maxzoom: 15, attribution: GSI_ATTRIBUTION },
 };
 
 /** The floor shows the mainland-Kanto acquisition window with room around

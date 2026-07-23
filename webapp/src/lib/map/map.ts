@@ -50,6 +50,11 @@ export const UNDERGROUND_SURFACE_OPACITY = 0.45;
 export interface ExhibitionMap {
   setRegion(region: RegionKey): void;
   setBasemap(basemap: BasemapKey): void;
+  /**
+   * Toggle the 2.5D view: perspective (camera pitch) on any basemap, plus the
+   * 3D DEM surface on imagery and relief. Decoupled from the basemap choice.
+   */
+  set2point5D(on: boolean): void;
   setAnalyticalLayers(layers: Layer[]): void;
   /**
    * Lower the camera and make the surface translucent so content drawn by the
@@ -79,7 +84,7 @@ export interface ExhibitionMap {
 
 export async function createExhibitionMap(
   container: HTMLElement,
-  initial: { region: RegionKey; basemap: BasemapKey },
+  initial: { region: RegionKey; basemap: BasemapKey; twoAndHalfD: boolean },
 ): Promise<ExhibitionMap> {
   registerGsiDemProtocol(maplibregl);
   // The style is a repo-owned snapshot served from our own origin, not the
@@ -107,6 +112,7 @@ export async function createExhibitionMap(
 
   let region = initial.region;
   let basemap = initial.basemap;
+  let twoAndHalfD = initial.twoAndHalfD;
   let undergroundMode = false;
 
   const map = new maplibregl.Map({
@@ -196,17 +202,21 @@ export async function createExhibitionMap(
     for (const kind of RASTER_KINDS) {
       map.setLayoutProperty(rasterId(kind), "visibility", kind === basemap ? "visible" : "none");
     }
-    // 起伏 is the 2.5D mode: the hillshade drapes over the GSI DEM surface.
-    // The underground stage owns the camera when active, so terrain waits.
-    const wantsTerrain = basemap === "hillshade" && !undergroundMode;
     const hasTerrain = map.getTerrain() !== null;
-    if (wantsTerrain && !hasTerrain) {
-      map.setTerrain({ source: TERRAIN_SOURCE_ID, exaggeration: TERRAIN_EXAGGERATION });
-      map.easeTo({ pitch: TERRAIN_PITCH });
-    } else if (!wantsTerrain && hasTerrain) {
-      map.setTerrain(null);
-      if (!undergroundMode) map.easeTo({ pitch: 0 });
+    // The underground stage reads through the surface and owns the camera: drop
+    // the terrain and let it set its own pitch.
+    if (undergroundMode) {
+      if (hasTerrain) map.setTerrain(null);
+      return;
     }
+    // 2.5D is a toggle decoupled from the basemap. Perspective (pitch) applies
+    // to any basemap; the 3D DEM surface only to imagery and relief, where real
+    // terrain adds meaning — a warped standard cartographic map reads as noise.
+    const wantsTerrain = twoAndHalfD && (basemap === "photo" || basemap === "hillshade");
+    if (wantsTerrain && !hasTerrain) map.setTerrain({ source: TERRAIN_SOURCE_ID, exaggeration: TERRAIN_EXAGGERATION });
+    else if (!wantsTerrain && hasTerrain) map.setTerrain(null);
+    const targetPitch = twoAndHalfD ? TERRAIN_PITCH : 0;
+    if (Math.abs(map.getPitch() - targetPitch) > 0.5) map.easeTo({ pitch: targetPitch });
   };
   void loaded.then(applyVisibility);
 
@@ -274,6 +284,11 @@ export async function createExhibitionMap(
     setBasemap(next) {
       if (next === basemap) return;
       basemap = next;
+      void loaded.then(applyVisibility);
+    },
+    set2point5D(next) {
+      if (next === twoAndHalfD) return;
+      twoAndHalfD = next;
       void loaded.then(applyVisibility);
     },
     setAnalyticalLayers(layers) {

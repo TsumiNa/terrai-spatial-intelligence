@@ -101,8 +101,8 @@ export const en = {
   "basemap.photoTitle": "GSI latest orthophoto / satellite imagery",
   "basemap.hillshade": "Relief",
   "basemap.hillshadeTitle": "DEM5/10m hillshade",
-  "basemap.slope": "Slope",
-  "basemap.slopeTitle": "DEM5/10m slope map",
+  "map.view25D": "2.5D",
+  "map.view25DTitle": "Tilt into 2.5D — perspective on any basemap, 3D terrain on imagery and relief",
 
   // Map area
   "map.aria": "Spatial analysis map",
@@ -573,8 +573,8 @@ export const zh: Record<MessageKey, string> = {
   "basemap.photoTitle": "GSI 全国最新正射影像 / 卫星影像",
   "basemap.hillshade": "起伏",
   "basemap.hillshadeTitle": "DEM5/10m 阴影起伏图",
-  "basemap.slope": "坡度",
-  "basemap.slopeTitle": "DEM5/10m 倾斜量图",
+  "map.view25D": "2.5D",
+  "map.view25DTitle": "切换 2.5D 视角 —— 任意底图皆可倾斜，影像与起伏叠加 3D 地形",
 
   "map.aria": "空间分析地图",
   "aria.keyMetrics": "关键指标",
@@ -1003,8 +1003,8 @@ export const ja: Record<MessageKey, string> = {
   "basemap.photoTitle": "GSI全国最新オルソ画像 / 衛星画像",
   "basemap.hillshade": "起伏",
   "basemap.hillshadeTitle": "DEM5/10m 陰影起伏図",
-  "basemap.slope": "傾斜",
-  "basemap.slopeTitle": "DEM5/10m 傾斜量図",
+  "map.view25D": "2.5D",
+  "map.view25DTitle": "2.5D 視点に切替 —— 任意の背景図で傾斜、画像・起伏では 3D 地形",
 
   "map.aria": "空間分析地図",
   "aria.keyMetrics": "主要指標",

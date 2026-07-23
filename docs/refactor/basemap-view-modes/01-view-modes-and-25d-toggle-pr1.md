@@ -1,7 +1,14 @@
 # PR1 Plan: View Modes and the 2.5D Toggle
 
-- Status: Planned
+- Status: In progress
 - Refactor: `basemap-view-modes`
+
+> Implementation note: the slope **basemap** is removed; the slope **module**
+> (building slope-risk analysis) is untouched. The 2.5D state is `twoAndHalfD`
+> in app state (deep-linkable via `?tilt=1`), an on-map `.view25d-toggle` button.
+> `applyVisibility` now applies pitch for any basemap in 2.5D and `setTerrain`
+> only for photo/hillshade. Visual baselines (both `-darwin` and `-linux`) were
+> regenerated for the changed toolbar chrome.
 
 ## Goal
 
