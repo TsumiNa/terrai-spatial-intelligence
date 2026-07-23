@@ -48,13 +48,20 @@ frontend work targets v6 rather than being written on 5.24 and migrated later.
 - **Gate first: verify WebGL2 on the exhibition/kiosk hardware** — the only real
   risk (v6 drops WebGL1). ~95% global; any modern iPad (iPadOS 15+) is fine, but
   confirm the actual display devices.
-- Code change is tiny: bump `webapp/package.json` `maplibre-gl` `^5.24.0` → `^6`,
-  change `webapp/src/lib/map/map.ts` default import
-  `import maplibregl from "maplibre-gl"` → `import * as maplibregl` (v6 is
-  ESM-only; the `import type` lines in dem.ts/config.ts are unaffected). No
-  `addProtocol`/gsidem, `setData`-2nd-param, `styleimagemissing`, or
-  Map-extends-Camera breakage in the project. Run `npm run build` + the Playwright
-  suites.
+- Code change is small: bump `webapp/package.json` `maplibre-gl` `^5.24.0` → `^6`,
+  then fix the two **default** imports — v6 removes the default export, so ESM
+  namespace imports are required, and this hits **both** the value default import
+  and the type-only default import:
+  - `webapp/src/lib/map/map.ts`:
+    `import maplibregl from "maplibre-gl"` → `import * as maplibregl from "maplibre-gl"`.
+  - `webapp/src/lib/map/dem.ts`:
+    `import type maplibregl from "maplibre-gl"` → `import type * as maplibregl from "maplibre-gl"`.
+  The **named** type imports in `config.ts`
+  (`import type { StyleSpecification, … } from "maplibre-gl"`) are unaffected —
+  removing the default export does not touch named exports. No `addProtocol`/gsidem,
+  `setData`-2nd-param, `styleimagemissing`, or Map-extends-Camera breakage. Run
+  `npm run build` (let `tsc` surface any remaining default-import sites) + the
+  Playwright suites.
 - Not for perf/power (v6 gains are incremental and unquantified) — purely to stay
   current and let the downstream frontend target v6.
 
