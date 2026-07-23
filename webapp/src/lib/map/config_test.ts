@@ -27,8 +27,6 @@ const baseStyle: StyleSpecification = {
 it("declares the published GSI zoom ranges, not deeper", () => {
   expect(RASTER_SOURCES.photo.maxzoom).toBe(18);
   expect(RASTER_SOURCES.hillshade.maxzoom).toBe(16);
-  expect(RASTER_SOURCES.slope.maxzoom).toBe(15);
-  expect(RASTER_SOURCES.slope.minzoom).toBe(3);
 });
 
 it("streams every raster basemap live from the GSI tile host", () => {
@@ -38,12 +36,12 @@ it("streams every raster basemap live from the GSI tile host", () => {
   }
 });
 
-it("appends three hidden nationwide raster layers and the terrain DEM source", () => {
+it("appends the nationwide raster layers and the terrain DEM source", () => {
   const composed = composeStyle(baseStyle);
-  // vector + three rasters + the raster-dem terrain source + the hidden fallback
-  expect(Object.keys(composed.sources)).toHaveLength(6);
-  // background + three rasters + the hidden fallback raster
-  expect(composed.layers).toHaveLength(5);
+  // vector + the raster-dem terrain + the hidden fallback + the user rasters
+  expect(Object.keys(composed.sources)).toHaveLength(3 + RASTER_KINDS.length);
+  // background + the hidden fallback + the user rasters
+  expect(composed.layers).toHaveLength(2 + RASTER_KINDS.length);
   const dem = composed.sources[TERRAIN_SOURCE_ID] as { type?: string; encoding?: string; tiles?: string[] };
   expect(dem.type).toBe("raster-dem");
   expect(dem.encoding).toBe("mapbox");

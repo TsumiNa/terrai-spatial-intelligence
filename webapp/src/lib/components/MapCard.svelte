@@ -28,7 +28,6 @@
     standard: { label: "basemap.standard", title: "basemap.standardTitle" },
     photo: { label: "basemap.photo", title: "basemap.photoTitle" },
     hillshade: { label: "basemap.hillshade", title: "basemap.hillshadeTitle" },
-    slope: { label: "basemap.slope", title: "basemap.slopeTitle" },
   };
 
   const assetBase = `${apiOrigin(typeof window === "undefined" ? "" : window.location.search)}/api/v1/assets`;
@@ -253,7 +252,7 @@
   onMount(() => {
     let disposed = false;
     let api: ExhibitionMap | undefined;
-    createExhibitionMap(container, { region: vm.region, basemap: app.basemap })
+    createExhibitionMap(container, { region: vm.region, basemap: app.basemap, twoAndHalfD: app.twoAndHalfD })
       .then((created) => {
         if (disposed) created.destroy();
         else {
@@ -273,6 +272,9 @@
   });
   $effect(() => {
     mapApi?.setBasemap(app.basemap);
+  });
+  $effect(() => {
+    mapApi?.set2point5D(app.twoAndHalfD);
   });
   $effect(() => {
     mapApi?.setUndergroundMode(app.module === "underground");
@@ -366,6 +368,15 @@
         {/each}
       </div>
       {#if app.module !== "underground"}
+        <button
+          class="basemap-button view25d-toggle"
+          class:active={app.twoAndHalfD}
+          aria-pressed={app.twoAndHalfD}
+          title={i18n.t("map.view25DTitle")}
+          onclick={() => app.toggle25D()}
+        >
+          {i18n.t("map.view25D")}
+        </button>
         <Popover.Root>
           <Popover.Trigger
             class="basemap-button foundation-toggle"

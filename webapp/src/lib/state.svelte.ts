@@ -5,8 +5,8 @@ import type { SceneBundle } from "./scene/catalog";
 import { MODULES, normalizeView } from "./modules";
 import { i18n } from "./i18n/i18n.svelte";
 
-export type BasemapKey = "standard" | "photo" | "hillshade" | "slope";
-export const BASEMAP_KEYS: BasemapKey[] = ["standard", "photo", "hillshade", "slope"];
+export type BasemapKey = "standard" | "photo" | "hillshade";
+export const BASEMAP_KEYS: BasemapKey[] = ["standard", "photo", "hillshade"];
 
 function isModule(value: unknown): value is ModuleName {
   return typeof value === "string" && (MODULES as string[]).includes(value);
@@ -17,12 +17,13 @@ function isBasemap(value: unknown): value is BasemapKey {
 }
 
 function initialParams() {
-  if (typeof window === "undefined") return { module: "overview" as ModuleName, view: null, basemap: "standard" as BasemapKey };
+  if (typeof window === "undefined") return { module: "overview" as ModuleName, view: null, basemap: "standard" as BasemapKey, twoAndHalfD: false };
   const params = new URLSearchParams(window.location.search);
   const module = isModule(params.get("module")) ? (params.get("module") as ModuleName) : "overview";
   const view = params.get("view");
   const basemap = isBasemap(params.get("basemap")) ? (params.get("basemap") as BasemapKey) : "standard";
-  return { module, view, basemap };
+  const twoAndHalfD = params.get("tilt") === "1";
+  return { module, view, basemap, twoAndHalfD };
 }
 
 const initial = initialParams();
@@ -30,6 +31,9 @@ const initial = initialParams();
 let module = $state<ModuleName>(initial.module);
 let view = $state<string | null>(initial.view);
 let basemap = $state<BasemapKey>(initial.basemap);
+// The 2.5D view toggle: perspective on any basemap, plus the 3D DEM surface on
+// imagery/relief. Decoupled from the basemap (basemap-view-modes).
+let twoAndHalfD = $state<boolean>(initial.twoAndHalfD);
 let data = $state<Bootstrap | null>(null);
 let loadError = $state<string | null>(null);
 let auditRecord = $state<AuditRecord | null>(null);
@@ -52,6 +56,9 @@ export const app = {
   },
   get basemap() {
     return basemap;
+  },
+  get twoAndHalfD() {
+    return twoAndHalfD;
   },
   get data() {
     return data;
@@ -91,6 +98,9 @@ export const app = {
   },
   selectBasemap(next: BasemapKey) {
     basemap = next;
+  },
+  toggle25D() {
+    twoAndHalfD = !twoAndHalfD;
   },
   toggleFoundationLayer(key: string) {
     foundationLayers = foundationLayers.includes(key)

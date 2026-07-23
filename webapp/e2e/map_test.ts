@@ -46,11 +46,34 @@ test("loads the vendored sprite from an absolute URL (v6 requires it)", async ({
 test("basemap switching keeps the single map instance (no camera rebuild)", async ({ page }) => {
   await waitForMap(page);
   const canvas = await page.locator("#map .maplibregl-canvas").elementHandle();
-  for (const label of ["影像", "起伏", "坡度", "标准"]) {
+  for (const label of ["影像", "起伏", "标准"]) {
     await page.locator(".basemap-button", { hasText: label }).click();
     await page.waitForTimeout(250);
     expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true);
   }
+});
+
+test("the 2.5D toggle tilts every basemap but adds 3D terrain only on imagery/relief", async ({ page }) => {
+  const demTiles: string[] = [];
+  page.on("response", (r) => {
+    if (r.url().includes("cyberjapandata.gsi.go.jp/xyz/dem_png/")) demTiles.push(r.url());
+  });
+
+  await waitForMap(page);
+  // default basemap is standard: 2.5D tilts it (perspective) but adds no terrain,
+  // so no DEM tiles are fetched — a warped vector cartographic map reads as noise.
+  await page.locator(".view25d-toggle").click();
+  await expect(page.locator(".view25d-toggle")).toHaveAttribute("aria-pressed", "true");
+  await page.waitForTimeout(1500);
+  expect(demTiles).toEqual([]);
+
+  // switch to relief: now the 3D DEM surface loads under it
+  await page.locator(".basemap-button", { hasText: "起伏" }).click();
+  await expect.poll(() => demTiles.length, { timeout: 15000 }).toBeGreaterThan(0);
+
+  // toggle 2.5D off
+  await page.locator(".view25d-toggle").click();
+  await expect(page.locator(".view25d-toggle")).toHaveAttribute("aria-pressed", "false");
 });
 
 test("boots and renders with gsi-cyberjapan.github.io blocked (pinned snapshot)", async ({ page }) => {
@@ -126,7 +149,7 @@ test("zooming past the raster ceilings produces no failed tile requests", async 
     }
     await page.waitForTimeout(400);
   }
-  await page.locator(".basemap-button", { hasText: "坡度" }).click();
+  await page.locator(".basemap-button", { hasText: "起伏" }).click();
   await page.waitForTimeout(800);
   expect(failures).toEqual([]);
 });
