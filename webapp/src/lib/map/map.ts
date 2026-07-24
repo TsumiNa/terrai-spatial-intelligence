@@ -145,7 +145,7 @@ export async function createExhibitionMap(
   let coverageIndex: CoverageIndex | null = null;
   let gsiBuildingLayerIds: string[] = [];
   let buildingsOutOfService = false;
-  let outOfServiceListener: ((outOfService: boolean) => void) | null = null;
+  const outOfServiceListeners = new Set<(outOfService: boolean) => void>();
 
   const map = new maplibregl.Map({
     container,
@@ -243,12 +243,16 @@ export async function createExhibitionMap(
   // coverage condition changes. Kept out of applyVisibility so the moveend path
   // never re-enters the pitch easeTo below (which breaks MapLibre's ease frame).
   const applyBuildingVisibility = () => {
+    // moveend can fire before the style finishes loading; setLayoutProperty would
+    // throw then, so wait for the style (the post-load applyVisibility re-applies).
+    if (!map.isStyleLoaded()) return;
     // The merged building tiles replace GSI's building texture only on the
-    // standard basemap, above ground, and inside coverage. Out of service (wholly
-    // outside coverage) or underground, our (empty) tiles hide and GSI's own
-    // buildings render as the fallback. Same gray on both sides, so the swap is
-    // invisible where they meet.
-    const showBuildings = basemap === "standard" && !undergroundMode && !buildingsOutOfService;
+    // standard basemap, above ground, inside coverage, and **only once the
+    // coverage footprint has loaded** — until then (or if it fails to load) GSI's
+    // own buildings render everywhere, so a missing coverage.json never empties the
+    // map. Out of service (wholly outside coverage) or underground, our tiles hide
+    // and GSI's buildings render. Same gray on both sides, so the swap is invisible.
+    const showBuildings = basemap === "standard" && !undergroundMode && coverageIndex !== null && !buildingsOutOfService;
     if (map.getLayer(BUILDING_TILES_LAYER_ID)) {
       map.setLayoutProperty(BUILDING_TILES_LAYER_ID, "visibility", showBuildings ? "visible" : "none");
     }
@@ -289,11 +293,13 @@ export async function createExhibitionMap(
     const bounds = map.getBounds();
     const view: [number, number, number, number] = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()];
     const atBuildingZoom = map.getZoom() >= BUILDING_TILES_MIN_ZOOM;
-    const inCoverage = coverageIndex === null || viewportInCoverage(view, coverageIndex);
-    const next = atBuildingZoom && !inCoverage;
+    // Only meaningful once coverage is loaded: with none loaded we show GSI (not
+    // our partial tiles), so a failed coverage fetch degrades to GSI, not an empty
+    // map, and the "out of service" badge never fires on a coverage we don't know.
+    const next = coverageIndex !== null && atBuildingZoom && !viewportInCoverage(view, coverageIndex);
     if (next !== buildingsOutOfService) {
       buildingsOutOfService = next;
-      outOfServiceListener?.(next);
+      for (const listener of outOfServiceListeners) listener(next);
     }
     // Only re-toggle the building layers here — never the terrain/pitch, which
     // moveend must not re-enter.
@@ -437,10 +443,10 @@ export async function createExhibitionMap(
       };
     },
     onBuildingsOutOfService(listener) {
-      outOfServiceListener = listener;
+      outOfServiceListeners.add(listener);
       listener(buildingsOutOfService);
       return () => {
-        if (outOfServiceListener === listener) outOfServiceListener = null;
+        outOfServiceListeners.delete(listener);
       };
     },
     frame([west, south, east, north]) {
