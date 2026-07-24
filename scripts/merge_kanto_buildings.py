@@ -56,6 +56,7 @@ from terrai_spatial.pipeline.provenance import utc_timestamp  # noqa: E402
 OSM_GEOJSON = ROOT / "data/osm/kanto_buildings/buildings.geojson"
 FGD_GEOJSON = ROOT / "data/fgd/kanto_buildings/buildings.geojson"
 COVERAGE_JSON = ROOT / "data/fgd/kanto_buildings/coverage.json"
+PLATEAU_HEIGHTS = ROOT / "data/plateau/kanto_buildings/heights.geojson"
 OUTPUT = ROOT / "data/tiles/kanto_buildings"
 MERGED_NAME = "merged.geojsonl"
 PMTILES_NAME = "buildings.pmtiles"
@@ -82,6 +83,63 @@ def load_coverage_meshes(coverage_path: Path) -> set[str]:
     return set(json.loads(coverage_path.read_text(encoding="utf-8"))["meshes"])
 
 
+# --- height (PR4): PLATEAU measured > OSM tags > class estimate -------------
+METRES_PER_LEVEL = 3.0
+DEFAULT_HEIGHT_M = 9.0
+# Class-based estimates (metres) where nothing measured is known — deliberately
+# coarse, and always tagged height_source="estimate" so they never masquerade
+# as measured.
+CLASS_HEIGHT_M = {
+    "house": 6.0, "detached": 6.0, "bungalow": 4.0, "hut": 3.0, "shed": 3.0, "garage": 3.0,
+    "apartments": 20.0, "residential": 12.0, "dormitory": 15.0, "terrace": 8.0,
+    "commercial": 12.0, "retail": 8.0, "office": 24.0, "hotel": 24.0,
+    "industrial": 10.0, "warehouse": 10.0, "factory": 10.0,
+    "school": 12.0, "university": 18.0, "hospital": 20.0, "public": 12.0,
+    "church": 12.0, "temple": 10.0, "shrine": 8.0,
+}
+
+
+def load_plateau_heights(path: Path) -> tuple[STRtree | None, list[float]]:
+    """Build an STRtree of PLATEAU building points and the parallel height list.
+
+    Returns ``(None, [])`` when the heights product is absent so the merge still
+    runs on OSM tags + estimates alone.
+    """
+
+    if not path.is_file():
+        return None, []
+    points: list[Any] = []
+    heights: list[float] = []
+    with fiona.open(path) as source:
+        for feature in source:
+            points.append(shape(feature.geometry))
+            heights.append(float(feature.properties.get("height") or 0.0))
+    return STRtree(points), heights
+
+
+def resolve_height(
+    geometry: Any,
+    building_class: str,
+    levels: Any,
+    plateau_tree: STRtree | None,
+    plateau_heights: list[float],
+) -> tuple[float, str]:
+    """The baked height + its honest source for one footprint (PR4's three tiers)."""
+
+    if plateau_tree is not None:
+        inside = plateau_tree.query(geometry, predicate="intersects")
+        if inside.size:
+            return round(max(plateau_heights[i] for i in inside), 1), "plateau"
+    if levels:
+        try:
+            value = float(levels)
+        except (TypeError, ValueError):
+            value = 0.0
+        if value > 0:
+            return round(value * METRES_PER_LEVEL, 1), "osm_tag"
+    return CLASS_HEIGHT_M.get(building_class, DEFAULT_HEIGHT_M), "estimate"
+
+
 def _write_feature(handle: Any, geometry: Any, properties: dict[str, Any]) -> None:
     record = {"type": "Feature", "geometry": mapping(geometry), "properties": properties}
     handle.write(json.dumps(record, ensure_ascii=False))
@@ -93,6 +151,7 @@ def merge(
     fgd_path: Path,
     coverage_meshes: set[str],
     output_dir: Path,
+    plateau_path: Path | None = None,
 ) -> dict[str, Any]:
     """Write the merged line-delimited GeoJSON and return the merge statistics."""
 
@@ -100,6 +159,13 @@ def merge(
     merged_path = output_dir / MERGED_NAME
     osm_kept = osm_clipped = 0
     osm_geoms: list[Any] = []
+    height_split = {"plateau": 0, "osm_tag": 0, "estimate": 0}
+    plateau_tree, plateau_heights = load_plateau_heights(plateau_path) if plateau_path else (None, [])
+
+    def bake_height(geometry: Any, building_class: str, levels: Any, base: dict[str, Any]) -> dict[str, Any]:
+        height, source = resolve_height(geometry, building_class, levels, plateau_tree, plateau_heights)
+        height_split[source] += 1
+        return {**base, "height": height, "height_source": source}
 
     with merged_path.open("w", encoding="utf-8") as handle:
         with fiona.open(osm_path) as osm:
@@ -110,14 +176,20 @@ def merge(
                     osm_clipped += 1
                     continue
                 properties = dict(feature.properties)
+                building_class = properties.get("building", "yes")
                 _write_feature(
                     handle,
                     geometry,
-                    {
-                        "feature_id": f"osm:{properties.get('osm_id')}",
-                        "footprint_source": "osm",
-                        "building": properties.get("building", "yes"),
-                    },
+                    bake_height(
+                        geometry,
+                        building_class,
+                        properties.get("building:levels"),
+                        {
+                            "feature_id": f"osm:{properties.get('osm_id')}",
+                            "footprint_source": "osm",
+                            "building": building_class,
+                        },
+                    ),
                 )
                 osm_geoms.append(geometry)
                 osm_kept += 1
@@ -133,15 +205,19 @@ def merge(
                 if tree.query(point, predicate="intersects").size:
                     fgd_dropped += 1
                     continue
-                properties = dict(feature.properties)
                 _write_feature(
                     handle,
                     geometry,
-                    {
-                        "feature_id": f"fgd:{properties.get('fgd_id')}",
-                        "footprint_source": "fgd",
-                        "building": "yes",
-                    },
+                    bake_height(
+                        geometry,
+                        "yes",
+                        None,
+                        {
+                            "feature_id": f"fgd:{feature.properties.get('fgd_id')}",
+                            "footprint_source": "fgd",
+                            "building": "yes",
+                        },
+                    ),
                 )
                 fgd_kept += 1
 
@@ -152,6 +228,7 @@ def merge(
         "osm_clipped_outside_coverage": osm_clipped,
         "fgd_kept": fgd_kept,
         "fgd_dropped_covered_by_osm": fgd_dropped,
+        "height_source_split": height_split,
     }
 
 
@@ -186,16 +263,16 @@ def generate_tiles(merged_path: Path, output_dir: Path) -> dict[str, Any]:
 
 
 def build(*, output: Path = OUTPUT, osm_path: Path = OSM_GEOJSON, fgd_path: Path = FGD_GEOJSON,
-          coverage_path: Path = COVERAGE_JSON, tiles: bool = True) -> dict[str, Any]:
+          coverage_path: Path = COVERAGE_JSON, plateau_path: Path = PLATEAU_HEIGHTS, tiles: bool = True) -> dict[str, Any]:
     coverage_meshes = load_coverage_meshes(coverage_path)
     retrieved_at = utc_timestamp()
-    stats = merge(osm_path, fgd_path, coverage_meshes, output)
+    stats = merge(osm_path, fgd_path, coverage_meshes, output, plateau_path=plateau_path)
     manifest: dict[str, Any] = {
         "retrieved_at": retrieved_at,
-        "scope": "TerrAI merged Kanto building tile source: OSM primary, 基盤地図情報 fill",
+        "scope": "TerrAI merged Kanto building tile source: OSM primary, 基盤地図情報 fill, PLATEAU height",
         "coverage_mesh_count": len(coverage_meshes),
         "merge": stats,
-        "schema": ["feature_id", "footprint_source", "building"],
+        "schema": ["feature_id", "footprint_source", "building", "height", "height_source"],
     }
     if tiles:
         manifest["tiles"] = generate_tiles(output / MERGED_NAME, output)
@@ -210,10 +287,12 @@ def main() -> None:
     args = parser.parse_args()
     manifest = build(tiles=not args.no_tiles)
     merge_stats = manifest["merge"]
+    split = merge_stats["height_source_split"]
     print(
         f"Merged {merge_stats['feature_count']} buildings "
         f"(OSM {merge_stats['osm_kept']} kept / {merge_stats['osm_clipped_outside_coverage']} clipped; "
-        f"FGD {merge_stats['fgd_kept']} fill / {merge_stats['fgd_dropped_covered_by_osm']} dropped)"
+        f"FGD {merge_stats['fgd_kept']} fill / {merge_stats['fgd_dropped_covered_by_osm']} dropped); "
+        f"height: {split['plateau']} plateau / {split['osm_tag']} osm_tag / {split['estimate']} estimate"
     )
 
 

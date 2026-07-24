@@ -249,6 +249,9 @@ def contract_failures() -> list[str]:
         # and the generated metadata.json in the same directory stay validated.
         if path.name == "buildings.geojson" and path.is_relative_to(ROOT / "data/fgd/kanto_buildings"):
             continue
+        # Likewise the gigabyte PLATEAU heights product; its manifests stay validated.
+        if path.name == "heights.geojson" and path.is_relative_to(ROOT / "data/plateau/kanto_buildings"):
+            continue
         ok, message = validate_json(path)
         if not ok:
             failures.append(f"invalid {path.relative_to(ROOT)}: {message}")

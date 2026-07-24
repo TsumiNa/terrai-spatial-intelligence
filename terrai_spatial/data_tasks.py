@@ -139,17 +139,31 @@ TASKS = {
         force_argument=True,
         check_stale=False,
     ),
+    "plateau_kanto": DataTask(
+        "plateau_kanto",
+        "distil PLATEAU LOD1 measured building heights for mainland Kanto",
+        "scripts/fetch_plateau_kanto_buildings.py",
+        inputs=("data/plateau/kanto_buildings/source_manifest.json",),
+        # Only the manifest is declared: the distilled heights.geojson is
+        # regenerable from the pinned CityGML resources.
+        outputs=("data/plateau/kanto_buildings/metadata.json",),
+        network=True,
+        automatic=False,
+        force_argument=True,
+        check_stale=False,
+    ),
     "merged_tiles": DataTask(
         "merged_tiles",
         "merge OSM (primary) + 基盤地図情報 (fill) buildings into one PMTiles source",
         "scripts/merge_kanto_buildings.py",
-        # The merge reads both gigabyte building products directly, plus the FGD
-        # coverage footprint: naming them as inputs blocks the task up front when a
-        # product is missing instead of failing mid-run.
+        # The merge reads both gigabyte building products directly, the FGD
+        # coverage footprint, and the PLATEAU heights: naming them as inputs blocks
+        # the task up front when a product is missing instead of failing mid-run.
         inputs=(
             "data/osm/kanto_buildings/buildings.geojson",
             "data/fgd/kanto_buildings/buildings.geojson",
             "data/fgd/kanto_buildings/coverage.json",
+            "data/plateau/kanto_buildings/heights.geojson",
         ),
         # The PMTiles is declared alongside the manifest so readiness tracks the
         # real deliverable (both gitignored); .pmtiles is not JSON, so declaring it
