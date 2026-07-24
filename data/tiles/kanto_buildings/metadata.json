@@ -1,0 +1,26 @@
+{
+  "retrieved_at": "2026-07-24T06:19:58Z",
+  "scope": "TerrAI merged Kanto building tile source: OSM primary, 基盤地図情報 fill",
+  "coverage_mesh_count": 180,
+  "merge": {
+    "output": "data/tiles/kanto_buildings/merged.geojsonl",
+    "feature_count": 13640510,
+    "osm_kept": 5177191,
+    "osm_clipped_outside_coverage": 194101,
+    "fgd_kept": 8463319,
+    "fgd_dropped_covered_by_osm": 4850720
+  },
+  "schema": [
+    "feature_id",
+    "footprint_source",
+    "building"
+  ],
+  "tiles": {
+    "output": "data/tiles/kanto_buildings/buildings.pmtiles",
+    "size_bytes": 1142389888,
+    "min_zoom": 0,
+    "max_zoom": 16,
+    "layer": "buildings",
+    "tool": "tippecanoe"
+  }
+}

@@ -41,3 +41,10 @@ data/osm/kanto_buildings/
 # generated metadata.json manifest are committed.
 data/fgd/kanto_buildings/source/
 data/fgd/kanto_buildings/buildings.geojson
+
+# The merged building tile source (fetch merged_tiles): the line-delimited merge
+# and the generated PMTiles are gigabyte-scale build products; the manifest is
+# committed. buildings.geojson-style products are regenerable from the pinned
+# OSM + FGD acquisitions.
+data/tiles/kanto_buildings/merged.geojsonl
+data/tiles/kanto_buildings/buildings.pmtiles
