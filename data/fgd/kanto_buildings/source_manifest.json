@@ -6,8 +6,8 @@
   "window": [138.65, 34.85, 140.95, 36.3],
   "format": "JPGIS(GML)",
   "license": "基盤地図情報 (GSI) — 測量法 承認申請-exempt; attribution + 加工表示 (processing note) required",
-  "publication_vintage": null,
+  "publication_vintage": "2026-04-30",
   "source_placement": "data/fgd/kanto_buildings/source/",
   "procedure": "scripts/fetch_fgd_kanto_buildings.py (module docstring): register at the FGD download service, select 建築物の外周線 for the four mainland-Kanto prefectures, download the JPGIS(GML) archive(s), place them under source_placement, set publication_vintage above, then run: uv run python scripts/fetch_fgd_kanto_buildings.py",
-  "note": "Registration-gated manual download. publication_vintage and the generated metadata.json (feature_count, per-archive sha256) are filled in when the owner completes the pinned download; the raw archive and the gigabyte-scale buildings.geojson stay out of git."
+  "note": "Registration-gated manual download. publication_vintage is set by hand; the generated metadata.json (feature_count, per-bundle sha256, mesh_count) and coverage.json (the mainland-mesh footprint + bbox) are produced when the task runs and are committed. The raw archive under source/ and the gigabyte-scale buildings.geojson stay out of git."
 }

@@ -127,9 +127,14 @@ TASKS = {
         # Registration-gated manual source: the committed pin is the reproducibility
         # input; the archive under source/ is dropped in by hand and never fetched.
         inputs=("data/fgd/kanto_buildings/source_manifest.json",),
-        # Only the manifest is declared: the streamed product is gigabyte-scale
-        # and declared JSON outputs are parsed in full on every status check.
-        outputs=("data/fgd/kanto_buildings/metadata.json",),
+        # Only the small manifests are declared: the streamed buildings.geojson is
+        # gigabyte-scale and declared JSON outputs are parsed in full on every
+        # status check. coverage.json is the mainland-mesh footprint the merge and
+        # the map boundary consume.
+        outputs=(
+            "data/fgd/kanto_buildings/metadata.json",
+            "data/fgd/kanto_buildings/coverage.json",
+        ),
         automatic=False,
         force_argument=True,
         check_stale=False,
