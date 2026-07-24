@@ -4,7 +4,7 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, BUILDING_EXTRUSION_LAYER_ID, BUILDING_TILES_ATTRIBUTION, BUILDING_TILES_LAYER_ID, BUILDING_TILES_MIN_ZOOM, BUILDING_TILES_SOURCE_ID, BUILDING_TILES_SOURCE_LAYER, FALLBACK_RASTER_LAYER_ID, FALLBACK_RASTER_SOURCE_ID, FALLBACK_STD_RASTER_URL, LOCAL_SPRITE_URL, RASTER_KINDS, RASTER_SOURCES, RELIEF_TINT_FADE_END_ZOOM, RELIEF_TINT_LAYER_ID, RELIEF_TINT_MAX_OPACITY, RELIEF_TINT_SOURCE_ID, RELIEF_TINT_START_ZOOM, RELIEF_TINT_URL, TERRAIN_SOURCE_ID, buildingTilesUrl, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
+import { BASEMAP_BUILDING_FILL, BUILDING_EXTRUSION_LAYER_ID, BUILDING_TILES_ATTRIBUTION, BUILDING_TILES_LAYER_ID, BUILDING_TILES_MIN_ZOOM, BUILDING_TILES_SOURCE_ID, BUILDING_TILES_SOURCE_LAYER, FALLBACK_RASTER_LAYER_ID, FALLBACK_RASTER_SOURCE_ID, FALLBACK_STD_RASTER_URL, LOCAL_SPRITE_URL, RASTER_KINDS, RASTER_SOURCES, RELIEF_TINT_FADE_END_ZOOM, RELIEF_TINT_LAYER_ID, RELIEF_TINT_MAX_OPACITY, RELIEF_TINT_SOURCE_ID, RELIEF_TINT_START_ZOOM, RELIEF_TINT_URL, TERRAIN_SOURCE_ID, buildingTilesUrl, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
 import { palette } from "../theme";
 import { rgba } from "./style-rules";
 
@@ -81,7 +81,8 @@ it("adds the merged building PMTiles source and a hidden fill above GSI building
   expect(fill.type).toBe("fill");
   expect(fill["source-layer"]).toBe(BUILDING_TILES_SOURCE_LAYER);
   expect(fill.minzoom).toBe(BUILDING_TILES_MIN_ZOOM);
-  expect(fill.maxzoom).toBe(BASEMAP_DETAIL_HANDOVER_ZOOM);
+  // No maxzoom cap (PR5 retired the z16 handover): the tiles span all zooms.
+  expect(fill.maxzoom).toBeUndefined();
   expect(fill.layout).toEqual({ visibility: "none" });
   expect(fill.paint?.["fill-color"]).toBe(BASEMAP_BUILDING_FILL);
   // Spliced above the GSI building layers, so it draws over ground / under labels.
@@ -209,25 +210,7 @@ it("composes the vendored snapshot, repointing the sprite off the experimental h
   expect(composed.sprite).toBe(LOCAL_SPRITE_URL);
   // glyphs (maps.gsi.go.jp) and the vector source (cyberjapandata) are untouched
   expect(composed.glyphs).toBe(vendoredStyle.glyphs);
-  // every building layer is clamped to the handover after compose
-  for (const l of buildingLayers(composed)) {
-    expect(l.maxzoom ?? 99).toBeLessThanOrEqual(BASEMAP_DETAIL_HANDOVER_ZOOM);
-  }
-});
-
-it("clamps basemap buildings to the handover zoom and nothing else", () => {
-  const style: StyleSpecification = {
-    version: 8,
-    sources: { v: { type: "vector", tiles: ["https://example.test/{z}/{x}/{y}.pbf"] } },
-    layers: [
-      { id: "bldg-early", type: "fill", source: "v", "source-layer": "building", minzoom: 13, maxzoom: 14 },
-      { id: "bldg-open", type: "fill", source: "v", "source-layer": "building", minzoom: 14 },
-      { id: "road", type: "line", source: "v", "source-layer": "road", minzoom: 11 },
-    ],
-  };
-  const clamped = clampBasemapBuildings(style);
-  const byId = Object.fromEntries(clamped.layers.map((layer) => [layer.id, layer]));
-  expect(byId["bldg-early"].maxzoom).toBe(14); // already below the handover
-  expect(byId["bldg-open"].maxzoom).toBe(BASEMAP_DETAIL_HANDOVER_ZOOM);
-  expect(byId["road"].maxzoom).toBeUndefined();
+  // PR5 retired the z16 clamp: GSI's own building layers keep their native zooms
+  // (they only render out of coverage, where our tiles are absent).
+  expect(buildingLayers(composed).length).toBeGreaterThan(0);
 });

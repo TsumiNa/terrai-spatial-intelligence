@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 
-import { field, localized, metric, queueScore, text, undergroundField, TYPE_LABELS } from "./audit";
+import { buildingAuditRecord, field, localized, metric, queueScore, text, undergroundField, TYPE_LABELS } from "./audit";
 
 it("keeps the three record kinds distinguishable", () => {
   expect(Object.keys(TYPE_LABELS).sort()).toEqual(["calculation", "model", "raw"]);
@@ -107,4 +107,35 @@ it("routes underground metrics to a PLATEAU raw record", () => {
   expect(text(record.sections[2].value, "ja")).toBe("取得 2026-07-21");
   const undated = metric("metric.undergroundSnapshot", "—", "", "note", {});
   expect(text(undated.sections[2].value, "zh")).toBe("获取日期不可用");
+});
+
+it("buildingAuditRecord shows the footprint source, measured/estimate height, and the cross-source caveat", () => {
+  const measured = buildingAuditRecord({
+    feature_id: "osm:303012795",
+    footprint_source: "osm",
+    building: "apartments",
+    height: 11.2,
+    height_source: "plateau",
+  });
+  expect(text(measured.title, "en")).toBe("Building");
+  expect(text(measured.value, "en")).toBe("apartments");
+  expect(measured.sections.map((s) => text(s.label, "en"))).toEqual([
+    "Footprint source",
+    "Height",
+    "Feature ID",
+    "License",
+    "Local evidence",
+  ]);
+  expect(text(measured.sections[0].value, "en")).toBe("OpenStreetMap (ODbL)");
+  expect(text(measured.sections[1].value, "en")).toBe("11.2 m · PLATEAU measured");
+  expect(text(measured.sections[2].value, "en")).toBe("osm:303012795");
+  // No API call — the evidence is the self-hosted PMTiles source (the URL is
+  // ?buildings=-configurable), not a windowed endpoint or a fixed local path.
+  expect(text(measured.sections[4].value, "en")).toBe("the merged building PMTiles (self-hosted source)");
+  expect(text(measured.caveat, "en")).toContain("not entity-identity matching");
+
+  // A government footprint with an estimated height is tagged as such.
+  const estimated = buildingAuditRecord({ feature_id: "fgd:x", footprint_source: "fgd", building: "yes", height: 9, height_source: "estimate" });
+  expect(text(estimated.sections[0].value, "ja")).toBe("基盤地図情報 (GSI)");
+  expect(text(estimated.sections[1].value, "en")).toBe("9 m · class estimate");
 });

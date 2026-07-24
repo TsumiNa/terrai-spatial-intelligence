@@ -24,9 +24,9 @@
   ],
   "tiles": {
     "output": "data/tiles/kanto_buildings/buildings.pmtiles",
-    "size_bytes": 1207449400,
+    "size_bytes": 1703159202,
     "min_zoom": 0,
-    "max_zoom": 16,
+    "max_zoom": 17,
     "layer": "buildings",
     "tool": "tippecanoe"
   }

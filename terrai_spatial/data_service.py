@@ -70,7 +70,9 @@ FOUNDATION_DATASETS: dict[str, str] = {
     "uc24_16_nihonbashi": "data/plateau/uc24_16_nihonbashi/manifest.json",
     "uc24_13_sapporo": "data/plateau/uc24_13_sapporo/manifest.json",
     "osmSapporoUndergroundAccess": "data/osm/sapporo_underground_access/features.geojson",
-    "osmBuildings": "data/osm/kanto_buildings/buildings.geojson",
+    # osmBuildings retired (osm-basemap-tiles PR5): the Kanto OSM footprints are now
+    # served as part of the merged self-hosted building PMTiles, not a windowed
+    # store collection. The acquisition (osm_kanto) stays as a tile input.
     "kunijibanBoreholes": "data/external/kunijiban_borehole/manifest.json",
 }
 ALL_DATASETS = {**DATASETS, **FOUNDATION_DATASETS}
@@ -128,7 +130,6 @@ DATASET_TIERS: dict[str, tuple[str, str]] = {
     "uc24_16_nihonbashi": ("FL", "observed"),
     "uc24_13_sapporo": ("FL", "observed"),
     "osmSapporoUndergroundAccess": ("FL", "observed"),
-    "osmBuildings": ("FL", "observed"),
     "kunijibanBoreholes": ("FL", "observed"),
 }
 

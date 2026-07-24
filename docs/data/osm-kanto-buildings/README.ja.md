@@ -19,7 +19,7 @@
 
 ## 本 project での利用
 
-高ズーム詳細レイヤ：ハンドオーバー zoom を超えると basemap の地図表現建物がこのフットプリントに置き換わり、各建物は raw 監査記録へクリックで到達できます。API key は `osmBuildings`、`osm_kanto` タスクで更新します。基盤証拠のみで、スコアには入りません。
+統合された自前建物タイル（`osm-basemap-tiles`）の主フットプリント源：OSM の同定・タグに、基盤地図情報がギャップを埋め、PLATEAU 高さが結合されます。`terrai-buildings` PMTiles レイヤとして描画され、詳細 zoom でクリックすると、焼き込まれたタイル属性から raw 監査記録が開きます（API 呼び出しなし）。`osm_kanto` タスクで更新し、オフラインのタイル統合に供給します。基盤証拠のみで、スコアには入りません。（ウィンドウ配信の `osmBuildings` コレクションは `osm-basemap-tiles` PR5 で廃止しました。）
 
 ## License
 

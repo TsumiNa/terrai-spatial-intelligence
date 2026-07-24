@@ -42,6 +42,7 @@ import {
   BUILDING_TILES_LAYER_ID,
   BUILDING_EXTRUSION_LAYER_ID,
   BUILDING_TILES_MIN_ZOOM,
+  BUILDING_CLICK_MIN_ZOOM,
   COVERAGE_URL,
   buildingTilesUrl,
   composeStyle,
@@ -103,6 +104,14 @@ export interface ExhibitionMap {
    * subscribe and whenever it changes; returns an unsubscribe function.
    */
   onBuildingsOutOfService(listener: (outOfService: boolean) => void): () => void;
+  /**
+   * A building in the merged tiles was clicked (only at/above the click zoom, and
+   * only when no deck overlay feature was picked — analysis wins contested
+   * clicks). Delivers the clicked feature's baked properties + the click point.
+   * **Single-subscriber**: registering a new handler replaces the previous one
+   * (one popup owner); returns an unsubscribe.
+   */
+  onBuildingClick(listener: (properties: Record<string, unknown>, lngLat: [number, number]) => void): () => void;
   destroy(): void;
 }
 
@@ -147,6 +156,7 @@ export async function createExhibitionMap(
   let gsiBuildingLayerIds: string[] = [];
   let buildingsOutOfService = false;
   const outOfServiceListeners = new Set<(outOfService: boolean) => void>();
+  let buildingClickListener: ((properties: Record<string, unknown>, lngLat: [number, number]) => void) | null = null;
 
   const map = new maplibregl.Map({
     container,
@@ -171,6 +181,42 @@ export async function createExhibitionMap(
 
   const overlay = new MapboxOverlay({ interleaved: false, layers: [], pickingRadius: 8 });
   map.addControl(overlay);
+
+  // Building clicks resolve from the baked tile properties (no API call), only at
+  // inspection zoom, and only when deck picked nothing at the point — deck's own
+  // layer onClick handles an analytical/foundation feature, so analysis wins
+  // contested clicks. deck (non-interleaved) consumes the map's own click event,
+  // so detect a click from a pointerdown/up pair (the same window pointerup the
+  // box-select uses) and read the tile layer with queryRenderedFeatures.
+  let clickDown: { x: number; y: number } | null = null;
+  const onClickDown = (event: PointerEvent) => {
+    clickDown = { x: event.clientX, y: event.clientY };
+  };
+  const onClickUp = (event: PointerEvent) => {
+    const down = clickDown;
+    clickDown = null;
+    if (!down || boxHandler || !buildingClickListener || map.getZoom() < BUILDING_CLICK_MIN_ZOOM) return;
+    if (Math.hypot(event.clientX - down.x, event.clientY - down.y) > 5) return; // a drag, not a click
+    const rect = map.getCanvas().getBoundingClientRect();
+    const point: [number, number] = [event.clientX - rect.left, event.clientY - rect.top];
+    if (overlay.pickObject({ x: point[0], y: point[1], radius: 8 })) return;
+    const layers = [BUILDING_TILES_LAYER_ID, BUILDING_EXTRUSION_LAYER_ID].filter((id) => map.getLayer(id));
+    if (!layers.length) return;
+    // Query a small box, not a bare point, so a click near a footprint still lands
+    // it (footprints are only a few pixels across at the click floor).
+    const [px, py] = point;
+    const region: [[number, number], [number, number]] = [
+      [px - 5, py - 5],
+      [px + 5, py + 5],
+    ];
+    const hit = map.queryRenderedFeatures(region, { layers })[0];
+    if (hit) {
+      const lngLat = map.unproject(point);
+      buildingClickListener(hit.properties ?? {}, [lngLat.lng, lngLat.lat]);
+    }
+  };
+  container.addEventListener("pointerdown", onClickDown);
+  window.addEventListener("pointerup", onClickUp);
 
   const popup = new maplibregl.Popup({ closeButton: true, maxWidth: "300px" });
   let popupCleanup: (() => void) | null = null;
@@ -453,6 +499,12 @@ export async function createExhibitionMap(
       listener(buildingsOutOfService);
       return () => {
         outOfServiceListeners.delete(listener);
+      };
+    },
+    onBuildingClick(listener) {
+      buildingClickListener = listener;
+      return () => {
+        if (buildingClickListener === listener) buildingClickListener = null;
       };
     },
     frame([west, south, east, north]) {

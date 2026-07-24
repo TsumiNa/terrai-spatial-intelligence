@@ -62,7 +62,9 @@ MERGED_NAME = "merged.geojsonl"
 PMTILES_NAME = "buildings.pmtiles"
 TILE_LAYER = "buildings"
 MIN_ZOOM = 0
-MAX_ZOOM = 16
+# z17 so buildings stay full-fidelity and clickable at inspection zoom (the
+# windowed z16 handover is retired in PR5); the source overzooms past z17.
+MAX_ZOOM = 17
 
 # 2次メッシュ cell size (must match scripts/fetch_fgd_kanto_buildings.py).
 MESH_LAT_DEG = 1 / 12

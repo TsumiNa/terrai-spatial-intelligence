@@ -11,7 +11,7 @@
 | GSI 指定避难数据 | 已接入，全国基线 | [指定避难所与分灾种紧急避难场所](gsi-designated-evacuation/README.zh.md) |
 | Google Satellite Embedding V1 | 已接入 | [年度遥感表征](google-satellite-embedding/README.zh.md) |
 | OpenStreetMap | 已接入 | [建筑、道路与场景对象](openstreetmap/README.zh.md) |
-| OSM 关东建筑轮廓 | 已接入、按需查询 | [高缩放建筑对象](osm-kanto-buildings/README.zh.md) |
+| OSM 关东建筑轮廓 | 已接入(合并瓦片) | [合并建筑瓦片来源](osm-kanto-buildings/README.zh.md) |
 | PLATEAU UC24-13 札幌 | 已接入，按需样例 | [观测地下结构](plateau-uc24-13-sapporo/README.zh.md) |
 | PLATEAU UC24-16 日本桥 | 已接入，按需样例 | [观测地下管线](plateau-uc24-16-nihonbashi/README.zh.md) |
 | KuniJiban 钻孔 | 已接入，按需区域数据 | [钻孔、地层与 SPT](kunijiban-boreholes/README.zh.md) |

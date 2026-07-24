@@ -19,7 +19,7 @@ Building footprints for the mainland-Kanto acquisition window, extracted from th
 
 ## Use in this project
 
-The high-zoom detail layer: past the handover zoom the basemap's cartographic buildings yield to these footprints, each clickable to its raw audit record. API key `osmBuildings`; refreshed by the `osm_kanto` task. Foundation evidence only — never scored.
+The primary footprint source of the merged self-hosted building tiles (`osm-basemap-tiles`): OSM identity + tags, with 基盤地図情報 filling the gaps and PLATEAU heights joined in. Rendered as the `terrai-buildings` PMTiles layer, clickable at inspection zoom to a raw audit record built from the baked tile properties — no API call. Refreshed by the `osm_kanto` task, which feeds the offline tile merge. Foundation evidence only — never scored. (The windowed `osmBuildings` served collection was retired in `osm-basemap-tiles` PR5.)
 
 ## License
 

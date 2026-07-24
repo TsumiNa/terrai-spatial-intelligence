@@ -19,7 +19,7 @@
 
 ## 在本项目中的使用
 
-高缩放细节层:超过交接缩放级后,底图的制图建筑让位于这些轮廓,每栋可点击进入原始审计记录。API key 为 `osmBuildings`,由 `osm_kanto` 任务刷新。仅作基础证据展示,不进入评分。
+合并自建建筑瓦片(`osm-basemap-tiles`)的主轮廓来源:OSM 提供身份与标签,基盤地図情報填补空缺,PLATEAU 高度联结其中。以 `terrai-buildings` PMTiles 图层渲染,在检视缩放级可点击,从瓦片内烘焙的属性直接构建原始审计记录(无需 API 调用)。由 `osm_kanto` 任务刷新,供离线瓦片合并使用。仅作基础证据展示,不进入评分。(窗口式 `osmBuildings` 服务集合已在 `osm-basemap-tiles` PR5 中退役。)
 
 ## License
 

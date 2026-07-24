@@ -18,7 +18,6 @@ const ON_DEMAND_FEATURE_KEYS = [
   "railway",
   "landUseMesh",
   "prefecturalLandPrice",
-  "osmBuildings",
   "osmSapporoUndergroundAccess",
 ];
 
