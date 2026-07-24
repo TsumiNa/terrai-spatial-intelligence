@@ -1,7 +1,11 @@
 # Self-built Merged Building Basemap Tiles
 
-- Status: In progress — PR1 adds the 基盤地図情報 acquisition mechanism; the
-  registration-gated FGD download and PR2–PR5 remain.
+- Status: Completed — all five PRs merged (#88/#90 FGD acquisition + coverage,
+  #91 OSM+FGD merge → PMTiles, #92 basemap integration + out-of-service boundary,
+  #93 PLATEAU heights + 2.5D extrusion, #94 retire the windowed path). One
+  self-hosted, offline-capable merged building tileset (13.64M buildings; 54.7%
+  PLATEAU-measured heights), clickable at inspection zoom from the baked
+  properties, with a coverage-aware out-of-service fallback.
 
 ## Context
 
