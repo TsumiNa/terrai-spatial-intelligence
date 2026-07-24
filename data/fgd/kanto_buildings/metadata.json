@@ -1,0 +1,42 @@
+{
+  "retrieved_at": "2026-07-24T05:50:42Z",
+  "scope": "TerrAI Kanto acquisition: 基盤地図情報 building outlines filling OSM's gaps inside the mainland window",
+  "dataset_id": "fgd-kanto-buildings-2026-04-30",
+  "output": "data/fgd/kanto_buildings/buildings.geojson",
+  "source_updated_at": "2026-04-30",
+  "prefectures": [
+    "Tokyo",
+    "Kanagawa",
+    "Chiba",
+    "Saitama"
+  ],
+  "license": "基盤地図情報 (GSI) — 測量法 承認申請-exempt; attribution + 加工表示 (processing note) required",
+  "feature_count": 13314039,
+  "invalid_geometries_skipped": 0,
+  "mesh_count": 180,
+  "coverage_bbox": [
+    138.625,
+    34.833333,
+    140.875,
+    36.333333
+  ],
+  "excluded_island_mesh_count": 29,
+  "service_url": "https://service.gsi.go.jp/kiban/",
+  "sources": [
+    {
+      "name": "20260724141616740-001",
+      "mesh_count": 79,
+      "sha256": "15dd0422e4ffcdd32ffc24f66f5046f70c6d28d6a39f03ec2681f7c1c75a078c"
+    },
+    {
+      "name": "20260724141904082-001",
+      "mesh_count": 63,
+      "sha256": "0ec448da58f372b2af78881bc76aa290d415382e61251a1314dd65007970be99"
+    },
+    {
+      "name": "20260724142008617-002",
+      "mesh_count": 38,
+      "sha256": "85b5dbbb952cea21f683c685400e1252f8512bf53087be30ef48f31cc2f492ab"
+    }
+  ]
+}

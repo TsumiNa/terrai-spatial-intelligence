@@ -6,11 +6,13 @@ import pytest
 
 from scripts.fetch_fgd_kanto_buildings import (
     LICENSE,
+    MAINLAND_BOUNDS,
     SERVICE_URL,
-    WINDOW,
-    _intersects_window,
+    _intersects_mainland,
     build,
+    is_mainland_mesh,
     iter_building_features,
+    mesh_cell,
     parse_fgd_buildings,
 )
 
@@ -18,6 +20,7 @@ from scripts.fetch_fgd_kanto_buildings import (
 # the FGD_GMLSchema namespace, GML 3.2 geometry, posList as "lat lon …", a hole,
 # a ring split across two curve segments sharing a joint, an out-of-window
 # feature, a BldL line (must be ignored), and a degenerate BldA (no valid ring).
+# All mainland features fall inside mesh 533914 (lon 139.5–139.625, lat 35.417–35.5).
 FIXTURE_GML = """<?xml version="1.0" encoding="UTF-8"?>
 <Dataset xmlns="http://fgd.gsi.go.jp/spec/2008/FGD_GMLSchema"
          xmlns:gml="http://www.opengis.net/gml/3.2" gml:id="Dataset1">
@@ -26,7 +29,7 @@ FIXTURE_GML = """<?xml version="1.0" encoding="UTF-8"?>
     <lfSpanFr><gml:timePosition>2023-01-01</gml:timePosition></lfSpanFr>
     <type>普通建物</type>
     <area>
-      <gml:Surface gml:id="K1_1-g" srsName="fguuid:jgd2011.bl">
+      <gml:Surface gml:id="K1_1-g" srsName="fguuid:jgd2024.bl">
         <gml:patches><gml:PolygonPatch><gml:exterior><gml:Ring><gml:curveMember>
           <gml:Curve gml:id="K1_1-c"><gml:segments><gml:LineStringSegment>
             <gml:posList>35.4400 139.6000 35.4400 139.6010 35.4410 139.6010 35.4410 139.6000 35.4400 139.6000</gml:posList>
@@ -99,29 +102,49 @@ FIXTURE_GML = """<?xml version="1.0" encoding="UTF-8"?>
 </Dataset>
 """
 
-# The per-mesh filename FGD uses; the mesh token disambiguates fid-less features.
-GML_NAME = "FG-GML-5339-00-BldA-20230101-0001.xml"
+MESH = "533914"  # mainland Kanto 2次メッシュ containing the fixture's features
+GML_NAME = f"FG-GML-{MESH}-BldA-20230101-0001.xml"
+ISLAND_MESH = "523913"  # an Izu-island mesh (lat 34.75–34.83), outside the mainland gate
 
 
-def write_fixture(directory: Path) -> Path:
+def write_fixture(directory: Path, name: str = GML_NAME) -> Path:
     directory.mkdir(parents=True, exist_ok=True)
-    path = directory / GML_NAME
+    path = directory / name
     path.write_text(FIXTURE_GML, encoding="utf-8")
     return path
 
 
-def test_window_intersection_uses_the_kanto_bounds() -> None:
-    west, south, east, north = WINDOW
-    assert _intersects_window((west + 0.1, south + 0.1, west + 0.2, south + 0.2))
-    assert _intersects_window((west - 0.1, south + 0.1, west + 0.1, south + 0.2))  # straddling
-    assert not _intersects_window((0.0, 0.0, 1.0, 1.0))
+def write_mesh_zip(directory: Path, mesh: str) -> Path:
+    """A per-mesh zip named like the FGD download, wrapping the fixture GML."""
+
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / f"FG-GML-{mesh}-11-20230101.zip"
+    with zipfile.ZipFile(path, "w") as archive:
+        archive.writestr(f"FG-GML-{mesh}-BldA-20230101-0001.xml", FIXTURE_GML)
+    return path
+
+
+def test_mainland_gate_excludes_the_pacific_islands() -> None:
+    assert is_mainland_mesh(MESH)  # 533914, central Kanto
+    assert not is_mainland_mesh(ISLAND_MESH)  # Izu Oshima
+    assert not is_mainland_mesh("365337")  # Minamitorishima, 154°E
+    assert not is_mainland_mesh("303650")  # Okinotorishima, 20°N
+    # mesh_cell maths: 533914 -> lon 139.5–139.625, lat 35.4167–35.5
+    w, s, e, n = mesh_cell(MESH)
+    assert (round(w, 4), round(s, 4)) == (139.5, 35.4167)
+
+
+def test_window_intersection_uses_the_mainland_bounds() -> None:
+    west, south, east, north = MAINLAND_BOUNDS
+    assert _intersects_mainland((west + 0.1, south + 0.1, west + 0.2, south + 0.2))
+    assert _intersects_mainland((west - 0.1, south + 0.1, west + 0.1, south + 0.2))  # straddling
+    assert not _intersects_mainland((0.0, 0.0, 1.0, 1.0))
 
 
 def test_parse_reads_blda_swaps_coordinates_and_ignores_bldl(tmp_path: Path) -> None:
     path = write_fixture(tmp_path)
     parsed = list(parse_fgd_buildings(path))
 
-    # Five BldA (K1_1,2,3,5,6); the BldL K1_4 is excluded; K1_5 has no geometry.
     kinds = [gml_id for gml_id, *_ in parsed]
     assert kinds == ["K1_1", "K1_2", "K1_6", "K1_3", "K1_5"]  # BldL K1_4 excluded
 
@@ -142,7 +165,6 @@ def test_split_ring_segments_dedupe_the_shared_joint(tmp_path: Path) -> None:
     path = write_fixture(tmp_path)
     parsed = {gml_id: geom for gml_id, _type, _fid, geom in parse_fgd_buildings(path)}
     ring = parsed["K1_6"]["coordinates"][0]
-    # Four distinct corners + the repeated closing vertex, no duplicated joint.
     assert ring == [[139.62, 35.46], [139.621, 35.46], [139.621, 35.461], [139.62, 35.461], [139.62, 35.46]]
 
 
@@ -150,12 +172,12 @@ def test_only_in_window_buildings_survive_with_identity_and_provenance(tmp_path:
     path = write_fixture(tmp_path)
     skipped: list[str] = []
     features = list(
-        iter_building_features([path], "2026-07-24T00:00:00Z", "2023-01-01", "fgd-kanto-buildings-2023-01-01", skipped=skipped)
+        iter_building_features([path], "2026-07-24T00:00:00Z", "2026-04-30", "fgd-kanto-buildings-2026-04-30", skipped=skipped)
     )
 
     # K1_1, K1_2, K1_6 in-window; K1_3 outside; K1_5 degenerate -> skipped.
     ids = [feature["properties"]["fgd_id"] for feature in features]
-    assert ids == ["fgoid:10-BLD-1", "5339-00:K1_2", "5339-00:K1_6"]
+    assert ids == ["fgoid:10-BLD-1", f"{MESH}:K1_2", f"{MESH}:K1_6"]
     assert len(skipped) == 1
 
     first = features[0]["properties"]
@@ -163,13 +185,11 @@ def test_only_in_window_buildings_survive_with_identity_and_provenance(tmp_path:
     assert first["fgd_id"] == "fgoid:10-BLD-1"  # the fid is preferred over the gml:id
     assert first["fgd_type"] == "普通建物"
     assert first["terrai_source_url"] == SERVICE_URL
-    assert first["terrai_source_updated_at"] == "2023-01-01"
-    assert first["terrai_retrieved_at"] == "2026-07-24T00:00:00Z"
-    # Fid-less feature falls back to a mesh-namespaced gml:id.
-    assert features[1]["properties"]["fgd_gml_id"] == "K1_2"
+    assert first["terrai_source_updated_at"] == "2026-04-30"
+    assert features[1]["properties"]["fgd_gml_id"] == "K1_2"  # fid-less falls back to mesh:gml_id
 
 
-def test_build_writes_a_valid_collection_and_manifest_from_a_directory(tmp_path: Path) -> None:
+def test_build_writes_collection_manifest_and_coverage(tmp_path: Path) -> None:
     source = tmp_path / "source"
     write_fixture(source)
 
@@ -184,37 +204,64 @@ def test_build_writes_a_valid_collection_and_manifest_from_a_directory(tmp_path:
     assert manifest["invalid_geometries_skipped"] == 1
     assert manifest["license"] == LICENSE
     assert manifest["prefectures"] == ["Tokyo", "Kanagawa", "Chiba", "Saitama"]
-    assert manifest["service_url"] == SERVICE_URL
+    assert manifest["mesh_count"] == 1
+    assert manifest["excluded_island_mesh_count"] == 0
     assert manifest["sources"][0]["name"] == GML_NAME
     assert manifest["sources"][0]["sha256"]
     written = json.loads((tmp_path / "out/metadata.json").read_text(encoding="utf-8"))
     assert written == manifest
 
+    coverage = json.loads((tmp_path / "out/coverage.json").read_text(encoding="utf-8"))
+    assert coverage["meshes"] == [MESH]
+    assert coverage["bbox"] == [139.5, 35.416667, 139.625, 35.5]
+    assert coverage["mesh_size_deg"]["lon"] == 0.125
 
-def test_build_extracts_a_zip_archive(tmp_path: Path) -> None:
+
+def test_island_meshes_excluded_and_meshes_deduped_across_bundles(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    # Bundle A: one mainland mesh + one island mesh. Bundle B: a duplicate of the
+    # mainland mesh (a border mesh shared by two prefecture downloads).
+    write_mesh_zip(source / "bundleA", MESH)
+    write_mesh_zip(source / "bundleA", ISLAND_MESH)
+    write_mesh_zip(source / "bundleB", MESH)
+
+    manifest = build(output=tmp_path / "out", source_dir=source)
+
+    assert manifest["mesh_count"] == 1  # the duplicate mainland mesh read once
+    assert manifest["feature_count"] == 3  # not 6 -> dedup worked
+    assert manifest["excluded_island_mesh_count"] == 1  # the island mesh dropped
+    coverage = json.loads((tmp_path / "out/coverage.json").read_text(encoding="utf-8"))
+    assert coverage["meshes"] == [MESH]
+    assert coverage["excluded_island_meshes"] == [ISLAND_MESH]
+
+
+def test_build_extracts_a_bundle_zip_of_per_mesh_zips(tmp_path: Path) -> None:
     source = tmp_path / "source"
     source.mkdir(parents=True)
-    with zipfile.ZipFile(source / "pack.zip", "w") as archive:
-        archive.writestr(GML_NAME, FIXTURE_GML)
+    staging = tmp_path / "staging"
+    inner = write_mesh_zip(staging, MESH)
+    with zipfile.ZipFile(source / "PackDLMap.zip", "w") as bundle:
+        bundle.write(inner, arcname=inner.name)
 
     manifest = build(output=tmp_path / "out", source_dir=source)
 
     assert manifest["feature_count"] == 3
-    assert manifest["sources"][0]["name"] == "pack.zip"
+    assert manifest["mesh_count"] == 1
+    assert manifest["sources"][0]["name"] == "PackDLMap.zip"
 
 
 def test_build_reads_vintage_from_the_source_manifest(tmp_path: Path) -> None:
     output = tmp_path / "out"
     output.mkdir(parents=True)
     (output / "source_manifest.json").write_text(
-        json.dumps({"publication_vintage": "2023-01-01", "prefectures": ["Tokyo"]}), encoding="utf-8"
+        json.dumps({"publication_vintage": "2026-04-30", "prefectures": ["Tokyo"]}), encoding="utf-8"
     )
     write_fixture(output / "source")
 
     manifest = build(output=output)
 
-    assert manifest["dataset_id"] == "fgd-kanto-buildings-2023-01-01"
-    assert manifest["source_updated_at"] == "2023-01-01"
+    assert manifest["dataset_id"] == "fgd-kanto-buildings-2026-04-30"
+    assert manifest["source_updated_at"] == "2026-04-30"
     assert manifest["prefectures"] == ["Tokyo"]
 
 
