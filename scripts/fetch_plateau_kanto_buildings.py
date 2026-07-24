@@ -64,12 +64,14 @@ def _gml_id(element: ElementTree.Element) -> str | None:
     return None
 
 
-def _footprint_centroid(building: ElementTree.Element) -> tuple[float, float] | None:
-    """The [lon, lat] centroid of a building's ground geometry.
+def _footprint_point(building: ElementTree.Element) -> tuple[float, float] | None:
+    """A representative [lon, lat] inside a building's ground geometry.
 
-    Prefers ``lod0FootPrint`` (a flat 2D footprint); falls back to ``lod1Solid``.
-    CityGML posLists are ``lat lon z …`` triples, so every third value (altitude)
-    is dropped and the pair is averaged.
+    The **mean of the footprint's vertices** — a cheap interior point, not the
+    area-weighted polygon centroid, which is all the point-in-footprint height
+    join needs. Prefers ``lod0FootPrint`` (a flat 2D footprint), falling back to
+    ``lod1Solid``. CityGML posLists are ``lat lon z …`` triples, so every third
+    value (altitude) is dropped and the lat/lon pair averaged.
     """
 
     footprint: ElementTree.Element | None = None
@@ -116,11 +118,11 @@ def iter_building_heights(stream: Any, municipality: str) -> Iterator[dict[str, 
                 height = float(height_text)
             except ValueError:
                 height = None
-            centroid = _footprint_centroid(element) if height and height > 0 else None
-            if centroid is not None:
+            point = _footprint_point(element) if height and height > 0 else None
+            if point is not None:
                 yield {
                     "type": "Feature",
-                    "geometry": {"type": "Point", "coordinates": [centroid[0], centroid[1]]},
+                    "geometry": {"type": "Point", "coordinates": [point[0], point[1]]},
                     "properties": {"height": height, "plateau_id": _gml_id(element), "municipality": municipality},
                 }
         element.clear()

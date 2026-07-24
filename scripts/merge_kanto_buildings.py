@@ -213,7 +213,7 @@ def merge(
                         "yes",
                         None,
                         {
-                            "feature_id": f"fgd:{dict(feature.properties).get('fgd_id')}",
+                            "feature_id": f"fgd:{feature.properties.get('fgd_id')}",
                             "footprint_source": "fgd",
                             "building": "yes",
                         },

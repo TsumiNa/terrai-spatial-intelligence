@@ -266,16 +266,10 @@ export function composeStyle(
     layout: { visibility: "none" },
     paint: { "fill-color": BASEMAP_BUILDING_FILL, "fill-outline-color": palette.gray },
   };
-  const lastBuilding = layers.reduce(
-    (acc, layer, index) => ("source-layer" in layer && layer["source-layer"] === "building" ? index : acc),
-    -1,
-  );
-  if (lastBuilding >= 0) layers.splice(lastBuilding + 1, 0, buildingFill);
-  else layers.push(buildingFill);
   // The 2.5D extrusion of the same fabric: block extrusion by the baked height
   // (PLATEAU-measured where modelled, else OSM tags, else a class estimate).
-  // Hidden until the 2.5D view is on (applyVisibility); drawn above the flat fill.
-  layers.push({
+  // Hidden until the 2.5D view is on (applyVisibility).
+  const buildingExtrusion: LayerSpecification = {
     id: BUILDING_EXTRUSION_LAYER_ID,
     type: "fill-extrusion",
     source: BUILDING_TILES_SOURCE_ID,
@@ -289,7 +283,15 @@ export function composeStyle(
       "fill-extrusion-base": 0,
       "fill-extrusion-opacity": 0.85,
     },
-  });
+  };
+  const lastBuilding = layers.reduce(
+    (acc, layer, index) => ("source-layer" in layer && layer["source-layer"] === "building" ? index : acc),
+    -1,
+  );
+  // Both go just above GSI's building layers (over ground, under labels), the
+  // extrusion right over the flat fill it replaces in 2.5D.
+  const insertAt = lastBuilding >= 0 ? lastBuilding + 1 : layers.length;
+  layers.splice(insertAt, 0, buildingFill, buildingExtrusion);
   sources[TERRAIN_SOURCE_ID] = {
     type: "raster-dem",
     tiles: [TERRAIN_TILE_URL],
