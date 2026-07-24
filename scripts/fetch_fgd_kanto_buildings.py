@@ -12,8 +12,8 @@ over it and mint ``feature_id`` = ``fgd:<id>`` where the footprint is government
 
 Manual, registration-gated acquisition — reproduce the pinned input like this:
 
-1. Register (free) at the Fundamental Geospatial Data download service,
-   https://fgd.gsi.go.jp/download/ . Account creation and the authenticated
+1. Register (free) at the Fundamental Geospatial Data download service at
+   https://service.gsi.go.jp/kiban/ — account creation and the authenticated
    download are a human step; this task never fetches over the network.
 2. Select the product 「建築物の外周線」 (building outlines, feature type ``BldA``)
    for the four mainland-Kanto prefectures — Tokyo, Kanagawa, Chiba, Saitama —
@@ -58,7 +58,7 @@ from terrai_spatial.pipeline.provenance import utc_timestamp  # noqa: E402
 from terrai_spatial.pipeline.regions import MLIT_ACQUISITION_BOUNDS  # noqa: E402
 from terrai_spatial.store import feature_bbox  # noqa: E402
 
-SERVICE_URL = "https://fgd.gsi.go.jp/download/"
+SERVICE_URL = "https://service.gsi.go.jp/kiban/"
 DATASET_BASE = "fgd-kanto-buildings"
 OUTPUT = ROOT / "data/fgd/kanto_buildings"
 # 承認申請-exempt basic-survey content; attribution + a processing note suffice.

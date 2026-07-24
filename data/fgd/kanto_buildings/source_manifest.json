@@ -1,7 +1,7 @@
 {
   "dataset": "fgd-kanto-buildings",
   "product": "基盤地図情報 建築物の外周線 (FGD building outlines, feature type BldA)",
-  "service_url": "https://fgd.gsi.go.jp/download/",
+  "service_url": "https://service.gsi.go.jp/kiban/",
   "prefectures": ["Tokyo", "Kanagawa", "Chiba", "Saitama"],
   "window": [138.65, 34.85, 140.95, 36.3],
   "format": "JPGIS(GML)",
