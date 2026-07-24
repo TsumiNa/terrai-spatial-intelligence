@@ -1,74 +1,71 @@
 # PR3 Plan: Hillshade Computed from a High-Resolution DEM
 
-- Status: Planned
+- Status: Completed
 - Refactor: `basemap-view-modes`
+
+> Correction (verified during implementation): the earlier draft claimed "DEM5A
+> (5 m) gives z16-17." That was wrong — **5 m resolves to ~z15** (GSI serves
+> `dem5a_png` only to z15 for exactly this reason). z16-17 needs **1 m data
+> (DEM1A ≈ z17)**, which GSI *does* serve live as `dem1a_png` to z17 — but only in
+> **LiDAR-surveyed areas** (Yokohama ✓, Nihonbashi ✓, Mobara ✗). So the fix is a
+> per-tile **resolution chain**, not a single self-hosted source, and needs no
+> self-hosting and no Phase-2 dependency.
 
 ## Goal
 
-Hillshade stops going blurry past z16. It is computed on the client from the DEM
-(not a pre-rendered raster capped at z16), driven by a **high-resolution DEM5A
-(5 m) source**, so the shaded relief — and the 2.5D terrain that shares the same
-DEM — stays sharp at high zoom. No fabricated detail: resolution comes from real
-elevation data, never from image upscaling.
+Hillshade stops going blurry past z16 where high-resolution data exists. It is
+computed on the client from the DEM (not the pre-rendered `hillshademap` raster,
+capped at z16), driven per tile by the finest available GSI DEM — **DEM1A (1 m,
+~z17)** where LiDAR covers it, degrading to DEM5A (5 m, z15) then DEM10B (10 m,
+z14). The same DEM feeds `setTerrain`, so the 2.5D surface sharpens too. No
+fabricated detail: sharpness comes from real elevation data, never image upscaling.
 
-## Why (the constraint)
+## Why (the corrected physics)
 
-The blur is a **data-resolution ceiling**, not a rendering one: GSI's pre-rendered
-`hillshademap` raster is `maxzoom` 16, so beyond z16 MapLibre overscales one tile
-and interpolates. Upscaling/super-resolving that image cannot add real relief — at
-best a smoother blur, at worst **fabricated terrain that reads as measured**, which
-violates the project's observed/provenance commitment. The only honest way to more
-detail is more DEM resolution. Note the current DEM is only z14 (`dem_png`, 10 m),
-**below** the z16 hillshade — so computing hillshade from today's DEM would be
-worse; the DEM source upgrade is the necessary part.
+Blur past z16 is a **data-resolution ceiling**. Web-Mercator resolution at lat 35°:
+10 m ≈ z13.6, **5 m ≈ z14.6 (z15)**, **1 m ≈ z17**. So only 1 m data resolves
+z16-17. GSI serves:
+
+- `dem_png` (DEM10B, 10 m) → z14 — the app's old source.
+- `dem5a_png` (DEM5A, 5 m) → z15.
+- `dem1a_png` (DEM1A, 1 m) → **z17** — but LiDAR coverage only.
+
+Upscaling/super-resolving the z16 raster cannot add real relief, and would
+fabricate measured-looking terrain (against provenance). The honest path is the
+finer DEM where it exists.
 
 ## Scope
 
-- Replace the pre-rendered `hillshademap` raster (hillshade mode's shaded base)
-  with MapLibre's native **`hillshade` layer computed from a `raster-dem`
-  source** — shaded per-pixel at render resolution on the GPU, and consistent with
-  the 3D terrain (same DEM).
-- Upgrade the DEM source to **DEM5A (5 m)** with a higher `maxzoom` than today's
-  z14. Source options, to confirm at implementation: a GSI 5 m elevation-tile
-  endpoint if one is published, otherwise **DEM5A tiles derived from the 基盤地図情報
-  acquisition** (`osm-basemap-tiles` PR1 already pins FGD, which distributes
-  DEM5A) — i.e. the **self-host-DEM** path. The same upgraded `raster-dem` feeds
-  `setTerrain`, so the 2.5D relief sharpens too. The `gsidem://` transcode stays if
-  the source is GSI-encoded; self-hosted DEM5A tiles are pre-encoded to Mapbox
-  terrain-RGB (no runtime transcode — the convergence noted in the DEM self-host
-  plan).
-- **Optional 2× DPR**: render the hillshade at higher `devicePixelRatio` to
-  supersample the *shading computation* (anti-aliasing, real — not fabricated
-  detail), behind a flag, weighing the GPU/fill-rate cost (relevant on handheld
-  power).
-- The colour-by-height tint (PR2) sits over this new DEM-computed hillshade
-  unchanged; both remain hillshade-mode + zoom driven.
+- **DEM resolution chain in the `gsidem://` protocol** (`dem.ts`): per requested
+  tile, try DEM1A → DEM5A → DEM10B; the finest that has a tile wins. DEM1A is
+  tried only at z ≥ 16 (its advantage zone) to avoid a wasted 404 across the wide
+  view. Where a source only reaches a lower zoom, its **parent tile is upsampled
+  by interpolating decoded elevations** (interpolating the encoded RGB would
+  corrupt them). A fully-uncovered tile is flat sea level. `DEM_MAX_ZOOM` = 17;
+  the raster-dem `maxzoom` follows.
+- **Computed hillshade**: replace the pre-rendered `hillshademap` raster with a
+  MapLibre native `hillshade` layer over the terrain `raster-dem`, so shading is
+  per-pixel at render resolution and consistent with the 3D surface; tuned toward
+  GSI's grayscale relief (palette-locked shadow/highlight, NW illumination).
+- **Optional 2× DPR** behind `?hidpi=1`: `map.setPixelRatio` supersamples the
+  render (incl. the computed hillshade) for crisper shading — anti-aliasing, not
+  fabricated detail — weighed against GPU/fill-rate and handheld power.
+- The colour-by-height tint (PR2) sits over the computed hillshade unchanged.
 
 ## Non-goals
 
-- **No image super-resolution / ML upscaling** of the hillshade — it fabricates
-  measured-looking terrain, against provenance. Sharpness comes from DEM
-  resolution only.
-- No change to the 2.5D toggle / per-mode rules (PR1) or the tint layer (PR2)
-  beyond swapping the shaded base.
-- No change to imagery/standard modes.
+- **No image super-resolution / ML upscaling** — fabricates measured-looking
+  terrain, against provenance. Sharpness comes from DEM resolution only.
+- **No self-hosting** — GSI's `dem1a_png` already serves 1 m to z17; the earlier
+  "self-host DEM5A / FGD" premise was based on the wrong physics and is dropped.
+- No change to the 2.5D toggle / per-mode rules (PR1) or the tint layer (PR2).
 
-## Implementation steps
+## Acceptance (met)
 
-1. Point the terrain/hillshade `raster-dem` at a DEM5A (5 m) source with a raised
-   `maxzoom`; confirm the endpoint or derive tiles from the FGD DEM5A.
-2. Replace the hillshade raster with a native `hillshade` layer over that
-   `raster-dem`; tune exaggeration/light to match the prior look.
-3. Add the optional 2× DPR path behind a flag.
-4. Verify the tint (PR2) still composites; update tests for sharpness at z16–17
-   and for terrain resolution.
-
-## Acceptance
-
-- In hillshade mode, relief stays sharp at z16–17 (no overscaled mush), driven by
-  the 5 m DEM; the 2.5D terrain from the same DEM is correspondingly sharper.
-- No image-upscaling path exists; the sharpness is attributable to DEM resolution.
-- The colour-by-height tint still composites correctly over the DEM-computed
-  hillshade.
-- `cd webapp && npm run build && npm run test`, the Playwright suites, and
-  `uv run python -m terrai_spatial validate` pass.
+- In hillshade mode at survey zoom in a LiDAR area (Yokohama), the relief is
+  computed from **1 m DEM1A** tiles and the pre-rendered `hillshademap` raster is
+  no longer requested (e2e). Non-LiDAR areas (Mobara) degrade to DEM5A/DEM10B via
+  overscale rather than losing terrain.
+- No image-upscaling path; sharpness is attributable to DEM resolution.
+- The colour-by-height tint still composites over the computed hillshade.
+- `npm run build`, 122 unit, 48 e2e (1 skipped), and `terrai validate` pass.

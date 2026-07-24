@@ -51,7 +51,11 @@ export const RASTER_KINDS: RasterKind[] = ["photo", "hillshade"];
 export const GSI_ATTRIBUTION =
   '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル (GSI)</a>';
 
-export const RASTER_SOURCES: Record<RasterKind, { url: string; minzoom: number; maxzoom: number; attribution: string }> = {
+/** The raster-tile basemaps. Only `photo` is a raster tile now: `hillshade` is
+ * computed on the GPU from the DEM chain (basemap-view-modes PR3), so it stays
+ * consistent with the 2.5D surface and sharpens with the 1 m LiDAR DEM rather
+ * than blurring past the pre-rendered hillshademap's z16 ceiling. */
+export const RASTER_SOURCES: Record<"photo", { url: string; minzoom: number; maxzoom: number; attribution: string }> = {
   // seamlessphoto blends third-party imagery; GSI's tile catalog requires
   // their credits alongside the GSI one when the layer is shown.
   photo: {
@@ -60,7 +64,6 @@ export const RASTER_SOURCES: Record<RasterKind, { url: string; minzoom: number; 
     maxzoom: 18,
     attribution: `${GSI_ATTRIBUTION}・Landsat 8（courtesy USGS/NASA）・GEBCO・GRUS画像（© Axelspace）`,
   },
-  hillshade: { url: "https://cyberjapandata.gsi.go.jp/xyz/hillshademap/{z}/{x}/{y}.png", minzoom: 2, maxzoom: 16, attribution: GSI_ATTRIBUTION },
 };
 
 /** The floor shows the mainland-Kanto acquisition window with room around
@@ -73,10 +76,19 @@ export const RASTER_SOURCES: Record<RasterKind, { url: string; minzoom: number; 
  * legibility choice for observation, not survey scale, and the pitch is the
  * angle the surface reads at without hiding the far half of the viewport. */
 export const TERRAIN_SOURCE_ID = "terrai-terrain-dem";
-export const TERRAIN_TILE_URL = "gsidem://https://cyberjapandata.gsi.go.jp/xyz/dem_png/{z}/{x}/{y}.png";
-export const TERRAIN_MAXZOOM = 14;
+/** The protocol resolves the DEM per tile from a resolution chain (DEM1A 1 m /
+ * DEM5A 5 m / DEM10B 10 m), so the URL only conveys z/x/y. See ./dem.ts. */
+export const TERRAIN_TILE_URL = "gsidem://terrai-dem/{z}/{x}/{y}";
+/** The chain's deepest zoom (1 m LiDAR reaches ~z17); MapLibre requests DEM tiles
+ * up to here, and the protocol overscales from coarser sources where 1 m is
+ * absent, so both the 2.5D surface and the computed hillshade stay sharp where
+ * high-resolution data exists (see ./dem.ts DEM_MAX_ZOOM). */
+export const TERRAIN_MAXZOOM = 17;
 export const TERRAIN_EXAGGERATION = 1.5;
 export const TERRAIN_PITCH = 55;
+/** The computed hillshade's look, tuned toward GSI's grayscale shaded relief. */
+export const HILLSHADE_EXAGGERATION = 0.6;
+export const HILLSHADE_ILLUMINATION_DIRECTION = 315; // NW, the cartographic convention
 
 export const MIN_ZOOM = 7;
 export const MAX_ZOOM = 18;
@@ -216,19 +228,33 @@ export function composeStyle(vectorStyle: StyleSpecification): StyleSpecificatio
     attribution: GSI_ATTRIBUTION,
   };
   layers.push({ id: FALLBACK_RASTER_LAYER_ID, type: "raster", source: FALLBACK_RASTER_SOURCE_ID, layout: { visibility: "none" } });
-  for (const kind of RASTER_KINDS) {
-    const id = rasterId(kind);
-    const { url, minzoom, maxzoom, attribution } = RASTER_SOURCES[kind];
-    sources[id] = {
-      type: "raster",
-      tiles: [url],
-      tileSize: 256,
-      minzoom,
-      maxzoom,
-      attribution,
-    };
-    layers.push({ id, type: "raster", source: id, layout: { visibility: "none" } });
-  }
+  // photo: a raster tile basemap (hidden until selected).
+  const photo = RASTER_SOURCES.photo;
+  sources[rasterId("photo")] = {
+    type: "raster",
+    tiles: [photo.url],
+    tileSize: 256,
+    minzoom: photo.minzoom,
+    maxzoom: photo.maxzoom,
+    attribution: photo.attribution,
+  };
+  layers.push({ id: rasterId("photo"), type: "raster", source: rasterId("photo"), layout: { visibility: "none" } });
+  // hillshade: computed on the GPU from the terrain raster-dem, not a pre-rendered
+  // raster — so it is consistent with the 2.5D surface and stays sharp with the
+  // 1 m LiDAR DEM where the pre-rendered hillshademap would blur past z16.
+  layers.push({
+    id: rasterId("hillshade"),
+    type: "hillshade",
+    source: TERRAIN_SOURCE_ID,
+    layout: { visibility: "none" },
+    paint: {
+      "hillshade-exaggeration": HILLSHADE_EXAGGERATION,
+      "hillshade-illumination-direction": HILLSHADE_ILLUMINATION_DIRECTION,
+      // palette-locked: dark shadows, paper-white highlights (no colour literals).
+      "hillshade-shadow-color": palette.ink,
+      "hillshade-highlight-color": palette.white,
+    },
+  });
   // The colour-by-height tint sits above the user rasters so it draws over the
   // shaded relief when hillshade is active. Its opacity fades from a wide view to
   // 0 by RELIEF_TINT_FADE_END_ZOOM, and the layer's maxzoom hides it past there so

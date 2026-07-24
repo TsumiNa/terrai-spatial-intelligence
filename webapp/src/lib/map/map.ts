@@ -126,6 +126,13 @@ export async function createExhibitionMap(
     maxPitch: MAX_PITCH, // above MapLibre's default 60, for the later lowered-camera stage
     attributionControl: { compact: false },
   });
+  // Optional 2× DPR (basemap-view-modes PR3): supersample the render — including
+  // the GPU-computed hillshade — for crisper shading, behind ?hidpi=1 given the
+  // GPU/fill-rate (and handheld-power) cost. This anti-aliases the shading; it
+  // does not fabricate DEM detail.
+  if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("hidpi") === "1") {
+    map.setPixelRatio(Math.max(2, window.devicePixelRatio));
+  }
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right");
 
   const overlay = new MapboxOverlay({ interleaved: false, layers: [], pickingRadius: 8 });

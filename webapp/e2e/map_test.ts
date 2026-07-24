@@ -56,7 +56,8 @@ test("basemap switching keeps the single map instance (no camera rebuild)", asyn
 test("the 2.5D toggle tilts every basemap but adds 3D terrain only on imagery/relief", async ({ page }) => {
   const demTiles: string[] = [];
   page.on("response", (r) => {
-    if (r.url().includes("cyberjapandata.gsi.go.jp/xyz/dem_png/")) demTiles.push(r.url());
+    // the DEM protocol resolves per tile across dem1a_png / dem5a_png / dem_png
+    if (/cyberjapandata\.gsi\.go\.jp\/xyz\/dem[0-9a-z]*_png\//.test(r.url())) demTiles.push(r.url());
   });
 
   await waitForMap(page);
@@ -98,6 +99,22 @@ test("hillshade shows the colour-by-height tint at wide zoom, only in that mode"
   // switch to hillshade at the same wide view: now the tint streams in
   await page.locator(".basemap-button", { hasText: "起伏" }).click();
   await expect.poll(() => reliefTiles.length, { timeout: 15000 }).toBeGreaterThan(0);
+});
+
+test("hillshade is computed from the 1m DEM at survey zoom, not the pre-rendered raster", async ({ page }) => {
+  const dem1a: string[] = [];
+  const hillshademap: string[] = [];
+  page.on("response", (r) => {
+    if (r.url().includes("/xyz/dem1a_png/")) dem1a.push(r.url());
+    if (r.url().includes("/xyz/hillshademap/")) hillshademap.push(r.url());
+  });
+
+  await waitForMap(page); // Yokohama at z16 — a 1m-LiDAR (DEM1A) covered area
+  await page.locator(".basemap-button", { hasText: "起伏" }).click();
+  // the shaded relief is computed from the 1m LiDAR DEM…
+  await expect.poll(() => dem1a.length, { timeout: 15000 }).toBeGreaterThan(0);
+  // …and the z16-capped pre-rendered hillshademap raster is retired
+  expect(hillshademap).toEqual([]);
 });
 
 test("boots and renders with gsi-cyberjapan.github.io blocked (pinned snapshot)", async ({ page }) => {
