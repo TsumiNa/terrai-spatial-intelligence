@@ -57,15 +57,18 @@ beyond it. The fix is not to super-sample the image — upscaling cannot add rea
 relief, and ML super-resolution would **fabricate measured-looking terrain**,
 against the project's observed/provenance commitment. Instead the hillshade is
 computed on the client from the DEM (MapLibre's `hillshade` layer over a
-`raster-dem` source), and the DEM source is upgraded to **DEM5A (5 m)** — which
-the project should have used from the start, and which the 基盤地図情報 acquisition
-(`osm-basemap-tiles` PR1) already brings in. Because the same `raster-dem` feeds
-`setTerrain`, this sharpens both the shaded relief and the 2.5D terrain. Three
-principles: **no image super-resolution; sharpness comes from DEM resolution; and
-it converges with the self-host-DEM path** (self-hosted DEM5A tiles, pre-encoded
-to Mapbox terrain-RGB, also retire the runtime transcode). An optional 2× DPR
-render supersamples the *shading computation* (anti-aliasing, not fabricated
-detail).
+`raster-dem` source), driven per tile by the finest GSI DEM available. The
+physics matter: 10 m resolves to ~z14, **5 m (DEM5A) to ~z15**, **1 m (DEM1A) to
+~z17** — so z16-17 sharpness needs 1 m data, which GSI serves live as `dem1a_png`
+to z17 (LiDAR-covered areas only; Yokohama and Nihonbashi yes, Mobara no). The
+`gsidem://` protocol therefore resolves a **chain — DEM1A → DEM5A → DEM10B —**
+overscaling from a coarser parent where the finer data is absent, so it is sharp
+where 1 m LiDAR exists and degrades gracefully elsewhere. The same `raster-dem`
+feeds `setTerrain`, sharpening both the relief and the 2.5D surface. Three
+principles: **no image super-resolution; sharpness comes from DEM resolution;
+all live from GSI (no self-hosting).** An optional 2× DPR render supersamples the
+*shading computation* (anti-aliasing, not fabricated detail). (The earlier draft
+said "DEM5A → z16-17"; that was wrong — 5 m caps at z15, hence this DEM1A chain.)
 
 ## Rationale
 
@@ -102,7 +105,7 @@ detail).
    mode (GSI `relief`/色別標高図 or equivalent) with zoom-driven opacity that
    fades on zoom-in and hides past a threshold.
 3. `03-hillshade-from-dem-and-resolution-pr3.md` — compute the hillshade on the
-   client from a high-resolution DEM5A (5 m) source instead of the z16-capped
-   pre-rendered raster, sharpening both the shading and the shared 2.5D terrain;
-   optional 2× DPR; no image super-resolution (sharpness from DEM resolution,
-   converging with the self-host-DEM path).
+   client from a per-tile DEM resolution chain (DEM1A 1 m ≈ z17 where LiDAR-covered
+   → DEM5A 5 m z15 → DEM10B 10 m z14) instead of the z16-capped pre-rendered
+   raster, sharpening both the shading and the shared 2.5D terrain; optional 2×
+   DPR; no image super-resolution, all live from GSI (no self-hosting).

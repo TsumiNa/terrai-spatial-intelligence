@@ -24,34 +24,37 @@ const baseStyle: StyleSpecification = {
   layers: [{ id: "background", type: "background" }],
 };
 
-it("declares the published GSI zoom ranges, not deeper", () => {
+it("declares the published GSI zoom range, not deeper", () => {
   expect(RASTER_SOURCES.photo.maxzoom).toBe(18);
-  expect(RASTER_SOURCES.hillshade.maxzoom).toBe(16);
 });
 
-it("streams every raster basemap live from the GSI tile host", () => {
+it("streams the raster basemap live from the GSI tile host", () => {
   for (const { url } of Object.values(RASTER_SOURCES)) {
     expect(url).toMatch(/^https:\/\/cyberjapandata\.gsi\.go\.jp\/xyz\//);
     expect(url).toContain("{z}/{x}/{y}");
   }
 });
 
-it("appends the nationwide raster layers and the terrain DEM source", () => {
+it("appends the basemap layers and the terrain DEM source", () => {
   const composed = composeStyle(baseStyle);
   // composeStyle adds, over baseStyle: the raster-dem terrain + the hidden
-  // fallback source + the relief-tint source + one source per user raster…
-  expect(Object.keys(composed.sources)).toHaveLength(Object.keys(baseStyle.sources).length + 3 + RASTER_KINDS.length);
-  // …and the hidden fallback layer + the relief-tint layer + one per user raster.
-  expect(composed.layers).toHaveLength(baseStyle.layers.length + 2 + RASTER_KINDS.length);
+  // fallback + the relief-tint sources + the photo raster source (hillshade is a
+  // computed layer over the terrain source, so it adds no source of its own)…
+  expect(Object.keys(composed.sources)).toHaveLength(Object.keys(baseStyle.sources).length + 4);
+  // …and the fallback, photo, hillshade and relief-tint layers.
+  expect(composed.layers).toHaveLength(baseStyle.layers.length + 4);
   const dem = composed.sources[TERRAIN_SOURCE_ID] as { type?: string; encoding?: string; tiles?: string[] };
   expect(dem.type).toBe("raster-dem");
   expect(dem.encoding).toBe("mapbox");
-  expect(dem.tiles?.[0]).toMatch(/^gsidem:\/\/https:\/\/cyberjapandata\.gsi\.go\.jp/);
+  expect(dem.tiles?.[0]).toMatch(/^gsidem:\/\/terrai-dem\//);
+  // every overlay layer starts hidden (the active basemap is a visibility toggle)
   for (const layer of composed.layers.slice(1)) {
-    expect(layer.type).toBe("raster");
     expect(layer.layout).toEqual({ visibility: "none" });
   }
-  // rasters render above every vector layer so an opaque basemap covers it
+  // hillshade is computed on the GPU from the terrain raster-dem, not a raster tile
+  const hillshade = composed.layers.find((l) => l.id === rasterId("hillshade"));
+  expect(hillshade?.type).toBe("hillshade");
+  expect((hillshade as { source?: string }).source).toBe(TERRAIN_SOURCE_ID);
   expect(composed.layers[0].id).toBe("background");
   const photo = composed.sources[rasterId("photo")] as { bounds?: number[]; attribution?: string };
   // nationwide: no bounds clamp remains from the retired per-region cache
