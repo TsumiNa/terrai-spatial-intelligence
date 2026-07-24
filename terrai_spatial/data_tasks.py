@@ -120,6 +120,20 @@ TASKS = {
         force_argument=True,
         check_stale=False,
     ),
+    "fgd_kanto": DataTask(
+        "fgd_kanto",
+        "normalize the pinned 基盤地図情報 Kanto building outlines into footprints",
+        "scripts/fetch_fgd_kanto_buildings.py",
+        # Registration-gated manual source: the committed pin is the reproducibility
+        # input; the archive under source/ is dropped in by hand and never fetched.
+        inputs=("data/fgd/kanto_buildings/source_manifest.json",),
+        # Only the manifest is declared: the streamed product is gigabyte-scale
+        # and declared JSON outputs are parsed in full on every status check.
+        outputs=("data/fgd/kanto_buildings/metadata.json",),
+        automatic=False,
+        force_argument=True,
+        check_stale=False,
+    ),
     "ci_fixture": DataTask(
         "ci_fixture",
         "derive the committed CI fixture windows from the full Kanto acquisitions",

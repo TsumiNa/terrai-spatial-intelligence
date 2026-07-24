@@ -243,7 +243,11 @@ def contract_failures() -> list[str]:
         # The Kanto acquisitions hold gigabyte-scale products; their manifests
         # are declared task outputs above, and the store build is the loud
         # validator of the products themselves.
-        if path.is_relative_to(ROOT / "data/mlit") or path.is_relative_to(ROOT / "data/osm/kanto_buildings"):
+        if (
+            path.is_relative_to(ROOT / "data/mlit")
+            or path.is_relative_to(ROOT / "data/osm/kanto_buildings")
+            or path.is_relative_to(ROOT / "data/fgd/kanto_buildings")
+        ):
             continue
         ok, message = validate_json(path)
         if not ok:
