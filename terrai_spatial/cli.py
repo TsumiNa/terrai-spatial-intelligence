@@ -245,6 +245,10 @@ def contract_failures() -> list[str]:
         # validator of the products themselves.
         if path.is_relative_to(ROOT / "data/mlit") or path.is_relative_to(ROOT / "data/osm/kanto_buildings"):
             continue
+        # Skip only the gigabyte FGD product; the committed source_manifest.json
+        # and the generated metadata.json in the same directory stay validated.
+        if path.name == "buildings.geojson" and path.is_relative_to(ROOT / "data/fgd/kanto_buildings"):
+            continue
         ok, message = validate_json(path)
         if not ok:
             failures.append(f"invalid {path.relative_to(ROOT)}: {message}")

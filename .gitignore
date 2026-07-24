@@ -34,3 +34,10 @@ data/mlit/
 # The OSM Kanto building footprints share the same reproducible-acquisition
 # treatment (fetch osm_kanto).
 data/osm/kanto_buildings/
+
+# The 基盤地図情報 (FGD) Kanto building outlines are a registration-gated manual
+# acquisition (fetch fgd_kanto): the raw GML archive and the gigabyte-scale
+# normalized product stay out of git; the small source_manifest.json and the
+# generated metadata.json manifest are committed.
+data/fgd/kanto_buildings/source/
+data/fgd/kanto_buildings/buildings.geojson

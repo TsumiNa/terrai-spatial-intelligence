@@ -1,6 +1,6 @@
 # Basemap View Modes and 2.5D
 
-- Status: Planned
+- Status: Completed — PR1 #85, PR2 #86, PR3 #87 merged.
 
 ## Context
 
