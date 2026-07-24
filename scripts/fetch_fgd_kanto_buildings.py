@@ -12,8 +12,8 @@ over it and mint ``feature_id`` = ``fgd:<id>`` where the footprint is government
 
 Manual, registration-gated acquisition — reproduce the pinned input like this:
 
-1. Register (free) at the Fundamental Geospatial Data download service,
-   https://service.gsi.go.jp/kiban/ . Account creation and the authenticated
+1. Register (free) at the Fundamental Geospatial Data download service at
+   https://service.gsi.go.jp/kiban/ — account creation and the authenticated
    download are a human step; this task never fetches over the network.
 2. Select the product 「建築物の外周線」 (building outlines, feature type ``BldA``)
    for the four mainland-Kanto prefectures — Tokyo, Kanagawa, Chiba, Saitama —
