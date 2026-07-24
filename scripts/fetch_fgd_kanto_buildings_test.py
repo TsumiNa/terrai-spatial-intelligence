@@ -121,7 +121,7 @@ def test_parse_reads_blda_swaps_coordinates_and_ignores_bldl(tmp_path: Path) -> 
     path = write_fixture(tmp_path)
     parsed = list(parse_fgd_buildings(path))
 
-    # Six BldA (K1_1,2,3,5,6 + none from BldL); K1_5 degenerate -> no geometry.
+    # Five BldA (K1_1,2,3,5,6); the BldL K1_4 is excluded; K1_5 has no geometry.
     kinds = [gml_id for gml_id, *_ in parsed]
     assert kinds == ["K1_1", "K1_2", "K1_6", "K1_3", "K1_5"]  # BldL K1_4 excluded
 

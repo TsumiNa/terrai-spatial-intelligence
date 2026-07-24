@@ -114,8 +114,13 @@ def parse_fgd_buildings(
 ) -> Iterator[tuple[str | None, str | None, str | None, dict[str, Any] | None]]:
     """Yield ``(gml_id, type, fid, geometry)`` for every ``BldA`` in one file."""
 
-    for _event, element in ElementTree.iterparse(gml_path, events=("end",)):
-        if _local(element.tag) != BUILDING_FEATURE:
+    # Retain the <Dataset> root and clear it after each feature: clearing only
+    # the feature leaves processed siblings attached to the root, so memory would
+    # grow with the mesh file's feature count.
+    context = ElementTree.iterparse(gml_path, events=("start", "end"))
+    _event, root = next(context)
+    for event, element in context:
+        if event != "end" or _local(element.tag) != BUILDING_FEATURE:
             continue
         type_text: str | None = None
         fid_text: str | None = None
@@ -145,6 +150,7 @@ def parse_fgd_buildings(
         geometry = {"type": "Polygon", "coordinates": rings} if rings else None
         yield _gml_id(element), type_text, fid_text, geometry
         element.clear()
+        root.clear()
 
 
 def _mesh_token(name: str) -> str:

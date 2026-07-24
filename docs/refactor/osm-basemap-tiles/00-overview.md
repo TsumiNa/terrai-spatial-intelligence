@@ -1,6 +1,6 @@
 # Self-built Merged Building Basemap Tiles
 
-- Status: In progress — PR1 (基盤地図情報 acquisition mechanism) merged; the
+- Status: In progress — PR1 adds the 基盤地図情報 acquisition mechanism; the
   registration-gated FGD download and PR2–PR5 remain.
 
 ## Context

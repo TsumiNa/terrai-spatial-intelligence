@@ -2,10 +2,10 @@
 
 - Status: In progress — the acquisition task, its GML parser, the committed
   `source_manifest.json` pin, the `fgd_kanto` registration, gitignore/validate
-  wiring and the manual-download procedure are merged and verified against a
-  synthetic FGD-schema fixture. Producing and committing the real `metadata.json`
-  (feature count + per-archive sha256 + vintage) awaits the registration-gated
-  FGD download, a documented manual owner step.
+  wiring and the manual-download procedure are added by this PR and verified
+  against a synthetic FGD-schema fixture. Producing and committing the real
+  `metadata.json` (feature count + per-archive sha256 + vintage) awaits the
+  registration-gated FGD download, a documented manual owner step.
 - Refactor: `osm-basemap-tiles`
 
 ## Goal
