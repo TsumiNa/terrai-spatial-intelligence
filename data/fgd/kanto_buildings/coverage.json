@@ -226,5 +226,5 @@
     "523912",
     "523913"
   ],
-  "note": "Mainland Kanto only. The FGD download for whole 東京都 includes the Izu/Ogasawara islands and the remote Pacific outposts (Minamitorishima 153°E, Okinotorishima 20°N); those meshes are excluded (see MAINLAND_BOUNDS in scripts/fetch_fgd_kanto_buildings.py) so the coverage stays mainland."
+  "note": "Mainland Kanto only. The FGD download for whole 東京都 includes the Izu/Ogasawara islands and the remote Pacific outposts (Minamitorishima 154°E, Okinotorishima 20°N); those meshes are excluded (see MAINLAND_BOUNDS in scripts/fetch_fgd_kanto_buildings.py) so the coverage stays mainland."
 }

@@ -217,16 +217,18 @@ def iter_building_features(
     """
 
     for gml_path in gml_files:
-        mesh = _mesh_of(gml_path.name)
+        # Always a stable label: the 6-digit mesh where the name carries one,
+        # else the file stem — never "None:<id>".
+        mesh = _mesh_of(gml_path.name) or gml_path.stem
         for gml_id, type_text, fid_text, geometry in parse_fgd_buildings(gml_path):
             if geometry is None:
                 if skipped is not None:
-                    skipped.append(fid_text or (f"{mesh}:{gml_id}" if gml_id else str(gml_path.name)))
+                    skipped.append(fid_text or (f"{mesh}:{gml_id}" if gml_id else mesh))
                 continue
             bbox = feature_bbox(geometry)
             if bbox is None or not _intersects_mainland(bbox):
                 continue
-            fgd_id = fid_text or (f"{mesh}:{gml_id}" if gml_id else gml_id)
+            fgd_id = fid_text or (f"{mesh}:{gml_id}" if gml_id else mesh)
             properties: dict[str, Any] = {
                 "fgd_id": fgd_id,
                 "footprint_source": "fgd",
@@ -368,7 +370,7 @@ def coverage_footprint(dataset_id: str, covered: list[str], excluded: list[str])
         "note": (
             "Mainland Kanto only. The FGD download for whole 東京都 includes the "
             "Izu/Ogasawara islands and the remote Pacific outposts (Minamitorishima "
-            "153°E, Okinotorishima 20°N); those meshes are excluded (see MAINLAND_BOUNDS "
+            "154°E, Okinotorishima 20°N); those meshes are excluded (see MAINLAND_BOUNDS "
             "in scripts/fetch_fgd_kanto_buildings.py) so the coverage stays mainland."
         ),
     }
