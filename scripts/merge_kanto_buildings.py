@@ -1,8 +1,8 @@
 """Merge OSM (primary) + 基盤地図情報 (fill) Kanto buildings into one tile source.
 
 The self-built basemap (docs/refactor/osm-basemap-tiles/00-overview.md) needs a
-single building inventory with no double-drawing: OSM where it exists (rich tags,
-stable ids), government footprints filling OSM's suburban and rural gaps, one
+single building inventory with no double-drawing: OSM where it exists (stable ids,
+primary), government footprints filling OSM's suburban and rural gaps, one
 consistent coverage. This is that build-time merge — affordable once, offline —
 producing a line-delimited GeoJSON the tile step (tippecanoe) turns into PMTiles.
 
@@ -13,16 +13,18 @@ Three rules, from the overview:
    reaches slightly past it (into Ibaraki, eastern Chiba); those footprints are
    dropped so the merged coverage is exactly the government footprint (the owner's
    "align OSM to the FGD range").
-2. **OSM primary.** Every in-coverage OSM building is kept with its tags.
+2. **OSM primary.** Every in-coverage OSM building is kept, its identity winning.
 3. **FGD fills the gaps.** A government footprint is kept only where **no** OSM
    building covers that ground — tested by whether the FGD footprint's
    representative point falls inside any OSM footprint (an STRtree lookup). Where
-   OSM already has the building, its identity and tags win and the FGD copy is
-   dropped, so the layer never double-draws.
+   OSM already has the building, its identity wins and the FGD copy is dropped, so
+   the layer never double-draws.
 
-Every output feature carries the baked schema: ``feature_id`` (``osm:<id>`` /
-``fgd:<id>``), ``footprint_source`` (``osm`` | ``fgd``) and ``building`` class.
-Height/height_source are added by PR4 (PLATEAU); no height here.
+Every output feature carries **only the baked render/identity schema** —
+``feature_id`` (``osm:<id>`` / ``fgd:<id>``), ``footprint_source`` (``osm`` |
+``fgd``) and ``building`` class — not OSM's full tag set: the tiles carry
+render/identity, analytical attributes stay in the source (the overview's
+render/analyse boundary). Height/height_source are added by PR4 (PLATEAU).
 
 The representative-point test is fast and correct for the common case (OSM and
 FGD footprints of the same building overlap at the centre). Offset digitisation
