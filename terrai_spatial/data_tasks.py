@@ -139,6 +139,29 @@ TASKS = {
         force_argument=True,
         check_stale=False,
     ),
+    "merged_tiles": DataTask(
+        "merged_tiles",
+        "merge OSM (primary) + 基盤地図情報 (fill) buildings into one PMTiles source",
+        "scripts/merge_kanto_buildings.py",
+        # The merge reads both gigabyte building products directly, plus the FGD
+        # coverage footprint: naming them as inputs blocks the task up front when a
+        # product is missing instead of failing mid-run.
+        inputs=(
+            "data/osm/kanto_buildings/buildings.geojson",
+            "data/fgd/kanto_buildings/buildings.geojson",
+            "data/fgd/kanto_buildings/coverage.json",
+        ),
+        # The PMTiles is declared alongside the manifest so readiness tracks the
+        # real deliverable (both gitignored); .pmtiles is not JSON, so declaring it
+        # never triggers a parse. merged.geojsonl is a transient intermediate.
+        outputs=(
+            "data/tiles/kanto_buildings/metadata.json",
+            "data/tiles/kanto_buildings/buildings.pmtiles",
+        ),
+        automatic=False,
+        force_argument=True,
+        check_stale=False,
+    ),
     "ci_fixture": DataTask(
         "ci_fixture",
         "derive the committed CI fixture windows from the full Kanto acquisitions",

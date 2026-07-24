@@ -1,7 +1,31 @@
 # PR2 Plan: Merged Tile Generation
 
-- Status: Planned
+- Status: In progress — `scripts/merge_kanto_buildings.py` merges OSM (primary) +
+  FGD (fill), **clipped to the `coverage.json` mesh footprint** (aligns OSM to the
+  FGD range), keeping an FGD footprint only where no OSM footprint covers its
+  representative point (STRtree). Baked schema `feature_id`/`footprint_source`/
+  `building`; PMTiles z0–16 via **tippecanoe**; registered as `merged_tiles`. The
+  real spike is recorded below; flips to Completed on merge.
 - Refactor: `osm-basemap-tiles`
+
+## Spike (real, 2026-07-24)
+
+The merge + tile build over the actual acquisitions, on the owner's Mac (128 GB):
+
+- **13,640,510 merged buildings** = **5,177,191 OSM** (primary; 194,101 clipped
+  outside the coverage footprint) + **8,463,319 FGD fill**. FGD nearly doubled the
+  fabric with buildings OSM lacked; **4,850,720 FGD footprints were dropped** where
+  OSM already covered the ground, so the layer never double-draws.
+- **PMTiles z0–16: 1.1 GB** (`buildings.pmtiles`, valid PMTiles v3); merged
+  line-delimited GeoJSON intermediate: 4.9 GB (gitignored).
+- **Wall-clock ~29 min**, peak RAM 4.25 GB — a comfortable one-time offline batch.
+  (The overview projected 300–700 MB for OSM-only; the government fill roughly
+  doubles the building count, hence ~1.1 GB — still a static, CDN-served,
+  range-request PMTiles with near-zero serving CPU.)
+- Known limitation (documented refinement): the OSM/FGD dedup uses a
+  representative-point-in-OSM test, fast and correct for the common case; offset
+  digitisation in dense blocks can leak a few doubles/gaps. An area-overlap
+  threshold is the follow-up if spot-checks show it matters.
 
 ## Goal
 
