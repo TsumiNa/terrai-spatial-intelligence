@@ -92,6 +92,6 @@ terms) requires crediting both, and ODbL share-alike applies if the merged
 - 国土地理院コンテンツ利用規約 — <https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html>
 - 国土地理院の測量成果の利用手続 — <https://www.gsi.go.jp/LAW/2930-index.html>
 - 出典の記載 | 国土地理院 — <https://www.gsi.go.jp/LAW/2930-meizi.html>
-- 基盤地図情報ダウンロードサービス — <https://fgd.gsi.go.jp/download/>
+- 基盤地図情報ダウンロードサービス — <https://service.gsi.go.jp/kiban/>
 - Project PLATEAU open data — <https://www.mlit.go.jp/plateau/open-data/>
 - PLATEAU Site Policy — <https://www.mlit.go.jp/plateau/site-policy/>
