@@ -173,6 +173,33 @@ export function clampBasemapBuildings(style: StyleSpecification, handover: numbe
   return { ...style, layers };
 }
 
+/** The self-built merged building tiles (osm-basemap-tiles): OSM primary + 基盤地図情報
+ * fill, one PMTiles vector source served locally in dev and from an object store
+ * (R2 / GCS / minio — all HTTP range) in production. Its fill replaces the
+ * neutralized GSI building texture below the z16 handover, in the same gray, but
+ * **only where the coverage footprint covers the viewport**; outside it the GSI
+ * buildings show and an out-of-service badge appears (map.ts, coverage.ts). */
+export const BUILDING_TILES_SOURCE_ID = "terrai-buildings";
+export const BUILDING_TILES_LAYER_ID = "terrai-buildings-fill";
+/** The tippecanoe layer name baked into the PMTiles (merge_kanto_buildings.py). */
+export const BUILDING_TILES_SOURCE_LAYER = "buildings";
+/** Buildings appear from survey zoom; the wide view below carries no fabric. */
+export const BUILDING_TILES_MIN_ZOOM = 13;
+export const BUILDING_TILES_DEFAULT_URL = "/basemap/buildings.pmtiles";
+/** The mainland coverage footprint the out-of-service boundary reads. */
+export const COVERAGE_URL = "/basemap/coverage.json";
+/** Both credits render wherever the merged fabric shows. */
+export const OSM_ATTRIBUTION = "© OpenStreetMap contributors (ODbL)";
+export const FGD_ATTRIBUTION = "基盤地図情報（国土地理院）を加工";
+export const BUILDING_TILES_ATTRIBUTION = `${OSM_ATTRIBUTION}・${FGD_ATTRIBUTION}`;
+
+/** The PMTiles source URL: `?buildings=` wins (an R2/minio URL), else the default
+ * served path — mirroring how `apiOrigin` reads `?api=`. */
+export function buildingTilesUrl(search = ""): string {
+  const override = new URLSearchParams(search).get("buildings");
+  return override && override.length > 0 ? override : BUILDING_TILES_DEFAULT_URL;
+}
+
 /** The availability fallback (basemap-resilience): GSI's **production** raster
  * 標準地図 (non-experimental, z0–18, same terms), a hidden layer promoted only
  * when the experimental vector tiles fail. It is not a user basemap option — it
@@ -207,10 +234,38 @@ export const RELIEF_TINT_FADE_END_ZOOM = 13;
  * vector layers, so a user basemap still covers it and a dead vector source
  * does not).
  */
-export function composeStyle(vectorStyle: StyleSpecification): StyleSpecification {
+export function composeStyle(
+  vectorStyle: StyleSpecification,
+  buildingTilesHref: string = BUILDING_TILES_DEFAULT_URL,
+): StyleSpecification {
   const frozen = clampBasemapBuildings(neutralizeBasemapBuildings(freezeHighZoomCartography(vectorStyle)));
   const sources: Record<string, SourceSpecification> = { ...frozen.sources };
   const layers: LayerSpecification[] = [...frozen.layers];
+  // The merged building tiles: a vector fill in the neutralized-GSI gray, spliced
+  // just above GSI's own building layers (which applyVisibility hides in coverage)
+  // so it sits over the ground and under the labels, and capped at the handover so
+  // the windowed clickable objects take over above z16. Hidden until shown.
+  sources[BUILDING_TILES_SOURCE_ID] = {
+    type: "vector",
+    url: `pmtiles://${buildingTilesHref}`,
+    attribution: BUILDING_TILES_ATTRIBUTION,
+  };
+  const buildingFill: LayerSpecification = {
+    id: BUILDING_TILES_LAYER_ID,
+    type: "fill",
+    source: BUILDING_TILES_SOURCE_ID,
+    "source-layer": BUILDING_TILES_SOURCE_LAYER,
+    minzoom: BUILDING_TILES_MIN_ZOOM,
+    maxzoom: BASEMAP_DETAIL_HANDOVER_ZOOM,
+    layout: { visibility: "none" },
+    paint: { "fill-color": BASEMAP_BUILDING_FILL, "fill-outline-color": palette.gray },
+  };
+  const lastBuilding = layers.reduce(
+    (acc, layer, index) => ("source-layer" in layer && layer["source-layer"] === "building" ? index : acc),
+    -1,
+  );
+  if (lastBuilding >= 0) layers.splice(lastBuilding + 1, 0, buildingFill);
+  else layers.push(buildingFill);
   sources[TERRAIN_SOURCE_ID] = {
     type: "raster-dem",
     tiles: [TERRAIN_TILE_URL],

@@ -106,6 +106,7 @@ export const en = {
 
   // Map area
   "map.aria": "Spatial analysis map",
+  "map.buildingsOutOfService": "Outside building-tile coverage — showing GSI buildings",
   "aria.keyMetrics": "Key metrics",
 
   // Queue explanations
@@ -577,6 +578,7 @@ export const zh: Record<MessageKey, string> = {
   "map.view25DTitle": "切换 2.5D 视角 —— 任意底图皆可倾斜，影像与起伏叠加 3D 地形",
 
   "map.aria": "空间分析地图",
+  "map.buildingsOutOfService": "超出建筑瓦片覆盖范围 — 显示 GSI 建筑",
   "aria.keyMetrics": "关键指标",
 
   "queueExpl.overviewUrban": "优先显示兼顾屋顶能源潜力、道路可达性与周边需求的候选点。",
@@ -1007,6 +1009,7 @@ export const ja: Record<MessageKey, string> = {
   "map.view25DTitle": "2.5D 視点に切替 —— 任意の背景図で傾斜、画像・起伏では 3D 地形",
 
   "map.aria": "空間分析地図",
+  "map.buildingsOutOfService": "建物タイルの提供範囲外 — GSI建物を表示",
   "aria.keyMetrics": "主要指標",
 
   "queueExpl.overviewUrban": "屋根エネルギー潜在力、道路アクセス、周辺需要を兼ねる候補を優先表示します。",

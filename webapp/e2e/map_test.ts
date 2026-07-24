@@ -194,3 +194,68 @@ test("zooming past the raster ceilings produces no failed tile requests", async 
   await page.waitForTimeout(800);
   expect(failures).toEqual([]);
 });
+
+test("renders the merged building tiles in coverage, with both credits", async ({ page }) => {
+  const pmtiles: string[] = [];
+  page.on("response", (r) => {
+    if (r.url().includes("/basemap/buildings.pmtiles")) pmtiles.push(r.url());
+  });
+
+  await waitForMap(page);
+  // Standard basemap over Mobara (z15, inside coverage, below the z16 handover):
+  // the self-built building fabric shows and requests the PMTiles archive.
+  await page.locator(".basemap-button", { hasText: "标准" }).click();
+  await page.locator(".view-tab", { hasText: "茂原" }).click();
+
+  await expect.poll(() => pmtiles.length, { timeout: 20000 }).toBeGreaterThan(0);
+  // No out-of-service badge inside coverage.
+  await expect(page.locator(".building-out-of-service")).toHaveCount(0);
+  // Both credits render wherever the merged fabric shows.
+  await expect(page.locator(".maplibregl-ctrl-attrib")).toContainText("OpenStreetMap");
+  await expect(page.locator(".maplibregl-ctrl-attrib")).toContainText("基盤地図情報");
+});
+
+test("the self-built fabric survives the GSI vector host being blocked", async ({ page }) => {
+  // Offline proof: kill the experimental vector tiles; the merged building
+  // PMTiles is our own asset and must still load, so the buildings do not vanish
+  // with GSI's cartography.
+  await page.route("**cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/**", (route) => route.abort());
+  const pmtiles: string[] = [];
+  page.on("response", (r) => {
+    if (r.url().includes("/basemap/buildings.pmtiles")) pmtiles.push(r.url());
+  });
+
+  await waitForMap(page);
+  await page.locator(".basemap-button", { hasText: "标准" }).click();
+  await page.locator(".view-tab", { hasText: "茂原" }).click();
+  await expect.poll(() => pmtiles.length, { timeout: 20000 }).toBeGreaterThan(0);
+});
+
+test("shows the out-of-service badge when panning wholly outside coverage", async ({ page }) => {
+  await waitForMap(page);
+  await page.locator(".basemap-button", { hasText: "标准" }).click();
+  await page.locator(".view-tab", { hasText: "茂原" }).click();
+  await expect(page.locator(".building-out-of-service")).toHaveCount(0);
+
+  // Zoom out to ~z13 (still building zoom, but a wide enough viewport that a
+  // handful of drags clears the coverage) via the ±1 zoom control.
+  for (let i = 0; i < 2; i += 1) {
+    await page.locator(".maplibregl-ctrl-zoom-out").click();
+    await page.waitForTimeout(300);
+  }
+
+  const canvas = page.locator("#map .maplibregl-canvas");
+  const box = (await canvas.boundingBox())!;
+  const cx = box.x + box.width / 2;
+  // Drag the view north (drag the canvas downward) until the viewport clears the
+  // coverage's north edge (~36.33) and the fabric goes out of service.
+  for (let i = 0; i < 24; i += 1) {
+    await page.mouse.move(cx, box.y + box.height * 0.2);
+    await page.mouse.down();
+    await page.mouse.move(cx, box.y + box.height * 0.85, { steps: 6 });
+    await page.mouse.up();
+    await page.waitForTimeout(180);
+    if (await page.locator(".building-out-of-service").count()) break;
+  }
+  await expect(page.locator(".building-out-of-service")).toBeVisible();
+});
