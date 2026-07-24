@@ -40,6 +40,7 @@ import {
   LOCAL_STYLE_URL,
   LOCAL_SPRITE_URL,
   BUILDING_TILES_LAYER_ID,
+  BUILDING_EXTRUSION_LAYER_ID,
   BUILDING_TILES_MIN_ZOOM,
   COVERAGE_URL,
   buildingTilesUrl,
@@ -253,8 +254,13 @@ export async function createExhibitionMap(
     // map. Out of service (wholly outside coverage) or underground, our tiles hide
     // and GSI's buildings render. Same gray on both sides, so the swap is invisible.
     const showBuildings = basemap === "standard" && !undergroundMode && coverageIndex !== null && !buildingsOutOfService;
+    // The flat fill carries the 2D view; the extrusion carries 2.5D. One or the
+    // other, so the extrusion's base never z-fights the flat fill.
     if (map.getLayer(BUILDING_TILES_LAYER_ID)) {
-      map.setLayoutProperty(BUILDING_TILES_LAYER_ID, "visibility", showBuildings ? "visible" : "none");
+      map.setLayoutProperty(BUILDING_TILES_LAYER_ID, "visibility", showBuildings && !twoAndHalfD ? "visible" : "none");
+    }
+    if (map.getLayer(BUILDING_EXTRUSION_LAYER_ID)) {
+      map.setLayoutProperty(BUILDING_EXTRUSION_LAYER_ID, "visibility", showBuildings && twoAndHalfD ? "visible" : "none");
     }
     for (const id of gsiBuildingLayerIds) {
       map.setLayoutProperty(id, "visibility", showBuildings ? "none" : "visible");

@@ -1,0 +1,1137 @@
+{
+  "schema_version": 1,
+  "dataset_id": "plateau-kanto-buildings",
+  "package_api": "https://www.geospatial.jp/ckan/api/3/action/package_search?q=plateau",
+  "license_url": "https://www.mlit.go.jp/plateau/site-policy/",
+  "license": "PLATEAU Site Policy §3 (license_id: plateau) — attribution, commercial use permitted",
+  "selection_rule": "Latest-year CityGML package per modelled mainland-Kanto municipality (prefecture codes 11 Saitama / 12 Chiba / 13 Tokyo / 14 Kanagawa); resource URLs frozen so catalog drift fails visibly. LOD1 bldg carries measuredHeight.",
+  "attribution": "3D都市モデル（Project PLATEAU）国土交通省",
+  "municipality_count": 125,
+  "resources": [
+    {
+      "code": "11100",
+      "prefecture": "Saitama",
+      "package": "plateau-11100-saitama-shi-2025",
+      "year": 2025,
+      "resource_id": "23d9f380-88e0-4891-bdee-0fea5e812c9c",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/65/77eae6-8d0f-411a-aecb-abe26d464fa8/11100_saitama-shi_city_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11202",
+      "prefecture": "Saitama",
+      "package": "plateau-11202-kumagaya-shi-2025",
+      "year": 2025,
+      "resource_id": "ae2a307c-5793-4e1b-b22f-1ea040d488a6",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/17/c1d213-b8b9-41d1-943d-55f829a915bf/11202_kumagaya-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11203",
+      "prefecture": "Saitama",
+      "package": "plateau-11203-kawaguchi-shi-2024",
+      "year": 2024,
+      "resource_id": "22e9b2fe-8375-43aa-961a-d41b6ed8b226",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/e2/adab26-a177-47ff-a6d8-18bd04f6baae/11203_kawaguchi-shi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "11207",
+      "prefecture": "Saitama",
+      "package": "plateau-11207-chichibu-shi-2025",
+      "year": 2025,
+      "resource_id": "5489acc2-5b26-4466-a7a9-2abf043809b2",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/e1/b32d5f-ac42-4810-a3e0-708f85284349/11207_chichibu-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11208",
+      "prefecture": "Saitama",
+      "package": "plateau-11208-tokorozawa-shi-2024",
+      "year": 2024,
+      "resource_id": "4de0f69e-cbff-4adf-8d1e-53b70173fca2",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/1b/9dc482-90e8-493f-b19a-622bdfa31cd4/11208_tokorozawa-shi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "11210",
+      "prefecture": "Saitama",
+      "package": "plateau-11210-kazo-shi-2023",
+      "year": 2023,
+      "resource_id": "34402f8e-fe53-401d-97cd-a9f879345feb",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/b2/73b5c6-9c5b-4eb3-a64f-97b8760700c1/11210_kazo-shi_pref_2023_citygml_2_op.zip"
+    },
+    {
+      "code": "11211",
+      "prefecture": "Saitama",
+      "package": "plateau-11211-honjo-shi-2025",
+      "year": 2025,
+      "resource_id": "f4daf037-aa1d-4f6b-af77-c0699de7aabc",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/23/c8386d-0ea7-4849-8013-c7a988ac7eeb/11211_honjo-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11214",
+      "prefecture": "Saitama",
+      "package": "plateau-11214-kasukabe-shi-2023",
+      "year": 2023,
+      "resource_id": "10528b99-1719-4806-a480-d1665b858adf",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/32/5671d7-6060-4de8-bdca-f40ebb4ddded/11214_kasukabe-shi_pref_2023_citygml_2_op.zip"
+    },
+    {
+      "code": "11215",
+      "prefecture": "Saitama",
+      "package": "plateau-11215-sayama-shi-2025",
+      "year": 2025,
+      "resource_id": "4c79336a-6d70-4ef5-bc78-53e5857243a8",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/8d/b971b1-042b-4b91-a76a-5df6c7d97914/11215_sayama-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11216",
+      "prefecture": "Saitama",
+      "package": "plateau-11216-hanyu-shi-2025",
+      "year": 2025,
+      "resource_id": "136aa964-6e98-4ce9-9c74-facf1f4f353c",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/ba/9213aa-c125-4a99-8aed-a968843db236/11216_hanyu-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11217",
+      "prefecture": "Saitama",
+      "package": "plateau-11217-konosu-shi-2024",
+      "year": 2024,
+      "resource_id": "c84dcb95-de18-4ea1-9ce4-48a4a64411e6",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/2d/25fc58-097d-4cbb-9284-e20f12164b01/11217_konosu-shi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "11218",
+      "prefecture": "Saitama",
+      "package": "plateau-11218-fukaya-shi-2025",
+      "year": 2025,
+      "resource_id": "1b2754bb-aaf5-4eb3-94aa-94e10e1ff3ed",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/fd/769f64-4fab-49c5-ae42-ecea9cd73b92/11218_fukaya-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11219",
+      "prefecture": "Saitama",
+      "package": "plateau-11219-ageo-shi-2025",
+      "year": 2025,
+      "resource_id": "4122f7d7-7136-4cd7-bbff-46d1ec18a47f",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/6f/b9ceb0-78cd-4e94-b18f-2636e52f3e95/11219_ageo-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11221",
+      "prefecture": "Saitama",
+      "package": "plateau-11221-soka-shi-2025",
+      "year": 2025,
+      "resource_id": "45d0e7aa-0f5e-4be6-83a6-28eea14f94cb",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/29/4168d7-1774-4c20-9a45-47b7798f1e31/11221_soka-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11222",
+      "prefecture": "Saitama",
+      "package": "plateau-11222-koshigaya-shi-2023",
+      "year": 2023,
+      "resource_id": "d604f14f-9666-4e33-b70f-eb83197899ca",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/d7/a0d004-4cdd-45b4-9bb9-fb22694e66be/11222_koshigaya-shi_pref_2023_citygml_2_op.zip"
+    },
+    {
+      "code": "11223",
+      "prefecture": "Saitama",
+      "package": "plateau-11223-warabi-shi-2024",
+      "year": 2024,
+      "resource_id": "5279d684-758c-44e4-b4e9-e80d70d509d7",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/60/3712bf-70bc-40fb-9f33-3a4a6d1bc5d8/11223_warabi-shi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "11224",
+      "prefecture": "Saitama",
+      "package": "plateau-11224-toda-shi-2022",
+      "year": 2022,
+      "resource_id": "f72d13c3-72fa-4a92-b2cd-0eb0645eed74",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/e5/2ea123-24d2-41b2-ab18-c9d758319e57/11224_toda-shi_city_2022_citygml_4_op.zip"
+    },
+    {
+      "code": "11225",
+      "prefecture": "Saitama",
+      "package": "plateau-11225-iruma-shi-2025",
+      "year": 2025,
+      "resource_id": "f53eb762-83fe-4459-99ae-34ed54163126",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/f0/acb6a3-06bd-43e3-a14a-dc3556858531/11225_iruma-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11227",
+      "prefecture": "Saitama",
+      "package": "plateau-11227-asaka-shi-2025",
+      "year": 2025,
+      "resource_id": "fbe3af5f-aafe-4ebb-ae6f-8f8f61c25ceb",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/fa/7ba6a4-45ca-4bd0-a3c9-3ca6bb16cbb8/11227_asaka-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11228",
+      "prefecture": "Saitama",
+      "package": "plateau-11228-shiki-shi-2024",
+      "year": 2024,
+      "resource_id": "f3c1264e-a962-4107-a70a-6bb547d53cec",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/17/12dc56-bd1b-49f3-9ba3-0e4b5694452b/11228_shiki-shi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "11229",
+      "prefecture": "Saitama",
+      "package": "plateau-11229-wako-shi-2025",
+      "year": 2025,
+      "resource_id": "a3f6a7ed-ff5e-40b9-81b5-3be4d7b331b7",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/fd/f1e69a-4b65-4cdd-b839-4ab3bdf3b774/11229_wako-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11230",
+      "prefecture": "Saitama",
+      "package": "plateau-11230-niiza-shi-2024",
+      "year": 2024,
+      "resource_id": "41864e1b-1d1a-4376-953a-d9104e8e4577",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/6f/55a417-9ce4-43ee-a200-fba3f7a6e5b1/11230_niiza-shi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "11231",
+      "prefecture": "Saitama",
+      "package": "plateau-11231-okegawa-shi-2025",
+      "year": 2025,
+      "resource_id": "00d4fb1a-e7a6-4668-89be-a30bdddf6c04",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/b0/18b0ee-df35-4c89-9d44-2d635fa3fa9b/11231_okegawa-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11232",
+      "prefecture": "Saitama",
+      "package": "plateau-11232-kuki-shi-2023",
+      "year": 2023,
+      "resource_id": "aaf16aed-20c2-476b-9089-b6e0927f8930",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/41/90706a-508c-4722-ba2e-55d46713e28b/11232_kuki-shi_pref_2023_citygml_2_op.zip"
+    },
+    {
+      "code": "11233",
+      "prefecture": "Saitama",
+      "package": "plateau-11233-kitamoto-shi-2025",
+      "year": 2025,
+      "resource_id": "a3630707-5d24-4c5d-94d8-61131c81fa21",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/36/3bf04a-3d0c-4b74-815a-a11b84e4f429/11233_kitamoto-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11234",
+      "prefecture": "Saitama",
+      "package": "plateau-11234-yashio-shi-2023",
+      "year": 2023,
+      "resource_id": "dc980a5f-e246-49e0-8448-8d36b42efc76",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/1b/b0b7b9-4729-4144-8426-fb913b8896a1/11234_yashio-shi_pref_2023_citygml_2_op.zip"
+    },
+    {
+      "code": "11235",
+      "prefecture": "Saitama",
+      "package": "plateau-11235-fujimi-shi-2024",
+      "year": 2024,
+      "resource_id": "a2516f67-122f-45e9-87a3-a546675679b5",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/cd/628a6c-f1c1-4a5f-9646-f23f2c899bbc/11235_fujimi-shi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "11237",
+      "prefecture": "Saitama",
+      "package": "plateau-11237-misato-shi-2024",
+      "year": 2024,
+      "resource_id": "c2e63881-91a4-426d-a99c-29515023f6cd",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/ad/12762d-6a01-4f46-81c2-8ad5bdaca348/11237_misato-shi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "11238",
+      "prefecture": "Saitama",
+      "package": "plateau-11238-hasuda-shi-2022",
+      "year": 2022,
+      "resource_id": "c3e780fb-7f2e-43af-ae19-2cace296f43b",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/2b/292151-6df1-47c6-96b5-77cbd86edf7c/11238_hasuda-shi_city_2022_citygml_4_op.zip"
+    },
+    {
+      "code": "11239",
+      "prefecture": "Saitama",
+      "package": "plateau-11239-sakado-shi-2025",
+      "year": 2025,
+      "resource_id": "5b0c714b-4386-4a34-adf0-17db161f438d",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/fe/e15ada-ed75-43fa-97e8-d282f44cd0fb/11239_sakado-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11240",
+      "prefecture": "Saitama",
+      "package": "plateau-11240-satte-shi-2024",
+      "year": 2024,
+      "resource_id": "eaec42ec-8cd4-49e0-8346-4db59e19d841",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/6a/97c034-728b-44db-b199-208ce23e0f7b/11240_satte-shi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "11241",
+      "prefecture": "Saitama",
+      "package": "plateau-11241-tsurugashima-shi-2024",
+      "year": 2024,
+      "resource_id": "e01f9d97-a261-4e14-b1a8-92c5da699d4a",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/7f/155317-0fea-4c50-bd56-cba637ff2a86/11241_tsurugashima-shi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "11243",
+      "prefecture": "Saitama",
+      "package": "plateau-11243-yoshikawa-shi-2023",
+      "year": 2023,
+      "resource_id": "4a2dbf23-6481-4823-a466-e9c39a2f4f78",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/96/1b0619-02ba-4f82-9b15-1d50b9767d52/11243_yoshikawa-shi_pref_2023_citygml_2_op.zip"
+    },
+    {
+      "code": "11245",
+      "prefecture": "Saitama",
+      "package": "plateau-11245-fujimino-shi-2025",
+      "year": 2025,
+      "resource_id": "d9fa48b9-31c5-4828-8728-5c8a0997cd28",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/9e/a9524b-4c11-449f-a56f-259f48ab909a/11245_fujimino-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11246",
+      "prefecture": "Saitama",
+      "package": "plateau-11246-shiraoka-shi-2023",
+      "year": 2023,
+      "resource_id": "b63e0a2a-6515-42b2-bc0b-90a8832c4b77",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/47/2fd405-b4c7-4ae3-8316-db953e7a4c39/11246_shiraoka-shi_pref_2023_citygml_2_op.zip"
+    },
+    {
+      "code": "11301",
+      "prefecture": "Saitama",
+      "package": "plateau-11301-ina-machi-2024",
+      "year": 2024,
+      "resource_id": "b51b1602-c865-4e5b-9008-01ac67b204cb",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/8e/c35ca6-fe97-48b9-bf17-17a63ed2c2b5/11301_ina-machi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "11324",
+      "prefecture": "Saitama",
+      "package": "plateau-11324-miyoshi-machi-2024",
+      "year": 2024,
+      "resource_id": "6af7c7fa-a938-442c-bdfe-25545b3d1976",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/93/33f200-a528-4946-b695-97cb3eda7d88/11324_miyoshi-machi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "11326",
+      "prefecture": "Saitama",
+      "package": "plateau-11326-moroyama-machi-2020",
+      "year": 2020,
+      "resource_id": "053e6648-0253-4bff-9c05-586151a8a546",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/f3/f99f46-3912-4046-a2e3-ef4deaa6fa2b/11326_moroyama-machi_city_2020_citygml_10_op.zip"
+    },
+    {
+      "code": "11341",
+      "prefecture": "Saitama",
+      "package": "plateau-11341-namegawa-machi-2025",
+      "year": 2025,
+      "resource_id": "3a1d2bdb-9d63-4167-ba41-10645071b52c",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/6e/22534d-a663-4026-9bb3-a90d364c522c/11341_namegawa-machi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11342",
+      "prefecture": "Saitama",
+      "package": "plateau-11342-ranzan-machi-2025",
+      "year": 2025,
+      "resource_id": "9c1c254a-029d-47fe-be14-cf67d1d5db28",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/95/88ef5a-e10c-4efc-8b8f-a9ef1c3adbef/11342_ranzan-machi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11343",
+      "prefecture": "Saitama",
+      "package": "plateau-11343-ogawa-machi-2025",
+      "year": 2025,
+      "resource_id": "a0813d2a-82c5-425a-b8fc-e6607365f1de",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/b4/5c05b5-a116-470d-bcf5-214efdf4d4c8/11343_ogawa-machi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11346",
+      "prefecture": "Saitama",
+      "package": "plateau-11346-kawajima-machi-2025",
+      "year": 2025,
+      "resource_id": "e5ea68e4-63d4-4ec7-9758-49ac3767647a",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/f2/f687b9-8e9a-461d-a674-35413e0facee/11346_kawajima-machi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11347",
+      "prefecture": "Saitama",
+      "package": "plateau-11347-yoshimi-machi-2025",
+      "year": 2025,
+      "resource_id": "898fb7d8-32f5-4dde-8a65-d915c7afd00a",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/25/3d297a-662a-471a-be4b-f8d0d673c947/11347_yoshimi-machi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11348",
+      "prefecture": "Saitama",
+      "package": "plateau-11348-hatoyama-machi-2025",
+      "year": 2025,
+      "resource_id": "268684e6-259b-4e90-b0c1-31f2f280031f",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/6d/ba0089-5fae-4ad6-a700-bdb568d259fd/11348_hatoyama-machi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11385",
+      "prefecture": "Saitama",
+      "package": "plateau-11385-kamisato-machi-2024",
+      "year": 2024,
+      "resource_id": "cf699833-79f4-4507-a982-c56cbe937a89",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/a4/5dd14b-890c-4011-a1a6-1d499309b81e/11385_kamisato-machi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "11408",
+      "prefecture": "Saitama",
+      "package": "plateau-11408-yorii-machi-2025",
+      "year": 2025,
+      "resource_id": "405fd431-514e-4d1b-a406-d9fa6edda108",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/a1/366885-e4ef-4a9d-8e3a-a28cb40c6291/11408_yorii-machi_city_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "11442",
+      "prefecture": "Saitama",
+      "package": "plateau-11442-miyashiro-machi-2023",
+      "year": 2023,
+      "resource_id": "66e66b0b-a4b8-4491-9824-d202ec1c2be5",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/15/51fbf7-be0e-4b8f-b0ba-b655f12a8891/11442_miyashiro-machi_pref_2023_citygml_2_op.zip"
+    },
+    {
+      "code": "11464",
+      "prefecture": "Saitama",
+      "package": "plateau-11464-sugito-machi-2023",
+      "year": 2023,
+      "resource_id": "1180415d-bc84-4ddb-8593-707c9f764f99",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/f2/6f90ea-29eb-489e-b04b-787eba8e50f4/11464_sugito-machi_pref_2023_citygml_2_op.zip"
+    },
+    {
+      "code": "11465",
+      "prefecture": "Saitama",
+      "package": "plateau-11465-matsubushi-machi-2023",
+      "year": 2023,
+      "resource_id": "017b642b-4d1e-4f21-8dce-51e73a8650db",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/05/ecad75-abff-4c55-8412-413e1c8547a8/11465_matsubushi-machi_pref_2023_citygml_2_op.zip"
+    },
+    {
+      "code": "12100",
+      "prefecture": "Chiba",
+      "package": "plateau-12100-chiba-shi-2024",
+      "year": 2024,
+      "resource_id": "2ed42871-d1b4-4ec5-a920-0f7510a77629",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/9b/ac12c5-31d6-4957-8630-51fb3327d4a6/12100_chiba-shi_city_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "12206",
+      "prefecture": "Chiba",
+      "package": "plateau-12206-kisarazu-shi-2024",
+      "year": 2024,
+      "resource_id": "ae5d123e-4198-40ce-8d96-0f07ea28d471",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/69/c74914-a1a7-408c-a329-e7d397d88412/12206_kisarazu-shi_city_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "12210",
+      "prefecture": "Chiba",
+      "package": "plateau-12210-mobara-shi-2022",
+      "year": 2022,
+      "resource_id": "276b8e2e-4301-4d79-93a3-255880c67bd9",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/a7/5baa85-1eb7-457d-8559-f001d8646551/12210_mobara-shi_city_2022_citygml_4_op.zip"
+    },
+    {
+      "code": "12217",
+      "prefecture": "Chiba",
+      "package": "plateau-12217-kashiwa-shi-2020",
+      "year": 2020,
+      "resource_id": "a83e1e38-6645-494c-afe8-b0fcb4719d1d",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/e3/bd06aa-3965-4f13-89f2-fb10dbbbb976/12217_kashiwa-shi_city_2020_citygml_7_op.zip"
+    },
+    {
+      "code": "12221",
+      "prefecture": "Chiba",
+      "package": "plateau-12221-yachiyo-shi-2022",
+      "year": 2022,
+      "resource_id": "963b57df-22a0-417f-b09b-b24225c12e42",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/39/386bc4-86a8-434a-bf68-093776972faf/12221_yachiyo-shi_city_2022_citygml_4_op.zip"
+    },
+    {
+      "code": "12347",
+      "prefecture": "Chiba",
+      "package": "plateau-12347-tako-machi-2025",
+      "year": 2025,
+      "resource_id": "e8dc9973-946f-4d96-b763-d74734b57a1d",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/50/9161a3-d160-497c-aebe-d281ae1e52a9/12347_tako-machi_city_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13101",
+      "prefecture": "Tokyo",
+      "package": "plateau-13101-chiyoda-ku-2025",
+      "year": 2025,
+      "resource_id": "76646177-6483-4c45-b0b4-29ca719baf2d",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/d1/e11ec4-3ad6-4923-a441-32cbd7455dee/13101_chiyoda-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13102",
+      "prefecture": "Tokyo",
+      "package": "plateau-13102-chuo-ku-2025",
+      "year": 2025,
+      "resource_id": "9a3dc553-052a-4dee-b34c-041651e75a86",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/42/16c58f-1b9f-459d-976b-1f47fcdbbea7/13102_chuo-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13103",
+      "prefecture": "Tokyo",
+      "package": "plateau-13103-minato-ku-2025",
+      "year": 2025,
+      "resource_id": "6ff5629e-fbdf-4505-b7d9-7cb47ba4f52b",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/ea/d75459-6d62-4a1f-8081-317603bd5f8d/13103_minato-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13104",
+      "prefecture": "Tokyo",
+      "package": "plateau-13104-shinjuku-ku-2025",
+      "year": 2025,
+      "resource_id": "c4071a71-19e9-4453-9787-100fcf3319dd",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/db/2866b9-e3c2-4bc4-83d3-b7b42e9b85a1/13104_shinjuku-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13105",
+      "prefecture": "Tokyo",
+      "package": "plateau-13105-bunkyo-ku-2025",
+      "year": 2025,
+      "resource_id": "77032453-babf-48a8-a503-d2dd391254ac",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/b1/ea0dc7-342c-4814-b3ff-b2c162e44457/13105_bunkyo-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13106",
+      "prefecture": "Tokyo",
+      "package": "plateau-13106-taito-ku-2025",
+      "year": 2025,
+      "resource_id": "e698231d-18ab-4847-b551-8cbd3e98cd9a",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/80/45b2b1-5a88-40ab-9877-70b540b8707e/13106_taito-ku_city_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13107",
+      "prefecture": "Tokyo",
+      "package": "plateau-13107-sumida-ku-2025",
+      "year": 2025,
+      "resource_id": "767a469a-54ac-4f7d-8d4f-508a6201ed4b",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/a6/8b550a-071a-4e70-9296-4dc203a0065f/13107_sumida-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13108",
+      "prefecture": "Tokyo",
+      "package": "plateau-13108-koto-ku-2025",
+      "year": 2025,
+      "resource_id": "8440baa7-335a-472b-a3e6-8f60076cb4fb",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/ae/e2fc78-4e4a-4173-9d64-b0e02a916aee/13108_koto-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13109",
+      "prefecture": "Tokyo",
+      "package": "plateau-13109-shinagawa-ku-2025",
+      "year": 2025,
+      "resource_id": "8c2b2d0a-3e8b-4b71-be99-e5af42d2d201",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/82/06d786-5090-42cd-96e4-f3c7122192fc/13109_shinagawa-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13110",
+      "prefecture": "Tokyo",
+      "package": "plateau-13110-meguro-ku-2025",
+      "year": 2025,
+      "resource_id": "3c162699-107f-492e-8063-0b7a35a60431",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/10/6cc3b4-2f82-4485-b4df-ba21eed697e1/13110_meguro-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13111",
+      "prefecture": "Tokyo",
+      "package": "plateau-13111-ota-ku-2025",
+      "year": 2025,
+      "resource_id": "9811531f-9842-4e3e-9746-7219a544f64e",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/4d/0c7256-c7e6-40b9-ae86-5fd6d2d6bfd9/13111_ota-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13112",
+      "prefecture": "Tokyo",
+      "package": "plateau-13112-setagaya-ku-2025",
+      "year": 2025,
+      "resource_id": "c4c3798e-c0cc-43c4-bbda-0dfde6a92f04",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/4d/e9ecc6-42d0-47ad-84a7-93d07c7766a8/13112_setagaya-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13113",
+      "prefecture": "Tokyo",
+      "package": "plateau-13113-shibuya-ku-2025",
+      "year": 2025,
+      "resource_id": "f7fa761b-d46a-474c-9f02-b011642b34cd",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/48/e684f3-fb86-44d4-b7e3-a3d72d54582d/13113_shibuya-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13114",
+      "prefecture": "Tokyo",
+      "package": "plateau-13114-nakano-ku-2025",
+      "year": 2025,
+      "resource_id": "984390ad-084d-4507-95f5-3072ca7598b3",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/e2/9434f5-c5ca-479e-b953-e2c27df299d1/13114_nakano-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13115",
+      "prefecture": "Tokyo",
+      "package": "plateau-13115-suginami-ku-2025",
+      "year": 2025,
+      "resource_id": "be806328-9cd2-46a5-ab5b-1680ff6bd4d7",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/a7/ca8241-26ed-4d26-9f22-b31e672dca83/13115_suginami-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13116",
+      "prefecture": "Tokyo",
+      "package": "plateau-13116-toshima-ku-2025",
+      "year": 2025,
+      "resource_id": "691b49ec-5794-419f-a0cc-e6ebea69fa63",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/32/d726d2-f749-431e-9c0e-f7f9fad2cd3a/13116_toshima-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13117",
+      "prefecture": "Tokyo",
+      "package": "plateau-13117-kita-ku-2025",
+      "year": 2025,
+      "resource_id": "5ff4007a-2a49-440f-8fdd-3536b4ff6446",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/1b/e3505e-0a13-49ee-8bd5-cf1f22692a92/13117_kita-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13118",
+      "prefecture": "Tokyo",
+      "package": "plateau-13118-arakawa-ku-2025",
+      "year": 2025,
+      "resource_id": "d26922b1-4303-43d0-b60d-fd1f9b5d1768",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/35/b55488-82fb-482b-b707-d75b1fb70743/13118_arakawa-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13119",
+      "prefecture": "Tokyo",
+      "package": "plateau-13119-itabashi-ku-2025",
+      "year": 2025,
+      "resource_id": "f19d58f6-efe5-4a3d-a334-61923c1d89ba",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/83/10b7c5-f1ba-4cd9-b268-8db440f2ceed/13119_itabashi-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13120",
+      "prefecture": "Tokyo",
+      "package": "plateau-13120-nerima-ku-2025",
+      "year": 2025,
+      "resource_id": "55921171-bcee-42a6-8733-9388beed3e52",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/44/31ccf1-036e-4a8f-9cdb-4481b85f89cc/13120_nerima-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13121",
+      "prefecture": "Tokyo",
+      "package": "plateau-13121-adachi-ku-2025",
+      "year": 2025,
+      "resource_id": "b0eda4b0-366a-49a6-84fe-e56caf1688f6",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/5c/b3f713-94a6-4a48-b422-a210958d3c09/13121_adachi-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13122",
+      "prefecture": "Tokyo",
+      "package": "plateau-13122-katsushika-ku-2025",
+      "year": 2025,
+      "resource_id": "7d2a57d6-37bd-4075-97d9-99c4979b0297",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/72/d76e7b-26a0-4918-8314-5f285be9bc10/13122_katsushika-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13123",
+      "prefecture": "Tokyo",
+      "package": "plateau-13123-edogawa-ku-2025",
+      "year": 2025,
+      "resource_id": "adbbf023-6fb0-4067-9e07-c56a9a392b2b",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/4c/df0aa3-231e-4a5b-8b00-a2f27604e3ae/13123_edogawa-ku_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13201",
+      "prefecture": "Tokyo",
+      "package": "plateau-13201-hachioji-shi-2025",
+      "year": 2025,
+      "resource_id": "4a766629-3f59-4024-9aa2-03d851eb866f",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/bd/6a5266-cf05-4046-a301-de125654dc7d/13201_hachioji-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13202",
+      "prefecture": "Tokyo",
+      "package": "plateau-13202-tachikawa-shi-2025",
+      "year": 2025,
+      "resource_id": "55087b4b-1958-42b1-a93e-dd307ab54359",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/d9/371af7-599b-4dc5-9307-d2543e044ba6/13202_tachikawa-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13203",
+      "prefecture": "Tokyo",
+      "package": "plateau-13203-musashino-shi-2025",
+      "year": 2025,
+      "resource_id": "b7c7d488-22c3-4c49-b55b-37e973b405a1",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/b7/4b6157-76c9-4d1d-abfc-d0e55d10ad65/13203_musashino-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13204",
+      "prefecture": "Tokyo",
+      "package": "plateau-13204-mitaka-shi-2025",
+      "year": 2025,
+      "resource_id": "a4c9d85f-2356-4eb2-b61f-855e31c2bcfb",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/90/07edf9-e1c5-45f8-95ea-a27556b4c3b7/13204_mitaka-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13205",
+      "prefecture": "Tokyo",
+      "package": "plateau-13205-ome-shi-2025",
+      "year": 2025,
+      "resource_id": "037ed312-6071-4b28-b7b5-d58f3da98b1b",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/ac/1ba0a5-e4d2-4c1a-b72d-e13d92756681/13205_ome-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13206",
+      "prefecture": "Tokyo",
+      "package": "plateau-13206-fuchu-shi-2025",
+      "year": 2025,
+      "resource_id": "e2bc412a-318f-4a9a-b212-c9b3ae4cc2f0",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/f1/f1c29e-e025-483f-9c43-d2d613ca5cd2/13206_fuchu-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13207",
+      "prefecture": "Tokyo",
+      "package": "plateau-13207-akishima-shi-2025",
+      "year": 2025,
+      "resource_id": "72cd6dd8-a7f4-4ba8-98a0-65ca42dce522",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/57/a7ef80-b22a-47a0-95d9-fa11a820cb71/13207_akishima-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13208",
+      "prefecture": "Tokyo",
+      "package": "plateau-13208-chofu-shi-2025",
+      "year": 2025,
+      "resource_id": "1187eaa2-8bde-4d91-b906-bdce3cf3df98",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/19/1eaeed-2760-4284-a098-e1570f18a38e/13208_chofu-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13209",
+      "prefecture": "Tokyo",
+      "package": "plateau-13209-machida-shi-2025",
+      "year": 2025,
+      "resource_id": "53105d3c-c2e8-4fa3-8a92-ac3d8cceb625",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/2a/4c1d12-41e3-43c1-b900-d26d4c63adc7/13209_machida-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13210",
+      "prefecture": "Tokyo",
+      "package": "plateau-13210-koganei-shi-2025",
+      "year": 2025,
+      "resource_id": "50a0c961-17a7-44ef-99ba-57cb9f5b603d",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/98/1fda84-d617-470d-9916-c55ef99d1359/13210_koganei-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13211",
+      "prefecture": "Tokyo",
+      "package": "plateau-13211-kodaira-shi-2025",
+      "year": 2025,
+      "resource_id": "43da3f70-a3bd-421b-81df-71917c7ac678",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/38/06c7d4-bde5-4cc6-8fd6-8fbe78c2c92a/13211_kodaira-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13212",
+      "prefecture": "Tokyo",
+      "package": "plateau-13212-hino-shi-2025",
+      "year": 2025,
+      "resource_id": "44cd039f-f985-4d33-a941-33b77b4f3f79",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/3d/416dae-06b7-46c8-b445-ea0eec914837/13212_hino-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13213",
+      "prefecture": "Tokyo",
+      "package": "plateau-13213-higashimurayama-shi-2025",
+      "year": 2025,
+      "resource_id": "73fe4c4d-a18e-4091-94a7-471a796d8f4d",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/48/fd8661-830e-4431-8bd9-4d57799d01b8/13213_higashimurayama-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13214",
+      "prefecture": "Tokyo",
+      "package": "plateau-13214-kokubunji-shi-2025",
+      "year": 2025,
+      "resource_id": "5cd2bc6b-2d1b-4bc9-aee8-1bc72da89547",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/ff/7d7983-7fb0-42a9-b85f-e001fc89ace8/13214_kokubunji-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13215",
+      "prefecture": "Tokyo",
+      "package": "plateau-13215-kunitachi-shi-2025",
+      "year": 2025,
+      "resource_id": "72c1fb3e-fab0-46b8-9c4f-de5d49585f25",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/b6/21288f-f49b-432d-a569-4961e9ed1688/13215_kunitachi-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13218",
+      "prefecture": "Tokyo",
+      "package": "plateau-13218-fussa-shi-2025",
+      "year": 2025,
+      "resource_id": "ddfe6462-cba7-46c1-9825-31d2ee0205f2",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/71/a6b131-abea-4df2-bbcf-349b4ad30dcc/13218_fussa-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13219",
+      "prefecture": "Tokyo",
+      "package": "plateau-13219-komae-shi-2025",
+      "year": 2025,
+      "resource_id": "54aa690a-ffe8-4541-91be-86b4c214a3d5",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/49/4cfcc7-5169-44ae-8f0a-c0fb9243673a/13219_komae-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13220",
+      "prefecture": "Tokyo",
+      "package": "plateau-13220-higashiyamato-shi-2025",
+      "year": 2025,
+      "resource_id": "73fd8f7b-c615-426b-938c-095fff60e8ca",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/f2/ce1c3d-fcc0-4b98-bc17-29513b245347/13220_higashiyamato-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13221",
+      "prefecture": "Tokyo",
+      "package": "plateau-13221-kiyose-shi-2025",
+      "year": 2025,
+      "resource_id": "96c61e97-d0f1-4896-9c04-f749bba20562",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/17/d0582e-7926-4cad-93af-08a24974f268/13221_kiyose-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13222",
+      "prefecture": "Tokyo",
+      "package": "plateau-13222-higashikurume-shi-2025",
+      "year": 2025,
+      "resource_id": "b4324c98-b188-406f-b5d5-4d4c2cf25b2e",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/fb/4d34ff-b30f-489c-aa71-15c3c1c63ba8/13222_higashikurume-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13223",
+      "prefecture": "Tokyo",
+      "package": "plateau-13223-musashimurayama-shi-2025",
+      "year": 2025,
+      "resource_id": "57733cdf-7818-4534-971a-131fdda3d17b",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/ef/fbd308-233e-4de8-9a36-26be2e54582b/13223_musashimurayama-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13224",
+      "prefecture": "Tokyo",
+      "package": "plateau-13224-tama-shi-2025",
+      "year": 2025,
+      "resource_id": "470bace7-e31c-4f12-a293-fa7c6c2450a7",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/75/4d2fb0-a25b-4bb7-8829-f8a6f0e7b719/13224_tama-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13225",
+      "prefecture": "Tokyo",
+      "package": "plateau-13225-inagi-shi-2025",
+      "year": 2025,
+      "resource_id": "44ba54fe-5e3f-47c6-aab9-841cb1ff49ba",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/88/bc8232-8c30-4819-aafd-2932f85477bb/13225_inagi-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13227",
+      "prefecture": "Tokyo",
+      "package": "plateau-13227-hamura-shi-2025",
+      "year": 2025,
+      "resource_id": "2a948c97-203f-4250-adbd-1207033d49b0",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/6e/28af8a-eeb9-4f08-a601-d92ba3d4b890/13227_hamura-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13228",
+      "prefecture": "Tokyo",
+      "package": "plateau-13228-akiruno-shi-2025",
+      "year": 2025,
+      "resource_id": "92944cc2-e45c-4f3d-b61c-85b71ad55c97",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/11/9e7e3d-73dc-458f-b0ad-7a9bfe9ea518/13228_akiruno-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13229",
+      "prefecture": "Tokyo",
+      "package": "plateau-13229-nishitokyo-shi-2025",
+      "year": 2025,
+      "resource_id": "48f18cbe-c309-4ea9-85a3-3cc29a3bcc91",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/c9/3bc113-16d6-4279-8a55-958875bb8e6f/13229_nishitokyo-shi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13303",
+      "prefecture": "Tokyo",
+      "package": "plateau-13303-mizuho-machi-2025",
+      "year": 2025,
+      "resource_id": "69c9c14d-723b-4009-b8d7-e00d6309aacc",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/d7/20cb35-cbb0-427b-bc33-b04234805d90/13303_mizuho-machi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13305",
+      "prefecture": "Tokyo",
+      "package": "plateau-13305-hinode-machi-2025",
+      "year": 2025,
+      "resource_id": "c14d4784-c377-4a78-b1e3-f93f00eb58de",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/00/216ed8-069b-4f26-8bba-fdfa40026908/13305_hinode-machi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13307",
+      "prefecture": "Tokyo",
+      "package": "plateau-13307-hinohara-mura-2025",
+      "year": 2025,
+      "resource_id": "93f138b7-ec5a-4fd2-b4d1-d66bdc3b61fd",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/d1/ed6f8c-ab74-4772-8097-ef4900cd8721/13307_hinohara-mura_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13308",
+      "prefecture": "Tokyo",
+      "package": "plateau-13308-okutama-machi-2025",
+      "year": 2025,
+      "resource_id": "1c559947-b51e-4aba-a6da-b350c8e5deb8",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/65/89f045-4321-4880-a8ef-c5cc301f24c9/13308_okutama-machi_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "13361",
+      "prefecture": "Tokyo",
+      "package": "plateau-13361-oshima-machi-2024",
+      "year": 2024,
+      "resource_id": "4a9bad6b-1674-451e-88ea-186fc6c6881b",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/77/ca9b31-1fd6-47a2-aa00-012cdb822244/13361_oshima-machi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "13362",
+      "prefecture": "Tokyo",
+      "package": "plateau-13362-toshima-mura-2024",
+      "year": 2024,
+      "resource_id": "38b06e8f-ffcf-4892-955d-9817022b80a3",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/45/40a1ee-1e80-4d69-bc6d-d75b77033151/13362_toshima-mura_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "13363",
+      "prefecture": "Tokyo",
+      "package": "plateau-13363-niijima-mura-2024",
+      "year": 2024,
+      "resource_id": "ea78f991-d550-4df9-95f9-f7a5efbc11e5",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/36/cd6b05-c682-4108-9c1d-35df135bedd6/13363_niijima-mura_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "13364",
+      "prefecture": "Tokyo",
+      "package": "plateau-13364-kozushima-mura-2024",
+      "year": 2024,
+      "resource_id": "4b91ee69-3d4f-415d-b2b7-79787020e108",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/f5/c1bb4b-bded-4964-b925-d55b190552d3/13364_kozushima-mura_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "13381",
+      "prefecture": "Tokyo",
+      "package": "plateau-13381-miyake-mura-2024",
+      "year": 2024,
+      "resource_id": "283b3882-081e-4eb1-9995-ea9ee0c5a947",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/68/3c2801-7c8b-481c-915f-acd65b217aa8/13381_miyake-mura_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "13382",
+      "prefecture": "Tokyo",
+      "package": "plateau-13382-mikurajima-mura-2024",
+      "year": 2024,
+      "resource_id": "08adc8c5-9998-4904-8b4c-3e718c05c6a9",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/a3/4cf385-9d6e-4eb3-90c7-933fadc0f3dd/13382_mikurajima-mura_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "13401",
+      "prefecture": "Tokyo",
+      "package": "plateau-13401-hachijo-machi-2024",
+      "year": 2024,
+      "resource_id": "3c3738b8-5ba3-4574-8b58-5253be22d2d3",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/0d/976cb5-a499-4b4c-8352-63b598e7ea4d/13401_hachijo-machi_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "13402",
+      "prefecture": "Tokyo",
+      "package": "plateau-13402-aogashima-mura-2024",
+      "year": 2024,
+      "resource_id": "6fc30039-3bb2-4903-b45c-0077325e4fb5",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/ae/cf5f1c-8691-422f-ae90-691dda948cb9/13402_aogashima-mura_pref_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "13421",
+      "prefecture": "Tokyo",
+      "package": "plateau-13421-ogasawara-mura-2025",
+      "year": 2025,
+      "resource_id": "7ea51586-ebbd-4b43-ac0e-4a564fd5d16c",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/72/11b5b0-10e6-491e-b6e8-82921d0bbf51/13421_ogasawara-mura_pref_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "14100",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14100-yokohama-shi-2024",
+      "year": 2024,
+      "resource_id": "9e8f5263-604f-40ed-9732-30f7c200906a",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/04/96d45a-a30b-4c9f-88c0-c1323b5a0f86/14100_yokohama-shi_city_2024_citygml_2_op.zip"
+    },
+    {
+      "code": "14130",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14130-kawasaki-shi-2022",
+      "year": 2022,
+      "resource_id": "61a0689d-3aa0-4986-bb97-869de23cf2df",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/40/25bd0a-f174-4f55-a9bd-0e6868ece0ae/14130_kawasaki-shi_city_2022_citygml_4_op.zip"
+    },
+    {
+      "code": "14150",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14150-sagamihara-shi-2024",
+      "year": 2024,
+      "resource_id": "ddf782c2-729c-4349-9a1b-62a88e7c0c35",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/62/28918e-31cd-458e-80d1-370326b4084b/14150_sagamihara-shi_city_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "14201",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14201-yokosuka-shi-2020",
+      "year": 2020,
+      "resource_id": "2fa16ad3-a468-40d7-b5aa-ee388b35b318",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/08/70e768-0ad0-4164-8db4-046878adfc7f/14201_yokosuka-shi_city_2020_citygml_7_op.zip"
+    },
+    {
+      "code": "14204",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14204-kamakura-shi-2024",
+      "year": 2024,
+      "resource_id": "33431e25-775c-41da-90d9-3abe6c67836b",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/24/fdd285-69b7-4ded-acab-5182de9a966a/14204_kamakura-shi_city_2024_citygml_1_op.zip"
+    },
+    {
+      "code": "14205",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14205-fujisawa-shi-2025",
+      "year": 2025,
+      "resource_id": "9b751fbd-d28c-44fe-be04-ab64d72971bb",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/f6/937d63-b787-4319-a5a5-bedcafde2cc7/14205_fujisawa-shi_city_2025_citygml_1_op.zip"
+    },
+    {
+      "code": "14212",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14212-atsugi-shi-2023",
+      "year": 2023,
+      "resource_id": "fb7ea888-8d6a-43d5-a3c3-1557007bfce9",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/3a/b7cefe-c29d-48d5-91e8-dbae8edd04b8/14212_atsugi-shi_city_2023_citygml_2_op.zip"
+    },
+    {
+      "code": "14382",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14382-hakone-machi-2020",
+      "year": 2020,
+      "resource_id": "1ff3d35f-fef3-4d23-b579-3652d04b5219",
+      "format": "ZIP",
+      "url": "https://assets.cms.plateau.reearth.io/assets/70/9ebd69-7a0e-47f4-a5d9-5241f1c0fee2/14382_hakone-machi_city_2020_citygml_9_op.zip"
+    }
+  ]
+}

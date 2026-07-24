@@ -181,17 +181,23 @@ export function clampBasemapBuildings(style: StyleSpecification, handover: numbe
  * buildings show and an out-of-service badge appears (map.ts, coverage.ts). */
 export const BUILDING_TILES_SOURCE_ID = "terrai-buildings";
 export const BUILDING_TILES_LAYER_ID = "terrai-buildings-fill";
+/** The 2.5D extruded form of the same fabric, read from the baked `height`. */
+export const BUILDING_EXTRUSION_LAYER_ID = "terrai-buildings-extrusion";
 /** The tippecanoe layer name baked into the PMTiles (merge_kanto_buildings.py). */
 export const BUILDING_TILES_SOURCE_LAYER = "buildings";
 /** Buildings appear from survey zoom; the wide view below carries no fabric. */
 export const BUILDING_TILES_MIN_ZOOM = 13;
+/** Extrusion is a close-in feature — only from the detail zoom up to the handover. */
+export const BUILDING_EXTRUSION_MIN_ZOOM = 14;
 export const BUILDING_TILES_DEFAULT_URL = "/basemap/buildings.pmtiles";
 /** The mainland coverage footprint the out-of-service boundary reads. */
 export const COVERAGE_URL = "/basemap/coverage.json";
-/** Both credits render wherever the merged fabric shows. */
+/** Every source credit renders wherever the merged fabric shows: OSM footprints,
+ * 基盤地図情報 fill, and PLATEAU measured heights. */
 export const OSM_ATTRIBUTION = "© OpenStreetMap contributors (ODbL)";
 export const FGD_ATTRIBUTION = "基盤地図情報（国土地理院）を加工";
-export const BUILDING_TILES_ATTRIBUTION = `${OSM_ATTRIBUTION}・${FGD_ATTRIBUTION}`;
+export const PLATEAU_ATTRIBUTION = "3D都市モデル（Project PLATEAU）";
+export const BUILDING_TILES_ATTRIBUTION = `${OSM_ATTRIBUTION}・${FGD_ATTRIBUTION}・${PLATEAU_ATTRIBUTION}`;
 
 /** The PMTiles source URL: `?buildings=` wins (an R2/minio URL), else the default
  * served path — mirroring how `apiOrigin` reads `?api=`. */
@@ -266,6 +272,24 @@ export function composeStyle(
   );
   if (lastBuilding >= 0) layers.splice(lastBuilding + 1, 0, buildingFill);
   else layers.push(buildingFill);
+  // The 2.5D extrusion of the same fabric: block extrusion by the baked height
+  // (PLATEAU-measured where modelled, else OSM tags, else a class estimate).
+  // Hidden until the 2.5D view is on (applyVisibility); drawn above the flat fill.
+  layers.push({
+    id: BUILDING_EXTRUSION_LAYER_ID,
+    type: "fill-extrusion",
+    source: BUILDING_TILES_SOURCE_ID,
+    "source-layer": BUILDING_TILES_SOURCE_LAYER,
+    minzoom: BUILDING_EXTRUSION_MIN_ZOOM,
+    maxzoom: BASEMAP_DETAIL_HANDOVER_ZOOM,
+    layout: { visibility: "none" },
+    paint: {
+      "fill-extrusion-color": palette.gray,
+      "fill-extrusion-height": ["get", "height"],
+      "fill-extrusion-base": 0,
+      "fill-extrusion-opacity": 0.85,
+    },
+  });
   sources[TERRAIN_SOURCE_ID] = {
     type: "raster-dem",
     tiles: [TERRAIN_TILE_URL],

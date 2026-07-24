@@ -1,6 +1,6 @@
 {
-  "retrieved_at": "2026-07-24T06:19:58Z",
-  "scope": "TerrAI merged Kanto building tile source: OSM primary, 基盤地図情報 fill",
+  "retrieved_at": "2026-07-24T09:46:21Z",
+  "scope": "TerrAI merged Kanto building tile source: OSM primary, 基盤地図情報 fill, PLATEAU height",
   "coverage_mesh_count": 180,
   "merge": {
     "output": "data/tiles/kanto_buildings/merged.geojsonl",
@@ -8,16 +8,23 @@
     "osm_kept": 5177191,
     "osm_clipped_outside_coverage": 194101,
     "fgd_kept": 8463319,
-    "fgd_dropped_covered_by_osm": 4850720
+    "fgd_dropped_covered_by_osm": 4850720,
+    "height_source_split": {
+      "plateau": 7465478,
+      "osm_tag": 61356,
+      "estimate": 6113676
+    }
   },
   "schema": [
     "feature_id",
     "footprint_source",
-    "building"
+    "building",
+    "height",
+    "height_source"
   ],
   "tiles": {
     "output": "data/tiles/kanto_buildings/buildings.pmtiles",
-    "size_bytes": 1142389888,
+    "size_bytes": 1207449400,
     "min_zoom": 0,
     "max_zoom": 16,
     "layer": "buildings",

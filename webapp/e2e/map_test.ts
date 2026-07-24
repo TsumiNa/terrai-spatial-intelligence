@@ -210,9 +210,30 @@ test("renders the merged building tiles in coverage, with both credits", async (
   await expect.poll(() => pmtiles.length, { timeout: 20000 }).toBeGreaterThan(0);
   // No out-of-service badge inside coverage.
   await expect(page.locator(".building-out-of-service")).toHaveCount(0);
-  // Both credits render wherever the merged fabric shows.
+  // Every source credit renders wherever the merged fabric shows.
   await expect(page.locator(".maplibregl-ctrl-attrib")).toContainText("OpenStreetMap");
   await expect(page.locator(".maplibregl-ctrl-attrib")).toContainText("基盤地図情報");
+  await expect(page.locator(".maplibregl-ctrl-attrib")).toContainText("PLATEAU");
+});
+
+test("2.5D extrudes the building fabric without error", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  const pmtiles: string[] = [];
+  page.on("response", (r) => {
+    if (r.url().includes("/basemap/buildings.pmtiles")) pmtiles.push(r.url());
+  });
+
+  await waitForMap(page);
+  await page.locator(".basemap-button", { hasText: "标准" }).click();
+  await page.locator(".view-tab", { hasText: "茂原" }).click();
+  await expect.poll(() => pmtiles.length, { timeout: 20000 }).toBeGreaterThan(0);
+  // Toggle 2.5D: the flat fill yields to the fill-extrusion; the tiles still load
+  // and nothing throws (the 3D itself is inside the masked #map canvas).
+  await page.locator(".view25d-toggle").click();
+  await expect(page.locator(".view25d-toggle")).toHaveAttribute("aria-pressed", "true");
+  await page.waitForTimeout(1200);
+  expect(errors).toEqual([]);
 });
 
 test("the self-built fabric survives the GSI vector host being blocked", async ({ page }) => {
@@ -249,7 +270,7 @@ test("shows the out-of-service badge when panning wholly outside coverage", asyn
   const cx = box.x + box.width / 2;
   // Drag the view north (drag the canvas downward) until the viewport clears the
   // coverage's north edge (~36.33) and the fabric goes out of service.
-  for (let i = 0; i < 24; i += 1) {
+  for (let i = 0; i < 36; i += 1) {
     await page.mouse.move(cx, box.y + box.height * 0.2);
     await page.mouse.down();
     await page.mouse.move(cx, box.y + box.height * 0.85, { steps: 6 });

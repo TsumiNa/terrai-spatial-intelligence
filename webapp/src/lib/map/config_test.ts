@@ -4,7 +4,7 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, BUILDING_TILES_ATTRIBUTION, BUILDING_TILES_LAYER_ID, BUILDING_TILES_MIN_ZOOM, BUILDING_TILES_SOURCE_ID, BUILDING_TILES_SOURCE_LAYER, FALLBACK_RASTER_LAYER_ID, FALLBACK_RASTER_SOURCE_ID, FALLBACK_STD_RASTER_URL, LOCAL_SPRITE_URL, RASTER_KINDS, RASTER_SOURCES, RELIEF_TINT_FADE_END_ZOOM, RELIEF_TINT_LAYER_ID, RELIEF_TINT_MAX_OPACITY, RELIEF_TINT_SOURCE_ID, RELIEF_TINT_START_ZOOM, RELIEF_TINT_URL, TERRAIN_SOURCE_ID, buildingTilesUrl, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
+import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, BUILDING_EXTRUSION_LAYER_ID, BUILDING_TILES_ATTRIBUTION, BUILDING_TILES_LAYER_ID, BUILDING_TILES_MIN_ZOOM, BUILDING_TILES_SOURCE_ID, BUILDING_TILES_SOURCE_LAYER, FALLBACK_RASTER_LAYER_ID, FALLBACK_RASTER_SOURCE_ID, FALLBACK_STD_RASTER_URL, LOCAL_SPRITE_URL, RASTER_KINDS, RASTER_SOURCES, RELIEF_TINT_FADE_END_ZOOM, RELIEF_TINT_LAYER_ID, RELIEF_TINT_MAX_OPACITY, RELIEF_TINT_SOURCE_ID, RELIEF_TINT_START_ZOOM, RELIEF_TINT_URL, TERRAIN_SOURCE_ID, buildingTilesUrl, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
 import { palette } from "../theme";
 import { rgba } from "./style-rules";
 
@@ -42,8 +42,9 @@ it("appends the basemap layers and the terrain DEM source", () => {
   // building PMTiles source (hillshade is a computed layer over the terrain
   // source, so it adds no source of its own)…
   expect(Object.keys(composed.sources)).toHaveLength(Object.keys(baseStyle.sources).length + 5);
-  // …and the fallback, photo, hillshade, relief-tint and building-fill layers.
-  expect(composed.layers).toHaveLength(baseStyle.layers.length + 5);
+  // …and the fallback, photo, hillshade, relief-tint, building-fill and
+  // building-extrusion layers (the extrusion reuses the building source).
+  expect(composed.layers).toHaveLength(baseStyle.layers.length + 6);
   const dem = composed.sources[TERRAIN_SOURCE_ID] as { type?: string; encoding?: string; tiles?: string[] };
   expect(dem.type).toBe("raster-dem");
   expect(dem.encoding).toBe("mapbox");
@@ -90,6 +91,15 @@ it("adds the merged building PMTiles source and a hidden fill above GSI building
     -1,
   );
   expect(buildingIdx).toBe(lastGsiBuilding + 1);
+
+  const extrusion = composed.layers.find((l) => l.id === BUILDING_EXTRUSION_LAYER_ID) as {
+    type?: string;
+    minzoom?: number;
+    paint?: { "fill-extrusion-height"?: unknown };
+  };
+  expect(extrusion.type).toBe("fill-extrusion");
+  expect(extrusion.minzoom).toBe(14);
+  expect(extrusion.paint?.["fill-extrusion-height"]).toEqual(["get", "height"]);
 });
 
 it("resolves the building-tiles URL from ?buildings= with a default fallback", () => {

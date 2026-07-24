@@ -61,3 +61,40 @@ def test_merge_clips_osm_keeps_primary_and_fills_with_fgd(tmp_path: Path) -> Non
     assert by_source["osm"]["building"] == "house"
     assert by_source["fgd"]["feature_id"] == "fgd:fgoid:Y"
     assert by_source["fgd"]["building"] == "yes"
+    # With no PLATEAU heights and no tags, both fall to a class estimate.
+    assert by_source["osm"]["height_source"] == "estimate"
+    assert by_source["osm"]["height"] == 6.0  # house
+    assert by_source["fgd"]["height_source"] == "estimate"
+    assert by_source["fgd"]["height"] == 9.0  # generic
+    assert stats["height_source_split"] == {"plateau": 0, "osm_tag": 0, "estimate": 2}
+
+
+def test_merge_bakes_three_tier_height(tmp_path: Path) -> None:
+    osm = tmp_path / "osm.geojson"
+    fgd = tmp_path / "fgd.geojson"
+    plateau = tmp_path / "heights.geojson"
+    write_collection(
+        osm,
+        [
+            # A: a PLATEAU point falls inside -> measured height wins.
+            {"type": "Feature", "geometry": square(139.600, 35.440), "properties": {"osm_id": 1, "building": "yes"}},
+            # B: building:levels present, no PLATEAU -> osm_tag (5 * 3 m).
+            {"type": "Feature", "geometry": square(139.610, 35.450), "properties": {"osm_id": 2, "building": "apartments", "building:levels": "5"}},
+            # C: nothing -> class estimate (house = 6 m).
+            {"type": "Feature", "geometry": square(139.615, 35.455), "properties": {"osm_id": 3, "building": "house"}},
+        ],
+    )
+    write_collection(fgd, [])
+    write_collection(
+        plateau,
+        [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [139.6005, 35.4405]}, "properties": {"height": 30.0}}],
+    )
+
+    stats = merge(osm, fgd, {MESH}, tmp_path / "out", plateau_path=plateau)
+
+    assert stats["height_source_split"] == {"plateau": 1, "osm_tag": 1, "estimate": 1}
+    lines = [json.loads(line) for line in (tmp_path / "out/merged.geojsonl").read_text().splitlines()]
+    by_id = {f["properties"]["feature_id"]: f["properties"] for f in lines}
+    assert by_id["osm:1"]["height"] == 30.0 and by_id["osm:1"]["height_source"] == "plateau"
+    assert by_id["osm:2"]["height"] == 15.0 and by_id["osm:2"]["height_source"] == "osm_tag"
+    assert by_id["osm:3"]["height"] == 6.0 and by_id["osm:3"]["height_source"] == "estimate"

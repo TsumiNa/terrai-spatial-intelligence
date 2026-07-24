@@ -48,3 +48,8 @@ data/fgd/kanto_buildings/buildings.geojson
 # OSM + FGD acquisitions.
 data/tiles/kanto_buildings/merged.geojsonl
 data/tiles/kanto_buildings/buildings.pmtiles
+
+# PLATEAU Kanto building heights (fetch plateau_kanto): the distilled points
+# product is regenerable from the pinned CityGML resources; the manifests are
+# committed. Source archives are streamed and never kept.
+data/plateau/kanto_buildings/heights.geojson

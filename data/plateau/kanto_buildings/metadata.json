@@ -1,0 +1,1012 @@
+{
+  "retrieved_at": "2026-07-24T08:45:22Z",
+  "scope": "TerrAI Kanto acquisition: PLATEAU LOD1 measured building heights for the 2.5D extrusion",
+  "dataset_id": "plateau-kanto-buildings",
+  "output": "data/plateau/kanto_buildings/heights.geojson",
+  "license": "PLATEAU Site Policy §3 (国土交通省) — attribution, commercial use permitted",
+  "attribution": "3D都市モデル（Project PLATEAU）国土交通省",
+  "municipality_count": 125,
+  "building_count": 9967358,
+  "sources": [
+    {
+      "code": "11100",
+      "prefecture": "Saitama",
+      "package": "plateau-11100-saitama-shi-2025",
+      "year": 2025,
+      "sha256": "446eec6dd2448decde8de6019a5a3600ca61320600bc75c1392f6fe219d640f0",
+      "building_count": 394980
+    },
+    {
+      "code": "11202",
+      "prefecture": "Saitama",
+      "package": "plateau-11202-kumagaya-shi-2025",
+      "year": 2025,
+      "sha256": "6e3060d7177f50fb88e5739084d115bd27ae6163310a1db8dbecd88486addbcc",
+      "building_count": 130725
+    },
+    {
+      "code": "11203",
+      "prefecture": "Saitama",
+      "package": "plateau-11203-kawaguchi-shi-2024",
+      "year": 2024,
+      "sha256": "39ab950e13e2343ccfea3099884030c3462267470c5923432fe566ca43c7379e",
+      "building_count": 165320
+    },
+    {
+      "code": "11207",
+      "prefecture": "Saitama",
+      "package": "plateau-11207-chichibu-shi-2025",
+      "year": 2025,
+      "sha256": "2e31bf11665447c6612fc65f2e76cf00b21902331243af24cceff638f5c1b8b9",
+      "building_count": 37670
+    },
+    {
+      "code": "11208",
+      "prefecture": "Saitama",
+      "package": "plateau-11208-tokorozawa-shi-2024",
+      "year": 2024,
+      "sha256": "aea0a3d366c2188812f5e60b0c646d3e0155c30217e03c76c5cd27a3bffae34b",
+      "building_count": 116998
+    },
+    {
+      "code": "11210",
+      "prefecture": "Saitama",
+      "package": "plateau-11210-kazo-shi-2023",
+      "year": 2023,
+      "sha256": "22cba440eaca850107ec6b3dbd15c2974a4baf133d0c3b54c6ceb10f3d47a1f7",
+      "building_count": 101508
+    },
+    {
+      "code": "11211",
+      "prefecture": "Saitama",
+      "package": "plateau-11211-honjo-shi-2025",
+      "year": 2025,
+      "sha256": "2a3a834c036a8366a3e941cf0a4c81f1b68f5ce3bf37b0528df9607a313d1433",
+      "building_count": 48672
+    },
+    {
+      "code": "11214",
+      "prefecture": "Saitama",
+      "package": "plateau-11214-kasukabe-shi-2023",
+      "year": 2023,
+      "sha256": "d664a1099ec3eb9942eaec80617b4726e6063e0bef1e5e6dfb3381428b47de36",
+      "building_count": 110687
+    },
+    {
+      "code": "11215",
+      "prefecture": "Saitama",
+      "package": "plateau-11215-sayama-shi-2025",
+      "year": 2025,
+      "sha256": "1a27c7f89804380a38e1a76c2cf375e0b2e36d92388de5baf84ee3ce0169f1e6",
+      "building_count": 62694
+    },
+    {
+      "code": "11216",
+      "prefecture": "Saitama",
+      "package": "plateau-11216-hanyu-shi-2025",
+      "year": 2025,
+      "sha256": "160c3701f07a9f29d855b73dddc299a1b4ef1becb214569113b88f4a0057ab40",
+      "building_count": 38442
+    },
+    {
+      "code": "11217",
+      "prefecture": "Saitama",
+      "package": "plateau-11217-konosu-shi-2024",
+      "year": 2024,
+      "sha256": "0f375fd7ff2dbea70c79057820dc1cebed888fc912fc7cd9490f3b67dc0cd609",
+      "building_count": 57682
+    },
+    {
+      "code": "11218",
+      "prefecture": "Saitama",
+      "package": "plateau-11218-fukaya-shi-2025",
+      "year": 2025,
+      "sha256": "582595a500e20f730a993601cd1c93ec9a8c8c88dadc06bddd1dba6ae82ee91a",
+      "building_count": 94578
+    },
+    {
+      "code": "11219",
+      "prefecture": "Saitama",
+      "package": "plateau-11219-ageo-shi-2025",
+      "year": 2025,
+      "sha256": "67c091eb837ad5e6227531f52ee63894b13e94a69644feb371aadb3b208730f0",
+      "building_count": 84396
+    },
+    {
+      "code": "11221",
+      "prefecture": "Saitama",
+      "package": "plateau-11221-soka-shi-2025",
+      "year": 2025,
+      "sha256": "9c4d66c809483f36279ef0b68fb5d1603b38d3b34e91190c942d6135e93edbee",
+      "building_count": 73601
+    },
+    {
+      "code": "11222",
+      "prefecture": "Saitama",
+      "package": "plateau-11222-koshigaya-shi-2023",
+      "year": 2023,
+      "sha256": "68370bac6eacbf318834ea95b6531f9c2486f64bfb60cf6b31519c9c8b732359",
+      "building_count": 124211
+    },
+    {
+      "code": "11223",
+      "prefecture": "Saitama",
+      "package": "plateau-11223-warabi-shi-2024",
+      "year": 2024,
+      "sha256": "6ed830b35ed77e2add7a4f2fbe2ce064512cfaedbc976d826e3a03e9390f42bc",
+      "building_count": 18523
+    },
+    {
+      "code": "11224",
+      "prefecture": "Saitama",
+      "package": "plateau-11224-toda-shi-2022",
+      "year": 2022,
+      "sha256": "6d7ccc504d3aa891883aef5e81e88cbeb7ea5110e119ebd08b784629c9e2f320",
+      "building_count": 28840
+    },
+    {
+      "code": "11225",
+      "prefecture": "Saitama",
+      "package": "plateau-11225-iruma-shi-2025",
+      "year": 2025,
+      "sha256": "779b4c1dade79a8d7af35249f1fdae518f7f0a98031cc49503f57430a2ad7aac",
+      "building_count": 56181
+    },
+    {
+      "code": "11227",
+      "prefecture": "Saitama",
+      "package": "plateau-11227-asaka-shi-2025",
+      "year": 2025,
+      "sha256": "548f1008b06c5ae0db295f8e9619c2121a53e80a11936ee616ab8f8289b94c7a",
+      "building_count": 34802
+    },
+    {
+      "code": "11228",
+      "prefecture": "Saitama",
+      "package": "plateau-11228-shiki-shi-2024",
+      "year": 2024,
+      "sha256": "623a0200af16fbb8e6a4745b18e2d5a99d421aae8c769ba47e713cf3e8818894",
+      "building_count": 19690
+    },
+    {
+      "code": "11229",
+      "prefecture": "Saitama",
+      "package": "plateau-11229-wako-shi-2025",
+      "year": 2025,
+      "sha256": "a3d4741566ce3dc6a2c6efbacd3ae0070130414bea76ac358c6a0c7e6779e551",
+      "building_count": 17861
+    },
+    {
+      "code": "11230",
+      "prefecture": "Saitama",
+      "package": "plateau-11230-niiza-shi-2024",
+      "year": 2024,
+      "sha256": "73457fc3dc898aeb9d53e5bab369659e72f38abaa9c1c9bedf77e8805163e2a1",
+      "building_count": 54866
+    },
+    {
+      "code": "11231",
+      "prefecture": "Saitama",
+      "package": "plateau-11231-okegawa-shi-2025",
+      "year": 2025,
+      "sha256": "e036ef0236e1813eaecd8fe5ed43a6a39336d9fac4846074070e7f40a766d211",
+      "building_count": 36300
+    },
+    {
+      "code": "11232",
+      "prefecture": "Saitama",
+      "package": "plateau-11232-kuki-shi-2023",
+      "year": 2023,
+      "sha256": "fc4e051eed819197111d764e133760322a93f3540ddc5a126c526770f692e57d",
+      "building_count": 108289
+    },
+    {
+      "code": "11233",
+      "prefecture": "Saitama",
+      "package": "plateau-11233-kitamoto-shi-2025",
+      "year": 2025,
+      "sha256": "025ae790d77ceb4c514d32d0ce0a31a3939591149ca7fd9ed2ceb904e187bcc8",
+      "building_count": 28294
+    },
+    {
+      "code": "11234",
+      "prefecture": "Saitama",
+      "package": "plateau-11234-yashio-shi-2023",
+      "year": 2023,
+      "sha256": "30847fa51413e52058ec96ba67461b3b6dd25ac6f28a0495d57ce005d011eb78",
+      "building_count": 34605
+    },
+    {
+      "code": "11235",
+      "prefecture": "Saitama",
+      "package": "plateau-11235-fujimi-shi-2024",
+      "year": 2024,
+      "sha256": "0f3a652727b790b98c2b92a299099c39223f045c1471d44d76715ee4c741db02",
+      "building_count": 34396
+    },
+    {
+      "code": "11237",
+      "prefecture": "Saitama",
+      "package": "plateau-11237-misato-shi-2024",
+      "year": 2024,
+      "sha256": "a8905990232088c0a72e4063111ff537f17584a279cd31a0a8079860abc34293",
+      "building_count": 51674
+    },
+    {
+      "code": "11238",
+      "prefecture": "Saitama",
+      "package": "plateau-11238-hasuda-shi-2022",
+      "year": 2022,
+      "sha256": "8febeff611e817313b90a5b7c83ebe47b725b0767fd6153af5b06f87ae6b4c6d",
+      "building_count": 41651
+    },
+    {
+      "code": "11239",
+      "prefecture": "Saitama",
+      "package": "plateau-11239-sakado-shi-2025",
+      "year": 2025,
+      "sha256": "87f611881a0950ea9dfb83ad1fd38f220e89b03dfc74445e18454c8d2d3280b7",
+      "building_count": 43505
+    },
+    {
+      "code": "11240",
+      "prefecture": "Saitama",
+      "package": "plateau-11240-satte-shi-2024",
+      "year": 2024,
+      "sha256": "aef819ec2c573c864e9945a1c7c999d939e6e6998dee03c42624ce87ac159878",
+      "building_count": 27574
+    },
+    {
+      "code": "11241",
+      "prefecture": "Saitama",
+      "package": "plateau-11241-tsurugashima-shi-2024",
+      "year": 2024,
+      "sha256": "311f2506877e967d6bf5af6deffdaedef22de5ac367605d07e7fe0a00ffa4d86",
+      "building_count": 24249
+    },
+    {
+      "code": "11243",
+      "prefecture": "Saitama",
+      "package": "plateau-11243-yoshikawa-shi-2023",
+      "year": 2023,
+      "sha256": "24a312b3a45fd842334d9179bfc046021c76b6987c959f01f00d586bf86c045e",
+      "building_count": 30180
+    },
+    {
+      "code": "11245",
+      "prefecture": "Saitama",
+      "package": "plateau-11245-fujimino-shi-2025",
+      "year": 2025,
+      "sha256": "31f211f98d2b71f71ca40166cf53406fc43a32aa3e89620946d058eb6ce1ca43",
+      "building_count": 37213
+    },
+    {
+      "code": "11246",
+      "prefecture": "Saitama",
+      "package": "plateau-11246-shiraoka-shi-2023",
+      "year": 2023,
+      "sha256": "c198893b4efea5637f5981ff3db807b8e847ff35653572c97715825a867ca252",
+      "building_count": 29285
+    },
+    {
+      "code": "11301",
+      "prefecture": "Saitama",
+      "package": "plateau-11301-ina-machi-2024",
+      "year": 2024,
+      "sha256": "619be1ff6ba87056aae858c18cf091a05028a4c5c2b3b165dc0199039f8913ed",
+      "building_count": 19963
+    },
+    {
+      "code": "11324",
+      "prefecture": "Saitama",
+      "package": "plateau-11324-miyoshi-machi-2024",
+      "year": 2024,
+      "sha256": "55b23c6cd5df5e1ca946010170af0e83ed6ae6a44736b93a6586b3bf7c91e5e4",
+      "building_count": 17642
+    },
+    {
+      "code": "11326",
+      "prefecture": "Saitama",
+      "package": "plateau-11326-moroyama-machi-2020",
+      "year": 2020,
+      "sha256": "6f1f02bed17d803916793426afda5451e856bbae7cb794ba959e53051730c583",
+      "building_count": 24418
+    },
+    {
+      "code": "11341",
+      "prefecture": "Saitama",
+      "package": "plateau-11341-namegawa-machi-2025",
+      "year": 2025,
+      "sha256": "cd8a8a7ab6a483cf2102764dc897a48dc333e6631a20d142de58cb3f9d4848e7",
+      "building_count": 14019
+    },
+    {
+      "code": "11342",
+      "prefecture": "Saitama",
+      "package": "plateau-11342-ranzan-machi-2025",
+      "year": 2025,
+      "sha256": "ea27cc4b00f0c7fc7da8007edaaf4859d6e7ded7c3581eb333566b9c4d449f1b",
+      "building_count": 14756
+    },
+    {
+      "code": "11343",
+      "prefecture": "Saitama",
+      "package": "plateau-11343-ogawa-machi-2025",
+      "year": 2025,
+      "sha256": "bd1f7fac48e296879727a12e0e96f704f81c14e83a784c9494a55ff7cf1e7c2e",
+      "building_count": 24071
+    },
+    {
+      "code": "11346",
+      "prefecture": "Saitama",
+      "package": "plateau-11346-kawajima-machi-2025",
+      "year": 2025,
+      "sha256": "9257007b0dd576289804db9b158d8173b89c464eef6b12aaa244014a0d751076",
+      "building_count": 17026
+    },
+    {
+      "code": "11347",
+      "prefecture": "Saitama",
+      "package": "plateau-11347-yoshimi-machi-2025",
+      "year": 2025,
+      "sha256": "79e58e60ba788f037a29bee1023774971603a47309dde1c62d64f350395e40ec",
+      "building_count": 18175
+    },
+    {
+      "code": "11348",
+      "prefecture": "Saitama",
+      "package": "plateau-11348-hatoyama-machi-2025",
+      "year": 2025,
+      "sha256": "90c2e7635dcb8cc0067842e87554e8b8b1a0899abaa8b481576f75598ac2ff7b",
+      "building_count": 10630
+    },
+    {
+      "code": "11385",
+      "prefecture": "Saitama",
+      "package": "plateau-11385-kamisato-machi-2024",
+      "year": 2024,
+      "sha256": "1b3bff7cc7960941e61514dec5a8cd5ad724ec79535b66f0807a39caf75d0146",
+      "building_count": 18760
+    },
+    {
+      "code": "11408",
+      "prefecture": "Saitama",
+      "package": "plateau-11408-yorii-machi-2025",
+      "year": 2025,
+      "sha256": "aa31e0af6e0668bfb6195ec3ccd4e2f46ed8279bce5178f1677d0af6155ecc63",
+      "building_count": 31118
+    },
+    {
+      "code": "11442",
+      "prefecture": "Saitama",
+      "package": "plateau-11442-miyashiro-machi-2023",
+      "year": 2023,
+      "sha256": "97c3b66814853e4d3b4a705d2680d88e96d03f629f4452d0b18a2b7958c10bb9",
+      "building_count": 18909
+    },
+    {
+      "code": "11464",
+      "prefecture": "Saitama",
+      "package": "plateau-11464-sugito-machi-2023",
+      "year": 2023,
+      "sha256": "7a069ea6600a82a631fcb8fb8765f9146e0dc2a86180929d3e66dfd1b0cb128f",
+      "building_count": 27449
+    },
+    {
+      "code": "11465",
+      "prefecture": "Saitama",
+      "package": "plateau-11465-matsubushi-machi-2023",
+      "year": 2023,
+      "sha256": "476bfc290f50ae0a480cb21c34f4ce66ae33af49553e8934326d5a54572a1c4f",
+      "building_count": 16672
+    },
+    {
+      "code": "12100",
+      "prefecture": "Chiba",
+      "package": "plateau-12100-chiba-shi-2024",
+      "year": 2024,
+      "sha256": "5fea4bdea550e98c99e90b2fe09df8f9def2d95f0ad7ec02d4300f1933d68f90",
+      "building_count": 61073
+    },
+    {
+      "code": "12206",
+      "prefecture": "Chiba",
+      "package": "plateau-12206-kisarazu-shi-2024",
+      "year": 2024,
+      "sha256": "fd7d9e089c85fbcc1418c1df205f8a28dc759ff8ec8b961186a9f62f3371e1e4",
+      "building_count": 77406
+    },
+    {
+      "code": "12210",
+      "prefecture": "Chiba",
+      "package": "plateau-12210-mobara-shi-2022",
+      "year": 2022,
+      "sha256": "a6aaceebeae7a4e5812d0d0caebb133e463e80b7b118ee81644a525dcbef5de8",
+      "building_count": 84009
+    },
+    {
+      "code": "12217",
+      "prefecture": "Chiba",
+      "package": "plateau-12217-kashiwa-shi-2020",
+      "year": 2020,
+      "sha256": "8bc58c5f65c290d2ae5b34b6da48cd00ae82e6b72ab2ea45c1ffd284676dd8e6",
+      "building_count": 169084
+    },
+    {
+      "code": "12221",
+      "prefecture": "Chiba",
+      "package": "plateau-12221-yachiyo-shi-2022",
+      "year": 2022,
+      "sha256": "47d2b3b226fc5cf7c1bef34f65b90f491ea4bbdfaab7261a5dcee483c4ea21a5",
+      "building_count": 69868
+    },
+    {
+      "code": "12347",
+      "prefecture": "Chiba",
+      "package": "plateau-12347-tako-machi-2025",
+      "year": 2025,
+      "sha256": "e0b4a147bd37a7637946c9be1f8355b569d4ffd11d80f599b5fde1be6221d7a2",
+      "building_count": 4526
+    },
+    {
+      "code": "13101",
+      "prefecture": "Tokyo",
+      "package": "plateau-13101-chiyoda-ku-2025",
+      "year": 2025,
+      "sha256": "d903d0e59a93475c8684284ac52e9b2b5cba972208dec258641fc8942ca42ee2",
+      "building_count": 37702
+    },
+    {
+      "code": "13102",
+      "prefecture": "Tokyo",
+      "package": "plateau-13102-chuo-ku-2025",
+      "year": 2025,
+      "sha256": "8577c832a59a3b068c2d03eee7775fe23b0c063e7072abb245d1a887d423c355",
+      "building_count": 35216
+    },
+    {
+      "code": "13103",
+      "prefecture": "Tokyo",
+      "package": "plateau-13103-minato-ku-2025",
+      "year": 2025,
+      "sha256": "d78ff451572e524f53dd6e3aa7ae478f9b1aef887b7a5b26dc39cb8e9c289731",
+      "building_count": 48924
+    },
+    {
+      "code": "13104",
+      "prefecture": "Tokyo",
+      "package": "plateau-13104-shinjuku-ku-2025",
+      "year": 2025,
+      "sha256": "3a936966bae01051787fd2039319237cedc8d7a0ae838c10d30c222f586a7282",
+      "building_count": 98800
+    },
+    {
+      "code": "13105",
+      "prefecture": "Tokyo",
+      "package": "plateau-13105-bunkyo-ku-2025",
+      "year": 2025,
+      "sha256": "a10865582419318dae118739aa3d3f97c74800ce25202aab65fa92c61f5e8c9e",
+      "building_count": 77813
+    },
+    {
+      "code": "13106",
+      "prefecture": "Tokyo",
+      "package": "plateau-13106-taito-ku-2025",
+      "year": 2025,
+      "sha256": "04991f050f84c99b67daef46f069b25294816929494d1c3eb3dd8b7dc51d471a",
+      "building_count": 65778
+    },
+    {
+      "code": "13107",
+      "prefecture": "Tokyo",
+      "package": "plateau-13107-sumida-ku-2025",
+      "year": 2025,
+      "sha256": "7dbd826cad2279e5cec8218f94345aa8550c661710751b50240a617c0f91e076",
+      "building_count": 86637
+    },
+    {
+      "code": "13108",
+      "prefecture": "Tokyo",
+      "package": "plateau-13108-koto-ku-2025",
+      "year": 2025,
+      "sha256": "f9d2f64e92ce0eb91174ec31c3a517fbfdcf10066e0a253580f4c39405590900",
+      "building_count": 79395
+    },
+    {
+      "code": "13109",
+      "prefecture": "Tokyo",
+      "package": "plateau-13109-shinagawa-ku-2025",
+      "year": 2025,
+      "sha256": "6fa02212e16faa5b78642056efde52678bee2844e4762fda150cc1cd25e2eba2",
+      "building_count": 99742
+    },
+    {
+      "code": "13110",
+      "prefecture": "Tokyo",
+      "package": "plateau-13110-meguro-ku-2025",
+      "year": 2025,
+      "sha256": "165b74076e620e79e6eb5d24a982fdb7a54fe4f9f75ac3e965209cd6a3211088",
+      "building_count": 105184
+    },
+    {
+      "code": "13111",
+      "prefecture": "Tokyo",
+      "package": "plateau-13111-ota-ku-2025",
+      "year": 2025,
+      "sha256": "5a6d7a318b7f036b972ec369f30270e38386d32dc4aedf965b582c3155ef6686",
+      "building_count": 193909
+    },
+    {
+      "code": "13112",
+      "prefecture": "Tokyo",
+      "package": "plateau-13112-setagaya-ku-2025",
+      "year": 2025,
+      "sha256": "fb5bd35d1b20b8cc756dbf88be7359f741d91f6ffe8db54360293ba9e7645000",
+      "building_count": 274268
+    },
+    {
+      "code": "13113",
+      "prefecture": "Tokyo",
+      "package": "plateau-13113-shibuya-ku-2025",
+      "year": 2025,
+      "sha256": "f7437469d85b1d4a85f2141671b08bbb84d6e05cb15ad2a8b4e8f6a28e67831d",
+      "building_count": 89170
+    },
+    {
+      "code": "13114",
+      "prefecture": "Tokyo",
+      "package": "plateau-13114-nakano-ku-2025",
+      "year": 2025,
+      "sha256": "cddd98aa4f4b1ab84a1642620e2333851e26626a57ad682a4cc040bb5fd813d9",
+      "building_count": 149952
+    },
+    {
+      "code": "13115",
+      "prefecture": "Tokyo",
+      "package": "plateau-13115-suginami-ku-2025",
+      "year": 2025,
+      "sha256": "9deaa984f060956f9aa2cde2507113ed7d3fcfffa0a53846081715ef68ca3816",
+      "building_count": 222280
+    },
+    {
+      "code": "13116",
+      "prefecture": "Tokyo",
+      "package": "plateau-13116-toshima-ku-2025",
+      "year": 2025,
+      "sha256": "d12300382305037000be90e71c587a60a7aa50b021cc081d172c7b2669ec4f2d",
+      "building_count": 110102
+    },
+    {
+      "code": "13117",
+      "prefecture": "Tokyo",
+      "package": "plateau-13117-kita-ku-2025",
+      "year": 2025,
+      "sha256": "497693054c03b6ee40cc01ca11d60cdd2929af9650d9b09fc53533a93a173999",
+      "building_count": 129459
+    },
+    {
+      "code": "13118",
+      "prefecture": "Tokyo",
+      "package": "plateau-13118-arakawa-ku-2025",
+      "year": 2025,
+      "sha256": "63c2e23d7ab368d87da2e5ff16584efdc5d23474c39ee5a7383f92741088ca62",
+      "building_count": 83500
+    },
+    {
+      "code": "13119",
+      "prefecture": "Tokyo",
+      "package": "plateau-13119-itabashi-ku-2025",
+      "year": 2025,
+      "sha256": "e43e8849c5200ea05700cfdccb38400e0466768955345c2c83ebe223bc335956",
+      "building_count": 154036
+    },
+    {
+      "code": "13120",
+      "prefecture": "Tokyo",
+      "package": "plateau-13120-nerima-ku-2025",
+      "year": 2025,
+      "sha256": "1834ba632de096eedd58c8e4b7ab67134730b88b2c2d4e17ca523f2c675db3f1",
+      "building_count": 235285
+    },
+    {
+      "code": "13121",
+      "prefecture": "Tokyo",
+      "package": "plateau-13121-adachi-ku-2025",
+      "year": 2025,
+      "sha256": "879d023f50b42c8676fe7e3fc6a40a6ce17c458c72aa8e251e3ed54a7b61e353",
+      "building_count": 221447
+    },
+    {
+      "code": "13122",
+      "prefecture": "Tokyo",
+      "package": "plateau-13122-katsushika-ku-2025",
+      "year": 2025,
+      "sha256": "112a6bd7101549c945947147fac09fd0aa794301489602493a09edf127708ed1",
+      "building_count": 164323
+    },
+    {
+      "code": "13123",
+      "prefecture": "Tokyo",
+      "package": "plateau-13123-edogawa-ku-2025",
+      "year": 2025,
+      "sha256": "a19f3e3b73be46d3765baeb9b6b7e17f5fc396eb70b5243912c843ea37f7fb06",
+      "building_count": 181846
+    },
+    {
+      "code": "13201",
+      "prefecture": "Tokyo",
+      "package": "plateau-13201-hachioji-shi-2025",
+      "year": 2025,
+      "sha256": "c1ff4c22e731aa2c88222af3e581ad989073b81f83649edf06f6476d4bfd7649",
+      "building_count": 245643
+    },
+    {
+      "code": "13202",
+      "prefecture": "Tokyo",
+      "package": "plateau-13202-tachikawa-shi-2025",
+      "year": 2025,
+      "sha256": "9c7a4555ffaef71d0b5d73ece73779db11e8b3710e2bdd323463710f181206b5",
+      "building_count": 89464
+    },
+    {
+      "code": "13203",
+      "prefecture": "Tokyo",
+      "package": "plateau-13203-musashino-shi-2025",
+      "year": 2025,
+      "sha256": "88e61676779055598c6721c172a1f2e92e96a4ff561e36914f66364877a817da",
+      "building_count": 83046
+    },
+    {
+      "code": "13204",
+      "prefecture": "Tokyo",
+      "package": "plateau-13204-mitaka-shi-2025",
+      "year": 2025,
+      "sha256": "19accfb2c51162da88d1342976e3765f2f10486185f7e3cc076afabb4926b66a",
+      "building_count": 96230
+    },
+    {
+      "code": "13205",
+      "prefecture": "Tokyo",
+      "package": "plateau-13205-ome-shi-2025",
+      "year": 2025,
+      "sha256": "8c1aab1d0df603be21cb9458d1cc862f19c694e96cb1e8287089447fa30e32fc",
+      "building_count": 72063
+    },
+    {
+      "code": "13206",
+      "prefecture": "Tokyo",
+      "package": "plateau-13206-fuchu-shi-2025",
+      "year": 2025,
+      "sha256": "01b009f77b5d6027755105acad57b64752ee80fe0a6c4da8abc9f92967fdc5ed",
+      "building_count": 98576
+    },
+    {
+      "code": "13207",
+      "prefecture": "Tokyo",
+      "package": "plateau-13207-akishima-shi-2025",
+      "year": 2025,
+      "sha256": "6acecaa39b97dfd351d07e025b8730bfad51ce2a0905501343650a3be1020dd8",
+      "building_count": 51703
+    },
+    {
+      "code": "13208",
+      "prefecture": "Tokyo",
+      "package": "plateau-13208-chofu-shi-2025",
+      "year": 2025,
+      "sha256": "1254ccf1d3c9d0ac8072173fe0c32292c63cad30b29b7d091036468e919e1d45",
+      "building_count": 101677
+    },
+    {
+      "code": "13209",
+      "prefecture": "Tokyo",
+      "package": "plateau-13209-machida-shi-2025",
+      "year": 2025,
+      "sha256": "49541958ebd1b48b1b294bce0552ba012f6d826d2011d50500cd0c42df57b706",
+      "building_count": 149618
+    },
+    {
+      "code": "13210",
+      "prefecture": "Tokyo",
+      "package": "plateau-13210-koganei-shi-2025",
+      "year": 2025,
+      "sha256": "25cf64a4cb9bc1c8b8ba2b7cd377bc66c01e091589fff8800056340d71f0036b",
+      "building_count": 61354
+    },
+    {
+      "code": "13211",
+      "prefecture": "Tokyo",
+      "package": "plateau-13211-kodaira-shi-2025",
+      "year": 2025,
+      "sha256": "8e42ff511ccf9c1996a3fb1a2571d6b8d6e4410d144dd003e3478172577b0bfa",
+      "building_count": 103146
+    },
+    {
+      "code": "13212",
+      "prefecture": "Tokyo",
+      "package": "plateau-13212-hino-shi-2025",
+      "year": 2025,
+      "sha256": "ba9d28ea178d109539ef99da26218a9f05f99ea53152358d0fbf415fbf76de07",
+      "building_count": 85711
+    },
+    {
+      "code": "13213",
+      "prefecture": "Tokyo",
+      "package": "plateau-13213-higashimurayama-shi-2025",
+      "year": 2025,
+      "sha256": "a33d150efb3ed551d6e80c6d1d8414c93020f5d8362b4491ad45135ab2806895",
+      "building_count": 65687
+    },
+    {
+      "code": "13214",
+      "prefecture": "Tokyo",
+      "package": "plateau-13214-kokubunji-shi-2025",
+      "year": 2025,
+      "sha256": "660b959f3f70dcdf4fb5c1df1b6366602b898932783795c29a3c140da3a61b11",
+      "building_count": 65947
+    },
+    {
+      "code": "13215",
+      "prefecture": "Tokyo",
+      "package": "plateau-13215-kunitachi-shi-2025",
+      "year": 2025,
+      "sha256": "bfd34c91a642518d3a8fe7b34f4da23a0c660cfe2bb3968d4f74db28d0c43a51",
+      "building_count": 45006
+    },
+    {
+      "code": "13218",
+      "prefecture": "Tokyo",
+      "package": "plateau-13218-fussa-shi-2025",
+      "year": 2025,
+      "sha256": "90af19da6d27c6f10639420d6cbd9006cb9a700bd9e57d398eec48d31d4eae14",
+      "building_count": 36482
+    },
+    {
+      "code": "13219",
+      "prefecture": "Tokyo",
+      "package": "plateau-13219-komae-shi-2025",
+      "year": 2025,
+      "sha256": "64c9830535994de803e7c08e1b7160666574fee10ec8c72a1911c3e721127c5e",
+      "building_count": 38583
+    },
+    {
+      "code": "13220",
+      "prefecture": "Tokyo",
+      "package": "plateau-13220-higashiyamato-shi-2025",
+      "year": 2025,
+      "sha256": "c08cd55e0d2652de63c648fa7d07a537b2b73c244566e9b25c48613a58f9ee90",
+      "building_count": 50142
+    },
+    {
+      "code": "13221",
+      "prefecture": "Tokyo",
+      "package": "plateau-13221-kiyose-shi-2025",
+      "year": 2025,
+      "sha256": "2eeba5e2ec9d0484eb95bc6eef07e2d824e5dd5746cd599b21a1eba11c03babb",
+      "building_count": 35833
+    },
+    {
+      "code": "13222",
+      "prefecture": "Tokyo",
+      "package": "plateau-13222-higashikurume-shi-2025",
+      "year": 2025,
+      "sha256": "761de13815447fc8431f0abc874968785edf56930bd4337d43da85c1bdfc4f35",
+      "building_count": 62191
+    },
+    {
+      "code": "13223",
+      "prefecture": "Tokyo",
+      "package": "plateau-13223-musashimurayama-shi-2025",
+      "year": 2025,
+      "sha256": "75c721403f95916d0cb700f1bf1d4b12fbacda35d47a58fee2e046cd71d77503",
+      "building_count": 47294
+    },
+    {
+      "code": "13224",
+      "prefecture": "Tokyo",
+      "package": "plateau-13224-tama-shi-2025",
+      "year": 2025,
+      "sha256": "2eb9c9128b33cb56054efaf321f5ac87805024a8e750c9779fecea7665056615",
+      "building_count": 41099
+    },
+    {
+      "code": "13225",
+      "prefecture": "Tokyo",
+      "package": "plateau-13225-inagi-shi-2025",
+      "year": 2025,
+      "sha256": "9d742367e57d82a650b20c6caaf4366bad21088bf05b770412239de9d4707d70",
+      "building_count": 33826
+    },
+    {
+      "code": "13227",
+      "prefecture": "Tokyo",
+      "package": "plateau-13227-hamura-shi-2025",
+      "year": 2025,
+      "sha256": "73aea73b7a60efced3770728b5750760aa3030d06f7e41b160ee071a2a1a7d58",
+      "building_count": 33190
+    },
+    {
+      "code": "13228",
+      "prefecture": "Tokyo",
+      "package": "plateau-13228-akiruno-shi-2025",
+      "year": 2025,
+      "sha256": "c7a20789fe66b76e0eafa4902c019b8ded018445187051bb47e6e22fc3043825",
+      "building_count": 66443
+    },
+    {
+      "code": "13229",
+      "prefecture": "Tokyo",
+      "package": "plateau-13229-nishitokyo-shi-2025",
+      "year": 2025,
+      "sha256": "ac79273d5e150ca5c90ddf43bd931de277508bc6d89045024186e43fd48006eb",
+      "building_count": 84069
+    },
+    {
+      "code": "13303",
+      "prefecture": "Tokyo",
+      "package": "plateau-13303-mizuho-machi-2025",
+      "year": 2025,
+      "sha256": "1f12f5f0733f9d7b9f82ce95116b8c476a7642f5d0d777ec09a94808e581b3c3",
+      "building_count": 33463
+    },
+    {
+      "code": "13305",
+      "prefecture": "Tokyo",
+      "package": "plateau-13305-hinode-machi-2025",
+      "year": 2025,
+      "sha256": "68d0f65978148be7c5edb0a3073a556ddb72bae018f768e0ebecae440505790e",
+      "building_count": 22546
+    },
+    {
+      "code": "13307",
+      "prefecture": "Tokyo",
+      "package": "plateau-13307-hinohara-mura-2025",
+      "year": 2025,
+      "sha256": "df0d0f9cbade2e31b12b05f0d616324dca58a429c7975451fb1d3b4bb5e70987",
+      "building_count": 4135
+    },
+    {
+      "code": "13308",
+      "prefecture": "Tokyo",
+      "package": "plateau-13308-okutama-machi-2025",
+      "year": 2025,
+      "sha256": "9a58de58e5952a4137f43c4a9d85b4ec1f7cc8151db43b2e87675ffa4431a55d",
+      "building_count": 7991
+    },
+    {
+      "code": "13361",
+      "prefecture": "Tokyo",
+      "package": "plateau-13361-oshima-machi-2024",
+      "year": 2024,
+      "sha256": "d24603f9bde298d59767ebd0cdd05de56e5f7fc9d74401cc88f39269bbb79cf3",
+      "building_count": 12010
+    },
+    {
+      "code": "13362",
+      "prefecture": "Tokyo",
+      "package": "plateau-13362-toshima-mura-2024",
+      "year": 2024,
+      "sha256": "24f29cc190a810405b546e8a96d0cfc9b1eed08983c983adc52d7a20a19306c9",
+      "building_count": 475
+    },
+    {
+      "code": "13363",
+      "prefecture": "Tokyo",
+      "package": "plateau-13363-niijima-mura-2024",
+      "year": 2024,
+      "sha256": "e67eb429cca927baacb25ab706ffc7498af70f30f23d3a787ebdb7f58e2fabcc",
+      "building_count": 4156
+    },
+    {
+      "code": "13364",
+      "prefecture": "Tokyo",
+      "package": "plateau-13364-kozushima-mura-2024",
+      "year": 2024,
+      "sha256": "7fada74ce4fd559cd59b71eff63fb3cbf059a1f7f182964c3e1ffe1fdf4acd56",
+      "building_count": 2141
+    },
+    {
+      "code": "13381",
+      "prefecture": "Tokyo",
+      "package": "plateau-13381-miyake-mura-2024",
+      "year": 2024,
+      "sha256": "d8990e4fea7a676c5e1a10937640811c3d897bdd8fb2a1849f270ba38e63ba55",
+      "building_count": 4295
+    },
+    {
+      "code": "13382",
+      "prefecture": "Tokyo",
+      "package": "plateau-13382-mikurajima-mura-2024",
+      "year": 2024,
+      "sha256": "1a6c0a80f0bcf6c1c15cfb13feebf75e57789e0f95451e712b851851d05bf855",
+      "building_count": 406
+    },
+    {
+      "code": "13401",
+      "prefecture": "Tokyo",
+      "package": "plateau-13401-hachijo-machi-2024",
+      "year": 2024,
+      "sha256": "fe752001b209bb5229087bf409b3e0d9e25ca03f8a79a1f635e5ee9fc97b2c3b",
+      "building_count": 9032
+    },
+    {
+      "code": "13402",
+      "prefecture": "Tokyo",
+      "package": "plateau-13402-aogashima-mura-2024",
+      "year": 2024,
+      "sha256": "4ee5475034b7c6395f84ff49382d29b0c28b99c247c65187a51f10a5997a3a91",
+      "building_count": 450
+    },
+    {
+      "code": "13421",
+      "prefecture": "Tokyo",
+      "package": "plateau-13421-ogasawara-mura-2025",
+      "year": 2025,
+      "sha256": "b3befef1811f8957476fc4c73534b07d530e417dbf414a0675ab631f0093f568",
+      "building_count": 2096
+    },
+    {
+      "code": "14100",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14100-yokohama-shi-2024",
+      "year": 2024,
+      "sha256": "e00c0edef51db6e967b6f45c0184c221b748868f55ad2bee66c83d306895fddc",
+      "building_count": 840413
+    },
+    {
+      "code": "14130",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14130-kawasaki-shi-2022",
+      "year": 2022,
+      "sha256": "7dc69bd39efe62eb2eef2cda1008ccbf6f9173f08d75be4675f3f78f891d644d",
+      "building_count": 270774
+    },
+    {
+      "code": "14150",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14150-sagamihara-shi-2024",
+      "year": 2024,
+      "sha256": "448a37c5b4776ff8290a50e06098b1c6e5f1c430b84d0166f51e509d81c71451",
+      "building_count": 264377
+    },
+    {
+      "code": "14201",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14201-yokosuka-shi-2020",
+      "year": 2020,
+      "sha256": "2e2abe2ec1ce726b456d42ee40d70ff2baa17870e1ee3b43d1bfa0cbfcc308da",
+      "building_count": 136291
+    },
+    {
+      "code": "14204",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14204-kamakura-shi-2024",
+      "year": 2024,
+      "sha256": "802aec587322a83846f00f039671deffd572df807bfd341558d6b1a97d4d9eff",
+      "building_count": 66159
+    },
+    {
+      "code": "14205",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14205-fujisawa-shi-2025",
+      "year": 2025,
+      "sha256": "7e85ff8e1642b9c2cc627f356acedbe792e95fac25febe2ee70c9312d6c415ea",
+      "building_count": 168075
+    },
+    {
+      "code": "14212",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14212-atsugi-shi-2023",
+      "year": 2023,
+      "sha256": "cf685045ebe79e84575b8304748bffef6c3047e92c39d094fd796dd7c520ebd4",
+      "building_count": 76901
+    },
+    {
+      "code": "14382",
+      "prefecture": "Kanagawa",
+      "package": "plateau-14382-hakone-machi-2020",
+      "year": 2020,
+      "sha256": "5f031fa8db70127884eb43b2a557f7c76ae738868c2abeeeb184dcbd1b2e70d8",
+      "building_count": 12665
+    }
+  ]
+}
