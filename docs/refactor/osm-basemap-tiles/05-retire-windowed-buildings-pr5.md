@@ -1,6 +1,6 @@
 # PR5 Plan: Retire the Windowed Buildings Path
 
-- Status: In progress — the tile building layers are clickable (a building resolves
+- Status: Completed (#94) — the tile building layers are clickable (a building resolves
   its provenance from the baked properties — `feature_id`, `footprint_source`,
   `building`, `height`/`height_source` — with no API call), the z16 handover/clamp
   and the tile-layer `maxzoom` caps are removed (tiles span all zooms; re-baked to
