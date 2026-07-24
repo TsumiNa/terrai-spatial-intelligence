@@ -25,7 +25,10 @@ maplibregl.setWorkerUrl(workerUrl);
 
 import type { RegionKey } from "../modules";
 import type { BasemapKey } from "../state.svelte";
+import { Protocol } from "pmtiles";
+
 import { registerGsiDemProtocol } from "./dem";
+import { type CoverageIndex, loadCoverage, viewportInCoverage } from "./coverage";
 import {
   MAX_PITCH,
   MAX_ZOOM,
@@ -36,12 +39,24 @@ import {
   REGION_CAMERAS,
   LOCAL_STYLE_URL,
   LOCAL_SPRITE_URL,
+  BUILDING_TILES_LAYER_ID,
+  BUILDING_TILES_MIN_ZOOM,
+  COVERAGE_URL,
+  buildingTilesUrl,
   composeStyle,
   rasterId,
   TERRAIN_EXAGGERATION,
   TERRAIN_PITCH,
   TERRAIN_SOURCE_ID,
 } from "./config";
+
+/** The PMTiles protocol backs the merged building tiles; register it once. */
+let pmtilesRegistered = false;
+function registerPmtilesProtocol(lib: typeof maplibregl): void {
+  if (pmtilesRegistered) return;
+  lib.addProtocol("pmtiles", new Protocol().tile);
+  pmtilesRegistered = true;
+}
 
 /** Camera pitch of the lowered underground view, within the raised MAX_PITCH. */
 export const UNDERGROUND_PITCH = 70;
@@ -80,6 +95,13 @@ export interface ExhibitionMap {
    * unsubscribe function.
    */
   onViewChange(listener: (view: { bounds: [number, number, number, number]; zoom: number }) => void): () => void;
+  /**
+   * Report whether the merged building tiles are out of service — the viewport,
+   * at building zoom, lies wholly outside the coverage footprint, so the map has
+   * fallen back to GSI's own building texture. Fires with the current value on
+   * subscribe and whenever it changes; returns an unsubscribe function.
+   */
+  onBuildingsOutOfService(listener: (outOfService: boolean) => void): () => void;
   destroy(): void;
 }
 
@@ -88,13 +110,15 @@ export async function createExhibitionMap(
   initial: { region: RegionKey; basemap: BasemapKey; twoAndHalfD: boolean },
 ): Promise<ExhibitionMap> {
   registerGsiDemProtocol(maplibregl);
+  registerPmtilesProtocol(maplibregl);
   // The style is a repo-owned snapshot served from our own origin, not the
   // experimental GitHub Pages host — so its dying can no longer stop the map
   // from constructing. A failure here is a deployment error (our own asset
   // missing), not an upstream outage.
   const response = await fetch(LOCAL_STYLE_URL);
   if (!response.ok) throw new Error(`local vector style unavailable: ${LOCAL_STYLE_URL} ${response.status} ${response.statusText}`);
-  const style = composeStyle(await response.json());
+  const search = typeof window !== "undefined" ? window.location.search : "";
+  const style = composeStyle(await response.json(), buildingTilesUrl(search));
   // MapLibre v6 requires an absolute sprite URL: the style is passed as an
   // object (no style URL to resolve against), so the repointed root-relative
   // sprite must be resolved to our own origin here or v6 rejects it and no
@@ -115,6 +139,13 @@ export async function createExhibitionMap(
   let basemap = initial.basemap;
   let twoAndHalfD = initial.twoAndHalfD;
   let undergroundMode = false;
+  // Merged building-tile coverage: the footprint the fabric is built for, the
+  // ids of GSI's own building layers (hidden where our tiles show), and the
+  // current out-of-service condition + its listener.
+  let coverageIndex: CoverageIndex | null = null;
+  let gsiBuildingLayerIds: string[] = [];
+  let buildingsOutOfService = false;
+  const outOfServiceListeners = new Set<(outOfService: boolean) => void>();
 
   const map = new maplibregl.Map({
     container,
@@ -208,7 +239,30 @@ export async function createExhibitionMap(
 
   const loaded = new Promise<void>((resolve) => map.once("load", () => resolve()));
 
+  // Toggle only the building layers — cheap, safe to run on every moveend as the
+  // coverage condition changes. Kept out of applyVisibility so the moveend path
+  // never re-enters the pitch easeTo below (which breaks MapLibre's ease frame).
+  const applyBuildingVisibility = () => {
+    // moveend can fire before the style finishes loading; setLayoutProperty would
+    // throw then, so wait for the style (the post-load applyVisibility re-applies).
+    if (!map.isStyleLoaded()) return;
+    // The merged building tiles replace GSI's building texture only on the
+    // standard basemap, above ground, inside coverage, and **only once the
+    // coverage footprint has loaded** — until then (or if it fails to load) GSI's
+    // own buildings render everywhere, so a missing coverage.json never empties the
+    // map. Out of service (wholly outside coverage) or underground, our tiles hide
+    // and GSI's buildings render. Same gray on both sides, so the swap is invisible.
+    const showBuildings = basemap === "standard" && !undergroundMode && coverageIndex !== null && !buildingsOutOfService;
+    if (map.getLayer(BUILDING_TILES_LAYER_ID)) {
+      map.setLayoutProperty(BUILDING_TILES_LAYER_ID, "visibility", showBuildings ? "visible" : "none");
+    }
+    for (const id of gsiBuildingLayerIds) {
+      map.setLayoutProperty(id, "visibility", showBuildings ? "none" : "visible");
+    }
+  };
+
   const applyVisibility = () => {
+    applyBuildingVisibility();
     for (const kind of RASTER_KINDS) {
       map.setLayoutProperty(rasterId(kind), "visibility", kind === basemap ? "visible" : "none");
     }
@@ -231,7 +285,47 @@ export async function createExhibitionMap(
     const targetPitch = twoAndHalfD ? TERRAIN_PITCH : 0;
     if (Math.abs(map.getPitch() - targetPitch) > 0.5) map.easeTo({ pitch: targetPitch });
   };
-  void loaded.then(applyVisibility);
+
+  // Recompute the out-of-service condition for the current viewport and re-apply.
+  // Out of service only when at building zoom AND the viewport lies wholly outside
+  // coverage; with no coverage loaded we degrade to "in coverage" (tiles shown).
+  const updateBuildingCoverage = () => {
+    const bounds = map.getBounds();
+    const view: [number, number, number, number] = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()];
+    const atBuildingZoom = map.getZoom() >= BUILDING_TILES_MIN_ZOOM;
+    // Only meaningful once coverage is loaded: with none loaded we show GSI (not
+    // our partial tiles), so a failed coverage fetch degrades to GSI, not an empty
+    // map, and the "out of service" badge never fires on a coverage we don't know.
+    const next = coverageIndex !== null && atBuildingZoom && !viewportInCoverage(view, coverageIndex);
+    if (next !== buildingsOutOfService) {
+      buildingsOutOfService = next;
+      for (const listener of outOfServiceListeners) listener(next);
+    }
+    // Only re-toggle the building layers here — never the terrain/pitch, which
+    // moveend must not re-enter.
+    applyBuildingVisibility();
+  };
+
+  void loaded.then(() => {
+    // Collect GSI's own building layer ids once the style is live, so the toggle
+    // above can hand the fabric over to our tiles inside coverage.
+    gsiBuildingLayerIds = map
+      .getStyle()
+      .layers.filter(
+        (layer) =>
+          "source-layer" in layer &&
+          (layer as { "source-layer"?: string })["source-layer"] === "building" &&
+          layer.id !== BUILDING_TILES_LAYER_ID,
+      )
+      .map((layer) => layer.id);
+    applyVisibility();
+    updateBuildingCoverage();
+  });
+  map.on("moveend", updateBuildingCoverage);
+  void loadCoverage(COVERAGE_URL).then((index) => {
+    coverageIndex = index;
+    void loaded.then(updateBuildingCoverage);
+  });
 
   // --- production-raster availability fallback (basemap-resilience) --------
   // The experimental vector tiles carry no SLA. When they fail, promote the
@@ -346,6 +440,13 @@ export async function createExhibitionMap(
       return () => {
         active = false;
         map.off("moveend", report);
+      };
+    },
+    onBuildingsOutOfService(listener) {
+      outOfServiceListeners.add(listener);
+      listener(buildingsOutOfService);
+      return () => {
+        outOfServiceListeners.delete(listener);
       };
     },
     frame([west, south, east, north]) {

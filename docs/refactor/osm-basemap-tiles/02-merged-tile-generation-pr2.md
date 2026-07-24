@@ -1,11 +1,11 @@
 # PR2 Plan: Merged Tile Generation
 
-- Status: In progress — `scripts/merge_kanto_buildings.py` merges OSM (primary) +
-  FGD (fill), **clipped to the `coverage.json` mesh footprint** (aligns OSM to the
+- Status: Completed (#91) — `scripts/merge_kanto_buildings.py` merges OSM (primary)
+  + FGD (fill), **clipped to the `coverage.json` mesh footprint** (aligns OSM to the
   FGD range), keeping an FGD footprint only where no OSM footprint covers its
   representative point (STRtree). Baked schema `feature_id`/`footprint_source`/
-  `building`; PMTiles z0–16 via **tippecanoe**; registered as `merged_tiles`. The
-  real spike is recorded below; flips to Completed on merge.
+  `building`; PMTiles z0–16 via **tippecanoe**; registered as `merged_tiles`. Real
+  spike recorded below.
 - Refactor: `osm-basemap-tiles`
 
 ## Spike (real, 2026-07-24)

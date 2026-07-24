@@ -36,6 +36,10 @@ let basemap = $state<BasemapKey>(initial.basemap);
 let twoAndHalfD = $state<boolean>(initial.twoAndHalfD);
 let data = $state<Bootstrap | null>(null);
 let loadError = $state<string | null>(null);
+// The merged building tiles cover only mainland Kanto; true when the viewport
+// (at building zoom) lies wholly outside that footprint and the map has fallen
+// back to GSI's building texture. Drives the on-map "out of service" badge.
+let buildingsOutOfService = $state<boolean>(false);
 let auditRecord = $state<AuditRecord | null>(null);
 let queueSelection = $state.raw<{ feature: Feature; tick: number } | null>(null);
 
@@ -80,6 +84,12 @@ export const app = {
   },
   get foundationLayers() {
     return foundationLayers;
+  },
+  get buildingsOutOfService() {
+    return buildingsOutOfService;
+  },
+  setBuildingsOutOfService(next: boolean) {
+    buildingsOutOfService = next;
   },
 
   selectModule(next: ModuleName) {

@@ -4,7 +4,7 @@ import { expect, it } from "vitest";
 
 import type { StyleSpecification } from "maplibre-gl";
 
-import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, FALLBACK_RASTER_LAYER_ID, FALLBACK_RASTER_SOURCE_ID, FALLBACK_STD_RASTER_URL, LOCAL_SPRITE_URL, RASTER_KINDS, RASTER_SOURCES, RELIEF_TINT_FADE_END_ZOOM, RELIEF_TINT_LAYER_ID, RELIEF_TINT_MAX_OPACITY, RELIEF_TINT_SOURCE_ID, RELIEF_TINT_START_ZOOM, RELIEF_TINT_URL, TERRAIN_SOURCE_ID, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
+import { BASEMAP_BUILDING_FILL, BASEMAP_DETAIL_HANDOVER_ZOOM, BUILDING_TILES_ATTRIBUTION, BUILDING_TILES_LAYER_ID, BUILDING_TILES_MIN_ZOOM, BUILDING_TILES_SOURCE_ID, BUILDING_TILES_SOURCE_LAYER, FALLBACK_RASTER_LAYER_ID, FALLBACK_RASTER_SOURCE_ID, FALLBACK_STD_RASTER_URL, LOCAL_SPRITE_URL, RASTER_KINDS, RASTER_SOURCES, RELIEF_TINT_FADE_END_ZOOM, RELIEF_TINT_LAYER_ID, RELIEF_TINT_MAX_OPACITY, RELIEF_TINT_SOURCE_ID, RELIEF_TINT_START_ZOOM, RELIEF_TINT_URL, TERRAIN_SOURCE_ID, buildingTilesUrl, clampBasemapBuildings, composeStyle, freezeHighZoomCartography, neutralizeBasemapBuildings, rasterId } from "./config";
 import { palette } from "../theme";
 import { rgba } from "./style-rules";
 
@@ -38,11 +38,12 @@ it("streams the raster basemap live from the GSI tile host", () => {
 it("appends the basemap layers and the terrain DEM source", () => {
   const composed = composeStyle(baseStyle);
   // composeStyle adds, over baseStyle: the raster-dem terrain + the hidden
-  // fallback + the relief-tint sources + the photo raster source (hillshade is a
-  // computed layer over the terrain source, so it adds no source of its own)…
-  expect(Object.keys(composed.sources)).toHaveLength(Object.keys(baseStyle.sources).length + 4);
-  // …and the fallback, photo, hillshade and relief-tint layers.
-  expect(composed.layers).toHaveLength(baseStyle.layers.length + 4);
+  // fallback + the relief-tint sources + the photo raster source + the merged
+  // building PMTiles source (hillshade is a computed layer over the terrain
+  // source, so it adds no source of its own)…
+  expect(Object.keys(composed.sources)).toHaveLength(Object.keys(baseStyle.sources).length + 5);
+  // …and the fallback, photo, hillshade, relief-tint and building-fill layers.
+  expect(composed.layers).toHaveLength(baseStyle.layers.length + 5);
   const dem = composed.sources[TERRAIN_SOURCE_ID] as { type?: string; encoding?: string; tiles?: string[] };
   expect(dem.type).toBe("raster-dem");
   expect(dem.encoding).toBe("mapbox");
@@ -60,6 +61,40 @@ it("appends the basemap layers and the terrain DEM source", () => {
   // nationwide: no bounds clamp remains from the retired per-region cache
   expect(photo.bounds).toBeUndefined();
   expect(photo.attribution).toContain("GSI");
+});
+
+it("adds the merged building PMTiles source and a hidden fill above GSI buildings", () => {
+  const composed = composeStyle(vendoredStyle, "https://cdn.example/buildings.pmtiles");
+  const source = composed.sources[BUILDING_TILES_SOURCE_ID] as { type?: string; url?: string; attribution?: string };
+  expect(source.type).toBe("vector");
+  expect(source.url).toBe("pmtiles://https://cdn.example/buildings.pmtiles");
+  expect(source.attribution).toBe(BUILDING_TILES_ATTRIBUTION);
+  const fill = composed.layers.find((l) => l.id === BUILDING_TILES_LAYER_ID) as {
+    type?: string;
+    "source-layer"?: string;
+    minzoom?: number;
+    maxzoom?: number;
+    layout?: unknown;
+    paint?: { "fill-color"?: string };
+  };
+  expect(fill.type).toBe("fill");
+  expect(fill["source-layer"]).toBe(BUILDING_TILES_SOURCE_LAYER);
+  expect(fill.minzoom).toBe(BUILDING_TILES_MIN_ZOOM);
+  expect(fill.maxzoom).toBe(BASEMAP_DETAIL_HANDOVER_ZOOM);
+  expect(fill.layout).toEqual({ visibility: "none" });
+  expect(fill.paint?.["fill-color"]).toBe(BASEMAP_BUILDING_FILL);
+  // Spliced above the GSI building layers, so it draws over ground / under labels.
+  const buildingIdx = composed.layers.findIndex((l) => l.id === BUILDING_TILES_LAYER_ID);
+  const lastGsiBuilding = composed.layers.reduce(
+    (acc, l, i) => ("source-layer" in l && (l as { "source-layer"?: string })["source-layer"] === "building" && l.id !== BUILDING_TILES_LAYER_ID ? i : acc),
+    -1,
+  );
+  expect(buildingIdx).toBe(lastGsiBuilding + 1);
+});
+
+it("resolves the building-tiles URL from ?buildings= with a default fallback", () => {
+  expect(buildingTilesUrl("")).toBe("/basemap/buildings.pmtiles");
+  expect(buildingTilesUrl("?buildings=https://r2.example/b.pmtiles")).toBe("https://r2.example/b.pmtiles");
 });
 
 it("appends a hidden production-raster fallback below the user rasters", () => {

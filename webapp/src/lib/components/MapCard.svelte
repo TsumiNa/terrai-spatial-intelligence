@@ -72,6 +72,11 @@
   });
 
   $effect(() => {
+    if (!mapApi) return;
+    return mapApi.onBuildingsOutOfService((outOfService) => app.setBuildingsOutOfService(outOfService));
+  });
+
+  $effect(() => {
     const wanted = new Set([
       ...app.foundationLayers.filter((key) => renderableLayers.some((entry) => entry.key === key)),
       ...activeDetailKeys(),
@@ -467,6 +472,16 @@
   {#if sceneMessage}
     <div class="absolute left-1/2 top-16 z-20 -translate-x-1/2 rounded-card border border-line bg-paper/95 px-4 py-2 text-xs text-ink shadow-card" role="status">
       {sceneMessage}
+    </div>
+  {/if}
+  {#if app.buildingsOutOfService}
+    <!-- The merged building tiles cover only mainland Kanto; outside that
+         footprint the map shows GSI's own buildings and says so. -->
+    <div
+      class="building-out-of-service pointer-events-none absolute left-1/2 top-2 z-20 -translate-x-1/2 rounded-card border border-line bg-paper/95 px-3 py-1 text-[11px] text-muted shadow-card"
+      role="status"
+    >
+      {i18n.t("map.buildingsOutOfService")}
     </div>
   {/if}
   {#if vm.notice}
