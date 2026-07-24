@@ -12,6 +12,7 @@ import type { StyleSpecification, LayerSpecification, SourceSpecification } from
 
 import type { RegionKey } from "../modules";
 import { palette } from "../theme";
+import { DEM_MAX_ZOOM } from "./dem";
 import { rgba } from "./style-rules";
 import type { BasemapKey } from "../state.svelte";
 
@@ -79,11 +80,11 @@ export const TERRAIN_SOURCE_ID = "terrai-terrain-dem";
 /** The protocol resolves the DEM per tile from a resolution chain (DEM1A 1 m /
  * DEM5A 5 m / DEM10B 10 m), so the URL only conveys z/x/y. See ./dem.ts. */
 export const TERRAIN_TILE_URL = "gsidem://terrai-dem/{z}/{x}/{y}";
-/** The chain's deepest zoom (1 m LiDAR reaches ~z17); MapLibre requests DEM tiles
- * up to here, and the protocol overscales from coarser sources where 1 m is
- * absent, so both the 2.5D surface and the computed hillshade stay sharp where
- * high-resolution data exists (see ./dem.ts DEM_MAX_ZOOM). */
-export const TERRAIN_MAXZOOM = 17;
+/** MapLibre requests DEM tiles up to the chain's deepest zoom (the single source
+ * of truth is ./dem.ts). The protocol overscales from coarser sources where 1 m
+ * is absent, so both the 2.5D surface and the computed hillshade stay sharp where
+ * high-resolution data exists. */
+export const TERRAIN_MAXZOOM = DEM_MAX_ZOOM;
 export const TERRAIN_EXAGGERATION = 1.5;
 export const TERRAIN_PITCH = 55;
 /** The computed hillshade's look, tuned toward GSI's grayscale shaded relief. */

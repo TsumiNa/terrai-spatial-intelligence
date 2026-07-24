@@ -114,13 +114,13 @@ export function registerGsiDemProtocol(lib: typeof maplibregl): void {
       const bitmap = await createImageBitmap(await response.blob());
       context.clearRect(0, 0, TILE, TILE);
       context.drawImage(bitmap, 0, 0);
+      bitmap.close(); // release the GPU-backed bitmap once drawn
       const src = context.getImageData(0, 0, TILE, TILE).data;
 
       if (dz === 0) {
-        // Native resolution: straight transcode.
-        const image = context.getImageData(0, 0, TILE, TILE);
-        transcodePixels(image.data);
-        out.data.set(image.data);
+        // Native resolution: straight transcode of the pixels already read.
+        transcodePixels(src);
+        out.data.set(src);
       } else {
         // Overscale: interpolate the *decoded elevations* of the parent tile's
         // sub-region, then re-encode. (Interpolating the encoded RGB is invalid.)

@@ -131,7 +131,9 @@ export async function createExhibitionMap(
   // GPU/fill-rate (and handheld-power) cost. This anti-aliases the shading; it
   // does not fabricate DEM detail.
   if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("hidpi") === "1") {
-    map.setPixelRatio(Math.max(2, window.devicePixelRatio));
+    // Supersample to 2×, capped at 2 to bound the fill-rate/power cost (the same
+    // ceiling scene.ts uses); crisp on standard displays without over-rendering.
+    map.setPixelRatio(Math.min(2, window.devicePixelRatio * 2));
   }
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right");
 
