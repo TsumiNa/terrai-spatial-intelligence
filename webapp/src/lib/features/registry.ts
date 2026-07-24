@@ -58,9 +58,6 @@ export interface FoundationLayerEntry {
    *  must say 2021 on screen. Per-feature values are shown at click time. */
   sourceUpdatedAt: string;
   limitations: Localized;
-  /** Part of the basemap experience: auto-managed past the handover zoom on
-   *  the standard basemap, never listed as a manual toggle. */
-  basemapDetail?: true;
   /** Per-layer window budget for denser-but-simpler features. */
   windowLimit?: number;
 }
@@ -216,28 +213,9 @@ export const FOUNDATION_LAYERS: FoundationLayerEntry[] = [
       "Prefectural land-price survey values are appraisals for standard lots.",
     ),
   },
-  {
-    key: "osmBuildings",
-    name: "fl.osmBuildings",
-    geometry: "polygon",
-    // The measured handover floor: a Shinjuku-scale z16 window is 1,857
-    // buildings / 1.1 MB raw; z15 is already 4.2 MB (plan PR2 record).
-    minZoom: 16,
-    extents: MLIT_EXTENTS,
-    attribution: "© OpenStreetMap contributors",
-    license: "Open Database License (ODbL) 1.0",
-    sourceUpdatedAt: "2026-01-01 pinned extract",
-    basemapDetail: true,
-    // Dense central-Tokyo fabric reaches ~10k footprints in a quantized z16
-    // window; the polygons are 5-15 vertices, so the budget is count, not
-    // tessellation weight like the huge land-history rings were.
-    windowLimit: 15000,
-    limitations: limitations(
-      "社区测绘覆盖度不均;没有建筑不代表实地不存在。",
-      "コミュニティマッピングの網羅性は不均一で、建物が無いことは不存在の証明ではありません。",
-      "Community coverage is uneven; an absent building is not proof of absence.",
-    ),
-  },
+  // osmBuildings retired (osm-basemap-tiles PR5): the Kanto OSM footprints render
+  // as part of the merged self-hosted building PMTiles (a MapLibre layer,
+  // clickable at every zoom), not a windowed store collection.
   {
     key: "osmSapporoUndergroundAccess",
     name: "fl.osmSapporoUndergroundAccess",

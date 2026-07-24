@@ -4,7 +4,7 @@
   import { Popover } from "bits-ui";
 
   import { apiOrigin } from "../api/client";
-  import { field, foundationField, localized, text, undergroundField, FIELD_LABELS, type AuditRecord, type FieldKey } from "../audit";
+  import { buildingAuditRecord, field, foundationField, localized, text, undergroundField, FIELD_LABELS, type AuditRecord, type FieldKey } from "../audit";
   import FeaturePopup from "./FeaturePopup.svelte";
   import { foundationLayer, renderableFoundationLayers } from "../features/registry";
   import { createWindowedFeatureClient, type WindowedState } from "../features/windowed";
@@ -47,15 +47,6 @@
   // viewports in and plain state snapshots out. Visibility itself lives in
   // app state, so it survives module, view, region and language switches.
   const renderableLayers = renderableFoundationLayers();
-  // The basemap-detail layer joins the windowed machinery automatically on
-  // the standard basemap in every module — the building experience belongs
-  // to the basemap, uniformly: GSI texture below the handover, OSM data
-  // objects above it, and analysis buildings simply draw on top (they are
-  // the same OSM footprints, so the analysis color covers its own outline).
-  function activeDetailKeys(): string[] {
-    const wanted = app.basemap === "standard" && app.module !== "underground";
-    return wanted ? renderableLayers.filter((entry) => entry.basemapDetail).map((entry) => entry.key) : [];
-  }
   let foundationStates = $state.raw<Record<string, WindowedState>>({});
   // Non-reactive by design: clients are synced incrementally, so toggling
   // one layer never recreates the others or drops their window caches.
@@ -77,10 +68,14 @@
   });
 
   $effect(() => {
-    const wanted = new Set([
-      ...app.foundationLayers.filter((key) => renderableLayers.some((entry) => entry.key === key)),
-      ...activeDetailKeys(),
-    ]);
+    if (!mapApi) return;
+    return mapApi.onBuildingClick((properties, coordinate) => openBuildingPopup(properties, coordinate));
+  });
+
+  $effect(() => {
+    const wanted = new Set(
+      app.foundationLayers.filter((key) => renderableLayers.some((entry) => entry.key === key)),
+    );
     untrack(() => {
       for (const [key, client] of [...foundationClients]) {
         if (wanted.has(key)) continue;
@@ -114,7 +109,7 @@
   });
 
   const activeAttributions = $derived(
-    [...activeDetailKeys(), ...app.foundationLayers]
+    app.foundationLayers
       .map((key) => foundationLayer(key))
       .filter((entry) => entry !== undefined)
       .map((entry) => `${i18n.t(entry.name)} — ${entry.attribution} · ${entry.license}`),
@@ -155,6 +150,27 @@
       { label: t("fl.license"), text: entry.license, record: foundationField(localized("fl.license"), entry.license, context("registry")) },
     ];
     showPopup(coordinate, { eyebrow: t("fl.eyebrow"), title: t(entry.name), fields });
+  }
+
+  const BUILDING_HEIGHT_WORD: Record<string, { zh: string; ja: string; en: string }> = {
+    plateau: { zh: "PLATEAU 实测", ja: "PLATEAU 実測", en: "PLATEAU measured" },
+    osm_tag: { zh: "OSM 标签", ja: "OSMタグ", en: "OSM tag" },
+    estimate: { zh: "按类别估算", ja: "種別推定", en: "estimate" },
+  };
+
+  function openBuildingPopup(properties: Record<string, unknown>, coordinate: [number, number]) {
+    const record = buildingAuditRecord(properties);
+    const t = i18n.t.bind(i18n);
+    const footprint = String(properties.footprint_source ?? "—");
+    const footprintName = footprint === "osm" ? "OpenStreetMap" : footprint === "fgd" ? "基盤地図情報" : footprint;
+    const heightSource = String(properties.height_source ?? "—");
+    const word = (BUILDING_HEIGHT_WORD[heightSource] ?? { zh: heightSource, ja: heightSource, en: heightSource })[i18n.lang];
+    const heightText = properties.height != null ? `${properties.height} m · ${word}` : "—";
+    const fields = [
+      { label: t("building.footprint"), text: footprintName, record },
+      { label: t("building.height"), text: heightText, record },
+    ];
+    showPopup(coordinate, { eyebrow: t("building.eyebrow"), title: t("building.title"), fields });
   }
 
   $effect(() => {
@@ -314,7 +330,7 @@
       // Foundation overlays are context: they render beneath the analysis,
       // and deck's topmost-first picking means an analytical feature wins
       // any contested click.
-      const overlays = [...activeDetailKeys(), ...app.foundationLayers]
+      const overlays = app.foundationLayers
         .map((key) => ({ key, state: foundationStates[key] }))
         .filter((item) => item.state?.status === "ready")
         .map(({ key, state }) =>
@@ -396,7 +412,7 @@
               sideOffset={6}
               aria-label={i18n.t("layers.aria")}
             >
-              {#each renderableLayers.filter((entry) => !entry.basemapDetail) as entry (entry.key)}
+              {#each renderableLayers as entry (entry.key)}
                 {@const on = app.foundationLayers.includes(entry.key)}
                 {@const status = on ? (foundationStates[entry.key]?.status ?? "loading") : "off"}
                 <button

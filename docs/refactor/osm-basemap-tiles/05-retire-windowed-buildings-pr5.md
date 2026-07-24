@@ -1,7 +1,29 @@
 # PR5 Plan: Retire the Windowed Buildings Path
 
-- Status: Planned
+- Status: In progress — the tile building layers are clickable (a building resolves
+  its provenance from the baked properties — `feature_id`, `footprint_source`,
+  `building`, `height`/`height_source` — with no API call), the z16 handover/clamp
+  and the tile-layer `maxzoom` caps are removed (tiles span all zooms; re-baked to
+  z17 for click fidelity), and `osmBuildings` is dropped from the served datasets +
+  store. Clicks are gated to an inspection-zoom threshold (owner-tunable
+  `BUILDING_CLICK_MIN_ZOOM = 16`, per owner feedback: no click when footprints are
+  a few pixels), and deck analytics win a contested click (their audit drawer),
+  buildings only on the background. The OSM acquisition + snapshot stay as tile
+  inputs.
 - Refactor: `osm-basemap-tiles`
+
+## Note — click plumbing
+
+deck's `MapboxOverlay` (interleaved: false) sits above MapLibre and consumes the
+map's click, and its own `onClick` only fires on a picked deck feature. So a
+background building click is detected from a `pointerdown`/`pointerup` pair (the
+same window `pointerup` the box-select uses), deferring to `overlay.pickObject` so
+an analytical/foundation feature still wins, then reading the tile layers with
+`queryRenderedFeatures` over a small pick box. The click was verified firing with
+correct baked properties; the e2e for the *interactive* click is impractical (the
+demo analytics overlap the fixture at every reachable camera), so the popup
+record is unit-tested (`buildingAuditRecord`) and the retirement is covered by the
+tile-vs-windowed e2e.
 
 ## Goal
 

@@ -129,24 +129,22 @@ test("layer visibility survives module and region switches", async ({ page }) =>
   await expectStatus(page, "landHistory", /belowZoom|loading|ready|empty/);
 });
 
-test("the standard basemap hands its buildings over to windowed OSM data", async ({ page }) => {
-  const requests = trackRequests(page, "osmBuildings");
-  // roads draws no buildings of its own, so the detail layer is active.
+test("buildings come from the self-hosted tiles, not a windowed osmBuildings query (PR5)", async ({ page }) => {
+  const windowed = trackRequests(page, "features/osmBuildings");
+  const pmtiles: string[] = [];
+  page.on("response", (r) => {
+    if (r.url().includes("/basemap/buildings.pmtiles")) pmtiles.push(r.url());
+  });
+  // roads draws no buildings of its own; the standard-basemap building fabric now
+  // comes entirely from the merged self-hosted tiles.
   await open(page, { module: "roads" });
 
-  // Auto-managed: no toggle was touched, yet the handover zoom requests data
-  // and the ODbL notice joins the attribution strip.
-  await expect.poll(() => requests.urls.length, { timeout: 15000 }).toBeGreaterThan(0);
-  await expect(page.locator(".map-attribution")).toContainText("OpenStreetMap");
-
-  // The layer is basemap experience, not a listed toggle.
+  await expect.poll(() => pmtiles.length, { timeout: 20000 }).toBeGreaterThan(0);
+  // the windowed osmBuildings endpoint is retired — it is never queried.
+  expect(windowed.urls).toEqual([]);
+  // the OSM credit now rides the tile source's attribution.
+  await expect(page.locator(".maplibregl-ctrl-attrib")).toContainText("OpenStreetMap");
+  // osmBuildings is gone from the layer toggle entirely.
   await page.locator(".foundation-toggle").click();
   await expect(page.locator('.foundation-item[data-layer="osmBuildings"]')).toHaveCount(0);
-  await page.keyboard.press("Escape");
-
-  // The building experience is uniform: analysis modules keep the detail
-  // layer (their colored buildings draw on top of the same footprints), so
-  // the ODbL notice persists.
-  await open(page, { module: "slope" });
-  await expect(page.locator(".map-attribution")).toContainText("OpenStreetMap");
 });

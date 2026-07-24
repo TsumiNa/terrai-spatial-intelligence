@@ -859,6 +859,45 @@ export function foundationField(title: Localized, value: AuditValue, context: Fo
   };
 }
 
+/** Provenance of one clicked building in the merged self-hosted tiles
+ * (osm-basemap-tiles): which source drew the footprint, whether the height is
+ * measured or estimated, and the honest caveat that alignment across sources is
+ * a build-time spatial approximation, not entity-identity matching. */
+export function buildingAuditRecord(props: Record<string, unknown>): AuditRecord {
+  const footprint = String(props.footprint_source ?? "—");
+  const heightSource = String(props.height_source ?? "—");
+  const heightValue = props.height != null ? `${props.height} m` : "—";
+  const buildingClass = String(props.building ?? "—");
+  const footprintName =
+    footprint === "osm" ? "OpenStreetMap (ODbL)" : footprint === "fgd" ? "基盤地図情報 (GSI)" : footprint;
+  const heightWords: Record<string, [string, string, string]> = {
+    plateau: ["PLATEAU 实测", "PLATEAU 実測", "PLATEAU measured"],
+    osm_tag: ["OSM 标签", "OSMタグ", "OSM tag"],
+    estimate: ["按类别估算", "種別推定", "class estimate"],
+  };
+  const hs = heightWords[heightSource] ?? [heightSource, heightSource, heightSource];
+  return {
+    kind: "raw",
+    title: ml("建筑物", "建物", "Building"),
+    value: buildingClass,
+    sections: [
+      section(ml("轮廓来源", "外周線の出典", "Footprint source"), ml(footprintName, footprintName, footprintName)),
+      section(
+        ml("高度", "高さ", "Height"),
+        ml(`${heightValue} · ${hs[0]}`, `${heightValue} · ${hs[1]}`, `${heightValue} · ${hs[2]}`),
+      ),
+      section(ml("要素 ID", "地物 ID", "Feature ID"), String(props.feature_id ?? "—")),
+      section(ml("许可", "ライセンス", "License"), "OSM ODbL · 基盤地図情報 · PLATEAU"),
+      section(ml("本地证据", "ローカル証拠", "Local evidence"), "/basemap/buildings.pmtiles"),
+    ],
+    caveat: ml(
+      "跨源对齐为构建时几何近似（点在多边形内），非同一实体的身份匹配。",
+      "ソース間の対応はビルド時の幾何近似（点-in-面）で、同一エンティティの同定ではありません。",
+      "Cross-source alignment is a build-time spatial approximation (point-in-footprint), not entity-identity matching.",
+    ),
+  };
+}
+
 /** Provenance of one element picked inside the standalone site scene. */
 export interface SceneAuditContext {
   datasetId: string;

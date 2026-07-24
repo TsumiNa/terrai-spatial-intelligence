@@ -213,7 +213,9 @@ it("sends the per-layer window budget instead of the default when given", async 
   const states: WindowedState[] = [];
   const client = createWindowedFeatureClient({
     api,
-    datasetKey: "osmBuildings",
+    // windowLimit is a generic per-layer budget passed by the caller; any dataset
+    // key exercises it (osmBuildings, which used it, was retired in PR5).
+    datasetKey: "landHistory",
     extents: LAND_HISTORY.extents,
     minZoom: 16,
     windowLimit: 15000,

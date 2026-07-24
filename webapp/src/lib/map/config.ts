@@ -155,24 +155,6 @@ export function neutralizeBasemapBuildings(style: StyleSpecification): StyleSpec
   return { ...style, layers };
 }
 
-/** Past this zoom the standard basemap's building texture yields to the
- * windowed OSM building objects (the measured floor from the OSM detail
- * plan: a Shinjuku-scale z16 window is 1,857 buildings / 1.1 MB raw). */
-export const BASEMAP_DETAIL_HANDOVER_ZOOM = 16;
-
-/**
- * Clamp the basemap's building layers to the handover zoom so exactly one
- * building inventory shows at any zoom: GSI's cartographic texture below
- * it, the clickable OSM data objects at and above it.
- */
-export function clampBasemapBuildings(style: StyleSpecification, handover: number = BASEMAP_DETAIL_HANDOVER_ZOOM): StyleSpecification {
-  const layers = style.layers.map((layer): LayerSpecification => {
-    if (!("source-layer" in layer) || layer["source-layer"] !== "building") return layer;
-    return { ...layer, maxzoom: Math.min(layer.maxzoom ?? 24, handover) };
-  });
-  return { ...style, layers };
-}
-
 /** The self-built merged building tiles (osm-basemap-tiles): OSM primary + 基盤地図情報
  * fill, one PMTiles vector source served locally in dev and from an object store
  * (R2 / GCS / minio — all HTTP range) in production. Its fill replaces the
@@ -187,8 +169,11 @@ export const BUILDING_EXTRUSION_LAYER_ID = "terrai-buildings-extrusion";
 export const BUILDING_TILES_SOURCE_LAYER = "buildings";
 /** Buildings appear from survey zoom; the wide view below carries no fabric. */
 export const BUILDING_TILES_MIN_ZOOM = 13;
-/** Extrusion is a close-in feature — only from the detail zoom up to the handover. */
+/** Extrusion is a close-in feature — only from the detail zoom up. */
 export const BUILDING_EXTRUSION_MIN_ZOOM = 14;
+/** Buildings are only clickable once they are big enough to target — zoomed out,
+ * a footprint is a few pixels and a click is meaningless. (Owner-tunable.) */
+export const BUILDING_CLICK_MIN_ZOOM = 16;
 export const BUILDING_TILES_DEFAULT_URL = "/basemap/buildings.pmtiles";
 /** The mainland coverage footprint the out-of-service boundary reads. */
 export const COVERAGE_URL = "/basemap/coverage.json";
@@ -244,7 +229,7 @@ export function composeStyle(
   vectorStyle: StyleSpecification,
   buildingTilesHref: string = BUILDING_TILES_DEFAULT_URL,
 ): StyleSpecification {
-  const frozen = clampBasemapBuildings(neutralizeBasemapBuildings(freezeHighZoomCartography(vectorStyle)));
+  const frozen = neutralizeBasemapBuildings(freezeHighZoomCartography(vectorStyle));
   const sources: Record<string, SourceSpecification> = { ...frozen.sources };
   const layers: LayerSpecification[] = [...frozen.layers];
   // The merged building tiles: a vector fill in the neutralized-GSI gray, spliced
@@ -262,7 +247,6 @@ export function composeStyle(
     source: BUILDING_TILES_SOURCE_ID,
     "source-layer": BUILDING_TILES_SOURCE_LAYER,
     minzoom: BUILDING_TILES_MIN_ZOOM,
-    maxzoom: BASEMAP_DETAIL_HANDOVER_ZOOM,
     layout: { visibility: "none" },
     paint: { "fill-color": BASEMAP_BUILDING_FILL, "fill-outline-color": palette.gray },
   };
@@ -275,7 +259,6 @@ export function composeStyle(
     source: BUILDING_TILES_SOURCE_ID,
     "source-layer": BUILDING_TILES_SOURCE_LAYER,
     minzoom: BUILDING_EXTRUSION_MIN_ZOOM,
-    maxzoom: BASEMAP_DETAIL_HANDOVER_ZOOM,
     layout: { visibility: "none" },
     paint: {
       "fill-extrusion-color": palette.gray,

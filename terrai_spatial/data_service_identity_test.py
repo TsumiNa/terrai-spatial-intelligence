@@ -155,7 +155,6 @@ QUERY_MATRIX = [
     {"key": "landUseMesh", "bbox": TOKYO_WINDOW, "limit": 500},
     {"key": "multistageFlood", "bbox": KOSHIGAYA_WINDOW},
     {"key": "landslideWarning", "bbox": HACHIOJI_WINDOW, "limit": 200},
-    {"key": "osmBuildings", "bbox": TOKYO_WINDOW, "limit": 300},
     {"key": "solar", "where": "status", "equals": "preferred", "sort": "score", "limit": 3},
     {"key": "buildings", "where": "risk_score", "minimum": 50.0, "sort": "risk_score", "descending": False, "limit": 100},
     {"key": "roads", "sort": "priority_score", "limit": 10},
@@ -273,7 +272,8 @@ def test_unwindowed_limit_query_pushes_the_limit_into_sql(monkeypatch: pytest.Mo
     # mechanism rather than a wall-clock: the no-bbox no-filter path must read
     # only `limit` rows (SQL LIMIT) and take `matched` from the manifest count,
     # never the unbounded scan.
-    key = "osmBuildings" if "osmBuildings" in ALL_DATASETS else "landUseMesh"
+    key = "landUseMesh"  # a large served collection (osmBuildings was retired in PR5)
+    assert key in ALL_DATASETS
     calls: dict[str, Any] = {}
     real_all = data_service_module.all_features
     real_count = data_service_module.dataset_feature_count
