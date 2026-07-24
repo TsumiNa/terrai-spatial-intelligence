@@ -215,7 +215,8 @@ export const FOUNDATION_LAYERS: FoundationLayerEntry[] = [
   },
   // osmBuildings retired (osm-basemap-tiles PR5): the Kanto OSM footprints render
   // as part of the merged self-hosted building PMTiles (a MapLibre layer,
-  // clickable at every zoom), not a windowed store collection.
+  // clickable at inspection zoom, BUILDING_CLICK_MIN_ZOOM), not a windowed
+  // store collection.
   {
     key: "osmSapporoUndergroundAccess",
     name: "fl.osmSapporoUndergroundAccess",

@@ -152,23 +152,15 @@
     showPopup(coordinate, { eyebrow: t("fl.eyebrow"), title: t(entry.name), fields });
   }
 
-  const BUILDING_HEIGHT_WORD: Record<string, { zh: string; ja: string; en: string }> = {
-    plateau: { zh: "PLATEAU 实测", ja: "PLATEAU 実測", en: "PLATEAU measured" },
-    osm_tag: { zh: "OSM 标签", ja: "OSMタグ", en: "OSM tag" },
-    estimate: { zh: "按类别估算", ja: "種別推定", en: "estimate" },
-  };
-
   function openBuildingPopup(properties: Record<string, unknown>, coordinate: [number, number]) {
+    // Derive the popup fields from the audit record's own sections so the popup
+    // and the audit drawer never diverge (footprint source = section 0, height +
+    // source = section 1).
     const record = buildingAuditRecord(properties);
     const t = i18n.t.bind(i18n);
-    const footprint = String(properties.footprint_source ?? "—");
-    const footprintName = footprint === "osm" ? "OpenStreetMap" : footprint === "fgd" ? "基盤地図情報" : footprint;
-    const heightSource = String(properties.height_source ?? "—");
-    const word = (BUILDING_HEIGHT_WORD[heightSource] ?? { zh: heightSource, ja: heightSource, en: heightSource })[i18n.lang];
-    const heightText = properties.height != null ? `${properties.height} m · ${word}` : "—";
     const fields = [
-      { label: t("building.footprint"), text: footprintName, record },
-      { label: t("building.height"), text: heightText, record },
+      { label: t("building.footprint"), text: text(record.sections[0].value, i18n.lang), record },
+      { label: t("building.height"), text: text(record.sections[1].value, i18n.lang), record },
     ];
     showPopup(coordinate, { eyebrow: t("building.eyebrow"), title: t("building.title"), fields });
   }

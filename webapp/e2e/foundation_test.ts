@@ -130,7 +130,7 @@ test("layer visibility survives module and region switches", async ({ page }) =>
 });
 
 test("buildings come from the self-hosted tiles, not a windowed osmBuildings query (PR5)", async ({ page }) => {
-  const windowed = trackRequests(page, "features/osmBuildings");
+  const windowed = trackRequests(page, "osmBuildings"); // trackRequests prefixes /api/v1/features/
   const pmtiles: string[] = [];
   page.on("response", (r) => {
     if (r.url().includes("/basemap/buildings.pmtiles")) pmtiles.push(r.url());

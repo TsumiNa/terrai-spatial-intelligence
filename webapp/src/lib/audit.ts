@@ -888,7 +888,10 @@ export function buildingAuditRecord(props: Record<string, unknown>): AuditRecord
       ),
       section(ml("要素 ID", "地物 ID", "Feature ID"), String(props.feature_id ?? "—")),
       section(ml("许可", "ライセンス", "License"), "OSM ODbL · 基盤地図情報 · PLATEAU"),
-      section(ml("本地证据", "ローカル証拠", "Local evidence"), "/basemap/buildings.pmtiles"),
+      section(
+        ml("本地证据", "ローカル証拠", "Local evidence"),
+        ml("合并建筑 PMTiles(自建瓦片源)", "統合建物 PMTiles（自前タイル源）", "the merged building PMTiles (self-hosted source)"),
+      ),
     ],
     caveat: ml(
       "跨源对齐为构建时几何近似（点在多边形内），非同一实体的身份匹配。",

@@ -129,8 +129,9 @@ it("buildingAuditRecord shows the footprint source, measured/estimate height, an
   expect(text(measured.sections[0].value, "en")).toBe("OpenStreetMap (ODbL)");
   expect(text(measured.sections[1].value, "en")).toBe("11.2 m · PLATEAU measured");
   expect(text(measured.sections[2].value, "en")).toBe("osm:303012795");
-  // No API call — the evidence is the local PMTiles, not a windowed endpoint.
-  expect(text(measured.sections[4].value, "en")).toBe("/basemap/buildings.pmtiles");
+  // No API call — the evidence is the self-hosted PMTiles source (the URL is
+  // ?buildings=-configurable), not a windowed endpoint or a fixed local path.
+  expect(text(measured.sections[4].value, "en")).toBe("the merged building PMTiles (self-hosted source)");
   expect(text(measured.caveat, "en")).toContain("not entity-identity matching");
 
   // A government footprint with an estimated height is tagged as such.

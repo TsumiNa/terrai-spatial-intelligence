@@ -107,8 +107,9 @@ export interface ExhibitionMap {
   /**
    * A building in the merged tiles was clicked (only at/above the click zoom, and
    * only when no deck overlay feature was picked — analysis wins contested
-   * clicks). Delivers the clicked feature's baked properties + the click point;
-   * returns an unsubscribe.
+   * clicks). Delivers the clicked feature's baked properties + the click point.
+   * **Single-subscriber**: registering a new handler replaces the previous one
+   * (one popup owner); returns an unsubscribe.
    */
   onBuildingClick(listener: (properties: Record<string, unknown>, lngLat: [number, number]) => void): () => void;
   destroy(): void;
