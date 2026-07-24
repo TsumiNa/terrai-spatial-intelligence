@@ -1,6 +1,6 @@
 # Self-built Merged Building Basemap Tiles
 
-- Status: Completed — all five PRs merged (#88/#90 FGD acquisition + coverage,
+- Status: Completed — the full PR sequence merged (#88/#90 FGD acquisition + coverage,
   #91 OSM+FGD merge → PMTiles, #92 basemap integration + out-of-service boundary,
   #93 PLATEAU heights + 2.5D extrusion, #94 retire the windowed path). One
   self-hosted, offline-capable merged building tileset (13.64M buildings; 54.7%
